@@ -1,0 +1,199 @@
+{
+  "id": "nysc",
+  "title": "NYSC Mobilisation",
+  "summary": "Complete guide to the National Youth Service Corps (NYSC) mobilisation process. Covers senate list verification, portal registration, pre-camp packing, camp survival, PPA posting, and monthly clearance.",
+  "category": "Youth Service",
+  "estimatedMinutes": 60,
+  "difficulty": "involved",
+  "sourceUrl": "https://portal.nysc.org.ng",
+  "lastVerified": "2026-10-14",
+  "steps": [
+    {
+      "type": "decision",
+      "id": "eligibility-track",
+      "title": "Where did you graduate from?",
+      "question": "Did you study at an accredited Nigerian university/polytechnic, or an institution outside Nigeria?",
+      "options": [
+        { "label": "Nigerian-trained graduate", "nextStepId": "nigerian-docs" },
+        { "label": "Foreign-trained graduate", "nextStepId": "foreign-docs" }
+      ]
+    },
+    {
+      "type": "document-check",
+      "id": "nigerian-docs",
+      "title": "Documents for Nigerian Graduates",
+      "documents": [
+        {
+          "id": "nin-slip",
+          "label": "Original National Identification Number (NIN) slip",
+          "required": true,
+          "acceptedFormats": ["PDF", "JPEG"]
+        },
+        {
+          "id": "statement-result",
+          "label": "Statement of Result or Degree/HND Certificate (original + photocopies)",
+          "required": true,
+          "acceptedFormats": ["Physical", "PDF"]
+        },
+        {
+          "id": "student-id",
+          "label": "Institutional Student Identity Card",
+          "required": true,
+          "acceptedFormats": ["Physical"]
+        },
+        {
+          "id": "medical-cert",
+          "label": "Medical Fitness Certificate from a Government/General Hospital",
+          "required": true,
+          "acceptedFormats": ["Physical", "PDF"]
+        },
+        {
+          "id": "passport-photos",
+          "label": "Recent passport photographs on plain white background",
+          "required": true,
+          "acceptedFormats": ["Physical", "JPEG"]
+        }
+      ],
+      "next": "portal-registration"
+    },
+    {
+      "type": "document-check",
+      "id": "foreign-docs",
+      "title": "Documents for Foreign-Trained Graduates",
+      "documents": [
+        {
+          "id": "nin-slip",
+          "label": "Original National Identification Number (NIN) slip",
+          "required": true,
+          "acceptedFormats": ["PDF", "JPEG"]
+        },
+        {
+          "id": "degree-cert",
+          "label": "Original Degree/HND Certificate (with English translation if in another language)",
+          "required": true,
+          "acceptedFormats": ["Physical", "PDF"]
+        },
+        {
+          "id": "transcript",
+          "label": "Complete official academic transcript",
+          "required": true,
+          "acceptedFormats": ["Physical", "PDF"]
+        },
+        {
+          "id": "intl-passport",
+          "label": "International Passport showing student visa and departure/entry stamps",
+          "required": true,
+          "acceptedFormats": ["Physical", "PDF"]
+        },
+        {
+          "id": "eval-letter",
+          "label": "Federal Ministry of Education Letter of Evaluation/Equivalence",
+          "required": true,
+          "acceptedFormats": ["Physical", "PDF"]
+        },
+        {
+          "id": "medical-cert",
+          "label": "Medical Fitness Certificate from a Government/General Hospital",
+          "required": true,
+          "acceptedFormats": ["Physical", "PDF"]
+        }
+      ],
+      "next": "portal-registration"
+    },
+    {
+      "type": "link",
+      "id": "portal-registration",
+      "title": "Register on the NYSC Portal",
+      "body": "Check that your institution has uploaded your name to the approved Senate or Academic Board list on the NYSC portal. Once confirmed, create your account, capture your biometrics, fill out your biodata, and pick your state preferences. Check the official portal for current registration timelines.",
+      "href": "https://portal.nysc.org.ng",
+      "linkLabel": "Open NYSC Portal →",
+      "next": "call-up-check"
+    },
+    {
+      "type": "info",
+      "id": "call-up-check",
+      "title": "Check Your Call-up Letter & Green Card",
+      "body": "When mobilization opens for your stream, download your Green Card and Call-up Letter directly from your dashboard.\n\nCheck every detail immediately: your full name spelling, date of birth, course, institution, and deployed state. If anything is wrong, apply for a correction on your dashboard right away before heading to camp. Date of birth corrections require a WAEC verification pin.",
+      "tips": [
+        "Print at least 3 color copies of both your Call-up Letter and Green Card.",
+        "Do NOT laminate your Green Card or Call-up Letter — camp officials must stamp and sign them.",
+        "Save digital PDF copies on your phone and Google Drive / cloud storage."
+      ],
+      "warning": "Never use third-party agents claiming to change your deployed state for a fee; all official postings are generated directly on the portal.",
+      "next": "pre-camp-checklist"
+    },
+    {
+      "type": "checklist",
+      "id": "pre-camp-checklist",
+      "title": "Pre-Camp Survival Packing Checklist",
+      "items": [
+        {
+          "id": "medical-cert-item",
+          "label": "Medical Certificate of Fitness from a Government or General Hospital",
+          "hint": "Must state genotype, blood group, and fitness for strenuous drills. Private hospital certs are rejected."
+        },
+        {
+          "id": "white-shorts-shirts",
+          "label": "Plain white round-neck shirts and plain white shorts (3–4 pairs each)",
+          "hint": "You will wear white-on-white outfits every day throughout the 21 days."
+        },
+        {
+          "id": "white-sneakers",
+          "label": "White tennis/rubber shoes and plain white socks",
+          "hint": "Rubber sneakers dry faster during morning dew and rain."
+        },
+        {
+          "id": "passport-photos-item",
+          "label": "8–10 passport photographs on a plain white background",
+          "hint": "Needed for your platoon file, bank account opening, and camp ID cards."
+        },
+        {
+          "id": "waist-pouch-padlocks",
+          "label": "Waist pouch and small padlocks with spare keys",
+          "hint": "Keep your phone, money, and room keys on your waist at all times."
+        },
+        {
+          "id": "mosquito-net-toiletries",
+          "label": "Mosquito net, bedsheets, basic toiletries, and mosquito repellent",
+          "hint": "Essential for hostel safety and comfortable rest after parade."
+        }
+      ],
+      "next": "orientation-camp"
+    },
+    {
+      "type": "info",
+      "id": "orientation-camp",
+      "title": "What to Expect at Orientation Camp",
+      "body": "Orientation camp lasts for 21 days under military and paramilitary supervision. On Day 1, you go through security screening, registration, biometric clearance, platoon assignment, and kit collection (khaki uniform, crested vest, jungle boots, cap, belt, and PT shorts).\n\nDaily schedule includes the 4:30 AM morning bugle, morning devotion, physical training (PT), military parade drills, SAED skills lectures, and evening social/sports competitions.",
+      "tips": [
+        "Guard your meal ticket, platoon slip, and bunk locker keys carefully.",
+        "Join your platoon activities, OBS (radio station), or the camp band to make friends.",
+        "Report to the camp clinic right away if you fall sick — doctors and nurses are on 24-hour duty."
+      ],
+      "next": "ppa-posting"
+    },
+    {
+      "type": "info",
+      "id": "ppa-posting",
+      "title": "Your PPA Posting & Relocation Basics",
+      "body": "On the final day of camp (Passing Out Parade), you will receive your posting letter to your Place of Primary Assignment (PPA) — usually a public school, government ministry, healthcare facility, or vetted private organization.\n\nTake your posting letter to your assigned employer within 48 hours for acceptance or rejection. If rejected, take the signed rejection letter back to your Local Government Inspector (LGI) for reposting. Relocation on marital or medical grounds is applied for inside camp before the close of orientation.",
+      "tips": [
+        "Never stay in an unapproved PPA without official documentation; unauthorized absence can lead to extension of service.",
+        "Ask your employer early about accommodation or transport support.",
+        "Keep a stamped copy of your employer's acceptance letter for your LGI documentation."
+      ],
+      "next": "cds-and-clearance"
+    },
+    {
+      "type": "info",
+      "id": "cds-and-clearance",
+      "title": "CDS Groups & Monthly Clearance",
+      "body": "Throughout your service year, you will belong to a Community Development Service (CDS) group that meets once a week for community projects.\n\nTo receive your monthly Federal Government stipend (allawee), you must complete your monthly biometric clearance at your Local Government Secretariat. Your PPA employer must sign your monthly evaluation letter, which you present to your LGI.",
+      "tips": [
+        "Sign your weekly CDS attendance register faithfully.",
+        "Do your biometric clearance early during the clearance window each month.",
+        "If you need to travel outside your state, submit an official leave request through your LGI to the State Coordinator."
+      ]
+    }
+  ]
+}

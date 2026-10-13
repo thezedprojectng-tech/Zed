@@ -1,0 +1,146 @@
+{
+  "id": "cac",
+  "title": "CAC Business Name Registration",
+  "summary": "Complete guide to registering a business name (sole proprietorship or partnership) with the Corporate Affairs Commission (CAC). Covers name availability search, online CRP form submission, fee payment, certificate download, and tax setup.",
+  "category": "Corporate Affairs",
+  "estimatedMinutes": 35,
+  "difficulty": "moderate",
+  "sourceUrl": "https://www.cac.gov.ng",
+  "lastVerified": "2026-10-14",
+  "steps": [
+    {
+      "type": "decision",
+      "id": "structure-choice",
+      "title": "Is a Business Name Right for You?",
+      "question": "Are you registering a sole proprietorship / partnership (Business Name), or a company (Private Limited Company / LTD)?",
+      "options": [
+        { "label": "Business Name (Sole Proprietorship / Enterprise)", "nextStepId": "cac-docs" },
+        { "label": "Private Limited Company (LTD)", "nextStepId": "ltd-overview" }
+      ]
+    },
+    {
+      "type": "info",
+      "id": "ltd-overview",
+      "title": "Business Name vs. Limited Company (LTD)",
+      "body": "A **Business Name (Enterprise)** is ideal for solo entrepreneurs, freelancers, artisans, small retail shops, and partnerships. It is fast, cost-effective, and has straightforward statutory obligations.\n\nA **Private Limited Company (LTD)** creates a separate legal entity with shareholders, directors, and share capital, which is suited for startups seeking equity investors or bidding for large institutional contracts.\n\nIf you want the fastest, simplest registration for your business, proceed with Business Name registration.",
+      "tips": [
+        "You can upgrade your registered Business Name to a Limited Liability Company later when your business expands.",
+        "Annual returns for a Business Name carry lower statutory filing fees."
+      ],
+      "next": "cac-docs"
+    },
+    {
+      "type": "document-check",
+      "id": "cac-docs",
+      "title": "Documents for Business Name Registration",
+      "documents": [
+        {
+          "id": "nin-slip",
+          "label": "Valid National Identification Number (NIN) slip for each proprietor",
+          "required": true,
+          "acceptedFormats": ["PDF", "JPEG"]
+        },
+        {
+          "id": "passport-photo",
+          "label": "Recent passport photograph on a clean white background",
+          "required": true,
+          "acceptedFormats": ["JPEG"]
+        },
+        {
+          "id": "signature-specimen",
+          "label": "Clear signature specimen signed on plain white paper",
+          "required": true,
+          "acceptedFormats": ["JPEG", "PNG"]
+        },
+        {
+          "id": "address-proof",
+          "label": "Proof of residential or business address (e.g. utility bill or tenancy receipt)",
+          "required": false,
+          "acceptedFormats": ["PDF", "JPEG"]
+        },
+        {
+          "id": "prof-cert",
+          "label": "Proficiency Certificate (required only for regulated professions like engineering, pharmacy, or legal consultancies)",
+          "required": false,
+          "acceptedFormats": ["PDF"]
+        }
+      ],
+      "next": "name-reservation"
+    },
+    {
+      "type": "link",
+      "id": "name-reservation",
+      "title": "Search & Reserve Your Business Name",
+      "body": "Visit the CAC Company Registration Portal (CRP) to conduct a free public name search and make sure your proposed name is unique. Once confirmed, submit a Name Reservation request with two name options (Option 1 and Option 2).\n\nCAC examines the name against existing trademarks, prohibited words, and registered entities. Approvals are typically granted within 24–48 hours.",
+      "href": "https://pre.cac.gov.ng",
+      "linkLabel": "Open CAC Company Registration Portal →",
+      "next": "form-details"
+    },
+    {
+      "type": "checklist",
+      "id": "form-details",
+      "title": "Complete the Online Registration Form",
+      "items": [
+        {
+          "id": "availability-code",
+          "label": "Availability Code from approved name reservation entered",
+          "hint": "Found on your CAC CRP dashboard once your name reservation is approved."
+        },
+        {
+          "id": "business-nature",
+          "label": "Nature of Business and principal activity category selected",
+          "hint": "Choose the main economic sector that best describes your operations."
+        },
+        {
+          "id": "proprietor-data",
+          "label": "Proprietor(s) details: full name matching NIN, date of birth, phone, and email",
+          "hint": "Must match your official NIMC identity record exactly."
+        },
+        {
+          "id": "business-location",
+          "label": "Principal place of business address filled in with street name, city, state, and LGA",
+          "hint": "A home address can be used for online, mobile, or home-based businesses."
+        },
+        {
+          "id": "upload-files",
+          "label": "Uploaded clear scans of passport photo, NIN slip, and signature specimen",
+          "hint": "Keep individual file sizes under 5MB each."
+        }
+      ],
+      "next": "payment-status"
+    },
+    {
+      "type": "info",
+      "id": "payment-status",
+      "title": "Pay Statutory Fees & Track Application",
+      "body": "After submitting your online form, pay the statutory registration fee directly on the CRP portal using the integrated Remita gateway. Check current fees on the official CAC portal.\n\nOnce paid, your application status updates to 'Pending Approval'. A CAC reviewing officer checks your documents. If any document is queried (such as a blurry signature), you will receive an email and can re-upload corrected files under 'My Registrations' on your dashboard.",
+      "tips": [
+        "Only pay through the official Remita payment gateway inside the CAC portal.",
+        "Check your registered email and portal notifications regularly for reviewer queries."
+      ],
+      "warning": "Avoid third-party touts charging inflated fees; the entire process is handled self-service on the CAC portal.",
+      "next": "download-certificate"
+    },
+    {
+      "type": "info",
+      "id": "download-certificate",
+      "title": "Download Your Electronic Certificate",
+      "body": "Once approved by the CAC registrar, your Electronic Certificate of Registration and Business Status Report are issued immediately.\n\nYou do not need to pick up a physical copy from any CAC office. Simply log in to the CAC portal, navigate to 'Downloads' on your dashboard, and print your high-resolution Certificate and Status Report.\n\nYour certificate displays your unique Business Name number (BN Number) and official QR code for instant third-party validation.",
+      "tips": [
+        "Save multiple digital backups of both the Certificate and Business Status Report PDF.",
+        "Banks, government agencies, and embassies verify registration authenticity by scanning the QR code on the certificate."
+      ],
+      "next": "post-incorporation"
+    },
+    {
+      "type": "info",
+      "id": "post-incorporation",
+      "title": "Open a Business Account & Tax Setup",
+      "body": "Now that your business is officially registered with the Federal Government of Nigeria, complete these essential next steps:\n\n1. **Corporate Bank Account**: Open a business current account at any commercial bank using your CAC Certificate, Status Report, valid ID, and BVN.\n2. **Tax Identification Number (TIN)**: Your electronic Status Report automatically comes with your Joint Tax Board (JTB) / FIRS Tax ID. Confirm it on the official tax portal.\n3. **Annual Returns**: File your annual returns on the CAC portal every year (due by June 30th after your first year of registration) to keep your business status active.",
+      "tips": [
+        "Separating your personal finances from your business bank account builds financial credibility and protects your business.",
+        "Keep your CAC login credentials secure for future annual return filings and post-incorporation changes."
+      ]
+    }
+  ]
+}

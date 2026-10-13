@@ -1,0 +1,146 @@
+{
+  "id": "nin-bvn",
+  "title": "NIN & BVN Harmonisation",
+  "summary": "Step-by-step guide to enrolling for your National Identification Number (NIN), linking it to your Bank Verification Number (BVN), and resolving name or date-of-birth mismatches across bank and NIMC records.",
+  "category": "Identity & Banking",
+  "estimatedMinutes": 25,
+  "difficulty": "easy",
+  "sourceUrl": "https://nimc.gov.ng",
+  "lastVerified": "2026-10-14",
+  "steps": [
+    {
+      "type": "decision",
+      "id": "has-nin",
+      "title": "Do you already have a NIN?",
+      "question": "Have you previously completed biometric enrolment and received an 11-digit National Identification Number (NIN)?",
+      "options": [
+        { "label": "Yes, I have an 11-digit NIN", "nextStepId": "check-nin-slip" },
+        { "label": "No, I need to enrol for a NIN", "nextStepId": "enrolment-docs" }
+      ]
+    },
+    {
+      "type": "document-check",
+      "id": "enrolment-docs",
+      "title": "Documents for NIMC Enrolment",
+      "documents": [
+        {
+          "id": "birth-cert",
+          "label": "Original National Population Commission (NPC) Birth Certificate or Court Age Declaration",
+          "required": true,
+          "acceptedFormats": ["Physical", "PDF"]
+        },
+        {
+          "id": "valid-id",
+          "label": "Valid photo ID (Voter's Card, Driver's License, or Student ID)",
+          "required": true,
+          "acceptedFormats": ["Physical"]
+        },
+        {
+          "id": "origin-cert",
+          "label": "Certificate of State or Local Government of Origin",
+          "required": false,
+          "acceptedFormats": ["Physical", "PDF"]
+        },
+        {
+          "id": "bvn-slip",
+          "label": "Bank Verification Number (BVN) printout (if you have an existing bank account)",
+          "required": false,
+          "acceptedFormats": ["Physical", "PDF"]
+        }
+      ],
+      "next": "nimc-enrolment"
+    },
+    {
+      "type": "link",
+      "id": "nimc-enrolment",
+      "title": "Enrol at an Accredited NIMC Centre",
+      "body": "Visit an accredited NIMC Enrolment Centre or participating commercial bank branch. Complete your enrolment form, capture your 10 fingerprints and facial photograph, and collect your National Identification Transaction Slip. Your 11-digit NIN will be issued after processing.",
+      "href": "https://nimc.gov.ng",
+      "linkLabel": "Find NIMC Enrolment Centres →",
+      "next": "check-nin-slip"
+    },
+    {
+      "type": "info",
+      "id": "check-nin-slip",
+      "title": "Check Your NIN Details & Slip",
+      "body": "Retrieve your standard National Identification Number (NIN) slip from the NIMC Self-Service Portal or official mobile app.\n\nDouble-check every detail: First Name, Middle Name, Surname, Date of Birth (DD-MM-YYYY), Gender, and Phone Number. The exact spelling and name order must match what your bank has on file.",
+      "tips": [
+        "You can check your 11-digit NIN anytime by dialling *346# from your registered mobile number.",
+        "Save a clear PDF copy of your NIN slip with the scannable QR code on your phone.",
+        "Never share your NIN, bank OTP, or BVN with unverified callers or third-party social media pages."
+      ],
+      "next": "link-bvn-nin"
+    },
+    {
+      "type": "checklist",
+      "id": "link-bvn-nin",
+      "title": "How to Link Your NIN to Your BVN",
+      "items": [
+        {
+          "id": "mobile-app-link",
+          "label": "Mobile Banking App: Check Profile or Settings > Link NIN/BVN",
+          "hint": "Most Nigerian commercial banks process linking directly in-app in under 2 minutes."
+        },
+        {
+          "id": "bank-ussd-link",
+          "label": "Bank USSD Code: Dial your bank's official NIN link code",
+          "hint": "Always dial from the phone number registered to your bank account."
+        },
+        {
+          "id": "bank-web-link",
+          "label": "Official Bank Self-Service Portal: Submit Account Number, BVN, and NIN",
+          "hint": "Confirm you are on your bank's verified https web domain before entering details."
+        },
+        {
+          "id": "customer-service-link",
+          "label": "Branch Customer Service Desk: Visit any branch if digital channels fail",
+          "hint": "Bring your original NIN slip and a valid photo ID card."
+        }
+      ],
+      "next": "mismatch-check"
+    },
+    {
+      "type": "decision",
+      "id": "mismatch-check",
+      "title": "Do You Have a Data Mismatch?",
+      "question": "Did your bank or NIMC flag a discrepancy in your name spelling, name order, or date of birth?",
+      "options": [
+        { "label": "NIMC / NIN record has errors", "nextStepId": "fix-nimc-record" },
+        { "label": "Bank / BVN record has errors", "nextStepId": "fix-bvn-record" },
+        { "label": "All details match (No mismatch)", "nextStepId": "unmatched-escalation" }
+      ]
+    },
+    {
+      "type": "info",
+      "id": "fix-nimc-record",
+      "title": "Correcting Details on Your NIMC Record",
+      "body": "If the error is on your NIN record (such as misspelled name, reversed first/last name, or incorrect date of birth):\n\n- **Minor corrections & phone numbers**: Use the NIMC Self-Service Portal or official mobile app to submit changes.\n- **Date of birth & major name changes**: Visit a State NIMC Head Office in person with your original NPC Birth Certificate, court affidavit, and newspaper publication where applicable.\n\nStatutory modification fees are paid via Remita on the portal. NIMC permits date of birth modifications only once in a lifetime.",
+      "tips": [
+        "Check the official NIMC website for current modification fees before making payment.",
+        "Modifications usually take between 2 to 7 working days to synchronize across national databases."
+      ],
+      "next": "unmatched-escalation"
+    },
+    {
+      "type": "info",
+      "id": "fix-bvn-record",
+      "title": "Updating Your BVN Record at Your Bank",
+      "body": "If your NIN is correct but your bank BVN has typographical errors or the wrong date of birth:\n\nVisit the specific bank branch where you initially registered your BVN. Ask for a BVN Data Correction form. Provide your verified NIN slip, a court affidavit, newspaper publication (for name changes), and a valid ID.\n\nThe bank officer will submit the correction request to the Nigeria Inter-Bank Settlement System (NIBSS). Updates typically reflect within 24–48 working hours.",
+      "tips": [
+        "Only the bank that originally enrolled your BVN can submit modification requests to NIBSS.",
+        "Request and keep a stamped copy of your correction request submission slip."
+      ],
+      "next": "unmatched-escalation"
+    },
+    {
+      "type": "info",
+      "id": "unmatched-escalation",
+      "title": "Final Verification & Escalation",
+      "body": "Once updates are submitted, allow 24 to 72 hours for NIBSS and NIMC databases to synchronize, then retry linking through your bank's app or portal.\n\nIf linking continues to fail despite matching documents, visit your bank branch customer care manager or contact the NIMC helpdesk (customercare@nimc.gov.ng) with your NIN slip and BVN profile attached.",
+      "tips": [
+        "Confirm that your mobile telecom SIM lines are also linked with your verified NIN to prevent service suspension.",
+        "Once linked, your bank account tier limits will be upgraded and remain fully operational."
+      ]
+    }
+  ]
+}

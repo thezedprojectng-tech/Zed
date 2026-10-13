@@ -1,0 +1,279 @@
+@import "tailwindcss";
+
+@layer base {
+  :root,
+  .dark {
+    /* ── Dark Theme Tokens (Default) ─────────────────────────────────── */
+    --background: #0a0a0b;
+    --foreground: #ededed;
+
+    --card: #121214;
+    --card-foreground: #ededed;
+
+    --popover: #121214;
+    --popover-foreground: #ededed;
+
+    --primary: #3ecf8e;
+    --primary-foreground: #051a11;
+
+    --secondary: #18181b;
+    --secondary-foreground: #d4d4d8;
+
+    --muted: #18181b;
+    --muted-foreground: #a1a1aa;
+
+    --accent: #11261d;
+    --accent-foreground: #3ecf8e;
+
+    --destructive: #7f1d1d;
+    --destructive-foreground: #fecaca;
+
+    --border: rgba(255, 255, 255, 0.09);
+    --input: rgba(255, 255, 255, 0.1);
+    --ring: #3ecf8e;
+
+    --radius: 0.5rem;
+    --radius-sm: 0.375rem;
+    --radius-lg: 0.75rem;
+
+    --sidebar-background: #0d0d0e;
+    --sidebar-foreground: #ededed;
+    --sidebar-border: rgba(255, 255, 255, 0.07);
+    --sidebar-primary: #3ecf8e;
+    --sidebar-accent: rgba(255, 255, 255, 0.04);
+
+    /* ── Font Stacks (Available globally via var(--font-*)) ──────────── */
+    --font-display: var(--font-cabinet), "Cabinet Grotesk", system-ui, -apple-system, sans-serif;
+    --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, sans-serif;
+    --font-mono: var(--font-geist-mono), ui-monospace, "Cascadia Code", monospace;
+    --font-serif: var(--font-instrument), "Instrument Serif", Georgia, serif;
+  }
+
+  .light {
+    /* ── Light Theme Tokens ──────────────────────────────────────────── */
+    --background: #fbfbfb;
+    --foreground: #09090b;
+
+    --card: #ffffff;
+    --card-foreground: #09090b;
+
+    --popover: #ffffff;
+    --popover-foreground: #09090b;
+
+    --primary: #059669;
+    --primary-foreground: #ffffff;
+
+    --secondary: #f4f4f5;
+    --secondary-foreground: #18181b;
+
+    --muted: #f4f4f5;
+    --muted-foreground: #71717a;
+
+    --accent: #ecfdf5;
+    --accent-foreground: #065f46;
+
+    --destructive: #ef4444;
+    --destructive-foreground: #ffffff;
+
+    --border: #e4e4e7;
+    --input: #e4e4e7;
+    --ring: #10b981;
+
+    --sidebar-background: #fbfbfb;
+    --sidebar-foreground: #09090b;
+    --sidebar-border: #e4e4e7;
+    --sidebar-primary: #059669;
+    --sidebar-accent: #f4f4f5;
+  }
+
+  html {
+    font-size: 16px;
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    line-height: 1.5;
+    min-height: 100dvh;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* ── Tailwind v4 Theme Inlining ──────────────────────────────────────── */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-sidebar: var(--sidebar-background);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-accent: var(--sidebar-accent);
+
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius);
+  --radius-lg: var(--radius-lg);
+
+  --font-display: var(--font-cabinet), "Cabinet Grotesk", system-ui, -apple-system, sans-serif;
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, "Cascadia Code", monospace;
+  --font-serif: var(--font-instrument), "Instrument Serif", Georgia, serif;
+}
+
+/* ── Typography Scale ────────────────────────────────────────────────── */
+@layer utilities {
+  .type-display {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 1.05;
+  }
+
+  .type-h1 {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.15;
+  }
+
+  .type-h2 {
+    font-family: var(--font-display);
+    font-size: clamp(1.125rem, 2.5vw, 1.375rem);
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    line-height: 1.25;
+  }
+
+  .type-h3 {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    line-height: 1.35;
+  }
+
+  .type-body {
+    font-family: var(--font-sans);
+    font-size: 0.9375rem;
+    line-height: 1.55;
+    letter-spacing: -0.005em;
+  }
+
+  .type-small {
+    font-family: var(--font-sans);
+    font-size: 0.8125rem;
+    line-height: 1.45;
+  }
+
+  .type-caption {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 500;
+  }
+
+  .type-accent-serif {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 400;
+    letter-spacing: normal;
+  }
+
+  /* ── Hairline Borders ────────────────────────────────────────────── */
+  .border-hairline {
+    border: 1px solid var(--border);
+  }
+
+  .border-hairline-t {
+    border-top: 1px solid var(--border);
+  }
+
+  .border-hairline-b {
+    border-bottom: 1px solid var(--border);
+  }
+
+  .border-hairline-r {
+    border-right: 1px solid var(--border);
+  }
+
+  .border-hairline-l {
+    border-left: 1px solid var(--border);
+  }
+
+  /* ── Dot-grid Background ─────────────────────────────────────────── */
+  .bg-dot-grid {
+    background-image: radial-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
+  /* ── Safe-area Padding (iOS bottom bar) ──────────────────────────── */
+  .pb-safe {
+    padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+  }
+}
+
+.light .bg-dot-grid,
+:root.light .bg-dot-grid {
+  background-image: radial-gradient(rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+}
+
+/* ── Marquee Animation ──────────────────────────────────────────────── */
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 32s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+/* ── Reduced Motion ──────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .animate-marquee {
+    animation: none !important;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

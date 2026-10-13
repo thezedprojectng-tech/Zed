@@ -1,0 +1,161 @@
+{
+  "id": "passport",
+  "title": "Get Your Nigerian Passport",
+  "summary": "Complete guide to applying for or renewing a Nigerian International Passport (Standard Booklet) through the NIS portal. Covers document preparation, online payment, biometric appointment, and collection.",
+  "category": "Immigration & Travel",
+  "estimatedMinutes": 45,
+  "difficulty": "moderate",
+  "sourceUrl": "https://immigration.gov.ng",
+  "lastVerified": "2026-10-14",
+  "steps": [
+    {
+      "type": "decision",
+      "id": "application-type",
+      "title": "What type of application is this?",
+      "question": "Are you applying for the first time, or renewing an existing passport?",
+      "options": [
+        { "label": "First-time application", "nextStepId": "fresh-docs" },
+        { "label": "Renewal", "nextStepId": "renewal-docs" }
+      ]
+    },
+    {
+      "type": "document-check",
+      "id": "fresh-docs",
+      "title": "Documents for Fresh Application",
+      "documents": [
+        {
+          "id": "birth-cert",
+          "label": "Original birth certificate or certified age declaration",
+          "required": true,
+          "acceptedFormats": ["PDF", "JPEG"]
+        },
+        {
+          "id": "nin-slip",
+          "label": "NIN slip or National ID card (must match your name)",
+          "required": true,
+          "acceptedFormats": ["PDF", "JPEG"]
+        },
+        {
+          "id": "passport-photos",
+          "label": "2 recent passport photographs on white background (3.5 × 4.5 cm)",
+          "required": true,
+          "acceptedFormats": ["JPEG"]
+        },
+        {
+          "id": "citizenship-evidence",
+          "label": "Evidence of Nigerian citizenship (if born abroad)",
+          "required": false,
+          "acceptedFormats": ["PDF", "JPEG"]
+        },
+        {
+          "id": "marriage-cert",
+          "label": "Marriage certificate (for name change only)",
+          "required": false,
+          "acceptedFormats": ["PDF", "JPEG"]
+        }
+      ],
+      "next": "portal-application"
+    },
+    {
+      "type": "document-check",
+      "id": "renewal-docs",
+      "title": "Documents for Renewal",
+      "documents": [
+        {
+          "id": "old-passport",
+          "label": "Current or most recent expired passport (original)",
+          "required": true,
+          "acceptedFormats": ["Physical"]
+        },
+        {
+          "id": "nin-slip",
+          "label": "NIN slip or National ID card",
+          "required": true,
+          "acceptedFormats": ["PDF", "JPEG"]
+        },
+        {
+          "id": "passport-photos",
+          "label": "2 recent passport photographs on white background (3.5 × 4.5 cm)",
+          "required": true,
+          "acceptedFormats": ["JPEG"]
+        },
+        {
+          "id": "marriage-cert",
+          "label": "Marriage certificate (for name change only)",
+          "required": false,
+          "acceptedFormats": ["PDF", "JPEG"]
+        }
+      ],
+      "next": "portal-application"
+    },
+    {
+      "type": "link",
+      "id": "portal-application",
+      "title": "Complete the Online Application",
+      "body": "Go to the NIS e-passport portal. Create an account or log in, select your application type (Standard 32-page or 64-page booklet), fill in your biodata, and upload scanned copies of your documents. Save your Application Reference Number — you will need it for the next steps.",
+      "href": "https://immigration.gov.ng",
+      "linkLabel": "Open NIS e-Passport Portal →",
+      "next": "fee-payment"
+    },
+    {
+      "type": "info",
+      "id": "fee-payment",
+      "title": "Pay the Application Fee",
+      "body": "After submitting your form, you will be directed to the Remita payment gateway. Pay the applicable fee using a debit card, bank transfer, or USSD. Keep your Remita Receipt Reference Number.\n\nCheck the current fee on the official NIS portal — fees are set by the government and are subject to change.",
+      "tips": [
+        "Use a Mastercard or Verve card for best success rates on the Remita gateway.",
+        "Screenshot your payment confirmation page before closing it.",
+        "Standard booklet (32 pages) and jumbo booklet (64 pages) have different fees."
+      ],
+      "warning": "Do not pay through any third-party agent or unofficial website. Only pay through the Remita link on the official NIS portal.",
+      "next": "book-appointment"
+    },
+    {
+      "type": "link",
+      "id": "book-appointment",
+      "title": "Book Your Biometric Appointment",
+      "body": "After payment, return to the NIS portal to schedule your biometric capture appointment at a Passport Office nearest to you. Choose a date and time slot, then download or screenshot your appointment slip. Bring the printed appointment slip and all original documents on the day.",
+      "href": "https://immigration.gov.ng",
+      "linkLabel": "Book Appointment on NIS Portal →",
+      "next": "attend-appointment"
+    },
+    {
+      "type": "checklist",
+      "id": "attend-appointment",
+      "title": "Prepare for Your Biometric Appointment",
+      "items": [
+        {
+          "id": "appointment-slip",
+          "label": "Printed appointment slip (or clear screenshot on your phone)",
+          "hint": "The officer will scan the QR code on the slip."
+        },
+        {
+          "id": "original-docs",
+          "label": "All original documents (birth cert, NIN, old passport if renewal)",
+          "hint": "Originals and photocopies are both typically requested."
+        },
+        {
+          "id": "payment-receipt",
+          "label": "Remita payment receipt (printed or on phone)",
+          "hint": "Keep your receipt reference number saved."
+        },
+        {
+          "id": "plain-clothes",
+          "label": "Dressed in plain, neutral clothing with no patterns or glasses",
+          "hint": "NIS photograph guidelines prohibit eyeglasses and patterned tops."
+        }
+      ],
+      "next": "collection"
+    },
+    {
+      "type": "info",
+      "id": "collection",
+      "title": "Collect Your Passport",
+      "body": "After your biometric capture, production typically takes several weeks. You will be contacted via SMS or email when your passport is ready. Return to the passport office where you enrolled to collect it — bring your original appointment slip and a valid ID.\n\nProcessing times vary by location and current volume. Check the NIS portal for current production timelines.",
+      "tips": [
+        "Track your application status on the NIS portal using your Application Reference Number.",
+        "Collection is in-person only — no proxies except for minors (with a consent letter)."
+      ]
+    }
+  ]
+}
