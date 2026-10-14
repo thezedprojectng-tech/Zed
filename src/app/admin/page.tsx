@@ -410,7 +410,7 @@ async function OverviewContent() {
         <FlowsGroupedBarChart data={data.flowGuideStats} />
       </div>
 
-      {/* Row 2 Charts: Verification Donut, Civic Levels, & Reports per Day */}
+      {/* Row 2 Charts: Verification Donut, Progression Levels, & Reports per Day */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <VerificationDonutChart
           verified={data.verifiedUsers}

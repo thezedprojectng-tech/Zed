@@ -15,13 +15,12 @@ import {
   User,
   ChevronLeft,
   ChevronRight,
-  ShieldCheck,
   LayoutDashboard,
   Users,
   FileText,
+  LayoutGrid,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import {
   Tooltip,
   TooltipContent,
@@ -29,6 +28,7 @@ import {
 } from "@/components/ui/tooltip";
 import { getLevelName } from "@/types";
 import { useAuthStore } from "@/store/useAuthStore";
+import { MODULES } from "@/data/modules";
 
 interface NavItem {
   href: string;
@@ -204,7 +204,90 @@ export function Sidebar() {
               </ul>
             </div>
           ))}
+
+        {/* Modules section */}
+        {!collapsed && (
+          <div className="space-y-1">
+            <p className="px-2 pb-1.5 font-mono text-[10px] font-semibold tracking-wider uppercase text-muted-foreground flex items-center gap-1.5">
+              <LayoutGrid className="h-3 w-3" aria-hidden="true" />
+              Modules
+            </p>
+            <ul className="space-y-0.5" role="list">
+              {MODULES.map((mod) => {
+                const Icon = mod.icon;
+                const isLive = mod.status === "live";
+                const href = isLive ? (mod.href ?? "/nav") : `/modules/${mod.slug}`;
+                const isActive = pathname.startsWith(href) && isLive;
+
+                if (isLive) {
+                  return (
+                    <li key={mod.slug}>
+                      <Link
+                        href={href}
+                        aria-current={isActive ? "page" : undefined}
+                        className={cn(
+                          "relative flex items-center gap-3 rounded-md px-3 py-2 text-xs font-medium transition-all group",
+                          isActive
+                            ? "bg-secondary text-foreground font-semibold shadow-xs before:absolute before:left-0 before:top-2 before:bottom-2 before:w-[2px] before:bg-primary before:rounded-r"
+                            : "text-muted-foreground hover:bg-secondary/60 hover:text-foreground"
+                        )}
+                      >
+                        <Icon
+                          className={cn(
+                            "h-4 w-4 shrink-0 transition-colors",
+                            isActive
+                              ? "text-primary"
+                              : "text-muted-foreground group-hover:text-foreground"
+                          )}
+                        />
+                        <span className="truncate flex-1">{mod.name}</span>
+                        <span className="inline-flex items-center gap-1 shrink-0 px-1.5 py-px rounded-full border border-primary/20 bg-primary/10 text-primary font-mono text-[9px] font-semibold uppercase tracking-wider">
+                          Live
+                        </span>
+                      </Link>
+                    </li>
+                  );
+                }
+
+                return (
+                  <li key={mod.slug}>
+                    <Link
+                      href={href}
+                      className="flex items-center gap-3 rounded-md px-3 py-2 text-xs font-medium text-muted-foreground/50 hover:text-muted-foreground transition-colors group"
+                    >
+                      <Icon className="h-4 w-4 shrink-0 text-muted-foreground/40" />
+                      <span className="truncate flex-1">{mod.name}</span>
+                      <span className="inline-flex items-center shrink-0 px-1.5 py-px rounded-full border border-border bg-secondary text-muted-foreground/60 font-mono text-[9px] font-medium uppercase tracking-wider">
+                        Soon
+                      </span>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        )}
+
+        {/* Collapsed: show just the grid icon with tooltip */}
+        {collapsed && (
+          <div className="space-y-0.5">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Link
+                  href="/modules/zed-skill"
+                  className="flex justify-center items-center py-2.5 rounded-md text-muted-foreground hover:bg-secondary/60 hover:text-foreground transition-colors"
+                >
+                  <LayoutGrid className="h-4 w-4" />
+                </Link>
+              </TooltipTrigger>
+              <TooltipContent side="right" className="font-sans text-xs">
+                Modules
+              </TooltipContent>
+            </Tooltip>
+          </div>
+        )}
       </nav>
+
 
       {/* Bottom User Card */}
       <div className="border-hairline-t p-3">

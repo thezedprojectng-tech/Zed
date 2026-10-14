@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import {
   BookOpen,
@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useNavProgressStore } from "@/store/useNavProgressStore";
 import { getLevelName } from "@/types";
@@ -23,6 +24,7 @@ import nyscFlow from "@/data/nav/nysc.flow.json";
 import ninBvnFlow from "@/data/nav/nin-bvn.flow.json";
 import cacFlow from "@/data/nav/cac.flow.json";
 import type { NavFlow } from "@/types/nav";
+import { MODULES } from "@/data/modules";
 
 function getTimeGreeting(): string {
   const hour = new Date().getHours();
@@ -110,13 +112,8 @@ const civilTips = [
 export default function HomePage() {
   const { user, profile } = useAuthStore();
   const { progressMap } = useNavProgressStore();
-  const [greeting, setGreeting] = useState("Good day");
-  const [dateString, setDateString] = useState("");
-
-  useEffect(() => {
-    setGreeting(getTimeGreeting());
-    setDateString(getFormattedDate());
-  }, []);
+  const [greeting] = useState(() => getTimeGreeting());
+  const [dateString] = useState(() => getFormattedDate());
 
   const fullName = profile?.full_name || (user?.user_metadata?.full_name as string | undefined);
   const firstName = fullName ? fullName.trim().split(" ")[0] : "there";
@@ -364,6 +361,75 @@ export default function HomePage() {
               </p>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* ── 6. Platform Modules ───────────────────────────────────────── */}
+      <section aria-label="Platform modules" className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="type-h2 text-foreground">Zed Modules</h2>
+            <p className="type-small text-muted-foreground mt-0.5">
+              The full Zed platform. One module is live today; more are in development.
+            </p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+          {MODULES.map((mod) => {
+            const Icon = mod.icon;
+            const isLive = mod.status === "live";
+            const href = isLive ? (mod.href ?? "/nav") : `/modules/${mod.slug}`;
+
+            return (
+              <Link
+                key={mod.slug}
+                href={href}
+                className={cn(
+                  "group rounded-xl border-hairline bg-card p-4 flex flex-col gap-2 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
+                  isLive
+                    ? "hover:border-border hover:bg-card/90"
+                    : "opacity-60 hover:opacity-80 cursor-default"
+                )}
+              >
+                <div className="flex items-center justify-between">
+                  <div
+                    className={cn(
+                      "flex h-8 w-8 items-center justify-center rounded-lg border-hairline",
+                      isLive
+                        ? "bg-primary/10 text-primary border-primary/20 group-hover:bg-primary/20"
+                        : "bg-secondary text-muted-foreground"
+                    )}
+                  >
+                    <Icon className="h-3.5 w-3.5" aria-hidden="true" />
+                  </div>
+                  {isLive ? (
+                    <Badge
+                      variant="outline"
+                      className="font-mono text-[9px] border-primary/20 bg-primary/10 text-primary px-1.5 py-0"
+                    >
+                      Live
+                    </Badge>
+                  ) : (
+                    <Badge
+                      variant="outline"
+                      className="font-mono text-[9px] border-border text-muted-foreground/60 px-1.5 py-0"
+                    >
+                      Soon
+                    </Badge>
+                  )}
+                </div>
+                <div>
+                  <p className={cn("text-xs font-semibold leading-tight", isLive ? "text-foreground" : "text-muted-foreground")}>
+                    {mod.name}
+                  </p>
+                  <p className="font-mono text-[10px] text-muted-foreground/60 mt-0.5">
+                    {mod.phase}
+                  </p>
+                </div>
+              </Link>
+            );
+          })}
         </div>
       </section>
     </div>

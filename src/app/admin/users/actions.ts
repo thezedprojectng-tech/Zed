@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { requireAdmin, maskPhone } from "@/lib/auth/admin-guard";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { logAdminAction } from "@/lib/audit/log";
+import { getLevelName } from "@/types";
 
 /**
  * Server action: Delete a user using Supabase Auth Admin.
@@ -202,12 +203,13 @@ export async function exportUsersCsvAction(): Promise<{
       return { success: false, error: "Failed to fetch users for CSV export." };
     }
 
-    const headers = ["ID", "Full Name", "Masked Phone", "Civic Level", "Verified", "Role", "Joined Date"];
+    const headers = ["ID", "Full Name", "Masked Phone", "Level", "Level Name", "Verified", "Role", "Joined Date"];
     const rows = users.map((u) => [
       `"${u.id}"`,
       `"${(u.full_name || "").replace(/"/g, '""')}"`,
       `"${maskPhone(u.phone_number)}"`,
       u.level_id,
+      `"${getLevelName(u.level_id)}"`,
       u.is_verified ? "true" : "false",
       `"${u.role}"`,
       `"${u.created_at}"`,

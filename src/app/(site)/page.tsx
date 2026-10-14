@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, ShieldCheck, Lock, Check, ExternalLink } from "lucide-react";
+import { ArrowRight, Lock } from "lucide-react";
 import { HeroSection } from "@/components/site/HeroSection";
 import { TabbedShowcase } from "@/components/site/TabbedShowcase";
 import { AlternatingFeatures } from "@/components/site/AlternatingFeatures";
 import { Accordion } from "@/components/site/Accordion";
 import { ClosingCTA } from "@/components/site/ClosingCTA";
 import { FadeIn } from "@/components/site/FadeIn";
+import { MODULES } from "@/data/modules";
 
 export const metadata: Metadata = {
   title: "Zed – One place. Every next move.",
@@ -62,88 +63,6 @@ const FAQ_ITEMS = [
   },
 ];
 
-interface EcosystemModule {
-  name: string;
-  badge: "LIVE" | "Coming soon";
-  description: string;
-  href?: string;
-}
-
-const ECOSYSTEM_MODULES: EcosystemModule[] = [
-  {
-    name: "Zed Nav",
-    badge: "LIVE",
-    description:
-      "Step-by-step verified civic playbooks for passport issuance, NYSC mobilization, NIN, and business registration.",
-    href: "/signup",
-  },
-  {
-    name: "Zed Skill",
-    badge: "Coming soon",
-    description:
-      "Practical career playbooks, technical roadmaps, and workplace readiness built for young Nigerians.",
-  },
-  {
-    name: "Zed Market",
-    badge: "Coming soon",
-    description:
-      "Transparent services and verified opportunities marketplace connecting youth and vetted providers.",
-  },
-  {
-    name: "Zed Chat",
-    badge: "Coming soon",
-    description:
-      "Peer-to-peer discussion channels and community messaging for real-time support.",
-  },
-  {
-    name: "Zed Mining",
-    badge: "Coming soon",
-    description:
-      "Participation tracking, platform utility, and recognition for active community contributors.",
-  },
-  {
-    name: "Campus Hubs",
-    badge: "Coming soon",
-    description:
-      "University-specific mobilization guides, clearance checklists, and campus community networks.",
-  },
-  {
-    name: "Alumni Office Hours",
-    badge: "Coming soon",
-    description:
-      "Direct mentorship sessions and career advice from experienced alumni and industry professionals.",
-  },
-  {
-    name: "Creator Lab",
-    badge: "Coming soon",
-    description:
-      "Digital craft resources, tools, and monetization guides for independent Nigerian creators.",
-  },
-  {
-    name: "Zed SOS",
-    badge: "Coming soon",
-    description:
-      "Rapid assistance, verified emergency helplines, and critical civic safety resources.",
-  },
-  {
-    name: "Zed Meet",
-    badge: "Coming soon",
-    description:
-      "Local physical community meetups, study sessions, and queue coordination across Nigerian cities.",
-  },
-  {
-    name: "Internship Radar",
-    badge: "Coming soon",
-    description:
-      "Curated tracking of verified internship openings, entry-level opportunities, and industrial training placements.",
-  },
-  {
-    name: "Civic Trackers",
-    badge: "Coming soon",
-    description:
-      "Community-reported wait times, status indicators, and operational updates at major public centers.",
-  },
-];
 
 const PILLARS = [
   {
@@ -249,8 +168,9 @@ export default function HomePage() {
           </FadeIn>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {ECOSYSTEM_MODULES.map((item, idx) => {
-              const isLive = item.badge === "LIVE";
+            {MODULES.map((mod, idx) => {
+              const isLive = mod.status === "live";
+              const cardHref = isLive ? mod.href! : `/modules/${mod.slug}`;
               const CardInner = (
                 <div
                   className={`h-full rounded-xl border p-5 space-y-3 flex flex-col justify-between transition-all ${
@@ -262,7 +182,7 @@ export default function HomePage() {
                   <div className="space-y-2">
                     <div className="flex items-center justify-between gap-2">
                       <h3 className="font-display font-bold text-base text-[#0B0B0C] flex items-center gap-1.5">
-                        {item.name}
+                        {mod.name}
                         {isLive && <ArrowRight className="h-3.5 w-3.5 text-[#3ecf8e]" />}
                       </h3>
                       {isLive ? (
@@ -277,7 +197,7 @@ export default function HomePage() {
                       )}
                     </div>
                     <p className="font-sans text-xs text-[#57575e] leading-relaxed">
-                      {item.description}
+                      {mod.tagline}
                     </p>
                   </div>
                   {isLive && (
@@ -290,23 +210,20 @@ export default function HomePage() {
               );
 
               return (
-                <FadeIn key={item.name} delay={idx * 0.04}>
-                  {isLive && item.href ? (
-                    <Link
-                      href={item.href}
-                      className="block h-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3ecf8e] rounded-xl"
-                    >
-                      {CardInner}
-                    </Link>
-                  ) : (
-                    CardInner
-                  )}
+                <FadeIn key={mod.slug} delay={idx * 0.04}>
+                  <Link
+                    href={cardHref}
+                    className="block h-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3ecf8e] rounded-xl"
+                  >
+                    {CardInner}
+                  </Link>
                 </FadeIn>
               );
             })}
           </div>
         </div>
       </section>
+
 
       {/* ── Section 6: Problem / Solution Statement ───────────────────── */}
       <section className="py-8 sm:py-12">

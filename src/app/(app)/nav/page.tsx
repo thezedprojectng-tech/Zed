@@ -6,6 +6,11 @@ import {
   Fingerprint,
   Building2,
   ArrowRight,
+  Clock,
+  FileSearch,
+  Smartphone,
+  FileText,
+  MessagesSquare,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -55,9 +60,47 @@ const guides: GuideItem[] = [
   },
 ];
 
+interface ComingNextItem {
+  label: string;
+  description: string;
+  icon: React.ElementType;
+  code: string;
+}
+
+const COMING_NEXT: ComingNextItem[] = [
+  {
+    label: "PPA Hub",
+    description:
+      "Find and confirm your Place of Primary Assignment. Search verified NYSC-approved organizations, track posting letters, and flag discrepancies before camp ends.",
+    icon: MessagesSquare,
+    code: "NYSC-05",
+  },
+  {
+    label: "CDS Logger",
+    description:
+      "Log Community Development Service attendance, generate printable monthly summary sheets, and stay ahead of the 2-CDS-per-week minimum requirement.",
+    icon: FileText,
+    code: "NYSC-06",
+  },
+  {
+    label: "Call-up Letter Parser",
+    description:
+      "Upload your NYSC call-up letter PDF and extract your state code, camp date, and reporting instructions automatically — no manual transcription errors.",
+    icon: FileSearch,
+    code: "NYSC-07",
+  },
+  {
+    label: "Phone OTP Sign-in",
+    description:
+      "Sign in to Zed with your Nigerian phone number via one-time password, with no email required. Full NDPA-compliant OTP pipeline.",
+    icon: Smartphone,
+    code: "AUTH-02",
+  },
+];
+
 export default function NavPage() {
   return (
-    <div className="mx-auto max-w-6xl px-4 py-6 md:px-8 space-y-6">
+    <div className="mx-auto max-w-6xl px-4 py-6 md:px-8 space-y-10">
       {/* Header */}
       <section className="space-y-1.5 border-hairline-b pb-6">
         <span className="font-mono text-xs uppercase tracking-wider text-muted-foreground">
@@ -71,7 +114,7 @@ export default function NavPage() {
       </section>
 
       {/* Guides Grid */}
-      <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <section className="grid grid-cols-1 md:grid-cols-2 gap-4" aria-label="Active guides">
         {guides.map((guide) => {
           const Icon = guide.icon;
           return (
@@ -88,7 +131,7 @@ export default function NavPage() {
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="font-mono text-[11px] text-muted-foreground">
-                        {String(guide.flow.steps.length).padStart(2, "0")} Steps · ~{guide.flow.estimatedMinutes} mins
+                        {String(guide.flow.steps.length).padStart(2, "0")} Steps &middot; ~{guide.flow.estimatedMinutes} mins
                       </span>
                       <Badge
                         variant="outline"
@@ -113,13 +156,58 @@ export default function NavPage() {
                 <div className="pt-4 border-hairline-t mt-4 flex items-center justify-between font-mono text-[11px] text-muted-foreground">
                   <span>REF: {guide.code}</span>
                   <span className="group-hover:text-foreground transition-colors">
-                    Open Guide →
+                    Open Guide &rarr;
                   </span>
                 </div>
               </Card>
             </Link>
           );
         })}
+      </section>
+
+      {/* Coming next */}
+      <section aria-label="Coming next in Zed Nav" className="space-y-4">
+        <div className="flex items-center gap-2 border-hairline-b pb-4">
+          <Clock className="h-3.5 w-3.5 text-muted-foreground" aria-hidden="true" />
+          <h2 className="type-caption text-muted-foreground font-semibold">
+            COMING NEXT IN ZED NAV
+          </h2>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {COMING_NEXT.map((item) => {
+            const Icon = item.icon;
+            return (
+              <div
+                key={item.code}
+                className="rounded-xl border-hairline bg-card/40 p-5 space-y-3 opacity-70"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-md border-hairline bg-secondary/60 text-muted-foreground">
+                    <Icon className="h-3.5 w-3.5" aria-hidden="true" />
+                  </div>
+                  <Badge
+                    variant="outline"
+                    className="font-mono text-[10px] border-border text-muted-foreground px-1.5 py-0"
+                  >
+                    Coming soon
+                  </Badge>
+                </div>
+                <div className="space-y-1">
+                  <h3 className="text-xs font-semibold text-foreground font-sans">
+                    {item.label}
+                  </h3>
+                  <p className="type-small text-muted-foreground leading-relaxed">
+                    {item.description}
+                  </p>
+                </div>
+                <div className="font-mono text-[11px] text-muted-foreground/60">
+                  REF: {item.code}
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </section>
     </div>
   );
