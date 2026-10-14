@@ -4,7 +4,7 @@ import { LegalPageLayout } from "@/components/site/LegalPageLayout";
 export const metadata: Metadata = {
   title: "Privacy Policy – Compliance with NDPA 2023 & NDPR",
   description:
-    "Comprehensive Privacy Policy of Zed Technologies Nigeria Ltd. Technical details on zero raw NIN storage, salted SHA-256 server-side hashing, lawful bases, data subject rights, and NDPC regulatory recourse.",
+    "Comprehensive Privacy Policy of Zed. Technical details on zero raw NIN storage, salted SHA-256 server-side hashing, lawful bases, data subject rights, and NDPC regulatory recourse.",
   openGraph: {
     title: "Privacy Policy – Compliance with NDPA 2023 & NDPR",
     description:
@@ -49,10 +49,9 @@ export default function PrivacyPolicyPage() {
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
           <p>
-            Zed Technologies Nigeria Ltd (&quot;Zed&quot;, &quot;we&quot;, &quot;us&quot;, or &quot;our&quot;) operates 
+            Zed (&quot;we&quot;, &quot;us&quot;, or &quot;our&quot;) operates 
             the Zed civil navigation platform and Progressive Web Application (the &quot;Platform&quot;). 
-            Zed is incorporated under the Laws of the Federal Republic of Nigeria with its principal registered office 
-            in Lagos State, Nigeria.
+            Zed is based in Lagos State, Nigeria.
           </p>
           <p>
             For the purposes of the <strong>Nigeria Data Protection Act 2023 (&quot;NDPA&quot;)</strong> and the 
@@ -348,7 +347,7 @@ export default function PrivacyPolicyPage() {
           </p>
           <div className="p-4 rounded-lg border border-[#E5E5E0] dark:border-white/10 bg-[#FAFAF8] dark:bg-[#141416] text-xs font-mono space-y-1 text-[#0B0B0C] dark:text-[#FAFAF8]">
             <strong>Data Protection Officer</strong><br />
-            Zed Technologies Nigeria Ltd.<br />
+            Zed<br />
             Yaba Technology Corridor, Lagos State, Nigeria.<br />
             Email: <a href="mailto:privacy@zedproject.ng" className="text-[#3ecf8e] underline">privacy@zedproject.ng</a>
           </div>

@@ -88,7 +88,7 @@ export default function VerifyNinPage() {
   return (
     <AuthLayout
       title="Harmonise your NIN"
-      subtitle="Verify your National Identity Number to unlock Civic Level 1."
+      subtitle="Verify your National Identity Number to unlock Rookie (Level 1)."
       rightHeadline={
         <>
           Identity privacy
@@ -112,7 +112,7 @@ export default function VerifyNinPage() {
             <code className="font-mono font-bold bg-amber-500/20 px-1 py-0.5 rounded">
               12345678901
             </code>
-            ) to simulate verification and unlock Level 1 in demo mode. No real NIMC check is performed.
+            ) to simulate verification and unlock Rookie (Level 1) in demo mode. No real NIMC check is performed.
           </p>
         </div>
 

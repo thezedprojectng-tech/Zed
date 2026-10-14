@@ -216,7 +216,7 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
             <div className="flex flex-col flex-1 min-w-0">
               <span className="font-medium text-foreground">Verify National Identity (NIN)</span>
               <span className="text-[11px] text-muted-foreground">
-                Unlock Civic Level 1 and verified citizen status
+                Verify your account and unlock Rookie (Level 1)
               </span>
             </div>
           </CommandItem>

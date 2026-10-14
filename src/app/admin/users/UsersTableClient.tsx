@@ -260,7 +260,7 @@ export function UsersTableClient({ users, currentAdminId }: UsersTableClientProp
                     className="text-left px-4 py-3 font-mono uppercase tracking-wider text-muted-foreground font-semibold text-[10px] whitespace-nowrap cursor-pointer hover:text-foreground select-none"
                   >
                     <div className="flex items-center gap-1.5">
-                      <span>Civic Level</span>
+                      <span>Level</span>
                       {renderSortIndicator("level")}
                     </div>
                   </th>

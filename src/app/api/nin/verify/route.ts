@@ -99,7 +99,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       success: true,
       is_verified: true,
-      message: "National Identity verified successfully! Civic Level 1 unlocked.",
+      message: "National Identity verified successfully! Rookie (Level 1) unlocked.",
     });
   } catch (err) {
     if (err instanceof z.ZodError) {
