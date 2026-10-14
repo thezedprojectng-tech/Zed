@@ -1,24 +1,39 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Loader2, LogOut, User, Mail, Phone } from "lucide-react";
-import type { Metadata } from "next";
+import {
+  Loader2,
+  LogOut,
+  User,
+  Mail,
+  Phone,
+  ShieldCheck,
+  ShieldAlert,
+  ArrowRight,
+  Award,
+} from "lucide-react";
 
 import { Header } from "@/components/layout/Header";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { useAuthStore } from "@/store/useAuthStore";
 import { signOut } from "@/lib/auth/actions";
 
 export default function ProfilePage() {
   const router = useRouter();
-  const { user, clearUser } = useAuthStore();
+  const { user, profile, clearUser } = useAuthStore();
   const [isSigningOut, setIsSigningOut] = useState(false);
 
-  const fullName = user?.user_metadata?.full_name as string | undefined;
-  const phoneNumber = user?.user_metadata?.phone_number as string | undefined;
+  const fullName =
+    profile?.full_name || (user?.user_metadata?.full_name as string | undefined);
+  const phoneNumber =
+    profile?.phone_number || (user?.user_metadata?.phone_number as string | undefined);
   const email = user?.email;
+  const isVerified = Boolean(profile?.is_verified);
+  const civicLevel = profile?.level_id || 1;
 
   const handleSignOut = async () => {
     setIsSigningOut(true);
@@ -27,6 +42,7 @@ export default function ProfilePage() {
       await signOut();
       toast.success("You have been signed out.");
       router.push("/login");
+      router.refresh();
     } catch {
       toast.error("Sign out failed. Please try again.");
       setIsSigningOut(false);
@@ -35,8 +51,68 @@ export default function ProfilePage() {
 
   return (
     <>
-      <Header title="Your Profile" subtitle="Manage your account and level." />
-      <section className="container-mobile py-6 space-y-6">
+      <Header title="Your Profile" subtitle="Manage your citizen account and civic credentials." />
+      <section className="container-mobile py-6 space-y-6 max-w-7xl mx-auto">
+        {/* Verification & Level Status Banner */}
+        <div className="rounded-xl border border-hairline bg-card p-5 space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
+              Civic Credentials
+            </h2>
+            <Badge
+              variant="outline"
+              className={
+                isVerified
+                  ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-500"
+                  : "border-amber-500/30 bg-amber-500/10 text-amber-500"
+              }
+            >
+              {isVerified ? "Verified Citizen" : "Verification Required"}
+            </Badge>
+          </div>
+
+          <div className="flex items-start gap-4 pt-1">
+            <div
+              className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border ${
+                isVerified
+                  ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-500"
+                  : "border-amber-500/30 bg-amber-500/10 text-amber-500"
+              }`}
+            >
+              {isVerified ? (
+                <ShieldCheck className="h-6 w-6" />
+              ) : (
+                <ShieldAlert className="h-6 w-6" />
+              )}
+            </div>
+
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <p className="font-semibold text-foreground text-sm">
+                  Civic Standing: Level {civicLevel}
+                </p>
+                <Award className="h-4 w-4 text-primary" />
+              </div>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                {isVerified
+                  ? "Your 11-digit NIN has been verified in demo mode. Your citizen account is verified at Civic Level 1."
+                  : "Your account is unverified. Harmonise your National Identity Number (NIN) to verify your account and unlock Level 1."}
+              </p>
+            </div>
+          </div>
+
+          {!isVerified && (
+            <div className="pt-2">
+              <Button asChild size="sm" className="w-full gap-2">
+                <Link href="/verify-nin">
+                  <span>Verify NIN now</span>
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
+          )}
+        </div>
+
         {/* Profile Card */}
         <div className="rounded-xl border border-hairline bg-card p-5 space-y-4">
           <h2 className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
@@ -81,12 +157,6 @@ export default function ProfilePage() {
             )}
           </div>
         </div>
-
-        {/* Phase 2 placeholder */}
-        <p className="text-xs text-muted-foreground">
-          {/* Phase 2: avatar upload, level badge, NIN status, stats, settings */}
-          More profile features are coming in Phase 2.
-        </p>
 
         {/* Sign Out */}
         <Button

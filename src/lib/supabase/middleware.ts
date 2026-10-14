@@ -2,8 +2,9 @@ import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
 
 /**
- * Utility used inside middleware.ts to refresh the Supabase session cookie
- * and protect (app) routes from unauthenticated access.
+ * Utility used inside middleware.ts to refresh the Supabase session cookie,
+ * protect (app) routes from unauthenticated access, and redirect authenticated
+ * users away from /login and /signup to /home.
  */
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
@@ -29,21 +30,32 @@ export async function updateSession(request: NextRequest) {
     }
   );
 
-  // IMPORTANT: Do not remove this call. It refreshes the user's session cookie
-  // on every request so it doesn't expire while they are actively using the app.
+  // IMPORTANT: Refreshes the session cookie so it does not expire during active use
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Redirect unauthenticated users away from protected (app) routes to /login
+  const pathname = request.nextUrl.pathname;
+
+  // 1. Redirect unauthenticated users away from protected (app) routes to /login
   const isAppRoute =
-    request.nextUrl.pathname.startsWith("/home") ||
-    request.nextUrl.pathname.startsWith("/nav") ||
-    request.nextUrl.pathname.startsWith("/profile");
+    pathname.startsWith("/home") ||
+    pathname.startsWith("/nav") ||
+    pathname.startsWith("/profile") ||
+    pathname.startsWith("/admin");
 
   if (!user && isAppRoute) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
+    return NextResponse.redirect(url);
+  }
+
+  // 2. Redirect authenticated users away from /login and /signup to /home
+  const isAuthRoute = pathname === "/login" || pathname === "/signup";
+
+  if (user && isAuthRoute) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/home";
     return NextResponse.redirect(url);
   }
 

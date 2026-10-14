@@ -82,7 +82,7 @@ const TABS: FlowTab[] = [
     bullets: [
       "Step-by-step procedure for name order and date-of-birth modifications",
       "Cross-bank BVN harmonization instructions to unlock restricted accounts",
-      "Zero raw NIN storage — client-side salted SHA-256 ensures total privacy",
+      "Zero raw NIN storage — salted SHA-256 hashing on our server protects your privacy",
     ],
     mockup: {
       title: "NIMC & BVN Record Alignment",
@@ -94,7 +94,7 @@ const TABS: FlowTab[] = [
         { label: "Enrolment Center", status: "Selected", detail: "NIMC State Headquarters biometric modification slot" },
         { label: "Bank Broadcast", status: "Pending", detail: "Present NIMC modification slip to bank compliance desk" },
       ],
-      footerNote: "Encrypted via client-side SHA-256. Raw NIN never stored.",
+      footerNote: "Transmitted over HTTPS and hashed with a secret salt. Raw NIN is never stored.",
     },
   },
   {

@@ -10,6 +10,8 @@ interface AuthLayoutProps {
   children: React.ReactNode;
   rightHeadline?: React.ReactNode;
   rightSubtext?: string;
+  rightFooterLeft?: string;
+  rightFooterRight?: string;
 }
 
 export function AuthLayout({
@@ -18,6 +20,8 @@ export function AuthLayout({
   children,
   rightHeadline,
   rightSubtext,
+  rightFooterLeft,
+  rightFooterRight,
 }: AuthLayoutProps) {
   return (
     <section className="min-h-screen bg-background p-3 text-foreground antialiased [font-synthesis:none]">
@@ -103,8 +107,8 @@ export function AuthLayout({
 
             {/* Bottom Status Card */}
             <div className="flex items-center justify-between border-t border-white/10 pt-4 font-mono text-[11px] text-white/60">
-              <span>FEDERATION WIDE COVERAGE</span>
-              <span className="text-emerald-400">ENCRYPTED CLIENT VAULT</span>
+              <span>{rightFooterLeft || "FEDERATION WIDE COVERAGE"}</span>
+              <span className="text-emerald-400">{rightFooterRight || "SECURE HTTPS"}</span>
             </div>
           </div>
         </div>

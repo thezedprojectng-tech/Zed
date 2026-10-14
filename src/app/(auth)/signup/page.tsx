@@ -81,8 +81,11 @@ export default function SignupPage() {
         phoneNumber: data.phone,
       });
       toast.success(res.message);
-      // Redirect to login so the user can sign in after confirming their email
-      router.push("/login?registered=true");
+      if (res.hasSession) {
+        router.push("/home");
+      } else {
+        router.push("/login?registered=true");
+      }
     } catch (err: any) {
       toast.error(err.message || "Failed to create account. Please try again.");
     } finally {
@@ -262,7 +265,7 @@ export default function SignupPage() {
               >
                 Privacy Policy
               </Link>
-              . My verification credentials remain client-side encrypted.
+              .
             </span>
           </label>
           {errors.terms && (

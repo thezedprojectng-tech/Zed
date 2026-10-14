@@ -4,7 +4,7 @@ import { LegalPageLayout } from "@/components/site/LegalPageLayout";
 export const metadata: Metadata = {
   title: "Privacy Policy – Compliance with NDPA 2023 & NDPR",
   description:
-    "Comprehensive Privacy Policy of Zed Technologies Nigeria Ltd. Technical details on zero raw NIN storage, SHA-256 client hashing, lawful bases, data subject rights, and NDPC regulatory recourse.",
+    "Comprehensive Privacy Policy of Zed Technologies Nigeria Ltd. Technical details on zero raw NIN storage, salted SHA-256 server-side hashing, lawful bases, data subject rights, and NDPC regulatory recourse.",
   openGraph: {
     title: "Privacy Policy – Compliance with NDPA 2023 & NDPR",
     description:
@@ -83,9 +83,7 @@ export default function PrivacyPolicyPage() {
               and optional display name.
             </li>
             <li>
-              <strong>Cryptographically Hashed Identity Tokens:</strong> A client-generated SHA-256 cryptographic hash 
-              representing your National Identity Number (NIN). Under no circumstances is the raw 11-digit numerical 
-              NIN recorded in our databases.
+              <strong>Cryptographically Hashed Identity Tokens:</strong> When you verify your National Identity Number (NIN), it is transmitted over an encrypted HTTPS connection to our backend server and converted into a one-way irreversible cryptographic digest using salted SHA-256. Under no circumstances is the raw 11-digit numerical NIN recorded or persisted in our databases.
             </li>
             <li>
               <strong>Inquiry &amp; Support Telemetry:</strong> Name, email address, inquiry topic, and message content 
@@ -120,9 +118,10 @@ export default function PrivacyPolicyPage() {
               MANDATORY TECHNICAL PROTOCOL:
             </span>
             <p>
-              1. All format and checksum checks on your NIN occur locally on your client device using JavaScript execution.<br />
-              2. When verification against NIMC verification rails is initiated, the raw number is processed in volatile memory and converted into a one-way irreversible cryptographic digest using standard SHA-256 with salted entropy.<br />
-              3. Zed&apos;s cloud infrastructure never writes, logs, caches, or persists plaintext NIN records on any physical disk or cloud database.
+              1. Format checks on your NIN occur locally on your client device before submission.<br />
+              2. When verification is initiated, the raw number is transmitted over an encrypted HTTPS connection to our backend server.<br />
+              3. Verification currently operates in a demo sandbox environment (mock provider). On our server, the raw NIN is processed in volatile memory, converted into a one-way irreversible cryptographic digest using standard SHA-256 with a secret server salt, and the raw number is discarded immediately.<br />
+              4. Only the salted SHA-256 hash is persisted in the database. Zed&apos;s infrastructure never writes, logs, caches, or persists plaintext NIN records on any physical disk or database.
             </p>
           </div>
           <p>

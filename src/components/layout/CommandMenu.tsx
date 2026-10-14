@@ -164,7 +164,7 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
                 <span className="font-mono text-[10px] text-muted-foreground">NYSC-02</span>
               </div>
               <span className="text-[11px] text-muted-foreground truncate">
-                Senate list verification, green card generation, camp medicals, call-up
+                Senate list verification, green card checklist, camp medicals, call-up
               </span>
             </div>
           </CommandItem>
@@ -216,7 +216,7 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
             <div className="flex flex-col flex-1 min-w-0">
               <span className="font-medium text-foreground">Verify National Identity (NIN)</span>
               <span className="text-[11px] text-muted-foreground">
-                Unlock Civic Level 1 and automated form filling
+                Unlock Civic Level 1 and verified citizen status
               </span>
             </div>
           </CommandItem>

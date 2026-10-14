@@ -2,36 +2,74 @@
 
 // ─── Supabase Auth Session Provider ───────────────────────────────────────────
 // Runs once on the client side to:
-//  1. Fetch the current Supabase session and push it into useAuthStore.
-//  2. Subscribe to onAuthStateChange so the store stays in sync after
-//     sign-in, sign-out, and token refresh events.
+//  1. Fetch current Supabase user and profile (from public.users) into useAuthStore.
+//  2. Subscribe to onAuthStateChange so store stays in sync on auth events.
+//  3. Automatically hydrate nav progress on user login.
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { useAuthStore } from "@/store/useAuthStore";
+import { useAuthStore, type UserProfile } from "@/store/useAuthStore";
+import { useNavProgressStore } from "@/store/useNavProgressStore";
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const { setUser, clearUser, setLoading } = useAuthStore();
+  const { setUser, setProfile, clearUser, setLoading } = useAuthStore();
+  const { syncWithRemote } = useNavProgressStore();
+  const mountedRef = useRef(false);
 
   useEffect(() => {
+    if (mountedRef.current) return;
+    mountedRef.current = true;
+
     const supabase = createClient();
 
-    // 1. Hydrate the store with any existing session immediately
-    supabase.auth.getUser().then(({ data: { user } }) => {
+    async function loadUserProfile(userId: string) {
+      try {
+        const { data, error } = await supabase
+          .from("users")
+          .select("*")
+          .eq("id", userId)
+          .maybeSingle();
+
+        if (error) {
+          console.error("Failed to load user profile:", error.message);
+          return null;
+        }
+        return (data as UserProfile) || null;
+      } catch (err) {
+        console.error("Unexpected error loading user profile:", err);
+        return null;
+      }
+    }
+
+    async function handleUserAuthenticated(user: any) {
+      setUser(user);
+      const profile = await loadUserProfile(user.id);
+      setProfile(profile);
+      setLoading(false);
+
+      // Trigger nav progress sync on login
+      syncWithRemote(user.id, supabase).catch((err) => {
+        console.error("Nav progress sync failed:", err);
+      });
+    }
+
+    // 1. Initial session load
+    setLoading(true);
+    supabase.auth.getUser().then(async ({ data: { user } }) => {
       if (user) {
-        setUser(user);
+        await handleUserAuthenticated(user);
       } else {
         clearUser();
       }
     });
 
-    // 2. Listen for future auth changes (login, logout, token refresh)
+    // 2. Auth state subscription
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (session?.user) {
-        setUser(session.user);
-      } else {
+        await handleUserAuthenticated(session.user);
+      } else if (event === "SIGNED_OUT" || !session) {
         clearUser();
       }
     });
@@ -39,7 +77,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => {
       subscription.unsubscribe();
     };
-  }, [setUser, clearUser, setLoading]);
+  }, [setUser, setProfile, clearUser, setLoading, syncWithRemote]);
 
   return <>{children}</>;
 }

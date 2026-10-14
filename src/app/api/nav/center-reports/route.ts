@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 const reportSchema = z.object({
   center_name: z.string().min(2).max(120),
   state: z.string().min(2).max(60),
-  wait_minutes: z.number().int().min(0).max(600),
+  wait_minutes: z.number().int().min(0).max(720),
 });
 
 /**

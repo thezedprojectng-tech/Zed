@@ -266,7 +266,7 @@ export function AlternatingFeatures() {
                       NIN Identity Slip Format
                     </div>
                     <div className="text-xs text-[#57575e] mt-0.5">
-                      11-digit checksum verified locally via client-side Luhn-type algorithm
+                      11-digit numerical length and formatting validated
                     </div>
                   </div>
                   <span className="inline-flex items-center gap-1 text-[11px] font-mono font-semibold text-[#0e7048] bg-[#3ecf8e]/10 px-2 py-0.5 rounded-full">
@@ -278,7 +278,7 @@ export function AlternatingFeatures() {
 
               <div className="pt-3 border-t border-[#E8E8E4] flex items-center gap-1.5 text-xs font-mono text-[#57575e]">
                 <ShieldCheck className="h-3.5 w-3.5 text-[#3ecf8e]" />
-                Zero server upload: files analyzed 100% in local memory
+                Zero cloud storage: files analyzed in temporary memory
               </div>
             </div>
           </div>

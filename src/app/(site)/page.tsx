@@ -48,7 +48,7 @@ const FAQ_ITEMS = [
   {
     question: "What happens to my NIN?",
     answer:
-      "Zed never stores your raw 11-digit NIN. Any identity validation uses client-side salted SHA-256 cryptographic hashing. Your raw NIN never resides in our database or permanent cloud storage, adhering strictly to the Nigeria Data Protection Act (NDPA 2023).",
+      "Zed never stores your raw 11-digit NIN. When you verify in demo mode, your NIN is sent securely over an encrypted connection, hashed with a secret salt on our server, and only the irreversible hash is saved. The raw number is never logged or stored in any database, adhering strictly to the Nigeria Data Protection Act (NDPA 2023).",
   },
   {
     question: "Which processes are covered?",
@@ -122,7 +122,7 @@ const PILLARS = [
     title: "Private",
     subtitle: "NIN hashed, never stored raw",
     description:
-      "Your 11-digit NIN never touches a cloud database unencrypted. Salted SHA-256 client-side hashing ensures your sovereign national identity stays entirely in your custody.",
+      "Your 11-digit NIN is transmitted over an encrypted HTTPS connection, hashed with a secret salt on our server, and never stored raw. Verification operates in demo mode.",
   },
 ];
 
@@ -274,7 +274,7 @@ export default function HomePage() {
                     Your National Identity Number is the master key to your civil, banking, and travel records. Storing raw identity numbers in cloud databases creates an unacceptable attack surface for identity theft.
                   </p>
                   <p>
-                    Zed applies client-side salted SHA-256 cryptographic hashing before any validation takes place. Under no circumstances is your raw 11-digit NIN written, logged, or persisted in our databases. In accordance with the Nigeria Data Protection Act (NDPA) 2023, you retain absolute rights to data export, audit, and instant deletion.
+                    Zed transmits your NIN over an encrypted connection and hashes it with a secret salt on our server. Under no circumstances is your raw 11-digit NIN written, logged, or persisted in our databases. Verification is a demo mock, and only the hash is retained.
                   </p>
                 </div>
 

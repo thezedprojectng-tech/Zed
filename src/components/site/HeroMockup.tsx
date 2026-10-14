@@ -5,7 +5,7 @@ import { motion, useInView, useReducedMotion } from "framer-motion";
 import { Check, ShieldCheck, FileText, ChevronRight, Clock, AlertCircle } from "lucide-react";
 
 const CHECKLIST_ITEMS = [
-  { id: 1, title: "National Identity Number (NIN) Slip", detail: "NIMC validated • Name order confirmed" },
+  { id: 1, title: "National Identity Number (NIN) Slip", detail: "Standard NIMC slip • Name order confirmed" },
   { id: 2, title: "Birth Certificate / Age Declaration", detail: "National Population Commission copy" },
   { id: 3, title: "Local Government Certificate of Origin", detail: "LGA stamped • State of origin matched" },
   { id: 4, title: "Passport Photographs (35×45mm)", detail: "White background • Neutral expression" },

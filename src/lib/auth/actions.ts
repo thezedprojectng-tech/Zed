@@ -41,32 +41,40 @@ export function isValidNIN(nin: string): boolean {
 
 /**
  * Sign up a new user with email and password.
- * Passes full_name and phone_number into user_metadata for profile hydration.
+ * Passes full_name and phone_number into user_metadata.
+ * A database trigger on auth.users automatically inserts the public.users profile row.
  */
 export async function signUp(params: {
   email: string;
   password: string;
   fullName: string;
   phoneNumber: string;
-}): Promise<{ success: boolean; message: string }> {
+}): Promise<{ success: boolean; message: string; hasSession: boolean }> {
   const supabase = createClient();
 
-  const { error } = await supabase.auth.signUp({
-    email: params.email,
+  const normalizedPhone = normalizeNigerianPhone(params.phoneNumber);
+
+  const { data, error } = await supabase.auth.signUp({
+    email: params.email.trim().toLowerCase(),
     password: params.password,
     options: {
       data: {
         full_name: params.fullName.trim(),
-        phone_number: normalizeNigerianPhone(params.phoneNumber),
+        phone_number: normalizedPhone,
       },
     },
   });
 
   if (error) {
-    // Provide friendly messages for common errors
-    if (error.message.includes("already registered")) {
+    // If signup fails with "Database error saving new user", phone or email may already be registered
+    if (
+      error.message.includes("Database error saving new user") ||
+      error.message.includes("already registered") ||
+      error.message.includes("duplicate key") ||
+      error.message.includes("unique")
+    ) {
       throw new Error(
-        "An account with this email already exists. Please sign in instead."
+        "This phone number or email address is already registered. Please sign in instead."
       );
     }
     if (error.message.includes("Password should be")) {
@@ -75,10 +83,14 @@ export async function signUp(params: {
     throw new Error(error.message);
   }
 
+  const hasSession = Boolean(data.session);
+
   return {
     success: true,
-    message:
-      "Account created! Check your email for a confirmation link before signing in.",
+    hasSession,
+    message: hasSession
+      ? "Account created successfully! Welcome to Zed."
+      : "Account created! Check your email for a confirmation link before signing in.",
   };
 }
 
@@ -92,7 +104,7 @@ export async function signIn(params: {
   const supabase = createClient();
 
   const { error } = await supabase.auth.signInWithPassword({
-    email: params.email,
+    email: params.email.trim().toLowerCase(),
     password: params.password,
   });
 
@@ -131,26 +143,4 @@ export async function signIn(params: {
 export async function signOut(): Promise<void> {
   const supabase = createClient();
   await supabase.auth.signOut();
-}
-
-/**
- * TODO: Replace with official NIMC hashing & validation endpoint
- * Simulates hashing and validating the 11-digit National Identity Number.
- */
-export async function verifyNin(
-  nin: string
-): Promise<{ success: boolean; message: string; is_verified: boolean }> {
-  // Validate exactly 11 digits
-  if (!isValidNIN(nin)) {
-    throw new Error("National Identity Number must be exactly 11 numeric digits.");
-  }
-
-  // TODO: Call the NIMC verification API here
-  await new Promise((resolve) => setTimeout(resolve, 800));
-
-  return {
-    success: true,
-    is_verified: true,
-    message: "National Identity verified. Civic Level 1 status unlocked.",
-  };
 }

@@ -10,15 +10,16 @@ import { toast } from "sonner";
 import {
   ArrowRight,
   Loader2,
-  ShieldAlert,
   ShieldCheck,
   Lock,
   ChevronRight,
+  AlertTriangle,
+  FlaskConical,
 } from "lucide-react";
 
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { Button } from "@/components/ui/button";
-import { verifyNin, isValidNIN } from "@/lib/auth/actions";
+import { isValidNIN } from "@/lib/auth/actions";
 import { useAuthStore } from "@/store/useAuthStore";
 
 const ninSchema = z.object({
@@ -36,7 +37,7 @@ type NinFormData = z.infer<typeof ninSchema>;
 
 export default function VerifyNinPage() {
   const router = useRouter();
-  const { user } = useAuthStore();
+  const { fetchProfile } = useAuthStore();
   const [isLoading, setIsLoading] = useState(false);
 
   const {
@@ -57,16 +58,28 @@ export default function VerifyNinPage() {
   const onSubmit = async (data: NinFormData) => {
     setIsLoading(true);
     try {
-      const res = await verifyNin(data.nin);
-      if (res.success) {
-        // TODO: Once a proper backend table stores NIN verification status,
-        // update the user's app_metadata here and call setUser() to refresh
-        // the store. For now we just navigate forward.
-        toast.success(res.message);
-        router.push("/home");
+      const response = await fetch("/api/nin/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nin: data.nin }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || "Failed to verify NIN.");
       }
+
+      // Refresh store profile so is_verified updates across all components
+      await fetchProfile();
+
+      toast.success(result.message || "National Identity verified successfully!");
+      router.push("/home");
+      router.refresh();
     } catch (err: any) {
-      toast.error(err.message || "Failed to verify NIN. Please check the digits and try again.");
+      toast.error(
+        err.message || "Failed to verify NIN. Please check the digits and try again."
+      );
     } finally {
       setIsLoading(false);
     }
@@ -75,7 +88,7 @@ export default function VerifyNinPage() {
   return (
     <AuthLayout
       title="Harmonise your NIN"
-      subtitle="Validate your National Identity Number to unlock Civic Level 1 and automated form filling."
+      subtitle="Verify your National Identity Number to unlock Civic Level 1."
       rightHeadline={
         <>
           Identity privacy
@@ -83,9 +96,26 @@ export default function VerifyNinPage() {
           by <span className="font-serif italic font-normal text-emerald-400">design.</span>
         </>
       }
-      rightSubtext="Your NIN is hashed directly on your device. We never transmit or store your raw credentials on central servers."
+      rightSubtext="Your NIN is sent over an encrypted connection, hashed with a secret salt on our server, and the raw number is never stored or logged. Only the hash is kept."
+      rightFooterLeft="HASHED, NEVER STORED"
+      rightFooterRight="DEMO MODE"
     >
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        {/* Prominent Demo Verification Notice */}
+        <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 space-y-1.5 text-amber-600 dark:text-amber-400">
+          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider">
+            <FlaskConical className="h-4 w-4 shrink-0" />
+            <span>Demo Verification Sandbox</span>
+          </div>
+          <p className="text-xs leading-relaxed text-amber-700 dark:text-amber-300">
+            This is a mock verification environment for testing. You can enter any 11 digits (e.g.{" "}
+            <code className="font-mono font-bold bg-amber-500/20 px-1 py-0.5 rounded">
+              12345678901
+            </code>
+            ) to simulate verification and unlock Level 1 in demo mode. No real NIMC check is performed.
+          </p>
+        </div>
+
         {/* NIN Input Field */}
         <div className="space-y-2">
           <div className="flex items-center justify-between">
@@ -128,7 +158,7 @@ export default function VerifyNinPage() {
             <span>How your National Identity is protected</span>
           </div>
           <p className="type-small text-[11px] text-muted-foreground leading-relaxed">
-            Your 11-digit NIN is hashed locally using cryptographic SHA-256 before verification against official NIMC records. Zed never stores or sells your raw identity number.
+            Your NIN is sent securely to our server, hashed with salted SHA-256, and the raw number is never stored or logged. This is a demo, so no real NIMC check is made.
           </p>
         </div>
 
@@ -141,7 +171,7 @@ export default function VerifyNinPage() {
           {isLoading ? (
             <>
               <Loader2 className="h-4 w-4 animate-spin" />
-              <span>Verifying with NIMC...</span>
+              <span>Verifying National Identity...</span>
             </>
           ) : (
             <>

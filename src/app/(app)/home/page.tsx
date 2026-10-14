@@ -107,7 +107,7 @@ const civilTips = [
 ];
 
 export default function HomePage() {
-  const { user } = useAuthStore();
+  const { user, profile } = useAuthStore();
   const { progressMap } = useNavProgressStore();
   const [greeting, setGreeting] = useState("Good day");
   const [dateString, setDateString] = useState("");
@@ -117,10 +117,10 @@ export default function HomePage() {
     setDateString(getFormattedDate());
   }, []);
 
-  const fullName = user?.user_metadata?.full_name as string | undefined;
+  const fullName = profile?.full_name || (user?.user_metadata?.full_name as string | undefined);
   const firstName = fullName ? fullName.trim().split(" ")[0] : "there";
-  // is_verified will be a custom claim once NIN verification is wired to the database
-  const isVerified = false;
+  const isVerified = Boolean(profile?.is_verified);
+  const civicLevel = profile?.level_id || 1;
 
   const activeFlow = progressMap["passport"] || {
     flow_id: "passport",
@@ -146,7 +146,7 @@ export default function HomePage() {
             {greeting}, {firstName}.
           </h1>
           <span className="type-caption text-muted-foreground">
-            CIVIC LEVEL 1 · CITIZEN STATUS
+            CIVIC LEVEL {civicLevel} · {isVerified ? "VERIFIED CITIZEN" : "CITIZEN STATUS"}
           </span>
         </div>
         <p className="type-body text-muted-foreground max-w-3xl">
@@ -178,8 +178,7 @@ export default function HomePage() {
                   Verify your NIN to unlock Level 1
                 </h2>
                 <p className="type-small text-muted-foreground">
-                  Validate your 11-digit National Identity Number to auto-fill immigration forms,
-                  access real-time wait crowd reports, and unlock official document generation.
+                  Verify your 11-digit National Identity Number to unlock Civic Level 1, confirm your verified citizen status, and track your procedural steps.
                 </p>
                 <div className="flex items-center gap-3">
                   <div className="w-48">

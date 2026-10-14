@@ -33,6 +33,7 @@ import {
   ShieldCheck,
   LogOut,
   Sparkles,
+  LayoutDashboard,
 } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { signOut } from "@/lib/auth/actions";
@@ -53,13 +54,16 @@ const routeLabels: Record<string, string> = {
   cac: "CAC Registration",
   profile: "Civil Profile",
   "verify-nin": "NIN Verification",
+  admin: "Admin",
+  users: "Users",
+  reports: "Reports",
 };
 
 export function TopBar({ onOpenCommand }: TopBarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const { theme, setTheme, resolvedTheme } = useTheme();
-  const { user, clearUser } = useAuthStore();
+  const { user, profile, clearUser } = useAuthStore();
   const [isOnline, setIsOnline] = useState(true);
   const [mounted, setMounted] = useState(false);
 
@@ -97,10 +101,11 @@ export function TopBar({ onOpenCommand }: TopBarProps) {
     return parts[0].slice(0, 2).toUpperCase();
   };
 
-  // Read profile metadata from the Supabase User object
-  const fullName = user?.user_metadata?.full_name as string | undefined;
-  const avatarUrl = user?.user_metadata?.avatar_url as string | undefined;
+  // Read profile metadata from profile or Supabase User object
+  const fullName = profile?.full_name || (user?.user_metadata?.full_name as string | undefined);
+  const avatarUrl = profile?.avatar_url || (user?.user_metadata?.avatar_url as string | undefined);
   const email = user?.email;
+  const civicLevel = profile?.level_id || 1;
 
   return (
     <header className="sticky top-0 z-30 flex h-14 w-full items-center justify-between border-hairline-b bg-background/80 px-4 md:px-6 backdrop-blur-md">
@@ -171,7 +176,7 @@ export function TopBar({ onOpenCommand }: TopBarProps) {
           <Search className="h-3.5 w-3.5" />
           <span className="hidden sm:inline">Search guides...</span>
           <kbd className="hidden sm:inline-flex h-4 items-center rounded border border-border bg-secondary/80 px-1 font-mono text-[10px] text-muted-foreground">
-            ⌘K
+            ctrl + K
           </kbd>
         </button>
 
@@ -277,7 +282,7 @@ export function TopBar({ onOpenCommand }: TopBarProps) {
                     variant="outline"
                     className="border-primary/30 bg-primary/10 text-primary text-[10px] py-0 px-1.5 font-mono"
                   >
-                    Level 1 Citizen
+                    Level {civicLevel} Citizen
                   </Badge>
                 </div>
               </div>
@@ -295,6 +300,14 @@ export function TopBar({ onOpenCommand }: TopBarProps) {
                 <span>NIN Verification</span>
               </Link>
             </DropdownMenuItem>
+            {profile?.role === "admin" && (
+              <DropdownMenuItem asChild>
+                <Link href="/admin" className="cursor-pointer text-amber-500 focus:text-amber-500">
+                  <LayoutDashboard className="mr-2 h-4 w-4" />
+                  <span>Admin Dashboard</span>
+                </Link>
+              </DropdownMenuItem>
+            )}
             <DropdownMenuSeparator />
             <DropdownMenuItem
               onClick={handleSignOut}
