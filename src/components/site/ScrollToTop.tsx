@@ -47,7 +47,7 @@ export function ScrollToTop() {
       type="button"
       onClick={scrollToTop}
       aria-label="Scroll back to top"
-      className={`fixed bottom-6 right-6 z-40 flex items-center justify-center h-11 w-11 rounded-full border border-[#E5E5E0] dark:border-white/10 bg-[#ffffff] dark:bg-[#141416] text-[#0B0B0C] dark:text-[#FAFAF8] shadow-md transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3ecf8e] cursor-pointer ${
+      className={`fixed bottom-6 right-6 z-40 flex items-center justify-center h-11 w-11 rounded-full border border-[#E5E5E0] bg-white text-[#0B0B0C] shadow-md transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3ecf8e] cursor-pointer ${
         isVisible
           ? "opacity-100 translate-y-0 pointer-events-auto"
           : "opacity-0 translate-y-3 pointer-events-none"
@@ -61,7 +61,7 @@ export function ScrollToTop() {
           cx="22"
           cy="22"
           r={radius}
-          className="stroke-[#E5E5E0] dark:stroke-white/10"
+          className="stroke-[#E5E5E0]"
           strokeWidth="2"
           fill="none"
         />

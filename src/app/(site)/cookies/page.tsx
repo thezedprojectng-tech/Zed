@@ -29,7 +29,7 @@ export default function CookiesPolicyPage() {
     >
       {/* ── Section 1 ──────────────────────────────────────────────── */}
       <section id="section-1" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
-        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
+        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] ">
           1. Introduction &amp; Scope
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
@@ -48,7 +48,7 @@ export default function CookiesPolicyPage() {
 
       {/* ── Section 2 ──────────────────────────────────────────────── */}
       <section id="section-2" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
-        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
+        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C]">
           2. PWA Low-Data Architecture &amp; Offline Storage
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
@@ -59,17 +59,17 @@ export default function CookiesPolicyPage() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
             <div className="p-4 rounded-xl border border-[#E5E5E0] dark:border-white/10 bg-[#FAFAF8] dark:bg-[#141416] space-y-2">
               <Wifi className="h-4 w-4 text-[#3ecf8e]" />
-              <h4 className="font-display font-semibold text-xs text-[#0B0B0C] dark:text-[#FAFAF8]">Zero Data Waste</h4>
+              <h4 className="font-display font-semibold text-xs text-[#fafaf8] ">Zero Data Waste</h4>
               <p className="text-xs text-[#57575e] dark:text-[#9c9ca4]">Core JSON playbooks are downloaded once and re-validated only when official fees update.</p>
             </div>
             <div className="p-4 rounded-xl border border-[#E5E5E0] dark:border-white/10 bg-[#FAFAF8] dark:bg-[#141416] space-y-2">
               <HardDrive className="h-4 w-4 text-[#3ecf8e]" />
-              <h4 className="font-display font-semibold text-xs text-[#0B0B0C] dark:text-[#FAFAF8]">Basement Resiliency</h4>
+              <h4 className="font-display font-semibold text-xs text-[#fafaf8] ">Basement Resiliency</h4>
               <p className="text-xs text-[#57575e] dark:text-[#9c9ca4]">Checklists and photo dimension audits run client-side in physical capture centers with zero signal.</p>
             </div>
             <div className="p-4 rounded-xl border border-[#E5E5E0] dark:border-white/10 bg-[#FAFAF8] dark:bg-[#141416] space-y-2">
               <ShieldCheck className="h-4 w-4 text-[#3ecf8e]" />
-              <h4 className="font-display font-semibold text-xs text-[#0B0B0C] dark:text-[#FAFAF8]">Zero Cloud Tracking</h4>
+              <h4 className="font-display font-semibold text-xs text-[#0B0B0C] ">Zero Cloud Tracking</h4>
               <p className="text-xs text-[#57575e] dark:text-[#9c9ca4]">Unsubmitted form drafts remain stored locally on your device rather than on remote servers.</p>
             </div>
           </div>
@@ -78,7 +78,7 @@ export default function CookiesPolicyPage() {
 
       {/* ── Section 3 ──────────────────────────────────────────────── */}
       <section id="section-3" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
-        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
+        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] ">
           3. Storage Technologies We Deploy
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
@@ -101,7 +101,7 @@ export default function CookiesPolicyPage() {
 
       {/* ── Section 4 ──────────────────────────────────────────────── */}
       <section id="section-4" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
-        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
+        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] ">
           4. Categories of Client-Side Storage
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
@@ -125,13 +125,13 @@ export default function CookiesPolicyPage() {
 
       {/* ── Section 5 ──────────────────────────────────────────────── */}
       <section id="section-5" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
-        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
+        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] ">
           5. Comprehensive Storage Inventory Table
         </h2>
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs font-sans">
             <thead>
-              <tr className="border-b border-[#E5E5E0] dark:border-white/10 bg-[#FAFAF8] dark:bg-[#141416] text-[#0B0B0C] dark:text-[#FAFAF8] font-mono uppercase tracking-wider">
+              <tr className="border-b border-[#E5E5E0] dark:border-white/10 bg-[#FAFAF8] dark:bg-[#141416] text-[#fafaf8]  font-mono uppercase tracking-wider">
                 <th className="py-3 px-4 font-semibold">Identifier</th>
                 <th className="py-3 px-4 font-semibold">Type</th>
                 <th className="py-3 px-4 font-semibold">Lifespan</th>
@@ -141,42 +141,42 @@ export default function CookiesPolicyPage() {
             </thead>
             <tbody className="divide-y divide-[#E5E5E0] dark:divide-white/10 text-[#57575e] dark:text-[#9c9ca4]">
               <tr>
-                <td className="py-3 px-4 font-mono font-medium text-[#0B0B0C] dark:text-[#FAFAF8]">zed_session</td>
+                <td className="py-3 px-4 font-mono font-medium text-[#0B0B0C] ">zed_session</td>
                 <td className="py-3 px-4">HTTP Cookie</td>
                 <td className="py-3 px-4">Session / 30 Days</td>
                 <td className="py-3 px-4 text-[#3ecf8e] font-semibold">Essential</td>
                 <td className="py-3 px-4">Cryptographically authenticated user session token.</td>
               </tr>
               <tr>
-                <td className="py-3 px-4 font-mono font-medium text-[#0B0B0C] dark:text-[#FAFAF8]">cf_clearance</td>
+                <td className="py-3 px-4 font-mono font-medium text-[#0B0B0C] ">cf_clearance</td>
                 <td className="py-3 px-4">HTTP Cookie</td>
                 <td className="py-3 px-4">1 Year</td>
                 <td className="py-3 px-4 text-[#3ecf8e] font-semibold">Essential</td>
                 <td className="py-3 px-4">Cloudflare Turnstile token to verify genuine human activity and block bot mining.</td>
               </tr>
               <tr>
-                <td className="py-3 px-4 font-mono font-medium text-[#0B0B0C] dark:text-[#FAFAF8]">zed_cookie_consent_v1</td>
+                <td className="py-3 px-4 font-mono font-medium text-[#0B0B0C] ">zed_cookie_consent_v1</td>
                 <td className="py-3 px-4">LocalStorage</td>
                 <td className="py-3 px-4">Persistent</td>
                 <td className="py-3 px-4 text-[#3ecf8e] font-semibold">Essential</td>
                 <td className="py-3 px-4">Records your cookie choices so the banner does not repeatedly disrupt browsing.</td>
               </tr>
               <tr>
-                <td className="py-3 px-4 font-mono font-medium text-[#0B0B0C] dark:text-[#FAFAF8]">zed_nav_cache</td>
+                <td className="py-3 px-4 font-mono font-medium text-[#0B0B0C] ">zed_nav_cache</td>
                 <td className="py-3 px-4">IndexedDB</td>
                 <td className="py-3 px-4">Persistent</td>
                 <td className="py-3 px-4 text-[#3ecf8e] font-semibold">Essential</td>
                 <td className="py-3 px-4">Stores procedural JSON playbooks for offline zero-connectivity navigation.</td>
               </tr>
               <tr>
-                <td className="py-3 px-4 font-mono font-medium text-[#0B0B0C] dark:text-[#FAFAF8]">zed_theme</td>
+                <td className="py-3 px-4 font-mono font-medium text-[#0B0B0C] ">zed_theme</td>
                 <td className="py-3 px-4">LocalStorage</td>
                 <td className="py-3 px-4">Persistent</td>
                 <td className="py-3 px-4">Functional</td>
                 <td className="py-3 px-4">Maintains your light/dark user interface preference.</td>
               </tr>
               <tr>
-                <td className="py-3 px-4 font-mono font-medium text-[#0B0B0C] dark:text-[#FAFAF8]">zed_flow_progress</td>
+                <td className="py-3 px-4 font-mono font-medium text-[#0B0B0C] ">zed_flow_progress</td>
                 <td className="py-3 px-4">LocalStorage</td>
                 <td className="py-3 px-4">Persistent</td>
                 <td className="py-3 px-4">Functional</td>
@@ -189,7 +189,7 @@ export default function CookiesPolicyPage() {
 
       {/* ── Section 6 ──────────────────────────────────────────────── */}
       <section id="section-6" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
-        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
+        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] ">
           6. Interactive Preference Controls &amp; Cookie Settings
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-4">
@@ -212,7 +212,7 @@ export default function CookiesPolicyPage() {
 
       {/* ── Section 7 ──────────────────────────────────────────────── */}
       <section id="section-7" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
-        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
+        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] ">
           7. Browser-Level Controls &amp; Cache Management
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
@@ -233,7 +233,7 @@ export default function CookiesPolicyPage() {
 
       {/* ── Section 8 ──────────────────────────────────────────────── */}
       <section id="section-8" className="space-y-4 scroll-mt-28">
-        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
+        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] ">
           8. Updates to this Policy &amp; Contact Information
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
@@ -241,7 +241,7 @@ export default function CookiesPolicyPage() {
             We may update this Cookie &amp; Storage Policy as new modules are deployed to the Zed platform. 
             All modifications will be posted here with an updated effective date.
           </p>
-          <div className="p-4 rounded-lg border border-[#E5E5E0] dark:border-white/10 bg-[#FAFAF8] dark:bg-[#141416] text-xs font-mono space-y-1 text-[#0B0B0C] dark:text-[#FAFAF8]">
+          <div className="p-4 rounded-lg border border-[#E5E5E0] dark:border-white/10 bg-[#FAFAF8] dark:bg-[#141416] text-xs font-mono space-y-1 text-[#fafaf8] ">
             <strong>Privacy &amp; Technical Governance</strong><br />
             Zed Technologies Nigeria<br />
             Email: <a href="mailto:privacy@zedproject.ng" className="text-[#3ecf8e] underline">privacy@zedproject.ng</a>

@@ -45,7 +45,7 @@ export default function TermsPage() {
     >
       {/* ── Section 1 ──────────────────────────────────────────────── */}
       <section id="section-1" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
-        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
+        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] ">
           1. Acceptance of Terms &amp; Platform Definition
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
@@ -71,7 +71,7 @@ export default function TermsPage() {
 
       {/* ── Section 2 ──────────────────────────────────────────────── */}
       <section id="section-2" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
-        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
+        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] ">
           2. Eligibility &amp; Age Requirements
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
@@ -86,11 +86,11 @@ export default function TermsPage() {
 
       {/* ── Section 3 ──────────────────────────────────────────────── */}
       <section id="section-3" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
-        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
+        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] ">
           3. Civic Guides &amp; Non-Affiliation Disclaimer
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
-          <div className="p-4 rounded-lg border border-[#E5E5E0] dark:border-white/10 bg-[#ffffff] dark:bg-[#141416] text-xs font-mono text-[#0B0B0C] dark:text-[#FAFAF8] space-y-2">
+          <div className="p-4 rounded-lg border border-[#E5E5E0] dark:border-white/10 bg-[#ffffff] dark:bg-[#141416] text-xs font-mono text-[#FAFAF8] space-y-2">
             <span className="font-bold text-[#3ecf8e] uppercase block">
               CRITICAL STATUTORY DISCLAIMER:
             </span>
@@ -111,7 +111,7 @@ export default function TermsPage() {
 
       {/* ── Section 4 ──────────────────────────────────────────────── */}
       <section id="section-4" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
-        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
+        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] ">
           4. User Accounts, Authentication &amp; Anti-Bot Protection
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
@@ -131,7 +131,7 @@ export default function TermsPage() {
 
       {/* ── Section 5 ──────────────────────────────────────────────── */}
       <section id="section-5" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
-        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
+        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] ">
           5. Zed Market: Escrow Mechanics &amp; Freelance Terms
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
@@ -149,7 +149,7 @@ export default function TermsPage() {
 
       {/* ── Section 6 ──────────────────────────────────────────────── */}
       <section id="section-6" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
-        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
+        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] ">
           6. Zed Meet &amp; Live Audio: Trust, Safety &amp; Audio Buffers
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
@@ -171,7 +171,7 @@ export default function TermsPage() {
 
       {/* ── Section 7 ──────────────────────────────────────────────── */}
       <section id="section-7" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
-        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
+        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] ">
           7. Campus Hubs &amp; Academic Vault Guidelines
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
@@ -188,7 +188,7 @@ export default function TermsPage() {
 
       {/* ── Section 8 ──────────────────────────────────────────────── */}
       <section id="section-8" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
-        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
+        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] ">
           8. $ZED Token Rules &amp; Dynamic Treasury Liquidity
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
@@ -206,7 +206,7 @@ export default function TermsPage() {
 
       {/* ── Section 9 ──────────────────────────────────────────────── */}
       <section id="section-9" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
-        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
+        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] ">
           9. Zed SOS: Geospatial Transit Safety Disclaimers
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
@@ -223,7 +223,7 @@ export default function TermsPage() {
 
       {/* ── Section 10 ─────────────────────────────────────────────── */}
       <section id="section-10" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
-        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
+        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] ">
           10. Acceptable Use &amp; Prohibited Conduct
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
@@ -239,7 +239,7 @@ export default function TermsPage() {
 
       {/* ── Section 11 ─────────────────────────────────────────────── */}
       <section id="section-11" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
-        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
+        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] ">
           11. Intellectual Property Rights
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
@@ -253,7 +253,7 @@ export default function TermsPage() {
 
       {/* ── Section 12 ─────────────────────────────────────────────── */}
       <section id="section-12" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
-        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
+        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] ">
           12. Disclaimers &amp; Limitation of Warranties
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
@@ -268,7 +268,7 @@ export default function TermsPage() {
 
       {/* ── Section 13 ─────────────────────────────────────────────── */}
       <section id="section-13" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
-        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
+        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] ">
           13. Limitation of Liability
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
@@ -282,7 +282,7 @@ export default function TermsPage() {
 
       {/* ── Section 14 ─────────────────────────────────────────────── */}
       <section id="section-14" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
-        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
+        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] ">
           14. Governing Law &amp; Dispute Resolution
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
@@ -297,7 +297,7 @@ export default function TermsPage() {
 
       {/* ── Section 15 ─────────────────────────────────────────────── */}
       <section id="section-15" className="space-y-4 scroll-mt-28">
-        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
+        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] ">
           15. Modifications to Terms &amp; Contact Information
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
@@ -306,7 +306,7 @@ export default function TermsPage() {
             via the Platform interface with at least 14 days&apos; notice. Continued use of the Platform after the effective date 
             constitutes full acceptance of the revised Terms.
           </p>
-          <div className="p-4 rounded-lg border border-[#E5E5E0] dark:border-white/10 bg-[#FAFAF8] dark:bg-[#141416] text-xs font-mono space-y-1 text-[#0B0B0C] dark:text-[#FAFAF8]">
+          <div className="p-4 rounded-lg border border-[#E5E5E0] dark:border-white/10 bg-[#FAFAF8] dark:bg-[#141416] text-xs font-mono space-y-1 text-[#FAFAF8] ">
             <strong>Legal Inquiries &amp; Compliance Desk</strong><br />
             Zed Technologies Nigeria<br />
             Yaba Technology Corridor, Lagos State, Nigeria.<br />

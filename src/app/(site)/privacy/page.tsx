@@ -45,7 +45,7 @@ export default function PrivacyPolicyPage() {
     >
       {/* ── Section 1 ──────────────────────────────────────────────── */}
       <section id="section-1" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
-        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
+        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] ">
           1. Introduction &amp; Platform Scope
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
@@ -70,7 +70,7 @@ export default function PrivacyPolicyPage() {
 
       {/* ── Section 2 ──────────────────────────────────────────────── */}
       <section id="section-2" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
-        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
+        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] ">
           2. Information We Collect Across Modules
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
@@ -107,7 +107,7 @@ export default function PrivacyPolicyPage() {
 
       {/* ── Section 3 ──────────────────────────────────────────────── */}
       <section id="section-3" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
-        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
+        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] ">
           3. Strict Prohibition of Raw NIN Storage &amp; Cryptographic Hashing Protocol
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
@@ -116,7 +116,7 @@ export default function PrivacyPolicyPage() {
             is a sensitive sovereign identifier. In recognition of the severe risks associated with centralized identity theft, 
             Zed enforces an architectural invariant:
           </p>
-          <div className="p-4 rounded-lg border border-[#E5E5E0] dark:border-white/10 bg-[#ffffff] dark:bg-[#141416] text-xs font-mono text-[#0B0B0C] dark:text-[#FAFAF8] space-y-2">
+          <div className="p-4 rounded-lg border border-[#E5E5E0] dark:border-white/10 bg-[#ffffff] dark:bg-[#141416] text-xs font-mono text-[#fafaf8]  space-y-2">
             <span className="font-bold text-[#3ecf8e] uppercase block">
               MANDATORY TECHNICAL PROTOCOL:
             </span>
@@ -137,7 +137,7 @@ export default function PrivacyPolicyPage() {
 
       {/* ── Section 4 ──────────────────────────────────────────────── */}
       <section id="section-4" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
-        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
+        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] ">
           4. Lawful Bases for Processing under NDPA 2023
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
@@ -163,7 +163,7 @@ export default function PrivacyPolicyPage() {
 
       {/* ── Section 5 ──────────────────────────────────────────────── */}
       <section id="section-5" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
-        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
+        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] ">
           5. Purposes of Data Processing
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
@@ -182,7 +182,7 @@ export default function PrivacyPolicyPage() {
 
       {/* ── Section 6 ──────────────────────────────────────────────── */}
       <section id="section-6" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
-        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
+        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] ">
           6. Financial Privacy &amp; Zero-Fintech Compliance Model
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
@@ -200,7 +200,7 @@ export default function PrivacyPolicyPage() {
 
       {/* ── Section 7 ──────────────────────────────────────────────── */}
       <section id="section-7" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
-        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
+        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] ">
           7. Real-Time WebRTC Audio &amp; Safety Buffer Protocol
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
@@ -218,7 +218,7 @@ export default function PrivacyPolicyPage() {
 
       {/* ── Section 8 ──────────────────────────────────────────────── */}
       <section id="section-8" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
-        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
+        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] ">
           8. Geospatial Data &amp; Safety Mapping (Zed SOS)
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
@@ -235,7 +235,7 @@ export default function PrivacyPolicyPage() {
 
       {/* ── Section 9 ──────────────────────────────────────────────── */}
       <section id="section-9" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
-        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
+        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] ">
           9. Data Retention &amp; Automated Deletion Schedules
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
@@ -253,7 +253,7 @@ export default function PrivacyPolicyPage() {
 
       {/* ── Section 10 ─────────────────────────────────────────────── */}
       <section id="section-10" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
-        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
+        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] ">
           10. Disclosure &amp; Sharing with Third-Party Processors
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
@@ -272,7 +272,7 @@ export default function PrivacyPolicyPage() {
 
       {/* ── Section 11 ─────────────────────────────────────────────── */}
       <section id="section-11" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
-        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
+        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] ">
           11. Cross-Border Data Transfers
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
@@ -286,7 +286,7 @@ export default function PrivacyPolicyPage() {
 
       {/* ── Section 12 ─────────────────────────────────────────────── */}
       <section id="section-12" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
-        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
+        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] ">
           12. Technical &amp; Organizational Security Measures
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
@@ -304,7 +304,7 @@ export default function PrivacyPolicyPage() {
 
       {/* ── Section 13 ─────────────────────────────────────────────── */}
       <section id="section-13" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
-        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
+        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] ">
           13. Your Statutory Rights as a Data Subject
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
@@ -320,7 +320,7 @@ export default function PrivacyPolicyPage() {
 
       {/* ── Section 14 ─────────────────────────────────────────────── */}
       <section id="section-14" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
-        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
+        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] ">
           14. Protection of Minors &amp; Student Data
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
@@ -334,14 +334,14 @@ export default function PrivacyPolicyPage() {
 
       {/* ── Section 15 ─────────────────────────────────────────────── */}
       <section id="section-15" className="space-y-4 scroll-mt-28">
-        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
+        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] ">
           15. Regulatory Recourse (NDPC) &amp; Data Protection Officer Contact
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
           <p>
             If you have questions, subject access requests, or believe your rights have not been respected, contact our Data Protection Officer:
           </p>
-          <div className="p-4 rounded-lg border border-[#E5E5E0] dark:border-white/10 bg-[#FAFAF8] dark:bg-[#141416] text-xs font-mono space-y-1 text-[#0B0B0C] dark:text-[#FAFAF8]">
+          <div className="p-4 rounded-lg border border-[#E5E5E0] dark:border-white/10 bg-[#FAFAF8] dark:bg-[#141416] text-xs font-mono space-y-1 text-[#fafaf8] ">
             <strong>Data Protection Officer</strong><br />
             Zed Technologies Nigeria<br />
             Yaba Technology Corridor, Lagos State, Nigeria.<br />
@@ -350,7 +350,7 @@ export default function PrivacyPolicyPage() {
           <p className="pt-2">
             You also have the statutory right to lodge a complaint directly with the primary supervisory authority:
           </p>
-          <div className="p-4 rounded-lg border border-[#E5E5E0] dark:border-white/10 bg-[#ffffff] dark:bg-[#141416] text-xs font-mono space-y-1 text-[#0B0B0C] dark:text-[#FAFAF8]">
+          <div className="p-4 rounded-lg border border-[#E5E5E0] dark:border-white/10 bg-[#ffffff] dark:bg-[#141416] text-xs font-mono space-y-1 text-[#fafaf8] ">
             <strong>NIGERIA DATA PROTECTION COMMISSION (NDPC)</strong><br />
             No. 5, Charles de Gaulle Street, Asokoro, Abuja, Nigeria.<br />
             Official Portal: <a href="https://ndpc.gov.ng" target="_blank" rel="noopener noreferrer" className="text-[#3ecf8e] underline">ndpc.gov.ng</a><br />
