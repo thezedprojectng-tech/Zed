@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowLeft, Compass, Home } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -16,11 +17,21 @@ export default function NotFound() {
     >
       {/* Top Header Row */}
       <header className="max-w-site mx-auto w-full flex items-center justify-between border-b border-[#E5E5E0] dark:border-white/10 pb-6">
-        <Link href="/" className="flex items-center gap-1.5 group">
-          <span className="font-display font-bold text-2xl tracking-tight text-[#0B0B0C] dark:text-[#FAFAF8]">
-            Zed
-          </span>
-          <span className="h-1.5 w-1.5 rounded-full bg-[#3ecf8e]" />
+        <Link href="/" className="flex items-center gap-1.5 group" aria-label="The Zed Project Home">
+          <Image
+            src="/icons/zed-logo-full-dark.png"
+            alt="The Zed Project"
+            width={120}
+            height={60}
+            className="h-8 w-auto object-contain dark:hidden"
+          />
+          <Image
+            src="/icons/zed-logo-full-light.png"
+            alt="The Zed Project"
+            width={120}
+            height={60}
+            className="h-8 w-auto object-contain hidden dark:block"
+          />
         </Link>
         <span className="font-mono text-xs text-[#57575e] dark:text-[#9c9ca4] font-medium uppercase tracking-wider">
           Error 404 // Unresolved Route

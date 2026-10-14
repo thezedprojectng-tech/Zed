@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import {
@@ -46,10 +47,21 @@ export function AdminSidebar({ adminUser }: AdminSidebarProps) {
     >
       {/* Brand Header */}
       <div className="flex h-13 items-center justify-between border-b border-border px-4">
-        <Link href="/admin" className="flex items-center gap-2">
-          <span className="font-display text-lg font-black tracking-tight text-foreground">
-            Zed
-          </span>
+        <Link href="/admin" className="flex items-center gap-2" aria-label="Zed Admin Console">
+          <Image
+            src="/icons/zed-logo-full-light.png"
+            alt="The Zed Project"
+            width={100}
+            height={50}
+            className="h-6 w-auto object-contain dark:hidden"
+          />
+          <Image
+            src="/icons/zed-logo-full-dark.png"
+            alt="The Zed Project"
+            width={100}
+            height={50}
+            className="h-6 w-auto object-contain hidden dark:block"
+          />
           <span className="rounded bg-amber-500/15 border border-amber-500/30 px-1.5 py-0.5 font-mono text-[9px] font-bold text-amber-500 tracking-wider">
             CONSOLE
           </span>

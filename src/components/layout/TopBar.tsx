@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import {
@@ -150,9 +151,22 @@ export function TopBar({ onOpenCommand }: TopBarProps) {
         </Breadcrumb>
 
         {/* Mobile Title */}
-        <span className="sm:hidden text-sm font-semibold tracking-tight text-foreground">
-          Zed
-        </span>
+        <Link href="/home" className="sm:hidden flex items-center" aria-label="Zed Home">
+          <Image
+            src="/icons/zed-logo-full-dark.png"
+            alt="Zed"
+            width={90}
+            height={45}
+            className="h-6 w-auto object-contain dark:hidden"
+          />
+          <Image
+            src="/icons/zed-logo-full-light.png"
+            alt="Zed"
+            width={90}
+            height={45}
+            className="h-6 w-auto object-contain hidden dark:block"
+          />
+        </Link>
       </div>
 
       {/* Right: Actions & Tools */}

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowUpRight, ArrowUp, MapPin } from "lucide-react";
 import { openCookieSettings } from "./CookieBanner";
 import { useSiteAuth } from "./useSiteAuth";
@@ -48,13 +49,19 @@ export function SiteFooter() {
 
           {/* ── Brand column ─────────────────────────────────────────────── */}
           <div className="lg:col-span-4 space-y-6">
-            {/* Wordmark */}
+            {/* Brand Logo */}
             <Link
               href="/"
-              className="inline-flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3ecf8e] rounded-sm"
+              className="inline-flex items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3ecf8e] rounded-sm py-1"
+              aria-label="The Zed Project Home"
             >
-              <span className="font-display font-bold text-2xl tracking-tight text-white">Zed</span>
-              <span className="h-1.5 w-1.5 rounded-full bg-[#3ecf8e]" />
+              <Image
+                src="/icons/zed-logo-full-light.png"
+                alt="The Zed Project"
+                width={160}
+                height={80}
+                className="h-8 sm:h-9 w-auto object-contain"
+              />
             </Link>
 
             {/* Mission statement */}

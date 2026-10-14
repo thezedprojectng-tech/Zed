@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import {
@@ -101,14 +102,46 @@ export function Sidebar() {
     >
       {/* Brand Header */}
       <div className="flex h-14 items-center justify-between border-hairline-b px-4">
-        {!collapsed && (
-          <Link href="/home" className="flex items-center gap-2">
-            <span className="font-display text-xl font-black tracking-tight text-foreground">
-              Zed
-            </span>
+        {!collapsed ? (
+          <Link href="/home" className="flex items-center gap-2" aria-label="Zed Dashboard">
+            <Image
+              src="/icons/zed-logo-full-dark.png"
+              alt="The Zed Project"
+              width={120}
+              height={60}
+              priority
+              className="h-7 w-auto object-contain dark:hidden"
+            />
+            <Image
+              src="/icons/zed-logo-full-light.png"
+              alt="The Zed Project"
+              width={120}
+              height={60}
+              priority
+              className="h-7 w-auto object-contain dark:block "
+            />
             <span className="rounded bg-primary/10 border border-primary/20 px-1.5 py-0.5 font-mono text-[10px] font-medium text-primary">
               v1.0
             </span>
+          </Link>
+        ) : (
+          <Link href="/home" className="flex items-center justify-center mx-auto" aria-label="Zed Dashboard">
+            <Image
+              src="/icons/zed-logo-mark-dark.png"
+              alt="Zed"
+              width={28}
+              height={35}
+              priority
+              className="h-7 w-auto object-contain dark:hidden"
+            />
+            <Image
+              src="/icons/zed-logo-mark-light.png"
+              alt="Zed"
+              width={28}
+              height={35}
+              priority
+              className="h-7 w-auto object-contain hidden dark:block"
+            />
           </Link>
         )}
 

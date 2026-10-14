@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { GrainGradient } from "@paper-design/shaders-react";
 import { ShieldCheck } from "lucide-react";
 
@@ -31,10 +32,23 @@ export function AuthLayout({
           <div className="mx-auto w-full max-w-[480px]">
             {/* Brand Logo */}
             <div className="mb-8">
-              <Link href="/" className="inline-flex items-center gap-2.5 group">
-                <span className="font-display text-2xl font-black tracking-tight text-foreground group-hover:text-primary transition-colors">
-                  Zed
-                </span>
+              <Link href="/" className="inline-flex items-center gap-2.5 group" aria-label="The Zed Project Home">
+                <Image
+                  src="/icons/zed-logo-full-dark.png"
+                  alt="The Zed Project"
+                  width={140}
+                  height={70}
+                  priority
+                  className="h-8 sm:h-9 w-auto object-contain dark:hidden"
+                />
+                <Image
+                  src="/icons/zed-logo-full-light.png"
+                  alt="The Zed Project"
+                  width={140}
+                  height={70}
+                  priority
+                  className="h-8 sm:h-9 w-auto object-contain hidden dark:block"
+                />
                 <span className="font-mono text-[10px] uppercase font-semibold text-primary border border-primary/20 bg-primary/10 px-2 py-0.5 rounded">
                   CIVIL v1.0
                 </span>

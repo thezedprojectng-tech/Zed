@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowUpRight, Menu, X } from "lucide-react";
 import { useSiteAuth } from "./useSiteAuth";
 
@@ -72,15 +73,20 @@ export function SiteHeader() {
     >
       <div className="max-w-site mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 sm:h-[72px]">
-          {/* Wordmark */}
+          {/* Brand Logo */}
           <Link
             href="/"
-            className="flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3ecf8e] rounded-sm"
+            className="flex items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3ecf8e] rounded-sm py-1"
+            aria-label="The Zed Project Home"
           >
-            <span className="font-display font-bold text-2xl sm:text-[26px] tracking-tight text-[#0B0B0C]">
-              Zed
-            </span>
-            <span className="h-1.5 w-1.5 rounded-full bg-[#3ecf8e]" />
+            <Image
+              src="/icons/zed-logo-full-dark.png"
+              alt="The Zed Project"
+              width={160}
+              height={80}
+              priority
+              className="h-8 sm:h-9 w-auto object-contain"
+            />
           </Link>
 
           {/* Desktop Navigation */}
