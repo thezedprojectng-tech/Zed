@@ -42,6 +42,13 @@
     --sidebar-primary: #3ecf8e;
     --sidebar-accent: rgba(255, 255, 255, 0.04);
 
+    /* ── Chart Tokens (Dark Theme) ─────────────────────────────────── */
+    --chart-1: #10b981;
+    --chart-2: #3b82f6;
+    --chart-3: #f59e0b;
+    --chart-4: #8b5cf6;
+    --chart-5: #f43f5e;
+
     /* ── Marketing Site Tokens (Dark Variant) ────────────────────────── */
     --site-bg: #0B0B0C;
     --site-surface: #141416;
@@ -102,6 +109,13 @@
     --sidebar-border: #e2e8f0;
     --sidebar-primary: #3ecf8e;
     --sidebar-accent: #f8fafc;
+
+    /* ── Chart Tokens (Light Theme) ────────────────────────────────── */
+    --chart-1: #10b981;
+    --chart-2: #3b82f6;
+    --chart-3: #f59e0b;
+    --chart-4: #8b5cf6;
+    --chart-5: #f43f5e;
 
     /* ── Marketing Site Tokens (Clean Light: Warm White #FAFAF8 & Near-Black #0B0B0C) */
     --site-bg: #FAFAF8;
