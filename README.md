@@ -1,36 +1,113 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# The Zed Project
 
-## Getting Started
+The all-in-one digital OS for Nigerian Gen Z: civil guides, skills, freelance work, community, campus life, creator resources and safety, with off-chain $ZED rewards.
 
-First, run the development server:
+This repository is **Phase 1 (Days 1-30, Core Foundation)**: a Next.js PWA, authentication, a NIN verification pipeline and the Zed Nav civil process engine. Other modules are shown as "Coming soon".
+
+Live: https://zedng.vercel.app
+
+## Status
+
+| Area | Status |
+|---|---|
+| Next.js PWA shell, offline caching | Built |
+| Authentication (email + password, phone saved to profile) | Built |
+| NIN verification pipeline | Built, **demo provider** (mocked) |
+| Zed Nav engine (JSON flows, state machine) | Built |
+| Flows: Passport, NYSC, NIN/BVN, CAC | Built |
+| Document checker (client-side) | Built |
+| Offline progress, synced to Supabase | Built |
+| Centre tracker | Built |
+| Admin console (users, reports, audit log, charts) | Built (extra) |
+| Marketing site, privacy, terms, cookies | Built (extra) |
+| PPA Hub, CDS Logger, call-up letter parser | Planned |
+| Phone OTP sign-in | Planned |
+| Zed Skill, Market, Meet, Communities, Campus Hubs, Live Audio Rooms, Creator Lab, Zed SOS, $ZED rewards | Planned (Phases 2-3), shown as Coming soon |
+
+## Tech stack
+
+- Next.js (App Router), React, TypeScript, Tailwind CSS
+- shadcn/ui and Recharts (dashboard and admin)
+- Supabase: Auth, Postgres, Row Level Security
+- Zustand, Zod, React Hook Form
+- Serwist (service worker and offline support)
+- Vitest
+
+## Getting started
+
+Requirements: Node.js 20+ and a Supabase project.
 
 ```bash
+npm install
+cp .env.example .env.local   # fill in the values below
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Environment variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Variable | Where it is used | Notes |
+|---|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` | Browser and server | Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Browser and server | Public anon key |
+| `SUPABASE_SERVICE_ROLE_KEY` | **Server only** | Never expose or commit. Used for admin actions |
+| `NIN_HASH_SALT` | **Server only** | At least 32 characters. Generate with `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"` |
 
-## Learn More
+Never commit `.env.local`. Set the same variables in Vercel for Production **and** Preview.
 
-To learn more about Next.js, take a look at the following resources:
+## Database
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+SQL migrations are in `supabase/migrations/`. Run them in order in the Supabase SQL editor (or via the Supabase CLI):
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. `0001_init.sql`: users, trigger, RLS, nav progress, centre reports
+2. `0002_admin_role.sql`: role column, `is_admin()`, admin policies
+3. `0003_admin_audit_log.sql`: append-only audit log
 
-## Deploy on Vercel
+Authentication is configured with email + password. The sign-up flow creates a `public.users` row from auth metadata through a security-definer trigger.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Creating an admin
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+In the Supabase SQL editor:
+
+```sql
+update public.users
+set role = 'admin'
+where id = (select id from auth.users where email = 'YOUR_EMAIL');
+```
+
+Admin pages are protected server-side. Non-admins receive a 404.
+
+## Security notes
+
+- The NIN is validated (11 digits) and **only a salted SHA-256 hash is stored**. The raw NIN is never stored or logged.
+- NIN verification currently uses a mock provider and the UI labels it "Demo verification".
+- The service role key is used only in server code.
+- Row Level Security is enabled. Users can read and update only their own profile, and column grants limit what can be edited.
+- Admin actions are written to an append-only audit log.
+
+## Scripts
+
+```bash
+npm run dev         # local development
+npm run build       # production build
+npm run lint        # lint
+npm run test        # unit tests (Zed Nav engine)
+```
+
+## Zed Nav flows
+
+Flows are JSON files in `src/data/nav/` and are validated against a Zod schema. Step types: `info`, `checklist`, `link`, `decision`, `document-check`. The engine in `src/lib/nav/engine.ts` is a pure state machine and has unit tests.
+
+## Differences from the specification
+
+- Email + password sign-in instead of phone OTP (OTP is planned).
+- Supabase (Auth, Postgres, RLS) instead of a separate Fastify or FastAPI service with Redis.
+- NIN provider is mocked. A real provider integration is needed for production.
+- The marketing site and admin console are additions beyond the Phase 1 scope.
+
+## Roadmap
+
+- Days 1-30: Core Foundation (this repository)
+- Days 31-60: Zed Meet, database expansion, daily $ZED mining, campus hubs
+- Days 61-90: Paystack/Flutterwave escrow, Zed SOS, creator asset library, beta launch
