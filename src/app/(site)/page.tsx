@@ -101,35 +101,7 @@ export default function HomePage() {
       {/* ── Section 2: Hero Section ───────────────────────────────────── */}
       <HeroSection />
 
-      {/* ── Section 3: Trust Strip ────────────────────────────────────── */}
-      <section className="border-y border-[#E5E5E0] py-10 bg-[#FAFAF8]/50">
-        <div className="max-w-site mx-auto px-4 sm:px-6 lg:px-8">
-          <FadeIn className="text-center space-y-6">
-            <p className="font-mono text-xs uppercase tracking-wider text-[#8a8a92]#6c6c74]">
-              Guides for processes handled by
-            </p>
-
-            <div className="flex flex-wrap items-center justify-center gap-8 sm:gap-14 md:gap-20 text-[#57575e]#9c9ca4]">
-              <span className="font-display font-semibold text-base sm:text-lg tracking-tight">
-                Nigeria Immigration Service
-              </span>
-              <span className="font-display font-semibold text-base sm:text-lg tracking-tight">
-                NYSC
-              </span>
-              <span className="font-display font-semibold text-base sm:text-lg tracking-tight">
-                NIMC
-              </span>
-              <span className="font-display font-semibold text-base sm:text-lg tracking-tight">
-                CAC
-              </span>
-            </div>
-
-            <p className="font-mono text-xs text-[#8a8a92]#6c6c74] max-w-xl mx-auto pt-1">
-              Zed is an independent guide and is not affiliated with any government agency.
-            </p>
-          </FadeIn>
-        </div>
-      </section>
+      
 
       {/* ── Section 4: Zed Nav (Tabbed Showcase) ────────────────────────── */}
       <section id="how-it-works" className="scroll-mt-24">
