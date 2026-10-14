@@ -35,7 +35,7 @@ export default function CookiesPolicyPage() {
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
           <p>
-            This Cookie &amp; Storage Policy explains how Zed Technologies Nigeria Ltd (&quot;Zed&quot;, &quot;we&quot;, 
+            This Cookie &amp; Storage Policy explains how Zed (&quot;we&quot;, 
             &quot;us&quot;) uses cookies, IndexedDB, and web storage mechanisms when you interact with our marketing 
             website and civil navigation application.
           </p>
@@ -248,7 +248,7 @@ export default function CookiesPolicyPage() {
           </p>
           <div className="p-4 rounded-lg border border-[#E5E5E0] dark:border-white/10 bg-[#FAFAF8] dark:bg-[#141416] text-xs font-mono space-y-1 text-[#0B0B0C] dark:text-[#FAFAF8]">
             <strong>Technical Privacy Desk</strong><br />
-            Zed Technologies Nigeria Ltd.<br />
+            Zed<br />
             Email: <a href="mailto:privacy@zedproject.ng" className="text-[#3ecf8e] underline">privacy@zedproject.ng</a>
           </div>
         </div>

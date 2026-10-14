@@ -23,6 +23,7 @@ import { VerificationDonutChart } from "@/components/admin/charts/VerificationDo
 import { CivicLevelBarChart, LevelDataPoint } from "@/components/admin/charts/CivicLevelBarChart";
 import { ReportsPerDayChart, ReportDayData } from "@/components/admin/charts/ReportsPerDayChart";
 import { DeleteReportButton } from "./reports/DeleteReportButton";
+import { getLevelName } from "@/types";
 
 export const metadata: Metadata = {
   title: "Admin Console — Overview",
@@ -207,7 +208,7 @@ async function fetchOverviewMetrics() {
     if (lvl in levelCounts) levelCounts[lvl]++;
   }
   const levelData: LevelDataPoint[] = [1, 2, 3, 4, 5].map((lvl) => ({
-    level: `Lvl ${lvl}`,
+    level: getLevelName(lvl),
     count: levelCounts[lvl] || 0,
   }));
 
@@ -477,8 +478,8 @@ async function OverviewContent() {
                       <td className="px-4 py-2.5 font-mono text-muted-foreground text-[11px] whitespace-nowrap">
                         {maskPhone(u.phone_number)}
                       </td>
-                      <td className="px-4 py-2.5 font-mono text-muted-foreground text-[11px]">
-                        Lvl {u.level_id}
+                      <td className="px-4 py-2.5 font-mono text-muted-foreground text-[11px] whitespace-nowrap">
+                        {getLevelName(u.level_id)}
                       </td>
                       <td className="px-4 py-2.5">
                         <Badge

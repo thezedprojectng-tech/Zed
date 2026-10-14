@@ -27,7 +27,7 @@ interface CivicLevelBarChartProps {
 
 const chartConfig = {
   count: {
-    label: "Citizens",
+    label: "Users",
     color: "var(--chart-4)",
   },
 } satisfies ChartConfig;
@@ -40,7 +40,7 @@ export function CivicLevelBarChart({ data }: CivicLevelBarChartProps) {
       <CardHeader className="pb-2 border-b border-border/50">
         <div className="flex items-center justify-between">
           <CardTitle className="text-sm font-semibold tracking-tight text-foreground">
-            Users by Civic Level
+            Users by Progression Level
           </CardTitle>
           <Badge
             variant="outline"
@@ -50,7 +50,7 @@ export function CivicLevelBarChart({ data }: CivicLevelBarChartProps) {
           </Badge>
         </div>
         <CardDescription className="text-xs text-muted-foreground">
-          Distribution of citizens across progression levels (1 to 5)
+          Distribution of users across progression tiers (Rookie to Zed Legend)
         </CardDescription>
       </CardHeader>
 

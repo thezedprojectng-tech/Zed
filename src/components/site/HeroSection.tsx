@@ -34,7 +34,7 @@ export function HeroSection() {
               transition={{ duration: 0.55, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
               className="block"
             >
-              Nigerian paperwork,
+              One place.
             </motion.span>
             <motion.span
               initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 16 }}
@@ -42,7 +42,7 @@ export function HeroSection() {
               transition={{ duration: 0.55, delay: 0.18, ease: [0.22, 1, 0.36, 1] }}
               className="block"
             >
-              made simple.
+              Every next move.
             </motion.span>
           </h1>
 
@@ -53,8 +53,7 @@ export function HeroSection() {
             transition={{ duration: 0.55, delay: 0.26, ease: [0.22, 1, 0.36, 1] }}
             className="font-sans text-lg sm:text-xl text-[#57575e] max-w-xl mx-auto leading-relaxed"
           >
-            Step-by-step guides for your passport, NYSC, NIN and BVN, and
-            business registration. Track progress. Work offline.
+            Zed is a Nigerian youth platform for civic processes, skills, work and community.
           </motion.p>
 
           {/* CTA Cluster */}

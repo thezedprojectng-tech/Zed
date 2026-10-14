@@ -9,13 +9,13 @@ import { ClosingCTA } from "@/components/site/ClosingCTA";
 import { FadeIn } from "@/components/site/FadeIn";
 
 export const metadata: Metadata = {
-  title: "Zed – Nigerian paperwork, made simple",
+  title: "Zed – One place. Every next move.",
   description:
-    "Step-by-step civic guides for your passport, NYSC, NIN and BVN, and business registration. Track your progress, check your documents, and keep going offline.",
+    "Zed is a Nigerian youth platform for civic processes, skills, work and community. Explore Zed Nav for step-by-step verified passport, NYSC, NIN, and CAC playbooks.",
   openGraph: {
-    title: "Zed – Nigerian paperwork, made simple",
+    title: "Zed – One place. Every next move.",
     description:
-      "Step-by-step civic guides for your passport, NYSC, NIN and BVN, and business registration. Track your progress, check your documents, and keep going offline.",
+      "Zed is a Nigerian youth platform for civic processes, skills, work and community. Explore Zed Nav for step-by-step verified passport, NYSC, NIN, and CAC playbooks.",
     url: "https://zedproject.ng",
     siteName: "Zed",
     locale: "en_NG",
@@ -23,9 +23,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Zed – Nigerian paperwork, made simple",
+    title: "Zed – One place. Every next move.",
     description:
-      "Step-by-step civic guides for your passport, NYSC, NIN and BVN, and business registration.",
+      "Zed is a Nigerian youth platform for civic processes, skills, work and community.",
   },
 };
 
@@ -33,12 +33,12 @@ const FAQ_ITEMS = [
   {
     question: "Is Zed free?",
     answer:
-      "Yes, completely. All procedural guides, checklist tracking, statutory fee calculators, and offline features on Zed are 100% free for all Nigerian citizens. We do not charge subscriptions, convenience markups, or hidden access fees.",
+      "Yes, completely. All procedural guides, checklist tracking, statutory fee calculators, and offline features on Zed are 100% free for all Nigerian youth. We do not charge subscriptions, convenience markups, or hidden access fees.",
   },
   {
     question: "Is it official government advice?",
     answer:
-      "No. Zed is an independent civic guide created by Nigerian technologists and civil contributors. We are not affiliated with, endorsed by, or representing the Nigeria Immigration Service, NYSC, NIMC, CAC, or any federal ministry. We aggregate, verify, and simplify publicly gazetted procedures.",
+      "No. Zed is an independent civic platform created by Nigerian technologists and civil contributors. We are not affiliated with, endorsed by, or representing the Nigeria Immigration Service, NYSC, NIMC, CAC, or any federal ministry. We aggregate, verify, and simplify publicly gazetted procedures.",
   },
   {
     question: "Does it work offline?",
@@ -51,9 +51,9 @@ const FAQ_ITEMS = [
       "Zed never stores your raw 11-digit NIN. When you verify in demo mode, your NIN is sent securely over an encrypted connection, hashed with a secret salt on our server, and only the irreversible hash is saved. The raw number is never logged or stored in any database, adhering strictly to the Nigeria Data Protection Act (NDPA 2023).",
   },
   {
-    question: "Which processes are covered?",
+    question: "Which processes are covered in Zed Nav?",
     answer:
-      "We currently provide complete, tested playbooks for: Nigerian Standard e-Passport (Fresh & Renewal), NYSC Mobilization & Call-Up, NIMC NIN registration & BVN Harmonization, and CAC Business Name & Company Incorporation. Additional civil playbooks are added systematically.",
+      "Zed Nav currently provides complete, tested playbooks for: Nigerian Standard e-Passport (Fresh & Renewal), NYSC Mobilization & Call-Up, NIMC NIN registration & BVN Harmonization, and CAC Business Name & Company Incorporation. Additional playbooks are added systematically.",
   },
   {
     question: "How do I report wrong information?",
@@ -62,36 +62,86 @@ const FAQ_ITEMS = [
   },
 ];
 
-const ROADMAP_ITEMS = [
+interface EcosystemModule {
+  name: string;
+  badge: "LIVE" | "Coming soon";
+  description: string;
+  href?: string;
+}
+
+const ECOSYSTEM_MODULES: EcosystemModule[] = [
   {
-    title: "Skills",
-    status: "Planned",
+    name: "Zed Nav",
+    badge: "LIVE",
     description:
-      "Practical career playbooks for Nigerian youth (remote work tax compliance, freelance invoicing, and verified internship pathways).",
+      "Step-by-step verified civic playbooks for passport issuance, NYSC mobilization, NIN, and business registration.",
+    href: "/signup",
   },
   {
-    title: "Marketplace",
-    status: "Planned",
+    name: "Zed Skill",
+    badge: "Coming soon",
     description:
-      "Verified directory of licensed legal practitioners, accredited accountants, and certified notaries with fixed, transparent pricing.",
+      "Practical career playbooks, technical roadmaps, and workplace readiness built for young Nigerians.",
   },
   {
-    title: "Campus hubs",
-    status: "Planned",
+    name: "Zed Market",
+    badge: "Coming soon",
     description:
-      "University-specific mobilization playbooks, transcript clearance guidelines, and student union verification resources.",
+      "Transparent services and verified opportunities marketplace connecting youth and vetted providers.",
   },
   {
-    title: "Zed Meet",
-    status: "Planned",
+    name: "Zed Chat",
+    badge: "Coming soon",
     description:
-      "Physical community coordination and queue-buddy scheduling for regional immigration and capture centers across Nigeria.",
+      "Peer-to-peer discussion channels and community messaging for real-time support.",
   },
   {
-    title: "Safety map",
-    status: "Planned",
+    name: "Zed Mining",
+    badge: "Coming soon",
     description:
-      "Citizen-reported queue wait times, security advisories, and facility accessibility metrics for major government offices.",
+      "Participation tracking, platform utility, and recognition for active community contributors.",
+  },
+  {
+    name: "Campus Hubs",
+    badge: "Coming soon",
+    description:
+      "University-specific mobilization guides, clearance checklists, and campus community networks.",
+  },
+  {
+    name: "Alumni Office Hours",
+    badge: "Coming soon",
+    description:
+      "Direct mentorship sessions and career advice from experienced alumni and industry professionals.",
+  },
+  {
+    name: "Creator Lab",
+    badge: "Coming soon",
+    description:
+      "Digital craft resources, tools, and monetization guides for independent Nigerian creators.",
+  },
+  {
+    name: "Zed SOS",
+    badge: "Coming soon",
+    description:
+      "Rapid assistance, verified emergency helplines, and critical civic safety resources.",
+  },
+  {
+    name: "Zed Meet",
+    badge: "Coming soon",
+    description:
+      "Local physical community meetups, study sessions, and queue coordination across Nigerian cities.",
+  },
+  {
+    name: "Internship Radar",
+    badge: "Coming soon",
+    description:
+      "Curated tracking of verified internship openings, entry-level opportunities, and industrial training placements.",
+  },
+  {
+    name: "Civic Trackers",
+    badge: "Coming soon",
+    description:
+      "Community-reported wait times, status indicators, and operational updates at major public centers.",
   },
 ];
 
@@ -162,17 +212,17 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Section 4: Tabbed Showcase ─────────────────────────────────── */}
+      {/* ── Section 4: Zed Nav (Tabbed Showcase) ────────────────────────── */}
       <section id="how-it-works" className="scroll-mt-24">
         <div className="max-w-site mx-auto px-4 sm:px-6 lg:px-8">
           <FadeIn className="text-center max-w-2xl mx-auto mb-10 sm:mb-14 space-y-4">
             <div className="font-mono text-xs uppercase tracking-wider text-[#3ecf8e] font-semibold">
-              Interactive Procedural Playbooks
+              Module 01 // Zed Nav (Live)
             </div>
-            <h2 className="font-display text-3xl sm:text-5xl font-bold tracking-tight text-[#0B0B0C]#FAFAF8]">
-              One place for every process.
+            <h2 className="font-display text-3xl sm:text-5xl font-bold tracking-tight text-[#0B0B0C]">
+              Zed Nav: Clear civic playbooks.
             </h2>
-            <p className="font-sans text-base text-[#57575e]#9c9ca4] leading-relaxed">
+            <p className="font-sans text-base text-[#57575e] leading-relaxed">
               Explore key screens, requirements, and verified statutory fees across our four core civil flows.
             </p>
           </FadeIn>
@@ -183,60 +233,135 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Section 5: Problem / Solution Statement ───────────────────── */}
+      {/* ── Section 5: The Zed Ecosystem ───────────────────────────────── */}
+      <section id="ecosystem" className="scroll-mt-24">
+        <div className="max-w-site mx-auto px-4 sm:px-6 lg:px-8">
+          <FadeIn className="text-center max-w-2xl mx-auto mb-10 sm:mb-14 space-y-4">
+            <div className="font-mono text-xs uppercase tracking-wider text-[#3ecf8e] font-semibold">
+              The Platform
+            </div>
+            <h2 className="font-display text-3xl sm:text-5xl font-bold tracking-tight text-[#0B0B0C]">
+              The Zed Ecosystem
+            </h2>
+            <p className="font-sans text-base text-[#57575e] leading-relaxed">
+              Twelve integrated modules built for Nigerian youth across civic processes, skills, work, and community. Zed Nav is live today; upcoming modules are in development.
+            </p>
+          </FadeIn>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {ECOSYSTEM_MODULES.map((item, idx) => {
+              const isLive = item.badge === "LIVE";
+              const CardInner = (
+                <div
+                  className={`h-full rounded-xl border p-5 space-y-3 flex flex-col justify-between transition-all ${
+                    isLive
+                      ? "border-[#3ecf8e]/50 bg-white shadow-sm hover:border-[#3ecf8e] hover:shadow-md cursor-pointer"
+                      : "border-[#E5E5E0] bg-white opacity-95"
+                  }`}
+                >
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between gap-2">
+                      <h3 className="font-display font-bold text-base text-[#0B0B0C] flex items-center gap-1.5">
+                        {item.name}
+                        {isLive && <ArrowRight className="h-3.5 w-3.5 text-[#3ecf8e]" />}
+                      </h3>
+                      {isLive ? (
+                        <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full border border-[#3ecf8e]/30 bg-[#3ecf8e]/10 text-[#2db87d] font-mono text-[10px] font-semibold uppercase tracking-wider">
+                          <span className="h-1.5 w-1.5 rounded-full bg-[#3ecf8e] animate-pulse" />
+                          LIVE
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full border border-[#E5E5E0] bg-[#F5F5F0] text-[#8a8a92] font-mono text-[10px] font-medium uppercase tracking-wider">
+                          Coming soon
+                        </span>
+                      )}
+                    </div>
+                    <p className="font-sans text-xs text-[#57575e] leading-relaxed">
+                      {item.description}
+                    </p>
+                  </div>
+                  {isLive && (
+                    <div className="pt-2 text-xs font-semibold text-[#3ecf8e] flex items-center gap-1">
+                      <span>Get started with Zed Nav</span>
+                      <ArrowRight className="h-3 w-3" />
+                    </div>
+                  )}
+                </div>
+              );
+
+              return (
+                <FadeIn key={item.name} delay={idx * 0.04}>
+                  {isLive && item.href ? (
+                    <Link
+                      href={item.href}
+                      className="block h-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3ecf8e] rounded-xl"
+                    >
+                      {CardInner}
+                    </Link>
+                  ) : (
+                    CardInner
+                  )}
+                </FadeIn>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Section 6: Problem / Solution Statement ───────────────────── */}
       <section className="py-8 sm:py-12">
         <div className="max-w-site mx-auto px-4 sm:px-6 lg:px-8">
-          <FadeIn className="max-w-3xl mx-auto rounded-xl border border-[#E5E5E0] bg-[#ffffff]#141416] p-8 sm:p-12 shadow-sm space-y-6">
+          <FadeIn className="max-w-3xl mx-auto rounded-xl border border-[#E5E5E0] bg-[#ffffff] p-8 sm:p-12 shadow-sm space-y-6">
             <div className="font-mono text-xs uppercase tracking-wider text-[#3ecf8e] font-semibold">
               The Reality of Nigerian Bureaucracy
             </div>
 
-            <h2 className="font-display text-2xl sm:text-4xl font-bold tracking-tight text-[#0B0B0C]#FAFAF8] leading-snug">
+            <h2 className="font-display text-2xl sm:text-4xl font-bold tracking-tight text-[#0B0B0C] leading-snug">
               Government processes shouldn&apos;t need a guide who knows a guide.
             </h2>
 
-            <div className="font-sans text-base text-[#57575e]#9c9ca4] space-y-4 leading-relaxed">
+            <div className="font-sans text-base text-[#57575e] space-y-4 leading-relaxed">
               <p>
                 Every year, millions of young Nigerians lose days of work and study to conflicting requirements, broken portals, and middleman markups. Official instructions sit scattered across outdated gazettes, unofficial blogs, and handwritten posters on counter windows. A simple renewal turns into multiple wasted trips.
               </p>
               <p>
-                Zed eliminates the guesswork. We audit official statutory fees, test procedural requirements against actual field conditions, and lay out the exact sequential path from your first document to final collection—right on your device, with zero middlemen.
+                Zed Nav eliminates the guesswork. We audit official statutory fees, test procedural requirements against actual field conditions, and lay out the exact sequential path from your first document to final collection—right on your device, with zero middlemen.
               </p>
             </div>
           </FadeIn>
         </div>
       </section>
 
-      {/* ── Section 6: Four Pillars Grid ──────────────────────────────── */}
+      {/* ── Section 7: Four Pillars Grid ──────────────────────────────── */}
       <section id="features" className="scroll-mt-24">
         <div className="max-w-site mx-auto px-4 sm:px-6 lg:px-8">
           <FadeIn className="text-center max-w-2xl mx-auto mb-12 sm:mb-16 space-y-4">
             <div className="font-mono text-xs uppercase tracking-wider text-[#3ecf8e] font-semibold">
-              Platform Architecture
+              Zed Nav Architecture
             </div>
-            <h2 className="font-display text-3xl sm:text-5xl font-bold tracking-tight text-[#0B0B0C]#FAFAF8]">
+            <h2 className="font-display text-3xl sm:text-5xl font-bold tracking-tight text-[#0B0B0C]">
               Built with purpose.
             </h2>
-            <p className="font-sans text-base text-[#57575e]#9c9ca4] leading-relaxed">
-              Four design principles guiding how Zed protects your time, your money, and your privacy.
+            <p className="font-sans text-base text-[#57575e] leading-relaxed">
+              Four design principles guiding how Zed Nav protects your time, your money, and your privacy.
             </p>
           </FadeIn>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {PILLARS.map((pillar, idx) => (
               <FadeIn key={idx} delay={idx * 0.08}>
-                <div className="h-full rounded-xl border border-[#E5E5E0] bg-[#ffffff]#141416] p-6 space-y-4 flex flex-col justify-between">
+                <div className="h-full rounded-xl border border-[#E5E5E0] bg-[#ffffff] p-6 space-y-4 flex flex-col justify-between">
                   <div className="space-y-3">
-                    <span className="font-mono text-[11px] uppercase tracking-wider text-[#8a8a92]#6c6c74] font-medium block">
+                    <span className="font-mono text-[11px] uppercase tracking-wider text-[#8a8a92] font-medium block">
                       {pillar.eyebrow}
                     </span>
-                    <h3 className="font-display text-xl font-bold text-[#0B0B0C]#FAFAF8]">
+                    <h3 className="font-display text-xl font-bold text-[#0B0B0C]">
                       {pillar.title}
                     </h3>
                     <p className="font-mono text-xs text-[#3ecf8e] font-semibold">
                       {pillar.subtitle}
                     </p>
-                    <p className="font-sans text-sm text-[#57575e]#9c9ca4] leading-relaxed">
+                    <p className="font-sans text-sm text-[#57575e] leading-relaxed">
                       {pillar.description}
                     </p>
                   </div>
@@ -247,29 +372,29 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Section 7: Alternating Feature Blocks with Mockups ────────── */}
+      {/* ── Section 8: Alternating Feature Blocks with Mockups ────────── */}
       <section>
         <div className="max-w-site mx-auto px-4 sm:px-6 lg:px-8">
           <AlternatingFeatures />
         </div>
       </section>
 
-      {/* ── Section 8: Privacy Section ─────────────────────────────────── */}
+      {/* ── Section 9: Privacy Section ─────────────────────────────────── */}
       <section className="py-6 sm:py-10">
         <div className="max-w-site mx-auto px-4 sm:px-6 lg:px-8">
-          <FadeIn className="rounded-xl border border-[#E5E5E0] bg-[#ffffff]#141416] p-8 sm:p-12 shadow-sm">
+          <FadeIn className="rounded-xl border border-[#E5E5E0] bg-[#ffffff] p-8 sm:p-12 shadow-sm">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
               <div className="lg:col-span-8 space-y-5">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#E5E5E0] bg-[#FAFAF8] text-[#57575e]#9c9ca4] font-mono text-xs uppercase tracking-wider font-medium">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#E5E5E0] bg-[#FAFAF8] text-[#57575e] font-mono text-xs uppercase tracking-wider font-medium">
                   <Lock className="h-3 w-3 text-[#3ecf8e]" />
                   <span>Sovereign Identity Protection</span>
                 </div>
 
-                <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-[#0B0B0C]#FAFAF8]">
+                <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-[#0B0B0C]">
                   Your NIN stays yours.
                 </h2>
 
-                <div className="font-sans text-sm sm:text-base text-[#57575e]#9c9ca4] space-y-3 leading-relaxed">
+                <div className="font-sans text-sm sm:text-base text-[#57575e] space-y-3 leading-relaxed">
                   <p>
                     Your National Identity Number is the master key to your civil, banking, and travel records. Storing raw identity numbers in cloud databases creates an unacceptable attack surface for identity theft.
                   </p>
@@ -281,7 +406,7 @@ export default function HomePage() {
                 <div className="pt-2">
                   <Link
                     href="/privacy"
-                    className="inline-flex items-center gap-2 text-sm font-medium text-[#0B0B0C]#FAFAF8] hover:text-[#3ecf8e] transition-colors group"
+                    className="inline-flex items-center gap-2 text-sm font-medium text-[#0B0B0C] hover:text-[#3ecf8e] transition-colors group"
                   >
                     <span>Read our full NDPA Data Privacy Policy</span>
                     <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
@@ -291,73 +416,34 @@ export default function HomePage() {
 
               <div className="lg:col-span-4 space-y-3">
                 <div className="p-4 rounded-lg border border-[#E5E5E0] bg-[#FAFAF8] space-y-1">
-                  <div className="font-mono text-xs font-semibold text-[#0B0B0C]#FAFAF8]">
+                  <div className="font-mono text-xs font-semibold text-[#0B0B0C]">
                     Salted SHA-256 Digest
                   </div>
-                  <div className="text-xs text-[#57575e]#9c9ca4]">
+                  <div className="text-xs text-[#57575e]">
                     One-way irreversible identity token
                   </div>
                 </div>
 
                 <div className="p-4 rounded-lg border border-[#E5E5E0] bg-[#FAFAF8] space-y-1">
-                  <div className="font-mono text-xs font-semibold text-[#0B0B0C]#FAFAF8]">
+                  <div className="font-mono text-xs font-semibold text-[#0B0B0C]">
                     Zero Plaintext Cloud Storage
                   </div>
-                  <div className="text-xs text-[#57575e]#9c9ca4]">
+                  <div className="text-xs text-[#57575e]">
                     Raw NIN never written to physical disk
                   </div>
                 </div>
 
                 <div className="p-4 rounded-lg border border-[#E5E5E0] bg-[#FAFAF8] space-y-1">
-                  <div className="font-mono text-xs font-semibold text-[#0B0B0C]#FAFAF8]">
+                  <div className="font-mono text-xs font-semibold text-[#0B0B0C]">
                     NDPA 2023 Compliant
                   </div>
-                  <div className="text-xs text-[#57575e]#9c9ca4]">
+                  <div className="text-xs text-[#57575e]">
                     Registered and auditable data controller protocols
                   </div>
                 </div>
               </div>
             </div>
           </FadeIn>
-        </div>
-      </section>
-
-      {/* ── Section 9: Roadmap Strip ─────────────────────────────────── */}
-      <section id="roadmap" className="scroll-mt-24">
-        <div className="max-w-site mx-auto px-4 sm:px-6 lg:px-8">
-          <FadeIn className="text-center max-w-2xl mx-auto mb-10 sm:mb-12 space-y-3">
-            <div className="font-mono text-xs uppercase tracking-wider text-[#3ecf8e] font-semibold">
-              Future Developments
-            </div>
-            <h2 className="font-display text-3xl sm:text-4xl font-bold tracking-tight text-[#0B0B0C]#FAFAF8]">
-              What&apos;s coming
-            </h2>
-            <p className="font-sans text-sm sm:text-base text-[#57575e]#9c9ca4]">
-              Honest, planned additions to the Zed platform. No hype, just real civic engineering.
-            </p>
-          </FadeIn>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-            {ROADMAP_ITEMS.map((item, idx) => (
-              <FadeIn key={idx} delay={idx * 0.06}>
-                <div className="h-full rounded-xl border border-[#E5E5E0] bg-[#ffffff]#141416] p-5 space-y-3 flex flex-col justify-between">
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <h3 className="font-display font-bold text-base text-[#0B0B0C]#FAFAF8]">
-                        {item.title}
-                      </h3>
-                      <span className="font-mono text-[10px] uppercase font-medium px-2 py-0.5 rounded-full border border-[#E5E5E0] text-[#8a8a92]#6c6c74]">
-                        {item.status}
-                      </span>
-                    </div>
-                    <p className="font-sans text-xs text-[#57575e]#9c9ca4] leading-relaxed">
-                      {item.description}
-                    </p>
-                  </div>
-                </div>
-              </FadeIn>
-            ))}
-          </div>
         </div>
       </section>
 

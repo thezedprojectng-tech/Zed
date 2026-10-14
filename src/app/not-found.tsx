@@ -39,7 +39,7 @@ export default function NotFound() {
         </h1>
 
         <p className="font-sans text-base text-[#57575e] dark:text-[#9c9ca4] max-w-lg mx-auto leading-relaxed">
-          The civil procedure, guide chapter, or link you followed cannot be found. It may have been restructured in the latest government circular update.
+          The page, guide chapter, or link you followed cannot be found. It may have been moved or updated.
         </p>
 
         {/* Action Cluster */}
@@ -57,14 +57,14 @@ export default function NotFound() {
             className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg border border-[#E5E5E0] dark:border-white/10 bg-[#ffffff] dark:bg-[#141416] hover:bg-[#f4f4f0] dark:hover:bg-white/[0.04] text-[#0B0B0C] dark:text-[#FAFAF8] text-sm font-medium transition-all"
           >
             <Compass className="h-4 w-4 text-[#3ecf8e]" />
-            <span>Browse civil playbooks</span>
+            <span>Browse Zed Nav</span>
           </Link>
         </div>
       </div>
 
       {/* Footer Meta Row */}
       <footer className="max-w-site mx-auto w-full border-t border-[#E5E5E0] dark:border-white/10 pt-6 flex flex-col sm:flex-row items-center justify-between text-xs font-mono text-[#57575e] dark:text-[#9c9ca4] gap-2">
-        <span>Zed Technologies Nigeria Ltd.</span>
+        <span>Zed</span>
         <span>Independent Civic Platform &bull; Lagos, Nigeria</span>
       </footer>
     </main>

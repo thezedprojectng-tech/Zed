@@ -14,7 +14,20 @@ export interface ZedUser {
   updated_at: string;
 }
 
-// ── Level System (display only – no unlock logic in Phase 1) ──────────────────
+// ── Level System (spec level names) ──────────────────────────────────────────
+
+export const LEVEL_NAMES: Record<number, string> = {
+  1: "Rookie",
+  2: "Explorer",
+  3: "Builder",
+  4: "Pro",
+  5: "Zed Legend",
+} as const;
+
+export function getLevelName(levelId: number | undefined | null): string {
+  if (!levelId) return "Rookie";
+  return LEVEL_NAMES[levelId] || `Level ${levelId}`;
+}
 
 export interface Level {
   id: 1 | 2 | 3 | 4 | 5;

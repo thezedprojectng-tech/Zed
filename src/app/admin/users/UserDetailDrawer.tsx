@@ -37,6 +37,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { deleteUserAction, changeUserRoleAction } from "./actions";
+import { getLevelName } from "@/types";
 
 export interface UserDetail {
   id: string;
@@ -193,7 +194,7 @@ export function UserDetailDrawer({
                     variant="outline"
                     className="border-primary/30 bg-primary/10 text-primary text-[10px] font-mono"
                   >
-                    Level {user.level_id}
+                    Level {user.level_id} · {getLevelName(user.level_id)}
                   </Badge>
                 </div>
               </div>

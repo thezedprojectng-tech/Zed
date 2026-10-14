@@ -60,12 +60,12 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
       open={open}
       onOpenChange={onOpenChange}
       title="Zed Quick Navigation"
-      description="Search civil guides, navigation flows, and dashboard routes"
+      description="Search Zed Nav guides, processes, and dashboard routes"
     >
-      <CommandInput placeholder="Search routes, civil guides, or actions..." />
+      <CommandInput placeholder="Search routes, Zed Nav guides, or actions..." />
       <CommandList>
         <CommandEmpty className="py-8 text-center text-xs text-muted-foreground font-sans">
-          No matching civil guide or route found.
+          No matching guide or route found.
         </CommandEmpty>
 
         <CommandGroup heading="Platform Routes">
@@ -78,7 +78,7 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
             <div className="flex flex-col flex-1 min-w-0">
               <span className="font-medium text-foreground">Dashboard</span>
               <span className="text-[11px] text-muted-foreground">
-                Overview, active application status, and citizen intelligence
+                Overview, active application status, and guide intelligence
               </span>
             </div>
             <ArrowRight className="h-3.5 w-3.5 text-muted-foreground opacity-60" />
@@ -91,9 +91,9 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
               <Compass className="h-3.5 w-3.5" />
             </div>
             <div className="flex flex-col flex-1 min-w-0">
-              <span className="font-medium text-foreground">Civil Guides Catalog</span>
+              <span className="font-medium text-foreground">Zed Nav</span>
               <span className="text-[11px] text-muted-foreground">
-                Official step-by-step bureaucratic navigation playbooks
+                Step-by-step civic and administrative navigation playbooks
               </span>
             </div>
             <ArrowRight className="h-3.5 w-3.5 text-muted-foreground opacity-60" />
@@ -123,9 +123,9 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
               <User className="h-3.5 w-3.5" />
             </div>
             <div className="flex flex-col flex-1 min-w-0">
-              <span className="font-medium text-foreground">Civil Profile & Credentials</span>
+              <span className="font-medium text-foreground">Profile & Credentials</span>
               <span className="text-[11px] text-muted-foreground">
-                Verification status, badge levels, and saved civil records
+                Verification status, progression levels, and saved records
               </span>
             </div>
             <ArrowRight className="h-3.5 w-3.5 text-muted-foreground opacity-60" />
@@ -134,7 +134,7 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
 
         <CommandSeparator />
 
-        <CommandGroup heading="Official Civil Process Guides">
+        <CommandGroup heading="Zed Nav Guides">
           <CommandItem
             onSelect={() => handleSelect(() => router.push("/nav/passport"))}
           >

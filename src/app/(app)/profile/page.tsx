@@ -21,6 +21,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAuthStore } from "@/store/useAuthStore";
 import { signOut } from "@/lib/auth/actions";
+import { getLevelName } from "@/types";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -51,13 +52,13 @@ export default function ProfilePage() {
 
   return (
     <>
-      <Header title="Your Profile" subtitle="Manage your citizen account and civic credentials." />
+      <Header title="Your Profile" subtitle="Manage your account details and progression." />
       <section className="container-mobile py-6 space-y-6 max-w-7xl mx-auto">
         {/* Verification & Level Status Banner */}
         <div className="rounded-xl border border-hairline bg-card p-5 space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
-              Civic Credentials
+              Level & Credentials
             </h2>
             <Badge
               variant="outline"
@@ -67,7 +68,7 @@ export default function ProfilePage() {
                   : "border-amber-500/30 bg-amber-500/10 text-amber-500"
               }
             >
-              {isVerified ? "Verified Citizen" : "Verification Required"}
+              {isVerified ? "Verified Member" : "Verification Required"}
             </Badge>
           </div>
 
@@ -89,14 +90,14 @@ export default function ProfilePage() {
             <div className="space-y-1">
               <div className="flex items-center gap-2">
                 <p className="font-semibold text-foreground text-sm">
-                  Civic Standing: Level {civicLevel}
+                  Current Level: {getLevelName(civicLevel)}
                 </p>
                 <Award className="h-4 w-4 text-primary" />
               </div>
               <p className="text-xs text-muted-foreground leading-relaxed">
                 {isVerified
-                  ? "Your 11-digit NIN has been verified in demo mode. Your citizen account is verified at Civic Level 1."
-                  : "Your account is unverified. Harmonise your National Identity Number (NIN) to verify your account and unlock Level 1."}
+                  ? `Your 11-digit NIN has been verified in demo mode. Your account status is verified at level ${getLevelName(civicLevel)}.`
+                  : "Your account is unverified. Verify your National Identity Number (NIN) in demo mode to verify your account and unlock your next level."}
               </p>
             </div>
           </div>

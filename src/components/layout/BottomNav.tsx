@@ -7,7 +7,7 @@ import { Home, Compass, MapPin, User } from "lucide-react";
 
 const mobileNavItems = [
   { href: "/home", label: "Dashboard", icon: Home },
-  { href: "/nav", label: "Civil Guides", icon: Compass },
+  { href: "/nav", label: "Zed Nav", icon: Compass },
   { href: "/nav/passport/centers", label: "Centers", icon: MapPin },
   { href: "/profile", label: "Profile", icon: User },
 ] as const;

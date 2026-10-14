@@ -187,7 +187,7 @@ export function SiteFooter() {
 
           <div className="space-y-1.5">
             <p className="font-mono text-xs text-[#5a5a64]">
-              &copy; {new Date().getFullYear()} Zed Technologies Nigeria Ltd. All rights reserved.
+              &copy; {new Date().getFullYear()} Zed. All rights reserved.
             </p>
             <p className="font-mono text-xs text-[#3d3d46] max-w-md leading-relaxed">
               Independent civic guide. Not affiliated with, endorsed by, or operated by any government agency.

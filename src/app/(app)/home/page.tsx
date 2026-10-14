@@ -17,6 +17,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useNavProgressStore } from "@/store/useNavProgressStore";
+import { getLevelName } from "@/types";
 import passportFlow from "@/data/nav/passport.flow.json";
 import nyscFlow from "@/data/nav/nysc.flow.json";
 import ninBvnFlow from "@/data/nav/nin-bvn.flow.json";
@@ -145,14 +146,14 @@ export default function HomePage() {
           <h1 className="type-display text-foreground">
             {greeting}, {firstName}.
           </h1>
-          <span className="type-caption text-muted-foreground">
-            CIVIC LEVEL {civicLevel} · {isVerified ? "VERIFIED CITIZEN" : "CITIZEN STATUS"}
+          <span className="type-caption text-muted-foreground font-mono">
+            {getLevelName(civicLevel).toUpperCase()} · {isVerified ? "VERIFIED" : "UNVERIFIED"}
           </span>
         </div>
         <p className="type-body text-muted-foreground max-w-3xl">
           Track official document progress, bypass center congestion, and navigate{" "}
           <span className="inline-block">
-            Nigerian civil institutions{" "}
+            Nigerian civic processes{" "}
             <span className="type-accent-serif text-foreground">seamlessly</span>.
           </span>
         </p>
@@ -171,21 +172,21 @@ export default function HomePage() {
                     <ShieldAlert className="h-3.5 w-3.5" />
                   </div>
                   <span className="type-caption text-primary">
-                    CIVIL IDENTITY REQUIREMENT
+                    IDENTITY VERIFICATION
                   </span>
                 </div>
                 <h2 className="type-h2 text-foreground">
-                  Verify your NIN to unlock Level 1
+                  Verify your NIN to level up
                 </h2>
                 <p className="type-small text-muted-foreground">
-                  Verify your 11-digit National Identity Number to unlock Civic Level 1, confirm your verified citizen status, and track your procedural steps.
+                  Verify your 11-digit National Identity Number to confirm your verified status and unlock your next progression level.
                 </p>
                 <div className="flex items-center gap-3">
                   <div className="w-48">
                     <Progress value={33} className="h-1.5 bg-secondary" />
                   </div>
                   <span className="font-mono text-[11px] text-muted-foreground">
-                    1 of 3 verified
+                    Level: {getLevelName(civicLevel)}
                   </span>
                 </div>
               </div>
@@ -210,7 +211,7 @@ export default function HomePage() {
       <section aria-label="In-progress civil flow">
         <div className="flex items-center justify-between mb-3">
           <h2 className="type-caption text-muted-foreground font-semibold">
-            ACTIVE CIVIL APPLICATION
+            ACTIVE ZED NAV GUIDE
           </h2>
           <span className="type-caption text-primary">IN PROGRESS</span>
         </div>
@@ -272,7 +273,7 @@ export default function HomePage() {
       <section aria-label="Official Civil Guides" className="space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="type-h2 text-foreground">Civil Process Guides</h2>
+            <h2 className="type-h2 text-foreground">Zed Nav Guides</h2>
             <p className="type-small text-muted-foreground mt-0.5">
               End-to-end bureaucratic navigation with official requirements, fees, and traps to avoid.
             </p>

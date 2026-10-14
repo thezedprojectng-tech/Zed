@@ -21,6 +21,7 @@ import {
 import { toast } from "sonner";
 import { UserDetail, UserDetailDrawer } from "./UserDetailDrawer";
 import { exportUsersCsvAction } from "./actions";
+import { getLevelName } from "@/types";
 
 interface UsersTableClientProps {
   users: UserDetail[];
@@ -185,11 +186,11 @@ export function UsersTableClient({ users, currentAdminId }: UsersTableClientProp
               className="h-8 px-2.5 rounded-md border border-border bg-secondary/40 text-xs text-foreground outline-none focus:border-primary transition-colors"
             >
               <option value="all">All Levels</option>
-              <option value="1">Level 1</option>
-              <option value="2">Level 2</option>
-              <option value="3">Level 3</option>
-              <option value="4">Level 4</option>
-              <option value="5">Level 5</option>
+              <option value="1">Level 1 · Rookie</option>
+              <option value="2">Level 2 · Explorer</option>
+              <option value="3">Level 3 · Builder</option>
+              <option value="4">Level 4 · Pro</option>
+              <option value="5">Level 5 · Zed Legend</option>
             </select>
 
             {/* Export CSV Button */}
@@ -325,7 +326,7 @@ export function UsersTableClient({ users, currentAdminId }: UsersTableClientProp
 
                     <td className="px-4 py-3 whitespace-nowrap">
                       <span className="font-mono font-medium text-foreground">
-                        Level {u.level_id}
+                        {getLevelName(u.level_id)}
                       </span>
                     </td>
 

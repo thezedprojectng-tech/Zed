@@ -27,6 +27,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { getLevelName } from "@/types";
 import { useAuthStore } from "@/store/useAuthStore";
 
 interface NavItem {
@@ -46,12 +47,12 @@ const sections: NavSection[] = [
     title: "PLATFORM",
     items: [
       { href: "/home", label: "Dashboard", icon: Home },
-      { href: "/nav", label: "Civil Guides", icon: Compass },
+      { href: "/nav", label: "Zed Nav", icon: Compass },
       { href: "/nav/passport/centers", label: "Centers Tracker", icon: MapPin },
     ],
   },
   {
-    title: "GUIDES",
+    title: "ZED NAV",
     items: [
       { href: "/nav/passport", label: "Nigerian Passport", icon: BookOpen },
       { href: "/nav/nysc", label: "NYSC Mobilisation", icon: GraduationCap },
@@ -61,7 +62,7 @@ const sections: NavSection[] = [
   },
   {
     title: "ACCOUNT",
-    items: [{ href: "/profile", label: "Civil Profile", icon: User }],
+    items: [{ href: "/profile", label: "Profile", icon: User }],
   },
   {
     title: "ADMIN",
@@ -106,7 +107,7 @@ export function Sidebar() {
               Zed
             </span>
             <span className="rounded bg-primary/10 border border-primary/20 px-1.5 py-0.5 font-mono text-[10px] font-medium text-primary">
-              CIVIL v1.0
+              v1.0
             </span>
           </Link>
         )}
@@ -224,12 +225,12 @@ export function Sidebar() {
           {!collapsed && (
             <div className="flex flex-1 flex-col overflow-hidden text-left">
               <span className="truncate text-xs font-medium text-foreground">
-                {fullName || "Citizen"}
+                {fullName || "User"}
               </span>
               <div className="flex items-center gap-1.5 mt-0.5">
                 <span className="h-1.5 w-1.5 rounded-full bg-primary shrink-0" />
                 <span className="truncate font-mono text-[10px] text-muted-foreground">
-                  Lvl 1 Citizen
+                  {getLevelName(profile?.level_id)}
                 </span>
               </div>
             </div>

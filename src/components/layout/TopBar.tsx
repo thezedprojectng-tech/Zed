@@ -37,6 +37,7 @@ import {
 } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { signOut } from "@/lib/auth/actions";
+import { getLevelName } from "@/types";
 
 interface TopBarProps {
   onOpenCommand: () => void;
@@ -52,7 +53,7 @@ const routeLabels: Record<string, string> = {
   ppa: "Place of Primary Assignment",
   "nin-bvn": "NIN & BVN",
   cac: "CAC Registration",
-  profile: "Civil Profile",
+  profile: "Profile",
   "verify-nin": "NIN Verification",
   admin: "Admin",
   users: "Users",
@@ -199,10 +200,10 @@ export function TopBar({ onOpenCommand }: TopBarProps) {
           >
             <div className="border-b border-border px-4 py-2.5">
               <p className="text-xs font-semibold tracking-tight text-foreground">
-                Civil Bureau Updates
+                Zed Nav Updates
               </p>
               <p className="text-[11px] text-muted-foreground">
-                Verified alerts from official Nigerian agencies
+                Verified procedural alerts and updates
               </p>
             </div>
             <div className="divide-y divide-border/50 text-xs">
@@ -272,7 +273,7 @@ export function TopBar({ onOpenCommand }: TopBarProps) {
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col space-y-1">
                 <p className="text-xs font-semibold leading-none text-foreground">
-                  {fullName || "Citizen"}
+                  {fullName || "User"}
                 </p>
                 <p className="text-[11px] leading-none text-muted-foreground font-mono">
                   {email || ""}
@@ -282,7 +283,7 @@ export function TopBar({ onOpenCommand }: TopBarProps) {
                     variant="outline"
                     className="border-primary/30 bg-primary/10 text-primary text-[10px] py-0 px-1.5 font-mono"
                   >
-                    Level {civicLevel} Citizen
+                    {getLevelName(civicLevel)}
                   </Badge>
                 </div>
               </div>
@@ -291,7 +292,7 @@ export function TopBar({ onOpenCommand }: TopBarProps) {
             <DropdownMenuItem asChild>
               <Link href="/profile" className="cursor-pointer">
                 <User className="mr-2 h-4 w-4" />
-                <span>Civil Profile & Credentials</span>
+                <span>Profile & Credentials</span>
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>

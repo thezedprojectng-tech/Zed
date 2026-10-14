@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Terms of Service – Legal Agreement & Platform Conditions",
     description:
-      "Review the Terms of Service for Zed Technologies Nigeria Ltd.",
+      "Review the Terms of Service for Zed.",
     url: "https://zedproject.ng/terms",
   },
 };
@@ -51,8 +51,8 @@ export default function TermsPage() {
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
           <p>
             These Terms of Service (&quot;Terms&quot;) constitute a legally binding contractual agreement between you 
-            (&quot;User&quot;, &quot;you&quot;, or &quot;your&quot;) and Zed Technologies Nigeria Ltd (&quot;Zed&quot;, 
-            &quot;we&quot;, &quot;us&quot;, or &quot;our&quot;), governing your access to and use of the Zed marketing website, 
+            (&quot;User&quot;, &quot;you&quot;, or &quot;your&quot;) and Zed 
+            (&quot;we&quot;, &quot;us&quot;, or &quot;our&quot;), governing your access to and use of the Zed marketing website, 
             Progressive Web Application, and associated civil tools (collectively, the &quot;Platform&quot;).
           </p>
           <p>
@@ -144,7 +144,7 @@ export default function TermsPage() {
           <p>
             The Platform, including its user interface design, visual identity, branding (&quot;ZED&quot;, &quot;ZED.NG&quot;), 
             typography, proprietary checklists, editorial flowcharts, and source code, is the exclusive intellectual property 
-            of Zed Technologies Nigeria Ltd and is protected under the Copyright Act 2022 of Nigeria and international intellectual 
+            of Zed and is protected under the Copyright Act 2022 of Nigeria and international intellectual 
             property treaties.
           </p>
           <p>
@@ -233,7 +233,7 @@ export default function TermsPage() {
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
           <p>
-            You agree to defend, indemnify, and hold harmless Zed Technologies Nigeria Ltd, its officers, directors, 
+            You agree to defend, indemnify, and hold harmless Zed, its officers, directors, 
             and employees from and against any claims, liabilities, damages, judgments, awards, losses, costs, or expenses 
             (including reasonable legal fees) arising out of or relating to your violation of these Terms, your misuse 
             of the Platform, or your submission of fraudulent documents to statutory authorities.
@@ -298,7 +298,7 @@ export default function TermsPage() {
           </p>
           <div className="p-4 rounded-lg border border-[#E5E5E0] dark:border-white/10 bg-[#FAFAF8] dark:bg-[#141416] text-xs font-mono space-y-1 text-[#0B0B0C] dark:text-[#FAFAF8]">
             <strong>Legal Department</strong><br />
-            Zed Technologies Nigeria Ltd.<br />
+            Zed<br />
             Yaba Technology Corridor, Lagos State, Nigeria.<br />
             Email: <a href="mailto:legal@zedproject.ng" className="text-[#3ecf8e] underline">legal@zedproject.ng</a>
           </div>
