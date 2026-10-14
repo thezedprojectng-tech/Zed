@@ -23,7 +23,7 @@ export function HeroSection() {
             className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#D8D8D2] bg-[#F5F5F0] text-[#57575e] font-mono text-xs uppercase tracking-widest font-medium"
           >
             <span className="h-1.5 w-1.5 rounded-full bg-[#3ecf8e]" />
-            <span>Civic guides for Nigerians</span>
+            <span>The Digital OS for Nigerian Youth</span>
           </motion.div>
 
           {/* Main Headline */}
@@ -51,9 +51,9 @@ export function HeroSection() {
             initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.55, delay: 0.26, ease: [0.22, 1, 0.36, 1] }}
-            className="font-sans text-lg sm:text-xl text-[#57575e] max-w-xl mx-auto leading-relaxed"
+            className="font-sans text-lg sm:text-xl text-[#57575e] max-w-2xl mx-auto leading-relaxed"
           >
-            Zed is a Nigerian youth platform for civic processes, skills, work and community.
+            The all-in-one digital operating system for Nigerian Gen Z. Master civil administrative processes, acquire practical digital skills, access escrow-backed freelance gigs, and connect across university hubs.
           </motion.p>
 
           {/* CTA Cluster */}
