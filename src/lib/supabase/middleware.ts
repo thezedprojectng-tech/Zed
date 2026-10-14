@@ -2,7 +2,8 @@ import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
 
 /**
- * Utility used inside middleware.ts to refresh the Supabase session cookie.
+ * Utility used inside middleware.ts to refresh the Supabase session cookie
+ * and protect (app) routes from unauthenticated access.
  */
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
@@ -28,13 +29,11 @@ export async function updateSession(request: NextRequest) {
     }
   );
 
-  // Refresh session (do not remove – required to keep cookies fresh)
+  // IMPORTANT: Do not remove this call. It refreshes the user's session cookie
+  // on every request so it doesn't expire while they are actively using the app.
   const {
     data: { user },
   } = await supabase.auth.getUser();
-
-  // Check dev session cookie (dev-only way to continue while Supabase is stubbed)
-  const hasDevSession = request.cookies.get("zed_dev_session")?.value === "true";
 
   // Redirect unauthenticated users away from protected (app) routes to /login
   const isAppRoute =
@@ -42,7 +41,7 @@ export async function updateSession(request: NextRequest) {
     request.nextUrl.pathname.startsWith("/nav") ||
     request.nextUrl.pathname.startsWith("/profile");
 
-  if (!user && !hasDevSession && isAppRoute) {
+  if (!user && isAppRoute) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);

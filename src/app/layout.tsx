@@ -6,6 +6,7 @@ import { GeistMono } from "geist/font/mono";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { AuthProvider } from "@/components/auth/AuthProvider";
 import "./globals.css";
 
 const cabinetGrotesk = localFont({
@@ -58,12 +59,21 @@ export const metadata: Metadata = {
     title: "Zed",
   },
   formatDetection: { telephone: false },
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "32x32" },
+      { url: "/favicon.svg", type: "image/svg+xml" },
+    ],
+    apple: [
+      { url: "/apple-icon", sizes: "180x180", type: "image/png" },
+    ],
+  },
 };
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#fbfbfb" },
-    { media: "(prefers-color-scheme: dark)", color: "#0a0a0b" },
+    { media: "(prefers-color-scheme: light)", color: "#FAFAF8" },
+    { media: "(prefers-color-scheme: dark)", color: "#0B0B0C" },
   ],
   width: "device-width",
   initialScale: 1,
@@ -81,18 +91,20 @@ export default function RootLayout({
       lang="en"
       suppressHydrationWarning
       data-scroll-behavior="smooth"
-      className={`dark ${cabinetGrotesk.variable} ${GeistSans.variable} ${GeistMono.variable} ${instrumentSerif.variable}`}
+      className={`${cabinetGrotesk.variable} ${GeistSans.variable} ${GeistMono.variable} ${instrumentSerif.variable}`}
     >
-      <body className="min-h-dvh bg-background text-foreground antialiased font-sans selection:bg-primary/20 selection:text-primary">
+      <body className="min-h-dvh bg-background text-foreground antialiased font-sans selection:bg-[#3ecf8e]/20 selection:text-[#3ecf8e]">
         <ThemeProvider
           attribute="class"
-          defaultTheme="dark"
+          defaultTheme="light"
           enableSystem={false}
           storageKey="zed-theme-v2"
           disableTransitionOnChange
         >
           <TooltipProvider delayDuration={150}>
-            {children}
+            <AuthProvider>
+              {children}
+            </AuthProvider>
             <Toaster
               theme="system"
               closeButton

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import {
   Breadcrumb,
@@ -35,6 +35,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
+import { signOut } from "@/lib/auth/actions";
 
 interface TopBarProps {
   onOpenCommand: () => void;
@@ -56,10 +57,17 @@ const routeLabels: Record<string, string> = {
 
 export function TopBar({ onOpenCommand }: TopBarProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const { theme, setTheme, resolvedTheme } = useTheme();
   const { user, clearUser } = useAuthStore();
   const [isOnline, setIsOnline] = useState(true);
   const [mounted, setMounted] = useState(false);
+
+  const handleSignOut = async () => {
+    clearUser();
+    await signOut();
+    router.push("/login");
+  };
 
   useEffect(() => {
     setMounted(true);
@@ -82,12 +90,17 @@ export function TopBar({ onOpenCommand }: TopBarProps) {
   // Compute breadcrumbs from pathname segments
   const segments = pathname.split("/").filter(Boolean);
 
-  const getInitials = (name?: string) => {
+  const getInitials = (name?: string | null) => {
     if (!name) return "ZE";
     const parts = name.trim().split(" ");
     if (parts.length >= 2) return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
     return parts[0].slice(0, 2).toUpperCase();
   };
+
+  // Read profile metadata from the Supabase User object
+  const fullName = user?.user_metadata?.full_name as string | undefined;
+  const avatarUrl = user?.user_metadata?.avatar_url as string | undefined;
+  const email = user?.email;
 
   return (
     <header className="sticky top-0 z-30 flex h-14 w-full items-center justify-between border-hairline-b bg-background/80 px-4 md:px-6 backdrop-blur-md">
@@ -240,9 +253,9 @@ export function TopBar({ onOpenCommand }: TopBarProps) {
               aria-label="User menu"
             >
               <Avatar className="h-7 w-7 border-hairline">
-                <AvatarImage src={user?.avatar_url || ""} />
+                <AvatarImage src={avatarUrl || ""} />
                 <AvatarFallback className="bg-secondary font-mono text-[11px] font-semibold text-foreground">
-                  {getInitials(user?.full_name)}
+                  {getInitials(fullName)}
                 </AvatarFallback>
               </Avatar>
             </button>
@@ -254,17 +267,17 @@ export function TopBar({ onOpenCommand }: TopBarProps) {
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col space-y-1">
                 <p className="text-xs font-semibold leading-none text-foreground">
-                  {user?.full_name || "Zayd Tahir"}
+                  {fullName || "Citizen"}
                 </p>
                 <p className="text-[11px] leading-none text-muted-foreground font-mono">
-                  {user?.phone_number || "+234 810 000 0000"}
+                  {email || ""}
                 </p>
                 <div className="mt-1.5 flex items-center gap-1.5">
                   <Badge
                     variant="outline"
                     className="border-primary/30 bg-primary/10 text-primary text-[10px] py-0 px-1.5 font-mono"
                   >
-                    Level {user?.level_id || 1} Citizen
+                    Level 1 Citizen
                   </Badge>
                 </div>
               </div>
@@ -284,7 +297,7 @@ export function TopBar({ onOpenCommand }: TopBarProps) {
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
-              onClick={() => clearUser()}
+              onClick={handleSignOut}
               className="text-destructive focus:bg-destructive/10 focus:text-destructive cursor-pointer"
             >
               <LogOut className="mr-2 h-4 w-4" />

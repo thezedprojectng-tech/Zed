@@ -117,8 +117,10 @@ export default function HomePage() {
     setDateString(getFormattedDate());
   }, []);
 
-  const firstName = user?.full_name ? user.full_name.trim().split(" ")[0] : "there";
-  const isVerified = user?.is_verified ?? false;
+  const fullName = user?.user_metadata?.full_name as string | undefined;
+  const firstName = fullName ? fullName.trim().split(" ")[0] : "there";
+  // is_verified will be a custom claim once NIN verification is wired to the database
+  const isVerified = false;
 
   const activeFlow = progressMap["passport"] || {
     flow_id: "passport",
@@ -144,7 +146,7 @@ export default function HomePage() {
             {greeting}, {firstName}.
           </h1>
           <span className="type-caption text-muted-foreground">
-            CIVIC LEVEL {user?.level_id || 1} · CITIZEN STATUS
+            CIVIC LEVEL 1 · CITIZEN STATUS
           </span>
         </div>
         <p className="type-body text-muted-foreground max-w-3xl">

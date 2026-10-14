@@ -66,12 +66,15 @@ export function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const { user } = useAuthStore();
 
-  const getInitials = (name?: string) => {
+  const getInitials = (name?: string | null) => {
     if (!name) return "ZE";
     const parts = name.trim().split(" ");
     if (parts.length >= 2) return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
     return parts[0].slice(0, 2).toUpperCase();
   };
+
+  const fullName = user?.user_metadata?.full_name as string | undefined;
+  const avatarUrl = user?.user_metadata?.avatar_url as string | undefined;
 
   return (
     <aside
@@ -184,21 +187,21 @@ export function Sidebar() {
           )}
         >
           <Avatar className="h-8 w-8 border-hairline shrink-0">
-            <AvatarImage src={user?.avatar_url || ""} />
+            <AvatarImage src={avatarUrl || ""} />
             <AvatarFallback className="bg-secondary font-mono text-[11px] font-semibold text-foreground">
-              {getInitials(user?.full_name)}
+              {getInitials(fullName)}
             </AvatarFallback>
           </Avatar>
 
           {!collapsed && (
             <div className="flex flex-1 flex-col overflow-hidden text-left">
               <span className="truncate text-xs font-medium text-foreground">
-                {user?.full_name || "Zayd Tahir"}
+                {fullName || "Citizen"}
               </span>
               <div className="flex items-center gap-1.5 mt-0.5">
                 <span className="h-1.5 w-1.5 rounded-full bg-primary shrink-0" />
                 <span className="truncate font-mono text-[10px] text-muted-foreground">
-                  Lvl {user?.level_id || 1} Citizen
+                  Lvl 1 Citizen
                 </span>
               </div>
             </div>

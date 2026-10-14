@@ -1,9 +1,10 @@
-// ─── Zed Authentication Actions (TODO: Wire to Supabase) ─────────────────────
-// Simulated 800ms stubs for prototyping the complete auth flow without live backend.
+// ─── Zed Authentication Actions ──────────────────────────────────────────────
+// Real Supabase Auth implementation using @supabase/ssr.
+// Phone OTP (signInWithOtp) will be added when an SMS provider is configured.
+// TODO: Wire phone OTP via supabase.auth.signInWithOtp() once Twilio / Africa's
+//       Talking SMS provider is configured in the Supabase dashboard.
 
-import type { ZedUser } from "@/types";
-
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+import { createClient } from "@/lib/supabase/client";
 
 /**
  * Normalizes a Nigerian phone number to international format: +234XXXXXXXXXX
@@ -39,65 +40,97 @@ export function isValidNIN(nin: string): boolean {
 }
 
 /**
- * TODO: Replace with real Supabase Auth signInWithOtp()
- * Simulates sending a 6-digit OTP to the provided phone number.
+ * Sign up a new user with email and password.
+ * Passes full_name and phone_number into user_metadata for profile hydration.
  */
-export async function sendOtp(
-  phone: string,
-  fullName?: string
-): Promise<{ success: boolean; message: string }> {
-  // Simulate network roundtrip
-  await sleep(800);
+export async function signUp(params: {
+  email: string;
+  password: string;
+  fullName: string;
+  phoneNumber: string;
+}): Promise<{ success: boolean; message: string }> {
+  const supabase = createClient();
 
-  // Store phone and optional name in sessionStorage for OTP verification step
-  if (typeof window !== "undefined") {
-    sessionStorage.setItem("zed_auth_phone", normalizeNigerianPhone(phone));
-    if (fullName) {
-      sessionStorage.setItem("zed_auth_fullname", fullName.trim());
+  const { error } = await supabase.auth.signUp({
+    email: params.email,
+    password: params.password,
+    options: {
+      data: {
+        full_name: params.fullName.trim(),
+        phone_number: normalizeNigerianPhone(params.phoneNumber),
+      },
+    },
+  });
+
+  if (error) {
+    // Provide friendly messages for common errors
+    if (error.message.includes("already registered")) {
+      throw new Error(
+        "An account with this email already exists. Please sign in instead."
+      );
     }
+    if (error.message.includes("Password should be")) {
+      throw new Error("Password must be at least 8 characters long.");
+    }
+    throw new Error(error.message);
   }
 
   return {
     success: true,
-    message: `Verification code sent to ${normalizeNigerianPhone(phone)}`,
+    message:
+      "Account created! Check your email for a confirmation link before signing in.",
   };
 }
 
 /**
- * TODO: Replace with real Supabase Auth verifyOtp()
- * Simulates verifying the 6-digit OTP and issuing a session.
+ * Sign in an existing user with email and password.
  */
-export async function verifyOtp(
-  phone: string,
-  token: string
-): Promise<{ success: boolean; user: ZedUser; message: string }> {
-  await sleep(800);
+export async function signIn(params: {
+  email: string;
+  password: string;
+}): Promise<{ success: boolean; message: string }> {
+  const supabase = createClient();
 
-  const storedName =
-    typeof window !== "undefined"
-      ? sessionStorage.getItem("zed_auth_fullname") || "Zayd Tahir"
-      : "Zayd Tahir";
+  const { error } = await supabase.auth.signInWithPassword({
+    email: params.email,
+    password: params.password,
+  });
 
-  const fakeUser: ZedUser = {
-    id: "dev-usr-" + Math.random().toString(36).substring(2, 9),
-    phone_number: normalizeNigerianPhone(phone),
-    full_name: storedName,
-    level_id: 1,
-    is_verified: false,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  };
-
-  // Set dev-session cookie so Next.js middleware allows accessing (app) routes
-  if (typeof document !== "undefined") {
-    document.cookie = "zed_dev_session=true; path=/; max-age=86400; SameSite=Lax";
+  if (error) {
+    if (
+      error.message.includes("Invalid login credentials") ||
+      error.message.includes("invalid_credentials")
+    ) {
+      throw new Error(
+        "Incorrect email or password. Please check your credentials and try again."
+      );
+    }
+    if (error.message.includes("Email not confirmed")) {
+      throw new Error(
+        "Please confirm your email address before signing in. Check your inbox for a verification link."
+      );
+    }
+    if (error.message.includes("Too many requests")) {
+      throw new Error(
+        "Too many login attempts. Please wait a moment and try again."
+      );
+    }
+    throw new Error(error.message);
   }
 
   return {
     success: true,
-    user: fakeUser,
-    message: "Phone number verified successfully.",
+    message: "Signed in successfully.",
   };
+}
+
+/**
+ * Sign out the current user.
+ * Clears the Supabase session cookie on the browser side.
+ */
+export async function signOut(): Promise<void> {
+  const supabase = createClient();
+  await supabase.auth.signOut();
 }
 
 /**
@@ -107,12 +140,13 @@ export async function verifyOtp(
 export async function verifyNin(
   nin: string
 ): Promise<{ success: boolean; message: string; is_verified: boolean }> {
-  await sleep(800);
-
   // Validate exactly 11 digits
   if (!isValidNIN(nin)) {
     throw new Error("National Identity Number must be exactly 11 numeric digits.");
   }
+
+  // TODO: Call the NIMC verification API here
+  await new Promise((resolve) => setTimeout(resolve, 800));
 
   return {
     success: true,

@@ -7,11 +7,21 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
-import { ArrowRight, Loader2, Phone, User, Check } from "lucide-react";
+import {
+  ArrowRight,
+  Loader2,
+  Phone,
+  User,
+  Mail,
+  Lock,
+  Check,
+  Eye,
+  EyeOff,
+} from "lucide-react";
 
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { Button } from "@/components/ui/button";
-import { sendOtp, isValidNigerianPhone } from "@/lib/auth/actions";
+import { signUp, isValidNigerianPhone } from "@/lib/auth/actions";
 
 const signupSchema = z.object({
   fullName: z
@@ -25,6 +35,11 @@ const signupSchema = z.object({
       (val) => isValidNigerianPhone(val),
       "Please enter a valid Nigerian phone number (e.g. 0801 234 5678 or +234...)"
     ),
+  email: z.string().min(1, "Email is required").email("Invalid email address"),
+  password: z
+    .string()
+    .min(8, "Password must be at least 8 characters")
+    .max(72, "Password is too long"),
   terms: z.boolean().refine((val) => val === true, {
     message: "You must accept the Terms and Privacy Policy to register",
   }),
@@ -35,6 +50,7 @@ type SignupFormData = z.infer<typeof signupSchema>;
 export default function SignupPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
@@ -47,6 +63,8 @@ export default function SignupPage() {
     defaultValues: {
       fullName: "",
       phone: "",
+      email: "",
+      password: "",
       terms: undefined,
     },
   });
@@ -56,13 +74,17 @@ export default function SignupPage() {
   const onSubmit = async (data: SignupFormData) => {
     setIsLoading(true);
     try {
-      const res = await sendOtp(data.phone, data.fullName);
-      if (res.success) {
-        toast.success(res.message);
-        router.push("/verify-otp");
-      }
+      const res = await signUp({
+        email: data.email,
+        password: data.password,
+        fullName: data.fullName,
+        phoneNumber: data.phone,
+      });
+      toast.success(res.message);
+      // Redirect to login so the user can sign in after confirming their email
+      router.push("/login?registered=true");
     } catch (err: any) {
-      toast.error(err.message || "Failed to send verification code. Please try again.");
+      toast.error(err.message || "Failed to create account. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -84,7 +106,7 @@ export default function SignupPage() {
       }
       rightSubtext="Deterministic bureaucratic playbooks for Nigerian youth. Passport renewals, NYSC call-up, and harmonised civil records."
     >
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
         {/* Full Name */}
         <div className="space-y-1.5">
           <label className="text-xs font-mono uppercase tracking-wider text-muted-foreground block">
@@ -100,6 +122,7 @@ export default function SignupPage() {
               type="text"
               placeholder="e.g. Babatunde Adeyemi"
               disabled={isLoading}
+              autoComplete="name"
               className="h-full w-full bg-transparent text-sm sm:text-base text-foreground outline-none placeholder:text-muted-foreground/60 font-sans disabled:opacity-50"
               {...register("fullName")}
             />
@@ -111,7 +134,7 @@ export default function SignupPage() {
           )}
         </div>
 
-        {/* Phone Number */}
+        {/* Nigerian Mobile Number */}
         <div className="space-y-1.5">
           <label className="text-xs font-mono uppercase tracking-wider text-muted-foreground block">
             Nigerian Mobile Number
@@ -126,6 +149,7 @@ export default function SignupPage() {
               type="tel"
               placeholder="0801 234 5678 or +234..."
               disabled={isLoading}
+              autoComplete="tel"
               className="h-full w-full bg-transparent text-sm sm:text-base text-foreground outline-none placeholder:text-muted-foreground/60 font-sans disabled:opacity-50"
               {...register("phone")}
             />
@@ -137,6 +161,72 @@ export default function SignupPage() {
           )}
         </div>
 
+        {/* Email */}
+        <div className="space-y-1.5">
+          <label className="text-xs font-mono uppercase tracking-wider text-muted-foreground block">
+            Email Address
+          </label>
+          <div
+            className={`flex h-14 items-center gap-3 rounded-xl border bg-secondary/30 px-4 transition-all focus-within:border-primary focus-within:ring-1 focus-within:ring-primary ${
+              errors.email ? "border-destructive bg-destructive/5" : "border-hairline"
+            }`}
+          >
+            <Mail className="h-4 w-4 text-muted-foreground shrink-0" />
+            <input
+              type="email"
+              placeholder="you@example.com"
+              disabled={isLoading}
+              autoComplete="email"
+              className="h-full w-full bg-transparent text-sm sm:text-base text-foreground outline-none placeholder:text-muted-foreground/60 font-sans disabled:opacity-50"
+              {...register("email")}
+            />
+          </div>
+          {errors.email && (
+            <p className="text-xs font-medium text-destructive mt-1">
+              {errors.email.message}
+            </p>
+          )}
+        </div>
+
+        {/* Password */}
+        <div className="space-y-1.5">
+          <label className="text-xs font-mono uppercase tracking-wider text-muted-foreground block">
+            Password
+          </label>
+          <div
+            className={`flex h-14 items-center gap-3 rounded-xl border bg-secondary/30 px-4 transition-all focus-within:border-primary focus-within:ring-1 focus-within:ring-primary ${
+              errors.password ? "border-destructive bg-destructive/5" : "border-hairline"
+            }`}
+          >
+            <Lock className="h-4 w-4 text-muted-foreground shrink-0" />
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="Minimum 8 characters"
+              disabled={isLoading}
+              autoComplete="new-password"
+              className="h-full w-full bg-transparent text-sm sm:text-base text-foreground outline-none placeholder:text-muted-foreground/60 font-sans disabled:opacity-50"
+              {...register("password")}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((p) => !p)}
+              className="shrink-0 text-muted-foreground hover:text-foreground transition-colors"
+              aria-label={showPassword ? "Hide password" : "Show password"}
+            >
+              {showPassword ? (
+                <EyeOff className="h-4 w-4" />
+              ) : (
+                <Eye className="h-4 w-4" />
+              )}
+            </button>
+          </div>
+          {errors.password && (
+            <p className="text-xs font-medium text-destructive mt-1">
+              {errors.password.message}
+            </p>
+          )}
+        </div>
+
         {/* Terms and Privacy Checkbox */}
         <div className="space-y-1 pt-1">
           <label className="flex items-start gap-3 cursor-pointer select-none">
@@ -144,7 +234,9 @@ export default function SignupPage() {
               type="button"
               role="checkbox"
               aria-checked={!!termsAccepted}
-              onClick={() => setValue("terms", !termsAccepted as any, { shouldValidate: true })}
+              onClick={() =>
+                setValue("terms", !termsAccepted as any, { shouldValidate: true })
+              }
               className={`relative mt-0.5 h-4 w-4 rounded border transition-colors flex items-center justify-center shrink-0 ${
                 termsAccepted
                   ? "bg-primary border-primary text-primary-foreground"
@@ -189,11 +281,11 @@ export default function SignupPage() {
           {isLoading ? (
             <>
               <Loader2 className="h-4 w-4 animate-spin" />
-              <span>Sending code...</span>
+              <span>Creating account...</span>
             </>
           ) : (
             <>
-              <span>Send code</span>
+              <span>Create account</span>
               <ArrowRight className="h-4 w-4" />
             </>
           )}

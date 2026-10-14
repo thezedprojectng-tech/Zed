@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowLeft, Home } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { ArrowLeft, Compass, Home } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "404 – Page Not Found",
-  description: "The page you are looking for does not exist.",
+  title: "404 – Page Not Found | Zed",
+  description: "The requested civic guide or procedural milestone does not exist on this directory.",
 };
 
 export default function NotFound() {
@@ -13,66 +12,61 @@ export default function NotFound() {
     <main
       id="main-content"
       role="main"
-      className="relative min-h-dvh flex flex-col items-center justify-center overflow-hidden bg-background text-foreground px-4 py-16 text-center"
+      className="min-h-dvh flex flex-col justify-between bg-[#FAFAF8] dark:bg-[#0B0B0C] text-[#0B0B0C] dark:text-[#FAFAF8] px-4 sm:px-6 lg:px-8 py-12 selection:bg-[#3ecf8e] selection:text-[#041f13]"
     >
-      {/* ── Background Atmosphere ────────────────────────────────────────── */}
-      <div className="absolute inset-0 pointer-events-none -z-10 overflow-hidden">
-        {/* Soft radial emerald ambient glow */}
-        <div
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[480px] sm:w-[720px] h-[360px] sm:h-[520px] rounded-full blur-[110px] opacity-25 dark:opacity-20"
-          style={{
-            background:
-              "radial-gradient(ellipse at center, var(--primary) 0%, rgba(62, 207, 142, 0.15) 45%, transparent 70%)",
-          }}
-        />
-
-        {/* Subtle circular radar/navigation rings */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[340px] sm:w-[480px] h-[340px] sm:h-[480px] rounded-full border border-border/30" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[540px] sm:w-[780px] h-[540px] sm:h-[780px] rounded-full border border-border/15" />
-
-        {/* Faded dot grid with radial fade mask */}
-        <div className="absolute inset-0 bg-dot-grid opacity-60 [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_30%,transparent_80%)]" />
-
-        {/* Giant architectural 404 watermark */}
-        <span
-          aria-hidden="true"
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 font-mono text-[14rem] sm:text-[22rem] font-black tracking-tighter text-foreground/[0.03] select-none leading-none"
-        >
-          404
+      {/* Top Header Row */}
+      <header className="max-w-site mx-auto w-full flex items-center justify-between border-b border-[#E5E5E0] dark:border-white/10 pb-6">
+        <Link href="/" className="flex items-center gap-1.5 group">
+          <span className="font-display font-bold text-2xl tracking-tight text-[#0B0B0C] dark:text-[#FAFAF8]">
+            Zed
+          </span>
+          <span className="h-1.5 w-1.5 rounded-full bg-[#3ecf8e]" />
+        </Link>
+        <span className="font-mono text-xs text-[#57575e] dark:text-[#9c9ca4] font-medium uppercase tracking-wider">
+          Error 404 // Unresolved Route
         </span>
+      </header>
+
+      {/* Main 404 Content */}
+      <div className="max-w-2xl mx-auto w-full py-16 text-center space-y-6">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#E5E5E0] dark:border-white/10 bg-[#ffffff] dark:bg-[#141416] text-[#57575e] dark:text-[#9c9ca4] font-mono text-xs uppercase tracking-wider font-medium">
+          <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
+          <span>Page not found</span>
+        </div>
+
+        <h1 className="font-display text-4xl sm:text-6xl font-bold tracking-tight text-[#0B0B0C] dark:text-[#FAFAF8] leading-tight">
+          This milestone doesn&apos;t exist.
+        </h1>
+
+        <p className="font-sans text-base text-[#57575e] dark:text-[#9c9ca4] max-w-lg mx-auto leading-relaxed">
+          The civil procedure, guide chapter, or link you followed cannot be found. It may have been restructured in the latest government circular update.
+        </p>
+
+        {/* Action Cluster */}
+        <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
+          <Link
+            href="/"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-[#3ecf8e] hover:bg-[#34b77d] text-[#041f13] font-medium text-sm rounded-lg shadow-sm transition-all"
+          >
+            <Home className="h-4 w-4" />
+            <span>Return to overview</span>
+          </Link>
+
+          <Link
+            href="/#how-it-works"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg border border-[#E5E5E0] dark:border-white/10 bg-[#ffffff] dark:bg-[#141416] hover:bg-[#f4f4f0] dark:hover:bg-white/[0.04] text-[#0B0B0C] dark:text-[#FAFAF8] text-sm font-medium transition-all"
+          >
+            <Compass className="h-4 w-4 text-[#3ecf8e]" />
+            <span>Browse civil playbooks</span>
+          </Link>
+        </div>
       </div>
 
-      {/* ── Foreground Content ───────────────────────────────────────────── */}
-      <div className="relative z-10 max-w-md w-full mx-auto p-6 sm:p-10 rounded-2xl border border-border/60 bg-card/60 backdrop-blur-md shadow-2xl space-y-6">
-        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-primary/20 bg-primary/10 text-primary font-mono text-xs uppercase tracking-widest font-semibold">
-          Error 404
-        </div>
-
-        <div className="space-y-2">
-          <h1 className="type-display text-foreground font-extrabold tracking-tight">
-            Page not found
-          </h1>
-          <p className="type-body text-muted-foreground text-sm sm:text-base leading-relaxed">
-            Sorry, we couldn&apos;t find the page you&apos;re looking for. It might have been moved, removed, or never existed.
-          </p>
-        </div>
-
-        <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
-          <Button asChild size="default" className="w-full sm:w-auto gap-2">
-            <Link href="/home">
-              <Home className="h-4 w-4" />
-              Back to Home
-            </Link>
-          </Button>
-
-          <Button asChild variant="outline" size="default" className="w-full sm:w-auto gap-2 border-hairline">
-            <Link href="/nav">
-              <ArrowLeft className="h-4 w-4" />
-              Civil Guides
-            </Link>
-          </Button>
-        </div>
-      </div>
+      {/* Footer Meta Row */}
+      <footer className="max-w-site mx-auto w-full border-t border-[#E5E5E0] dark:border-white/10 pt-6 flex flex-col sm:flex-row items-center justify-between text-xs font-mono text-[#57575e] dark:text-[#9c9ca4] gap-2">
+        <span>Zed Technologies Nigeria Ltd.</span>
+        <span>Independent Civic Platform &bull; Lagos, Nigeria</span>
+      </footer>
     </main>
   );
 }

@@ -36,7 +36,7 @@ type NinFormData = z.infer<typeof ninSchema>;
 
 export default function VerifyNinPage() {
   const router = useRouter();
-  const { user, setUser } = useAuthStore();
+  const { user } = useAuthStore();
   const [isLoading, setIsLoading] = useState(false);
 
   const {
@@ -59,13 +59,9 @@ export default function VerifyNinPage() {
     try {
       const res = await verifyNin(data.nin);
       if (res.success) {
-        if (user) {
-          setUser({
-            ...user,
-            is_verified: true,
-            level_id: 1,
-          });
-        }
+        // TODO: Once a proper backend table stores NIN verification status,
+        // update the user's app_metadata here and call setUser() to refresh
+        // the store. For now we just navigate forward.
         toast.success(res.message);
         router.push("/home");
       }

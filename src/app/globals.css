@@ -42,6 +42,24 @@
     --sidebar-primary: #3ecf8e;
     --sidebar-accent: rgba(255, 255, 255, 0.04);
 
+    /* ── Marketing Site Tokens (Dark Variant) ────────────────────────── */
+    --site-bg: #0B0B0C;
+    --site-surface: #141416;
+    --site-surface-alt: #1a1a1e;
+    --site-ink: #FAFAF8;
+    --site-ink-muted: #9c9ca4;
+    --site-ink-faint: #6c6c74;
+    --site-border: rgba(255, 255, 255, 0.09);
+    --site-border-subtle: rgba(255, 255, 255, 0.05);
+    --site-border-strong: rgba(255, 255, 255, 0.18);
+    --site-accent: #3ecf8e;
+    --site-accent-hover: #34b77d;
+    --site-accent-subtle: rgba(62, 207, 142, 0.12);
+    --site-vermilion: #3ecf8e;
+    --site-vermilion-hover: #34b77d;
+    --site-vermilion-subtle: rgba(62, 207, 142, 0.12);
+    --site-grid-line: rgba(255, 255, 255, 0.04);
+
     /* ── Font Stacks (Available globally via var(--font-*)) ──────────── */
     --font-display: var(--font-cabinet), "Cabinet Grotesk", system-ui, -apple-system, sans-serif;
     --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, sans-serif;
@@ -51,7 +69,7 @@
 
   .light {
     /* ── Light Theme Tokens ──────────────────────────────────────────── */
-    --background: #fbfbfb;
+    --background: #ffffff;
     --foreground: #09090b;
 
     --card: #ffffff;
@@ -60,14 +78,14 @@
     --popover: #ffffff;
     --popover-foreground: #09090b;
 
-    --primary: #059669;
-    --primary-foreground: #ffffff;
+    --primary: #3ecf8e;
+    --primary-foreground: #041f13;
 
-    --secondary: #f4f4f5;
-    --secondary-foreground: #18181b;
+    --secondary: #f8fafc;
+    --secondary-foreground: #0f172a;
 
-    --muted: #f4f4f5;
-    --muted-foreground: #71717a;
+    --muted: #f1f5f9;
+    --muted-foreground: #64748b;
 
     --accent: #ecfdf5;
     --accent-foreground: #065f46;
@@ -75,15 +93,33 @@
     --destructive: #ef4444;
     --destructive-foreground: #ffffff;
 
-    --border: #e4e4e7;
-    --input: #e4e4e7;
-    --ring: #10b981;
+    --border: #e2e8f0;
+    --input: #e2e8f0;
+    --ring: #3ecf8e;
 
-    --sidebar-background: #fbfbfb;
+    --sidebar-background: #ffffff;
     --sidebar-foreground: #09090b;
-    --sidebar-border: #e4e4e7;
-    --sidebar-primary: #059669;
-    --sidebar-accent: #f4f4f5;
+    --sidebar-border: #e2e8f0;
+    --sidebar-primary: #3ecf8e;
+    --sidebar-accent: #f8fafc;
+
+    /* ── Marketing Site Tokens (Clean Light: Warm White #FAFAF8 & Near-Black #0B0B0C) */
+    --site-bg: #FAFAF8;
+    --site-surface: #ffffff;
+    --site-surface-alt: #f4f4f0;
+    --site-ink: #0B0B0C;
+    --site-ink-muted: #57575e;
+    --site-ink-faint: #8a8a92;
+    --site-border: #e6e6e2;
+    --site-border-subtle: #f0f0eb;
+    --site-border-strong: #d0d0c8;
+    --site-accent: #3ecf8e;
+    --site-accent-hover: #34b77d;
+    --site-accent-subtle: rgba(62, 207, 142, 0.12);
+    --site-vermilion: #3ecf8e;
+    --site-vermilion-hover: #34b77d;
+    --site-vermilion-subtle: rgba(62, 207, 142, 0.12);
+    --site-grid-line: rgba(11, 11, 12, 0.03);
   }
 
   html {
@@ -131,6 +167,24 @@
   --color-sidebar-primary: var(--sidebar-primary);
   --color-sidebar-accent: var(--sidebar-accent);
 
+  /* ── Marketing Site Inline Colors ── */
+  --color-site-bg: var(--site-bg);
+  --color-site-surface: var(--site-surface);
+  --color-site-surface-alt: var(--site-surface-alt);
+  --color-site-ink: var(--site-ink);
+  --color-site-ink-muted: var(--site-ink-muted);
+  --color-site-ink-faint: var(--site-ink-faint);
+  --color-site-border: var(--site-border);
+  --color-site-border-subtle: var(--site-border-subtle);
+  --color-site-border-strong: var(--site-border-strong);
+  --color-site-accent: var(--site-accent);
+  --color-site-accent-hover: var(--site-accent-hover);
+  --color-site-accent-subtle: var(--site-accent-subtle);
+  --color-site-vermilion: var(--site-vermilion);
+  --color-site-vermilion-hover: var(--site-vermilion-hover);
+  --color-site-vermilion-subtle: var(--site-vermilion-subtle);
+  --color-site-grid: var(--site-grid-line);
+
   --radius-sm: var(--radius-sm);
   --radius-md: var(--radius);
   --radius-lg: var(--radius-lg);
@@ -143,6 +197,9 @@
 
 /* ── Typography Scale ────────────────────────────────────────────────── */
 @layer utilities {
+  .max-w-site {
+    max-width: 1160px;
+  }
   .type-display {
     font-family: var(--font-display);
     font-size: clamp(2rem, 4vw, 3rem);
@@ -228,6 +285,23 @@
   .bg-dot-grid {
     background-image: radial-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px);
     background-size: 24px 24px;
+  }
+
+  /* ── Site Paper Grid (Visible Architectural Grid) ───────────────── */
+  .bg-site-grid {
+    background-image:
+      linear-gradient(to right, var(--site-grid-line) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--site-grid-line) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+
+  /* ── Site Ink Borders (Thick 1-2px architectural rules) ─────────── */
+  .border-site-rule {
+    border-color: var(--site-border-subtle);
+  }
+
+  .border-site-rule-strong {
+    border-color: var(--site-border-strong);
   }
 
   /* ── Safe-area Padding (iOS bottom bar) ──────────────────────────── */

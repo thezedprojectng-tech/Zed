@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <!-- Obsidian dark squircle background matching Zed brand -->
+  <rect width="32" height="32" rx="7" fill="#0B0B0C"/>
+  <rect x="0.5" y="0.5" width="31" height="31" rx="6.5" stroke="#FFFFFF" stroke-opacity="0.14"/>
+  
+  <!-- Geometric bold "Z" monogram -->
+  <path d="M7 8.5H23L9.5 23.5H20.5" stroke="#FFFFFF" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Signature Zed Emerald Dot -->
+  <circle cx="25" cy="23.5" r="2.2" fill="#3ECF8E"/>
+</svg>
