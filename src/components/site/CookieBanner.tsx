@@ -23,10 +23,27 @@ export function openCookieSettings() {
 export function CookieBanner() {
   const [isOpen, setIsOpen] = useState(false);
   const [isManaging, setIsManaging] = useState(false);
-  const [preferences, setPreferences] = useState({
-    essential: true,
-    preferences: true,
-    analytics: false,
+  const [preferences, setPreferences] = useState(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          return {
+            essential: true,
+            preferences: !!parsed.preferences,
+            analytics: !!parsed.analytics,
+          };
+        }
+      } catch {
+        // fallback to defaults
+      }
+    }
+    return {
+      essential: true,
+      preferences: true,
+      analytics: false,
+    };
   });
 
   useEffect(() => {
@@ -36,17 +53,6 @@ export function CookieBanner() {
       // Small timeout so banner appears naturally without layout flash
       const timer = setTimeout(() => setIsOpen(true), 600);
       return () => clearTimeout(timer);
-    } else {
-      try {
-        const parsed = JSON.parse(stored);
-        setPreferences({
-          essential: true,
-          preferences: !!parsed.preferences,
-          analytics: !!parsed.analytics,
-        });
-      } catch {
-        setIsOpen(true);
-      }
     }
   }, []);
 
@@ -126,7 +132,7 @@ export function CookieBanner() {
           </div>
 
           <p className="font-sans text-xs text-[#57575e] dark:text-[#9c9ca4] leading-relaxed">
-            Zed uses cookies and browser storage solely to enable offline guides and maintain privacy-preserving sessions. No ad trackers or marketing pixels.{" "}
+            Zed uses cookies and client-side storage to enable offline PWA guides, preserve session security, and cache low-data resources across Nigerian networks. Zero third-party ad tracking or data sales.{" "}
             <Link
               href="/cookies"
               className="underline text-[#0B0B0C] dark:text-[#FAFAF8] hover:text-[#3ecf8e]"

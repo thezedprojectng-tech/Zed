@@ -4,61 +4,67 @@ import { LegalPageLayout } from "@/components/site/LegalPageLayout";
 export const metadata: Metadata = {
   title: "Terms of Service – Legal Agreement & Platform Conditions",
   description:
-    "Terms of Service governing the use of Zed civil navigation playbooks, document auditing tools, and platform interfaces. Non-affiliation with government agencies and verification requirements.",
+    "Terms of Service governing the use of the Zed digital operating system, including Zed Nav civil playbooks, Zed Market escrow micro-gigs, Zed Meet networking, campus community hubs, and $ZED rewards.",
   openGraph: {
     title: "Terms of Service – Legal Agreement & Platform Conditions",
     description:
-      "Review the Terms of Service for Zed.",
+      "Review the Terms of Service for Zed, including marketplace escrow, community conduct, and civil guide disclaimers.",
     url: "https://zedproject.ng/terms",
   },
 };
 
 const TOC = [
-  { id: "section-1", title: "Acceptance of Terms & Binding Agreement" },
+  { id: "section-1", title: "Acceptance of Terms & Platform Definition" },
   { id: "section-2", title: "Eligibility & Age Requirements" },
-  { id: "section-3", title: "Nature of the Service & Non-Affiliation Disclaimer" },
-  { id: "section-4", title: "User Accounts, Authentication & Security" },
-  { id: "section-5", title: "Acceptable Use & Prohibited Conduct" },
-  { id: "section-6", title: "Intellectual Property Rights" },
-  { id: "section-7", title: "No Legal, Financial, or Official Government Advice" },
-  { id: "section-8", title: "Statutory Fee Estimates & External Portals" },
-  { id: "section-9", title: "Disclaimers & Limitation of Warranties" },
-  { id: "section-10", title: "Limitation of Liability" },
-  { id: "section-11", title: "Indemnification" },
-  { id: "section-12", title: "Suspension, Termination & Access Restriction" },
-  { id: "section-13", title: "Governing Law & Dispute Resolution" },
-  { id: "section-14", title: "Modifications to Terms" },
-  { id: "section-15", title: "Contact Information" },
+  { id: "section-3", title: "Civic Guides & Non-Affiliation Disclaimer" },
+  { id: "section-4", title: "User Accounts, Authentication & Anti-Bot Protection" },
+  { id: "section-5", title: "Zed Market: Escrow Mechanics & Freelance Terms" },
+  { id: "section-6", title: "Zed Meet & Live Audio: Trust, Safety & Audio Buffers" },
+  { id: "section-7", title: "Campus Hubs & Academic Vault Guidelines" },
+  { id: "section-8", title: "$ZED Token Rules & Dynamic Treasury Liquidity" },
+  { id: "section-9", title: "Zed SOS: Geospatial Transit Safety Disclaimers" },
+  { id: "section-10", title: "Acceptable Use & Prohibited Conduct" },
+  { id: "section-11", title: "Intellectual Property Rights" },
+  { id: "section-12", title: "Disclaimers & Limitation of Warranties" },
+  { id: "section-13", title: "Limitation of Liability" },
+  { id: "section-14", title: "Governing Law & Dispute Resolution" },
+  { id: "section-15", title: "Modifications to Terms & Contact Information" },
 ];
 
 /**
  * LEGAL REVIEW NOTICE:
- * Draft – to be reviewed by a qualified Nigerian lawyer before launch.
+ * Draft – to be reviewed by a qualified Nigerian lawyer before production launch.
  */
 export default function TermsPage() {
   return (
     <LegalPageLayout
       title="Terms of Service"
-      subtitle="The contractual framework and operating terms governing your access to and use of Zed civil playbooks, software applications, and documentation."
+      subtitle="The contractual framework and operating conditions governing your access to and use of the Zed digital operating system, software applications, escrow marketplace, and documentation."
       lastUpdated="October 14, 2026"
       toc={TOC}
     >
       {/* ── Section 1 ──────────────────────────────────────────────── */}
       <section id="section-1" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
         <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
-          1. Acceptance of Terms &amp; Binding Agreement
+          1. Acceptance of Terms &amp; Platform Definition
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
           <p>
-            These Terms of Service (&quot;Terms&quot;) constitute a legally binding contractual agreement between you 
-            (&quot;User&quot;, &quot;you&quot;, or &quot;your&quot;) and Zed 
-            (&quot;we&quot;, &quot;us&quot;, or &quot;our&quot;), governing your access to and use of the Zed marketing website, 
-            Progressive Web Application, and associated civil tools (collectively, the &quot;Platform&quot;).
+            These Terms of Service (&quot;Terms&quot;) constitute a legally binding agreement between you 
+            (&quot;User&quot;, &quot;you&quot;, or &quot;your&quot;) and Zed Technologies Nigeria 
+            (&quot;Zed&quot;, &quot;we&quot;, &quot;us&quot;, or &quot;our&quot;), governing your access to and use of the Zed marketing website, 
+            Progressive Web Application (PWA), and associated modular digital services (collectively, the &quot;Platform&quot;).
           </p>
           <p>
-            By accessing, browsing, downloading, or utilizing any portion of the Platform, you acknowledge that you have 
-            read, understood, and unconditionally agree to be bound by these Terms and our Privacy Policy. If you do not 
-            agree to these Terms, you must discontinue use of the Platform immediately.
+            The Platform provides an integrated digital operating system for Nigerian youth, integrating: 
+            <strong>Zed Nav</strong> (procedural civil state machines), <strong>Zed Skill</strong> (learning tracks), 
+            <strong>Zed Market</strong> (escrow-backed micro-gigs), <strong>Zed Meet</strong> (WebRTC speed networking and drop-in audio rooms), 
+            <strong>Campus Hubs &amp; Academic Vault</strong> (university departmental resources and Alumni Office Hours), 
+            <strong>Zed SOS</strong> (geospatial transit safety alerts), and the <strong>$ZED Token Engine</strong> (proof-of-engagement reward system).
+          </p>
+          <p>
+            By accessing or utilizing any portion of the Platform, you acknowledge that you have read, understood, and unconditionally agree 
+            to be bound by these Terms and our Privacy Policy. If you do not agree to these Terms, you must immediately cease use of the Platform.
           </p>
         </div>
       </section>
@@ -70,10 +76,10 @@ export default function TermsPage() {
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
           <p>
-            You must be at least 18 years of age or possess the legal capacity to enter into binding contracts under 
-            the Laws of the Federal Republic of Nigeria to create an account or use interactive features on the Platform. 
-            If you are accessing the Platform on behalf of an incorporated entity, company, or organization, you represent 
-            and warrant that you possess full corporate authority to bind that entity to these Terms.
+            You must be at least 16 years of age to access civic guides and educational materials on the Platform. 
+            To enter into binding freelance contracts, execute escrow payments, or receive cash disbursements in Zed Market, 
+            you must be at least 18 years of age or possess the legal capacity to enter into binding contracts under 
+            the Laws of the Federal Republic of Nigeria.
           </p>
         </div>
       </section>
@@ -81,24 +87,24 @@ export default function TermsPage() {
       {/* ── Section 3 ──────────────────────────────────────────────── */}
       <section id="section-3" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
         <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
-          3. Nature of the Service &amp; Non-Affiliation Disclaimer
+          3. Civic Guides &amp; Non-Affiliation Disclaimer
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
           <div className="p-4 rounded-lg border border-[#E5E5E0] dark:border-white/10 bg-[#ffffff] dark:bg-[#141416] text-xs font-mono text-[#0B0B0C] dark:text-[#FAFAF8] space-y-2">
             <span className="font-bold text-[#3ecf8e] uppercase block">
-              CRITICAL STATUTORY NOTICE:
+              CRITICAL STATUTORY DISCLAIMER:
             </span>
             <p>
-              ZED TECHNOLOGIES NIGERIA LTD IS AN INDEPENDENT CIVIC TECHNOLOGY COMPANY AND IS NOT AFFILIATED, ASSOCIATED, 
+              ZED IS AN INDEPENDENT CIVIC TECHNOLOGY PLATFORM OPERATED BY NIGERIAN TECHNOLOGISTS. ZED IS NOT AFFILIATED, ASSOCIATED, 
               AUTHORIZED, ENDORSED BY, OR IN ANY WAY OFFICIALLY CONNECTED WITH THE FEDERAL GOVERNMENT OF NIGERIA, 
               THE NIGERIA IMMIGRATION SERVICE (NIS), THE NATIONAL YOUTH SERVICE CORPS (NYSC), THE NATIONAL IDENTITY 
-              MANAGEMENT COMMISSION (NIMC), THE CORPORATE AFFAIRS COMMISSION (CAC), OR ANY OF THEIR SUBSIDIARIES OR AFFILIATES.
+              MANAGEMENT COMMISSION (NIMC), THE CORPORATE AFFAIRS COMMISSION (CAC), OR ANY FEDERAL OR STATE MINISTRY.
             </p>
           </div>
           <p>
-            Zed does not issue international passports, national identity slips, NYSC discharge/exemption certificates, 
-            or CAC certificates of incorporation. Zed provides deterministic organizational playbooks, statutory fee calculations, 
-            and educational guidelines designed to assist citizens in self-navigating official public services.
+            Zed does not issue Nigerian passports, national identity slips, NYSC call-up letters, or CAC business certificates. 
+            Zed provides plain-language educational playbooks, crowdsourced wait-time reports, and document dimension checkers. 
+            All official filings and statutory payments must be concluded directly through official government portals.
           </p>
         </div>
       </section>
@@ -106,14 +112,19 @@ export default function TermsPage() {
       {/* ── Section 4 ──────────────────────────────────────────────── */}
       <section id="section-4" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
         <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
-          4. User Accounts, Authentication &amp; Security
+          4. User Accounts, Authentication &amp; Anti-Bot Protection
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
           <p>
-            Certain features of the Platform may require authentication via a valid Nigerian mobile phone number and 
-            One-Time Password (OTP). You agree to provide true, accurate, and current information. You are solely responsible 
-            for safeguarding your mobile device and authentication tokens, and you agree to notify Zed immediately upon 
-            discovering any unauthorized access or breach of security.
+            To access personalized features, you must authenticate using a verified Nigerian mobile phone number via SMS OTP. 
+            You are solely responsible for maintaining the confidentiality of your session credentials and for all activities 
+            conducted under your account.
+          </p>
+          <p>
+            To prevent botting, Sybil attacks, and automated $ZED mining fraud, Zed utilizes Cloudflare Turnstile verification 
+            and hardware fingerprinting. Operating automated scripts, headless browsers, or multiple fraudulent accounts on 
+            a single physical device constitutes a material breach of these Terms, resulting in immediate multiplier revocation 
+            and account termination.
           </p>
         </div>
       </section>
@@ -121,16 +132,17 @@ export default function TermsPage() {
       {/* ── Section 5 ──────────────────────────────────────────────── */}
       <section id="section-5" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
         <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
-          5. Acceptable Use &amp; Prohibited Conduct
+          5. Zed Market: Escrow Mechanics &amp; Freelance Terms
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
-          <p>You agree to use the Platform strictly for lawful purposes. You expressly covenant NOT to:</p>
+          <p>
+            Zed Market connects Nigerian freelance talent with domestic and international buyers under an escrow framework:
+          </p>
           <ul className="list-disc pl-5 space-y-2">
-            <li>Submit fabricated, forged, altered, or stolen national identity credentials or documents.</li>
-            <li>Use the Platform to facilitate unauthorized commercial touting, illegal document fabrication, or extortion of fellow citizens.</li>
-            <li>Interfere with, intercept, or reverse engineer any software, scripts, or security controls deployed on the Platform.</li>
-            <li>Scrape, harvest, or bulk-extract Zed playbooks, checklists, or data using automated spiders, bots, or scrapers without express written authorization.</li>
-            <li>Transmit malware, viruses, worms, or malicious code designed to disrupt client devices or our infrastructure.</li>
+            <li><strong>Milestone Escrow:</strong> Client funds are deposited via CBN-licensed payment gateways (Paystack and Flutterwave) and held securely in escrow until the client reviews and formally approves the agreed project milestone.</li>
+            <li><strong>Direct Payouts:</strong> Approved earnings route directly to verified Nigerian bank accounts (GTB, Kuda, OPay, Moniepoint, Zenith) or designated USDT wallet addresses.</li>
+            <li><strong>Prohibition of Circumvention:</strong> Users agree not to solicit or accept off-platform payments to circumvent marketplace escrow protections or platform fees. Doing so voids all escrow protections and may result in immediate suspension.</li>
+            <li><strong>Tax Responsibility:</strong> Freelancers are independently responsible for declaring income and remitting applicable personal income taxes in accordance with Nigerian revenue laws.</li>
           </ul>
         </div>
       </section>
@@ -138,105 +150,103 @@ export default function TermsPage() {
       {/* ── Section 6 ──────────────────────────────────────────────── */}
       <section id="section-6" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
         <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
-          6. Intellectual Property Rights
+          6. Zed Meet &amp; Live Audio: Trust, Safety &amp; Audio Buffers
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
           <p>
-            The Platform, including its user interface design, visual identity, branding (&quot;ZED&quot;, &quot;ZED.NG&quot;), 
-            typography, proprietary checklists, editorial flowcharts, and source code, is the exclusive intellectual property 
-            of Zed and is protected under the Copyright Act 2022 of Nigeria and international intellectual 
-            property treaties.
+            Zed Meet facilitates 1-on-1 WebRTC speed networking and community audio rooms. You agree to adhere to our strict Community Standards:
           </p>
-          <p>
-            Subject to your compliance with these Terms, Zed grants you a personal, revocable, non-exclusive, non-transferable 
-            license to view and interact with the content strictly for personal, non-commercial civic navigation.
-          </p>
+          <ul className="list-disc pl-5 space-y-2">
+            <li>Zero tolerance for hate speech, harassment, cyber-stalking, financial fraud (&quot;419&quot; scams), phone number farming, or explicit adult content.</li>
+            <li>Users must hold Level 1+ verified status (phone/NIN verification) to initiate randomized matching.</li>
+            <li>
+              <strong>Consent to Moderation Buffering:</strong> You acknowledge and expressly consent that during Zed Meet sessions, 
+              the client software maintains a temporary 30-second rolling audio buffer in volatile device memory. If a counterparty triggers 
+              the 1-Tap Block/Report button, this buffer is transmitted for human moderator review. In all other circumstances, 
+              conversations remain ephemeral and unrecorded.
+            </li>
+          </ul>
         </div>
       </section>
 
       {/* ── Section 7 ──────────────────────────────────────────────── */}
       <section id="section-7" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
         <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
-          7. No Legal, Financial, or Official Government Advice
+          7. Campus Hubs &amp; Academic Vault Guidelines
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
           <p>
-            The content, playbooks, calculators, and explanations provided on Zed are for general informational, educational, 
-            and navigational guidance only. <strong>They do not constitute formal legal advice, certified tax advisory, 
-            or official government pronouncements.</strong>
+            Campus Hubs (for universities such as UNILAG, OAU, UI, FUTA, and ABU) are student-centered educational spaces:
           </p>
-          <p>
-            Government administrative rules, circulars, and executive directives in Nigeria change frequently. Users are 
-            obligated to verify all procedural requirements and statutory rates directly with the designated statutory 
-            authority (e.g., official NIS, NYSC, NIMC, or CAC gazettes and counter desks).
-          </p>
+          <ul className="list-disc pl-5 space-y-2">
+            <li>Materials contributed to the Academic Vault (past questions, lecture summaries, SIWES guides) must be shared solely for non-commercial educational study.</li>
+            <li>You may not upload live examination question papers, leaked assessments, or copyright-infringing commercial textbooks.</li>
+            <li>Alumni participating in 15-minute Office Hours do so as volunteer mentors. Mentorship does not guarantee academic grades, employment, or internship placements.</li>
+          </ul>
         </div>
       </section>
 
       {/* ── Section 8 ──────────────────────────────────────────────── */}
       <section id="section-8" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
         <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
-          8. Statutory Fee Estimates &amp; External Portals
+          8. $ZED Token Rules &amp; Dynamic Treasury Liquidity
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
           <p>
-            Zed publishes statutory fee estimates based on published government gazettes and Remita gateway schedules. 
-            However, Zed does not control payment gateways or banking transaction fees. When you leave Zed to complete 
-            payments on external government portals (e.g., Remita, NIS portal, CAC CRP), you are governed by the third-party 
-            terms and privacy policies of those independent entities.
+            The $ZED Token is an off-chain engagement loyalty point mechanism designed to encourage active civic learning and community contribution:
           </p>
+          <ul className="list-disc pl-5 space-y-2">
+            <li><strong>Non-Securities Status:</strong> $ZED Tokens are not fiat currency, legal tender, investment contracts, shares, or digital asset securities under Nigerian law. They carry no voting rights or equity in Zed Technologies.</li>
+            <li><strong>Zero-Fintech Architecture:</strong> Rewards are calculated off-chain. Conversions to Naira cashouts are funded via monthly platform revenue pools (ad revenue, recruitment fees, merchant voucher commissions) using the Dynamic Treasury Formula: <em>Conversion Rate = Monthly Cash Pool (NGN) / Total $ZED Submitted</em>.</li>
+            <li><strong>Data Bundle Redemption:</strong> Tokens may alternatively be redeemed for discounted MTN, Airtel, Glo, and 9mobile data top-ups via third-party telecom APIs.</li>
+            <li><strong>No Guaranteed Yield:</strong> Zed makes no warranty regarding the ongoing cash conversion rate of $ZED points. Fraudulent claims, script automation, or multiplier manipulation result in immediate token balance forfeiture.</li>
+          </ul>
         </div>
       </section>
 
       {/* ── Section 9 ──────────────────────────────────────────────── */}
       <section id="section-9" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
         <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
-          9. Disclaimers &amp; Limitation of Warranties
+          9. Zed SOS: Geospatial Transit Safety Disclaimers
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
           <p>
-            THE PLATFORM IS PROVIDED ON AN &quot;AS IS&quot; AND &quot;AS AVAILABLE&quot; BASIS WITHOUT WARRANTIES OF ANY KIND, 
-            EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR 
-            PURPOSE, TIMELINESS, OR NON-INFRINGEMENT.
+            Zed SOS provides crowd-sourced geospatial awareness for road hazards, police checkpoints, and transit emergencies:
           </p>
-          <p>
-            Zed does not warrant that the Platform will be uninterrupted, error-free, secure, or that governmental authorities 
-            will approve your specific passport application, NYSC mobilization, or business name filing.
-          </p>
+          <ul className="list-disc pl-5 space-y-2">
+            <li>Alerts are submitted in real time by community members and are advisory in nature. Zed does not independently verify physical roadway conditions on the ground.</li>
+            <li>Zed SOS is <strong>not</strong> an official armed emergency dispatch or law enforcement response service. In life-threatening emergencies, immediately contact official Nigerian emergency lines (such as 112).</li>
+            <li>Submitting false, fabricated, or malicious hazard reports is strictly prohibited and constitutes grounds for permanent banning.</li>
+          </ul>
         </div>
       </section>
 
       {/* ── Section 10 ─────────────────────────────────────────────── */}
       <section id="section-10" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
         <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
-          10. Limitation of Liability
+          10. Acceptable Use &amp; Prohibited Conduct
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
-          <p>
-            TO THE MAXIMUM EXTENT PERMITTED BY NIGERIAN LAW, IN NO EVENT SHALL ZED TECHNOLOGIES NIGERIA LTD, ITS DIRECTORS, 
-            EMPLOYEES, OR AGENTS BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, 
-            INCLUDING LOSS OF PROFITS, TRAVEL CANCELLATIONS, EMPLOYMENT MISSED DEADLINES, OR DELAYS RESULTING FROM 
-            GOVERNMENTAL ACTIONS, HOWSOEVER ARISING.
-          </p>
-          <p>
-            OUR TOTAL AGGREGATE LIABILITY ARISING OUT OF OR IN CONNECTION WITH THESE TERMS SHALL NOT EXCEED THE TOTAL 
-            SUM OF ₦10,000 (TEN THOUSAND NAIRA) OR THE TOTAL FEES PAID BY YOU TO ZED IN THE PRECEDING THREE MONTHS, 
-            WHICHEVER IS LESS.
-          </p>
+          <p>You agree not to engage in any prohibited conduct, including:</p>
+          <ul className="list-disc pl-5 space-y-2">
+            <li>Harvesting personal phone numbers or identity data from community boards or Zed Meet sessions.</li>
+            <li>Deploying bots, spiders, or automated scrapers against Zed API endpoints or PWA caches.</li>
+            <li>Attempting to reverse-engineer, decompile, or compromise the integrity of our salted hashing architecture.</li>
+            <li>Using the Platform for money laundering, terrorism financing, or fraudulent financial schemes.</li>
+          </ul>
         </div>
       </section>
 
       {/* ── Section 11 ─────────────────────────────────────────────── */}
       <section id="section-11" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
         <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
-          11. Indemnification
+          11. Intellectual Property Rights
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
           <p>
-            You agree to defend, indemnify, and hold harmless Zed, its officers, directors, 
-            and employees from and against any claims, liabilities, damages, judgments, awards, losses, costs, or expenses 
-            (including reasonable legal fees) arising out of or relating to your violation of these Terms, your misuse 
-            of the Platform, or your submission of fraudulent documents to statutory authorities.
+            All software code, user interface designs, logos, and proprietary workflow state machines are the exclusive intellectual 
+            property of Zed Technologies Nigeria. Creator Asset Lab resources (drum kits, overlays, Canva templates) are licensed 
+            for personal and commercial creative projects under the terms specified in each asset download.
           </p>
         </div>
       </section>
@@ -244,13 +254,14 @@ export default function TermsPage() {
       {/* ── Section 12 ─────────────────────────────────────────────── */}
       <section id="section-12" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
         <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
-          12. Suspension, Termination &amp; Access Restriction
+          12. Disclaimers &amp; Limitation of Warranties
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
           <p>
-            Zed reserves the right, in its sole discretion and without prior notice, to terminate or suspend your access 
-            to all or part of the Platform for conduct that Zed believes violates these Terms, harms other citizens, 
-            or infringes upon third-party rights.
+            THE PLATFORM IS PROVIDED ON AN &quot;AS IS&quot; AND &quot;AS AVAILABLE&quot; BASIS WITHOUT WARRANTIES OF ANY KIND, 
+            EITHER EXPRESS OR IMPLIED. ZED DISCLAIMS ALL WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, 
+            AND NON-INFRINGEMENT. WE DO NOT GUARANTEE THAT PROCEDURAL GUIDES WILL REFLECT REAL-TIME GOVERNMENT GAZETTE CHANGES 
+            WITHOUT DELAY, OR THAT GOVERNMENT OFFICIALS WILL ACCEPT INDEPENDENTLY PREPARED DOCUMENTATION.
           </p>
         </div>
       </section>
@@ -258,17 +269,13 @@ export default function TermsPage() {
       {/* ── Section 13 ─────────────────────────────────────────────── */}
       <section id="section-13" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
         <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
-          13. Governing Law &amp; Dispute Resolution
+          13. Limitation of Liability
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
           <p>
-            These Terms and any dispute or claim arising out of them shall be governed by, and construed in accordance with, 
-            the <strong>Laws of the Federal Republic of Nigeria</strong>.
-          </p>
-          <p>
-            Any dispute arising out of or in connection with these Terms shall first be submitted to good-faith mediation 
-            at the Lagos Multi-Door Courthouse (LMDC). Where mediation fails within 30 days of notice, the dispute shall 
-            be referred to and finally resolved by arbitration in Lagos under the Arbitration and Mediation Act 2023.
+            TO THE MAXIMUM EXTENT PERMITTED UNDER NIGERIAN LAW, ZED SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, 
+            CONSEQUENTIAL, OR PUNITIVE DAMAGES, INCLUDING LOSS OF PROFITS, DATA, OR OPPORTUNITY, ARISING OUT OF YOUR USE OF 
+            CIVIC GUIDES, MARKETPLACE GIG TRANSACTIONS, OR TRANSIT SAFETY MAPS.
           </p>
         </div>
       </section>
@@ -276,13 +283,14 @@ export default function TermsPage() {
       {/* ── Section 14 ─────────────────────────────────────────────── */}
       <section id="section-14" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
         <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
-          14. Modifications to Terms
+          14. Governing Law &amp; Dispute Resolution
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
           <p>
-            Zed may revise these Terms from time to time. The updated version will be indicated by an updated &quot;Last updated&quot; 
-            date at the top of this document. Continued use of the Platform after such modifications constitutes acceptance 
-            of the updated Terms.
+            These Terms shall be governed by, construed, and enforced exclusively in accordance with the 
+            <strong>Laws of the Federal Republic of Nigeria</strong>. Any dispute arising out of or in connection with these Terms 
+            shall first be referred to good-faith mediation in Lagos State, Nigeria. If unresolved within 30 days, the dispute 
+            shall be submitted to the exclusive jurisdiction of the competent courts of Lagos State.
           </p>
         </div>
       </section>
@@ -290,15 +298,17 @@ export default function TermsPage() {
       {/* ── Section 15 ─────────────────────────────────────────────── */}
       <section id="section-15" className="space-y-4 scroll-mt-28">
         <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
-          15. Contact Information
+          15. Modifications to Terms &amp; Contact Information
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
           <p>
-            For legal inquiries or notices regarding these Terms, contact our legal counsel:
+            Zed reserves the right to amend these Terms at any time. When material changes are made, we will notify users 
+            via the Platform interface with at least 14 days&apos; notice. Continued use of the Platform after the effective date 
+            constitutes full acceptance of the revised Terms.
           </p>
           <div className="p-4 rounded-lg border border-[#E5E5E0] dark:border-white/10 bg-[#FAFAF8] dark:bg-[#141416] text-xs font-mono space-y-1 text-[#0B0B0C] dark:text-[#FAFAF8]">
-            <strong>Legal Department</strong><br />
-            Zed<br />
+            <strong>Legal Inquiries &amp; Compliance Desk</strong><br />
+            Zed Technologies Nigeria<br />
             Yaba Technology Corridor, Lagos State, Nigeria.<br />
             Email: <a href="mailto:legal@zedproject.ng" className="text-[#3ecf8e] underline">legal@zedproject.ng</a>
           </div>

@@ -6,17 +6,18 @@ import { openCookieSettings } from "./CookieBanner";
 import { useSiteAuth } from "./useSiteAuth";
 
 const PRODUCT_LINKS = [
-  { href: "/#features", label: "Features" },
-  { href: "/#how-it-works", label: "How it works" },
-  { href: "/#roadmap", label: "Roadmap" },
+  { href: "/#how-it-works", label: "Zed Nav" },
+  { href: "/#ecosystem", label: "Ecosystem" },
+  { href: "/#features", label: "Architecture" },
+  { href: "/#token-engine", label: "$ZED Mining" },
   { href: "/#faq", label: "FAQ" },
 ];
 
 const GUIDES_LINKS = [
-  { href: "/signup", label: "Nigerian Passport" },
-  { href: "/signup", label: "NYSC Mobilization" },
-  { href: "/signup", label: "NIN & BVN" },
-  { href: "/signup", label: "CAC Registration" },
+  { href: "/nav/passport", label: "Nigerian Passport" },
+  { href: "/nav/nysc", label: "NYSC Mobilization" },
+  { href: "/nav/nin-bvn", label: "NIN & BVN" },
+  { href: "/nav/cac", label: "CAC Registration" },
 ];
 
 const LEGAL_LINKS = [
@@ -58,7 +59,7 @@ export function SiteFooter() {
 
             {/* Mission statement */}
             <p className="font-sans text-sm text-[#8a8a94] leading-relaxed max-w-xs">
-              Plain-language civic guides, verified statutory fees, and client-side document checks — built for every Nigerian citizen.
+              The digital operating system for Nigerian Gen Z. Demystifying civil procedures, unlocking practical digital skills, escrow freelance micro-gigs, and campus communities.
             </p>
 
             {/* CTA */}

@@ -2,29 +2,28 @@
 
 import { LegalPageLayout } from "@/components/site/LegalPageLayout";
 import { openCookieSettings } from "@/components/site/CookieBanner";
-import { SlidersHorizontal } from "lucide-react";
+import { SlidersHorizontal, HardDrive, Wifi, ShieldCheck, Zap } from "lucide-react";
 
 const TOC = [
   { id: "section-1", title: "Introduction & Scope" },
-  { id: "section-2", title: "What are Cookies & Local Storage Technologies?" },
-  { id: "section-3", title: "Why Zed Uses Client-Side Storage" },
-  { id: "section-4", title: "Categories of Cookies & Local Storage We Use" },
+  { id: "section-2", title: "PWA Low-Data Architecture & Offline Storage" },
+  { id: "section-3", title: "Storage Technologies We Deploy" },
+  { id: "section-4", title: "Categories of Client-Side Storage" },
   { id: "section-5", title: "Comprehensive Storage Inventory Table" },
   { id: "section-6", title: "Interactive Preference Controls & Cookie Settings" },
-  { id: "section-7", title: "Browser-Level Controls & Clearing Cache" },
-  { id: "section-8", title: "Updates to this Policy" },
-  { id: "section-9", title: "Contact Us" },
+  { id: "section-7", title: "Browser-Level Controls & Cache Management" },
+  { id: "section-8", title: "Updates to this Policy & Contact Information" },
 ];
 
 /**
  * LEGAL REVIEW NOTICE:
- * Draft – to be reviewed by a qualified Nigerian lawyer before launch.
+ * Draft – to be reviewed by a qualified Nigerian lawyer before production launch.
  */
 export default function CookiesPolicyPage() {
   return (
     <LegalPageLayout
       title="Cookie & Storage Policy"
-      subtitle="Detailed technical inventory of how Zed utilizes cookies, local storage, and Service Worker caches to provide offline civil guides and privacy-preserving sessions."
+      subtitle="Detailed technical inventory of how Zed utilizes cookies, local storage, and Service Worker caches to provide offline civil playbooks and privacy-preserving sessions across Nigerian networks."
       lastUpdated="October 14, 2026"
       toc={TOC}
     >
@@ -35,14 +34,14 @@ export default function CookiesPolicyPage() {
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
           <p>
-            This Cookie &amp; Storage Policy explains how Zed (&quot;we&quot;, 
-            &quot;us&quot;) uses cookies, IndexedDB, and web storage mechanisms when you interact with our marketing 
-            website and civil navigation application.
+            This Cookie &amp; Storage Policy explains how Zed (&quot;we&quot;, &quot;us&quot;) utilizes cookies, 
+            HTML5 Web Storage, IndexedDB, and Service Worker caches across our public website and Progressive Web Application (PWA).
           </p>
           <p>
-            Zed does not participate in behavioral ad retargeting networks. We use client-side storage technologies 
-            primarily to ensure our playbooks remain accessible offline when you are physically present at government 
-            centers with poor or zero cellular reception.
+            Zed does <strong>not</strong> deploy behavioral advertising retargeting networks, cross-site trackers, or marketing pixels. 
+            We utilize client-side storage mechanisms primarily to fulfill our core architectural directive: 
+            ensuring civil administrative playbooks, course notes, and requirement checklists remain 100% operational offline 
+            when Nigerian citizens are inside government capture basements with zero cellular connectivity.
           </p>
         </div>
       </section>
@@ -50,72 +49,75 @@ export default function CookiesPolicyPage() {
       {/* ── Section 2 ──────────────────────────────────────────────── */}
       <section id="section-2" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
         <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
-          2. What are Cookies &amp; Local Storage Technologies?
+          2. PWA Low-Data Architecture &amp; Offline Storage
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
           <p>
-            Modern web applications utilize several distinct client-side storage technologies:
+            The Zed platform is engineered as a mobile-first PWA with an ultra-light bundle footprint (&lt; 1.8MB). 
+            To accommodate weak 3G and 4G networks (MTN, Airtel, Glo, 9mobile), Zed uses aggressive local caching:
           </p>
-          <ul className="list-disc pl-5 space-y-2">
-            <li>
-              <strong>HTTP Cookies:</strong> Small strings of text placed on your device by a web server. Cookies may 
-              be &quot;session cookies&quot; (deleted when you close your browser) or &quot;persistent cookies&quot; 
-              (retained until an expiration date).
-            </li>
-            <li>
-              <strong>HTML5 Web Storage (localStorage &amp; sessionStorage):</strong> Key-value data stores embedded 
-              in your browser that allow persistent storage without transmitting data in HTTP request headers.
-            </li>
-            <li>
-              <strong>IndexedDB:</strong> A transactional, client-side object database that enables Zed to store 
-              high-volume civil guides, checklists, and document templates for offline execution.
-            </li>
-            <li>
-              <strong>Service Worker Cache:</strong> A script running in the background that intercepts network requests 
-              and serves cached assets during network dropouts.
-            </li>
-          </ul>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+            <div className="p-4 rounded-xl border border-[#E5E5E0] dark:border-white/10 bg-[#FAFAF8] dark:bg-[#141416] space-y-2">
+              <Wifi className="h-4 w-4 text-[#3ecf8e]" />
+              <h4 className="font-display font-semibold text-xs text-[#0B0B0C] dark:text-[#FAFAF8]">Zero Data Waste</h4>
+              <p className="text-xs text-[#57575e] dark:text-[#9c9ca4]">Core JSON playbooks are downloaded once and re-validated only when official fees update.</p>
+            </div>
+            <div className="p-4 rounded-xl border border-[#E5E5E0] dark:border-white/10 bg-[#FAFAF8] dark:bg-[#141416] space-y-2">
+              <HardDrive className="h-4 w-4 text-[#3ecf8e]" />
+              <h4 className="font-display font-semibold text-xs text-[#0B0B0C] dark:text-[#FAFAF8]">Basement Resiliency</h4>
+              <p className="text-xs text-[#57575e] dark:text-[#9c9ca4]">Checklists and photo dimension audits run client-side in physical capture centers with zero signal.</p>
+            </div>
+            <div className="p-4 rounded-xl border border-[#E5E5E0] dark:border-white/10 bg-[#FAFAF8] dark:bg-[#141416] space-y-2">
+              <ShieldCheck className="h-4 w-4 text-[#3ecf8e]" />
+              <h4 className="font-display font-semibold text-xs text-[#0B0B0C] dark:text-[#FAFAF8]">Zero Cloud Tracking</h4>
+              <p className="text-xs text-[#57575e] dark:text-[#9c9ca4]">Unsubmitted form drafts remain stored locally on your device rather than on remote servers.</p>
+            </div>
+          </div>
         </div>
       </section>
 
       {/* ── Section 3 ──────────────────────────────────────────────── */}
       <section id="section-3" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
         <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
-          3. Why Zed Uses Client-Side Storage
+          3. Storage Technologies We Deploy
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
-          <p>We deploy storage technologies strictly for three primary operational objectives:</p>
-          <ol className="list-decimal pl-5 space-y-2">
-            <li><strong>Essential Security &amp; Session Continuity:</strong> Maintaining authenticated state and verifying cross-site request forgery (CSRF) tokens.</li>
-            <li><strong>Offline Resiliency:</strong> Persisting procedural checklists and fee audit templates so they operate in cellular dead zones.</li>
-            <li><strong>User Experience Preferences:</strong> Remembering whether you prefer our light paper theme or inverted dark theme, and recording your cookie consent preferences.</li>
-          </ol>
+          <ul className="list-disc pl-5 space-y-2">
+            <li>
+              <strong>HTTP Cookies:</strong> Encrypted text tokens placed on your device to maintain secure authentication sessions and verify CSRF tokens.
+            </li>
+            <li>
+              <strong>HTML5 LocalStorage:</strong> Key-value browser storage used for persistent client preferences, such as your dark/light theme choice and cookie consent records.
+            </li>
+            <li>
+              <strong>IndexedDB:</strong> A client-side transactional database used by Zed to cache complex step-by-step state machine guides, checklist states, and downloadable PDF summaries for offline access.
+            </li>
+            <li>
+              <strong>Service Worker Cache:</strong> Background scripts that intercept network requests to instantly deliver cached application shells and static icons during internet outages.
+            </li>
+          </ul>
         </div>
       </section>
 
       {/* ── Section 4 ──────────────────────────────────────────────── */}
       <section id="section-4" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
         <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
-          4. Categories of Storage We Use
+          4. Categories of Client-Side Storage
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
-          <p>We categorize all client-side storage mechanisms into three functional tiers:</p>
-          <ul className="list-disc pl-5 space-y-3">
+          <p>We classify our client-side storage technologies into three operational categories:</p>
+          <ul className="list-disc pl-5 space-y-2">
             <li>
-              <strong>Tier 1: Strictly Essential (Always Active)</strong><br />
-              These elements are indispensable for the website to function. They include authentication session tokens, 
-              CSRF protection, and your cookie consent status. Because the site cannot operate safely without them, 
-              they do not require prior consent under the NDPA.
+              <strong>Strictly Necessary Storage (Always Active):</strong> Essential for session authentication, 
+              CSRF protection, Cloudflare Turnstile anti-bot hardware verification, and offline PWA capability. These cannot be disabled.
             </li>
             <li>
-              <strong>Tier 2: Functional &amp; Preferences (Configurable)</strong><br />
-              These elements remember your chosen settings, such as your theme choice (Light vs Dark) 
-              and locally pinned guide bookmarks. Disabling them may reset your visual theme between visits.
+              <strong>Functional &amp; Preference Storage:</strong> Remembers your chosen theme mode, collapsed sidebar state, 
+              and active module filters.
             </li>
             <li>
-              <strong>Tier 3: Anonymous Diagnostics &amp; Telemetry (Optional)</strong><br />
-              Aggregated, privacy-preserving performance counters measuring page load latency, network disconnect errors, 
-              and Service Worker cache hit rates. No personal identifiers or phone numbers are linked to these metrics.
+              <strong>Performance &amp; Diagnostic Telemetry (Optional):</strong> Measures load times and client error events 
+              to troubleshoot weak network performance across Nigerian telecommunications networks.
             </li>
           </ul>
         </div>
@@ -126,52 +128,59 @@ export default function CookiesPolicyPage() {
         <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
           5. Comprehensive Storage Inventory Table
         </h2>
-        <div className="overflow-x-auto rounded-lg border border-[#E5E5E0] dark:border-white/10">
-          <table className="w-full text-left font-mono text-xs text-[#0B0B0C] dark:text-[#FAFAF8] border-collapse">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse text-xs font-sans">
             <thead>
-              <tr className="border-b border-[#E5E5E0] dark:border-white/10 bg-[#f4f4f0] dark:bg-white/[0.04]">
-                <th className="p-3 border-r border-[#E5E5E0] dark:border-white/10 font-bold">Identifier</th>
-                <th className="p-3 border-r border-[#E5E5E0] dark:border-white/10 font-bold">Type</th>
-                <th className="p-3 border-r border-[#E5E5E0] dark:border-white/10 font-bold">Category</th>
-                <th className="p-3 border-r border-[#E5E5E0] dark:border-white/10 font-bold">Lifespan</th>
-                <th className="p-3 font-bold">Purpose</th>
+              <tr className="border-b border-[#E5E5E0] dark:border-white/10 bg-[#FAFAF8] dark:bg-[#141416] text-[#0B0B0C] dark:text-[#FAFAF8] font-mono uppercase tracking-wider">
+                <th className="py-3 px-4 font-semibold">Identifier</th>
+                <th className="py-3 px-4 font-semibold">Type</th>
+                <th className="py-3 px-4 font-semibold">Lifespan</th>
+                <th className="py-3 px-4 font-semibold">Category</th>
+                <th className="py-3 px-4 font-semibold">Purpose</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#E5E5E0] dark:divide-white/10">
-              <tr className="hover:bg-black/[0.02] dark:hover:bg-white/[0.02]">
-                <td className="p-3 border-r border-[#E5E5E0] dark:border-white/10 font-bold">sb-*-auth-token</td>
-                <td className="p-3 border-r border-[#E5E5E0] dark:border-white/10">Cookie / Storage</td>
-                <td className="p-3 border-r border-[#E5E5E0] dark:border-white/10 text-[#0e7048] dark:text-[#3ecf8e] font-semibold">Essential</td>
-                <td className="p-3 border-r border-[#E5E5E0] dark:border-white/10">Session (30 days)</td>
-                <td className="p-3">Maintains encrypted user authentication session.</td>
+            <tbody className="divide-y divide-[#E5E5E0] dark:divide-white/10 text-[#57575e] dark:text-[#9c9ca4]">
+              <tr>
+                <td className="py-3 px-4 font-mono font-medium text-[#0B0B0C] dark:text-[#FAFAF8]">zed_session</td>
+                <td className="py-3 px-4">HTTP Cookie</td>
+                <td className="py-3 px-4">Session / 30 Days</td>
+                <td className="py-3 px-4 text-[#3ecf8e] font-semibold">Essential</td>
+                <td className="py-3 px-4">Cryptographically authenticated user session token.</td>
               </tr>
-              <tr className="hover:bg-black/[0.02] dark:hover:bg-white/[0.02]">
-                <td className="p-3 border-r border-[#E5E5E0] dark:border-white/10 font-bold">zed_cookie_consent_v1</td>
-                <td className="p-3 border-r border-[#E5E5E0] dark:border-white/10">localStorage</td>
-                <td className="p-3 border-r border-[#E5E5E0] dark:border-white/10 text-[#0e7048] dark:text-[#3ecf8e] font-semibold">Essential</td>
-                <td className="p-3 border-r border-[#E5E5E0] dark:border-white/10">Persistent (1 year)</td>
-                <td className="p-3">Records your cookie choices so banner does not reappear.</td>
+              <tr>
+                <td className="py-3 px-4 font-mono font-medium text-[#0B0B0C] dark:text-[#FAFAF8]">cf_clearance</td>
+                <td className="py-3 px-4">HTTP Cookie</td>
+                <td className="py-3 px-4">1 Year</td>
+                <td className="py-3 px-4 text-[#3ecf8e] font-semibold">Essential</td>
+                <td className="py-3 px-4">Cloudflare Turnstile token to verify genuine human activity and block bot mining.</td>
               </tr>
-              <tr className="hover:bg-black/[0.02] dark:hover:bg-white/[0.02]">
-                <td className="p-3 border-r border-[#E5E5E0] dark:border-white/10 font-bold">zed-theme-v2</td>
-                <td className="p-3 border-r border-[#E5E5E0] dark:border-white/10">localStorage</td>
-                <td className="p-3 border-r border-[#E5E5E0] dark:border-white/10">Preferences</td>
-                <td className="p-3 border-r border-[#E5E5E0] dark:border-white/10">Persistent</td>
-                <td className="p-3">Saves your preferred theme (Light vs Dark).</td>
+              <tr>
+                <td className="py-3 px-4 font-mono font-medium text-[#0B0B0C] dark:text-[#FAFAF8]">zed_cookie_consent_v1</td>
+                <td className="py-3 px-4">LocalStorage</td>
+                <td className="py-3 px-4">Persistent</td>
+                <td className="py-3 px-4 text-[#3ecf8e] font-semibold">Essential</td>
+                <td className="py-3 px-4">Records your cookie choices so the banner does not repeatedly disrupt browsing.</td>
               </tr>
-              <tr className="hover:bg-black/[0.02] dark:hover:bg-white/[0.02]">
-                <td className="p-3 border-r border-[#E5E5E0] dark:border-white/10 font-bold">zed_nav_checklists</td>
-                <td className="p-3 border-r border-[#E5E5E0] dark:border-white/10">IndexedDB</td>
-                <td className="p-3 border-r border-[#E5E5E0] dark:border-white/10">Preferences</td>
-                <td className="p-3 border-r border-[#E5E5E0] dark:border-white/10">Persistent</td>
-                <td className="p-3">Stores your personal checklist progress offline.</td>
+              <tr>
+                <td className="py-3 px-4 font-mono font-medium text-[#0B0B0C] dark:text-[#FAFAF8]">zed_nav_cache</td>
+                <td className="py-3 px-4">IndexedDB</td>
+                <td className="py-3 px-4">Persistent</td>
+                <td className="py-3 px-4 text-[#3ecf8e] font-semibold">Essential</td>
+                <td className="py-3 px-4">Stores procedural JSON playbooks for offline zero-connectivity navigation.</td>
               </tr>
-              <tr className="hover:bg-black/[0.02] dark:hover:bg-white/[0.02]">
-                <td className="p-3 border-r border-[#E5E5E0] dark:border-white/10 font-bold">zed_telemetry_diag</td>
-                <td className="p-3 border-r border-[#E5E5E0] dark:border-white/10">localStorage</td>
-                <td className="p-3 border-r border-[#E5E5E0] dark:border-white/10">Analytics</td>
-                <td className="p-3 border-r border-[#E5E5E0] dark:border-white/10">30 days</td>
-                <td className="p-3">Aggregated anonymous error counts (only with consent).</td>
+              <tr>
+                <td className="py-3 px-4 font-mono font-medium text-[#0B0B0C] dark:text-[#FAFAF8]">zed_theme</td>
+                <td className="py-3 px-4">LocalStorage</td>
+                <td className="py-3 px-4">Persistent</td>
+                <td className="py-3 px-4">Functional</td>
+                <td className="py-3 px-4">Maintains your light/dark user interface preference.</td>
+              </tr>
+              <tr>
+                <td className="py-3 px-4 font-mono font-medium text-[#0B0B0C] dark:text-[#FAFAF8]">zed_flow_progress</td>
+                <td className="py-3 px-4">LocalStorage</td>
+                <td className="py-3 px-4">Persistent</td>
+                <td className="py-3 px-4">Functional</td>
+                <td className="py-3 px-4">Retains active checklist step positions on your device before cloud synchronization.</td>
               </tr>
             </tbody>
           </table>
@@ -185,17 +194,17 @@ export default function CookiesPolicyPage() {
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-4">
           <p>
-            You retain sovereign control over which non-essential storage categories Zed may employ on this browser. 
-            You can reopen your settings modal at any point to update or withdraw consent:
+            You can modify your cookie and local storage preferences at any time. You can choose to enable or disable 
+            functional preferences and anonymous telemetry without affecting your access to free civic playbooks.
           </p>
           <div>
             <button
               type="button"
               onClick={openCookieSettings}
-              className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-lg border border-[#E5E5E0] dark:border-white/10 bg-[#ffffff] dark:bg-[#141416] hover:bg-[#f4f4f0] dark:hover:bg-white/[0.04] text-[#0B0B0C] dark:text-[#FAFAF8] font-mono text-xs font-semibold tracking-wider transition-colors cursor-pointer"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#0B0B0C] dark:bg-white text-white dark:text-[#0B0B0C] text-xs font-semibold hover:bg-[#1a1a1e] dark:hover:bg-[#E5E5E0] transition-colors cursor-pointer"
             >
               <SlidersHorizontal className="h-4 w-4 text-[#3ecf8e]" />
-              <span>Open Cookie Preference Center</span>
+              <span>Open Cookie &amp; Storage Settings</span>
             </button>
           </div>
         </div>
@@ -204,51 +213,37 @@ export default function CookiesPolicyPage() {
       {/* ── Section 7 ──────────────────────────────────────────────── */}
       <section id="section-7" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
         <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
-          7. Browser-Level Controls &amp; Clearing Cache
+          7. Browser-Level Controls &amp; Cache Management
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
           <p>
-            In addition to our preference modal, you can delete or block cookies and storage directly through your 
-            browser settings:
+            In addition to our interactive settings, modern web browsers allow you to block cookies or clear local storage caches manually:
           </p>
           <ul className="list-disc pl-5 space-y-2">
-            <li><strong>Apple Safari (iOS / macOS):</strong> Settings &rarr; Safari &rarr; Advanced &rarr; Website Data &rarr; Remove All.</li>
-            <li><strong>Google Chrome (Android / Desktop):</strong> Settings &rarr; Privacy and Security &rarr; Clear Browsing Data &rarr; Cookies and other site data.</li>
-            <li><strong>Mozilla Firefox:</strong> Settings &rarr; Privacy &amp; Security &rarr; Cookies and Site Data &rarr; Clear Data.</li>
+            <li><strong>Google Chrome &amp; Edge:</strong> Settings &gt; Privacy and Security &gt; Clear Browsing Data &gt; Cookies and Other Site Data.</li>
+            <li><strong>Mozilla Firefox:</strong> Settings &gt; Privacy &amp; Security &gt; Cookies and Site Data &gt; Clear Data.</li>
+            <li><strong>Apple Safari:</strong> Settings &gt; Safari &gt; Clear History and Website Data.</li>
           </ul>
           <p>
-            Please note that wiping IndexedDB will erase any locally bookmarked checklists that you have not synchronized 
-            to an authenticated account.
+            Please note that clearing IndexedDB or blocking storage will remove offline playbooks from your device, 
+            requiring an internet connection to re-download the guides upon your next visit.
           </p>
         </div>
       </section>
 
       {/* ── Section 8 ──────────────────────────────────────────────── */}
-      <section id="section-8" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
+      <section id="section-8" className="space-y-4 scroll-mt-28">
         <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
-          8. Updates to this Policy
+          8. Updates to this Policy &amp; Contact Information
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
           <p>
-            We may update our Cookie &amp; Storage Policy to reflect changes in technical features or emerging standards 
-            enforced by the Nigeria Data Protection Commission (NDPC). The latest revision date will always be visible 
-            at the top of this page.
-          </p>
-        </div>
-      </section>
-
-      {/* ── Section 9 ──────────────────────────────────────────────── */}
-      <section id="section-9" className="space-y-4 scroll-mt-28">
-        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
-          9. Contact Us
-        </h2>
-        <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
-          <p>
-            If you have technical questions regarding our storage mechanisms or offline cache implementation, reach out:
+            We may update this Cookie &amp; Storage Policy as new modules are deployed to the Zed platform. 
+            All modifications will be posted here with an updated effective date.
           </p>
           <div className="p-4 rounded-lg border border-[#E5E5E0] dark:border-white/10 bg-[#FAFAF8] dark:bg-[#141416] text-xs font-mono space-y-1 text-[#0B0B0C] dark:text-[#FAFAF8]">
-            <strong>Technical Privacy Desk</strong><br />
-            Zed<br />
+            <strong>Privacy &amp; Technical Governance</strong><br />
+            Zed Technologies Nigeria<br />
             Email: <a href="mailto:privacy@zedproject.ng" className="text-[#3ecf8e] underline">privacy@zedproject.ng</a>
           </div>
         </div>
