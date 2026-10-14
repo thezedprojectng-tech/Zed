@@ -58,17 +58,17 @@ export default function CookiesPolicyPage() {
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
             <div className="p-4 rounded-xl border border-[#E5E5E0] dark:border-white/10 bg-[#FAFAF8] dark:bg-[#141416] space-y-2">
-              <Wifi className="h-4 w-4 text-[#3ecf8e]" />
+              <Wifi className="h-4 w-4 text-[#2E82F7]" />
               <h4 className="font-display font-semibold text-xs text-[#fafaf8] ">Zero Data Waste</h4>
               <p className="text-xs text-[#57575e] dark:text-[#9c9ca4]">Core JSON playbooks are downloaded once and re-validated only when official fees update.</p>
             </div>
             <div className="p-4 rounded-xl border border-[#E5E5E0] dark:border-white/10 bg-[#FAFAF8] dark:bg-[#141416] space-y-2">
-              <HardDrive className="h-4 w-4 text-[#3ecf8e]" />
+              <HardDrive className="h-4 w-4 text-[#2E82F7]" />
               <h4 className="font-display font-semibold text-xs text-[#fafaf8] ">Basement Resiliency</h4>
               <p className="text-xs text-[#57575e] dark:text-[#9c9ca4]">Checklists and photo dimension audits run client-side in physical capture centers with zero signal.</p>
             </div>
             <div className="p-4 rounded-xl border border-[#E5E5E0] dark:border-white/10 bg-[#FAFAF8] dark:bg-[#141416] space-y-2">
-              <ShieldCheck className="h-4 w-4 text-[#3ecf8e]" />
+              <ShieldCheck className="h-4 w-4 text-[#2E82F7]" />
               <h4 className="font-display font-semibold text-xs text-[#0B0B0C] ">Zero Cloud Tracking</h4>
               <p className="text-xs text-[#57575e] dark:text-[#9c9ca4]">Unsubmitted form drafts remain stored locally on your device rather than on remote servers.</p>
             </div>
@@ -144,28 +144,28 @@ export default function CookiesPolicyPage() {
                 <td className="py-3 px-4 font-mono font-medium text-[#0B0B0C] ">zed_session</td>
                 <td className="py-3 px-4">HTTP Cookie</td>
                 <td className="py-3 px-4">Session / 30 Days</td>
-                <td className="py-3 px-4 text-[#3ecf8e] font-semibold">Essential</td>
+                <td className="py-3 px-4 text-[#2E82F7] font-semibold">Essential</td>
                 <td className="py-3 px-4">Cryptographically authenticated user session token.</td>
               </tr>
               <tr>
                 <td className="py-3 px-4 font-mono font-medium text-[#0B0B0C] ">cf_clearance</td>
                 <td className="py-3 px-4">HTTP Cookie</td>
                 <td className="py-3 px-4">1 Year</td>
-                <td className="py-3 px-4 text-[#3ecf8e] font-semibold">Essential</td>
+                <td className="py-3 px-4 text-[#2E82F7] font-semibold">Essential</td>
                 <td className="py-3 px-4">Cloudflare Turnstile token to verify genuine human activity and block bot mining.</td>
               </tr>
               <tr>
                 <td className="py-3 px-4 font-mono font-medium text-[#0B0B0C] ">zed_cookie_consent_v1</td>
                 <td className="py-3 px-4">LocalStorage</td>
                 <td className="py-3 px-4">Persistent</td>
-                <td className="py-3 px-4 text-[#3ecf8e] font-semibold">Essential</td>
+                <td className="py-3 px-4 text-[#2E82F7] font-semibold">Essential</td>
                 <td className="py-3 px-4">Records your cookie choices so the banner does not repeatedly disrupt browsing.</td>
               </tr>
               <tr>
                 <td className="py-3 px-4 font-mono font-medium text-[#0B0B0C] ">zed_nav_cache</td>
                 <td className="py-3 px-4">IndexedDB</td>
                 <td className="py-3 px-4">Persistent</td>
-                <td className="py-3 px-4 text-[#3ecf8e] font-semibold">Essential</td>
+                <td className="py-3 px-4 text-[#2E82F7] font-semibold">Essential</td>
                 <td className="py-3 px-4">Stores procedural JSON playbooks for offline zero-connectivity navigation.</td>
               </tr>
               <tr>
@@ -203,7 +203,7 @@ export default function CookiesPolicyPage() {
               onClick={openCookieSettings}
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#0B0B0C] dark:bg-white text-white dark:text-[#0B0B0C] text-xs font-semibold hover:bg-[#1a1a1e] dark:hover:bg-[#E5E5E0] transition-colors cursor-pointer"
             >
-              <SlidersHorizontal className="h-4 w-4 text-[#3ecf8e]" />
+              <SlidersHorizontal className="h-4 w-4 text-[#2E82F7]" />
               <span>Open Cookie &amp; Storage Settings</span>
             </button>
           </div>
@@ -244,7 +244,7 @@ export default function CookiesPolicyPage() {
           <div className="p-4 rounded-lg border border-[#E5E5E0] dark:border-white/10 bg-[#FAFAF8] dark:bg-[#141416] text-xs font-mono space-y-1 text-[#fafaf8] ">
             <strong>Privacy &amp; Technical Governance</strong><br />
             Zed Technologies Nigeria<br />
-            Email: <a href="mailto:privacy@zedproject.ng" className="text-[#3ecf8e] underline">privacy@zedproject.ng</a>
+            Email: <a href="mailto:privacy@zedproject.ng" className="text-[#2E82F7] underline">privacy@zedproject.ng</a>
           </div>
         </div>
       </section>

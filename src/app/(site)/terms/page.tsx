@@ -91,7 +91,7 @@ export default function TermsPage() {
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
           <div className="p-4 rounded-lg border border-[#E5E5E0] dark:border-white/10 bg-[#ffffff] dark:bg-[#141416] text-xs font-mono text-[#FAFAF8] space-y-2">
-            <span className="font-bold text-[#3ecf8e] uppercase block">
+            <span className="font-bold text-[#2E82F7] uppercase block">
               CRITICAL STATUTORY DISCLAIMER:
             </span>
             <p>
@@ -310,7 +310,7 @@ export default function TermsPage() {
             <strong>Legal Inquiries &amp; Compliance Desk</strong><br />
             Zed Technologies Nigeria<br />
             Yaba Technology Corridor, Lagos State, Nigeria.<br />
-            Email: <a href="mailto:legal@zedproject.ng" className="text-[#3ecf8e] underline">legal@zedproject.ng</a>
+            Email: <a href="mailto:legal@zedproject.ng" className="text-[#2E82F7] underline">legal@zedproject.ng</a>
           </div>
         </div>
       </section>

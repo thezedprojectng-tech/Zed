@@ -76,7 +76,7 @@ export function SiteHeader() {
           {/* Brand Logo */}
           <Link
             href="/"
-            className="flex items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3ecf8e] rounded-sm py-1"
+            className="flex items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2E82F7] rounded-sm py-1"
             aria-label="The Zed Project Home"
           >
             <Image
@@ -95,7 +95,7 @@ export function SiteHeader() {
               <a
                 key={link.href}
                 href={link.href}
-                className="group relative py-1 text-sm font-medium text-[#57575e] hover:text-[#0B0B0C] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3ecf8e] rounded-sm"
+                className="group relative py-1 text-sm font-medium text-[#57575e] hover:text-[#0B0B0C] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2E82F7] rounded-sm"
               >
                 <span>{link.label}</span>
                 <span className="absolute inset-x-0 -bottom-0.5 h-[1.5px] bg-[#0B0B0C] scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-200" />
@@ -110,7 +110,7 @@ export function SiteHeader() {
               {isAuthenticated ? (
                 <Link
                   href="/home"
-                  className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#0B0B0C] hover:bg-[#1a1a1e] text-white text-sm font-medium rounded-lg transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3ecf8e]"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#0B0B0C] hover:bg-[#1a1a1e] text-white text-sm font-medium rounded-lg transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2E82F7]"
                 >
                   <span>Open Zed</span>
                   <ArrowUpRight className="h-4 w-4" />
@@ -119,13 +119,13 @@ export function SiteHeader() {
                 <>
                   <Link
                     href="/login"
-                    className="text-sm font-medium text-[#57575e] hover:text-[#0B0B0C] px-3 py-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3ecf8e] rounded-sm"
+                    className="text-sm font-medium text-[#57575e] hover:text-[#0B0B0C] px-3 py-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2E82F7] rounded-sm"
                   >
                     Sign in
                   </Link>
                   <Link
                     href="/signup"
-                    className="inline-flex items-center justify-center px-4 py-2 bg-[#0B0B0C] hover:bg-[#1a1a1e] text-white text-sm font-medium rounded-lg transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3ecf8e]"
+                    className="inline-flex items-center justify-center px-4 py-2 bg-[#0B0B0C] hover:bg-[#1a1a1e] text-white text-sm font-medium rounded-lg transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2E82F7]"
                   >
                     Get started
                   </Link>
@@ -139,7 +139,7 @@ export function SiteHeader() {
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
               aria-expanded={isMobileMenuOpen}
-              className="md:hidden h-9 w-9 rounded-lg border border-[#E8E8E4] flex items-center justify-center text-[#0B0B0C] hover:bg-[#f4f4f0] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3ecf8e] cursor-pointer transition-colors"
+              className="md:hidden h-9 w-9 rounded-lg border border-[#E8E8E4] flex items-center justify-center text-[#0B0B0C] hover:bg-[#f4f4f0] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2E82F7] cursor-pointer transition-colors"
             >
               {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
@@ -161,7 +161,7 @@ export function SiteHeader() {
                 key={link.href}
                 href={link.href}
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="py-2.5 text-base font-medium text-[#0B0B0C] hover:text-[#3ecf8e] transition-colors"
+                className="py-2.5 text-base font-medium text-[#0B0B0C] hover:text-[#2E82F7] transition-colors"
               >
                 {link.label}
               </a>

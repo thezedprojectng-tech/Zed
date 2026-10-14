@@ -192,7 +192,7 @@ export default function HomePage() {
       <section aria-label="Engineering Directives" className="border-y border-[#E5E5E0] py-10 bg-[#FAFAF8]/70">
         <div className="max-w-site mx-auto px-4 sm:px-6 lg:px-8">
           <FadeIn className="text-center space-y-3 mb-8">
-            <p className="font-mono text-xs uppercase tracking-widest text-[#3ecf8e] font-semibold">
+            <p className="font-mono text-xs uppercase tracking-widest text-[#2E82F7] font-semibold">
               System Directives // Version 2.0.0
             </p>
             <h2 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-[#0B0B0C]">
@@ -207,7 +207,7 @@ export default function HomePage() {
                 <FadeIn key={directive.title} delay={idx * 0.06}>
                   <div className="h-full rounded-xl border border-[#E5E5E0] bg-white p-5 space-y-3 flex flex-col justify-between shadow-xs">
                     <div className="space-y-2.5">
-                      <div className="h-9 w-9 rounded-lg border border-[#E5E5E0] bg-[#FAFAF8] flex items-center justify-center text-[#3ecf8e]">
+                      <div className="h-9 w-9 rounded-lg border border-[#E5E5E0] bg-[#FAFAF8] flex items-center justify-center text-[#2E82F7]">
                         <Icon className="h-4.5 w-4.5" />
                       </div>
                       <h3 className="font-display font-bold text-base text-[#0B0B0C]">
@@ -229,7 +229,7 @@ export default function HomePage() {
       <section id="how-it-works" className="scroll-mt-24">
         <div className="max-w-site mx-auto px-4 sm:px-6 lg:px-8">
           <FadeIn className="text-center max-w-2xl mx-auto mb-10 sm:mb-14 space-y-4">
-            <div className="font-mono text-xs uppercase tracking-wider text-[#3ecf8e] font-semibold">
+            <div className="font-mono text-xs uppercase tracking-wider text-[#2E82F7] font-semibold">
               Module 01 // Zed Nav (Live Engine)
             </div>
             <h2 className="font-display text-3xl sm:text-5xl font-bold tracking-tight text-[#0B0B0C]">
@@ -250,7 +250,7 @@ export default function HomePage() {
       <section id="ecosystem" className="scroll-mt-24">
         <div className="max-w-site mx-auto px-4 sm:px-6 lg:px-8">
           <FadeIn className="text-center max-w-2xl mx-auto mb-10 sm:mb-14 space-y-4">
-            <div className="font-mono text-xs uppercase tracking-wider text-[#3ecf8e] font-semibold">
+            <div className="font-mono text-xs uppercase tracking-wider text-[#2E82F7] font-semibold">
               The Platform
             </div>
             <h2 className="font-display text-3xl sm:text-5xl font-bold tracking-tight text-[#0B0B0C]">
@@ -269,7 +269,7 @@ export default function HomePage() {
                 <div
                   className={`h-full rounded-xl border p-5 space-y-3 flex flex-col justify-between transition-all ${
                     isLive
-                      ? "border-[#3ecf8e]/50 bg-white shadow-sm hover:border-[#3ecf8e] hover:shadow-md cursor-pointer"
+                      ? "border-[#2E82F7]/50 bg-white shadow-sm hover:border-[#2E82F7] hover:shadow-md cursor-pointer"
                       : "border-[#E5E5E0] bg-white opacity-95 hover:border-[#D8D8D2]"
                   }`}
                 >
@@ -277,11 +277,11 @@ export default function HomePage() {
                     <div className="flex items-center justify-between gap-2">
                       <h3 className="font-display font-bold text-base text-[#0B0B0C] flex items-center gap-1.5">
                         {mod.name}
-                        {isLive && <ArrowRight className="h-3.5 w-3.5 text-[#3ecf8e]" />}
+                        {isLive && <ArrowRight className="h-3.5 w-3.5 text-[#2E82F7]" />}
                       </h3>
                       {isLive ? (
-                        <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full border border-[#3ecf8e]/30 bg-[#3ecf8e]/10 text-[#2db87d] font-mono text-[10px] font-semibold uppercase tracking-wider">
-                          <span className="h-1.5 w-1.5 rounded-full bg-[#3ecf8e] animate-pulse" />
+                        <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full border border-[#2E82F7]/30 bg-[#2E82F7]/10 text-[#2567d4] font-mono text-[10px] font-semibold uppercase tracking-wider">
+                          <span className="h-1.5 w-1.5 rounded-full bg-[#2E82F7] animate-pulse" />
                           LIVE
                         </span>
                       ) : (
@@ -295,7 +295,7 @@ export default function HomePage() {
                     </p>
                   </div>
                   {isLive && (
-                    <div className="pt-2 text-xs font-semibold text-[#3ecf8e] flex items-center gap-1">
+                    <div className="pt-2 text-xs font-semibold text-[#2E82F7] flex items-center gap-1">
                       <span>Get started with Zed Nav</span>
                       <ArrowRight className="h-3 w-3" />
                     </div>
@@ -307,7 +307,7 @@ export default function HomePage() {
                 <FadeIn key={mod.slug} delay={idx * 0.03}>
                   <Link
                     href={cardHref}
-                    className="block h-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3ecf8e] rounded-xl"
+                    className="block h-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2E82F7] rounded-xl"
                   >
                     {CardInner}
                   </Link>
@@ -322,7 +322,7 @@ export default function HomePage() {
       <section className="py-4 sm:py-8">
         <div className="max-w-site mx-auto px-4 sm:px-6 lg:px-8">
           <FadeIn className="max-w-3xl mx-auto rounded-xl border border-[#E5E5E0] bg-white p-8 sm:p-12 shadow-sm space-y-6">
-            <div className="font-mono text-xs uppercase tracking-wider text-[#3ecf8e] font-semibold">
+            <div className="font-mono text-xs uppercase tracking-wider text-[#2E82F7] font-semibold">
               The Reality of Nigerian Youth Navigation
             </div>
 
@@ -346,7 +346,7 @@ export default function HomePage() {
       <section id="features" className="scroll-mt-24">
         <div className="max-w-site mx-auto px-4 sm:px-6 lg:px-8">
           <FadeIn className="text-center max-w-2xl mx-auto mb-12 sm:mb-16 space-y-4">
-            <div className="font-mono text-xs uppercase tracking-wider text-[#3ecf8e] font-semibold">
+            <div className="font-mono text-xs uppercase tracking-wider text-[#2E82F7] font-semibold">
               Zed Architecture
             </div>
             <h2 className="font-display text-3xl sm:text-5xl font-bold tracking-tight text-[#0B0B0C]">
@@ -368,7 +368,7 @@ export default function HomePage() {
                     <h3 className="font-display text-xl font-bold text-[#0B0B0C]">
                       {pillar.title}
                     </h3>
-                    <p className="font-mono text-xs text-[#3ecf8e] font-semibold">
+                    <p className="font-mono text-xs text-[#2E82F7] font-semibold">
                       {pillar.subtitle}
                     </p>
                     <p className="font-sans text-sm text-[#57575e] leading-relaxed">
@@ -393,7 +393,7 @@ export default function HomePage() {
       <section id="token-engine" className="scroll-mt-24 py-6 sm:py-10">
         <div className="max-w-site mx-auto px-4 sm:px-6 lg:px-8">
           <FadeIn className="text-center max-w-3xl mx-auto mb-12 space-y-4">
-            <div className="font-mono text-xs uppercase tracking-wider text-[#3ecf8e] font-semibold">
+            <div className="font-mono text-xs uppercase tracking-wider text-[#2E82F7] font-semibold">
               The Incentive Layer // Gamified Progression
             </div>
             <h2 className="font-display text-3xl sm:text-5xl font-bold tracking-tight text-[#0B0B0C]">
@@ -424,13 +424,13 @@ export default function HomePage() {
                           Lvl {tier.level}
                         </td>
                         <td className="py-3.5 px-5 font-display font-bold text-[#0B0B0C] flex items-center gap-2">
-                          <span className="h-2 w-2 rounded-full bg-[#3ecf8e]" />
+                          <span className="h-2 w-2 rounded-full bg-[#2E82F7]" />
                           {tier.name}
                         </td>
                         <td className="py-3.5 px-5 text-[#57575e] text-xs">
                           {tier.criteria}
                         </td>
-                        <td className="py-3.5 px-5 font-mono text-xs font-bold text-[#2db87d]">
+                        <td className="py-3.5 px-5 font-mono text-xs font-bold text-[#2E82F7]">
                           {tier.multiplier}
                         </td>
                         <td className="py-3.5 px-5 font-mono text-xs text-[#0B0B0C] font-semibold">
@@ -444,14 +444,14 @@ export default function HomePage() {
 
               <div className="p-5 border-t border-[#E5E5E0] bg-[#FAFAF8]/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-[#57575e]">
                 <div className="flex items-center gap-2">
-                  <Coins className="h-4 w-4 text-[#3ecf8e]" />
+                  <Coins className="h-4 w-4 text-[#2E82F7]" />
                   <span>
                     <strong>Dynamic Treasury Pool:</strong> $ZED converts directly to Naira withdrawals via Paystack/Monnify or discounted mobile data bundles (MTN, Airtel, Glo, 9mobile).
                   </span>
                 </div>
                 <Link
                   href="/signup"
-                  className="font-medium text-[#0B0B0C] hover:text-[#3ecf8e] flex items-center gap-1 shrink-0"
+                  className="font-medium text-[#0B0B0C] hover:text-[#2E82F7] flex items-center gap-1 shrink-0"
                 >
                   <span>Start mining as Rookie</span>
                   <ArrowRight className="h-3 w-3" />
@@ -466,7 +466,7 @@ export default function HomePage() {
       <section className="py-6 sm:py-10">
         <div className="max-w-site mx-auto px-4 sm:px-6 lg:px-8">
           <FadeIn className="text-center max-w-2xl mx-auto mb-10 space-y-3">
-            <div className="font-mono text-xs uppercase tracking-wider text-[#3ecf8e] font-semibold">
+            <div className="font-mono text-xs uppercase tracking-wider text-[#2E82F7] font-semibold">
               Community & Safety
             </div>
             <h2 className="font-display text-3xl sm:text-4xl font-bold tracking-tight text-[#0B0B0C]">
@@ -481,7 +481,7 @@ export default function HomePage() {
             <FadeIn delay={0.05}>
               <div className="h-full rounded-xl border border-[#E5E5E0] bg-white p-6 space-y-3 flex flex-col justify-between">
                 <div className="space-y-2.5">
-                  <div className="h-9 w-9 rounded-lg border border-[#E5E5E0] bg-[#FAFAF8] flex items-center justify-center text-[#3ecf8e]">
+                  <div className="h-9 w-9 rounded-lg border border-[#E5E5E0] bg-[#FAFAF8] flex items-center justify-center text-[#2E82F7]">
                     <GraduationCap className="h-4.5 w-4.5" />
                   </div>
                   <h3 className="font-display font-bold text-lg text-[#0B0B0C]">Campus Hubs</h3>
@@ -498,7 +498,7 @@ export default function HomePage() {
             <FadeIn delay={0.1}>
               <div className="h-full rounded-xl border border-[#E5E5E0] bg-white p-6 space-y-3 flex flex-col justify-between">
                 <div className="space-y-2.5">
-                  <div className="h-9 w-9 rounded-lg border border-[#E5E5E0] bg-[#FAFAF8] flex items-center justify-center text-[#3ecf8e]">
+                  <div className="h-9 w-9 rounded-lg border border-[#E5E5E0] bg-[#FAFAF8] flex items-center justify-center text-[#2E82F7]">
                     <Users className="h-4.5 w-4.5" />
                   </div>
                   <h3 className="font-display font-bold text-lg text-[#0B0B0C]">Zed Meet</h3>
@@ -515,7 +515,7 @@ export default function HomePage() {
             <FadeIn delay={0.15}>
               <div className="h-full rounded-xl border border-[#E5E5E0] bg-white p-6 space-y-3 flex flex-col justify-between">
                 <div className="space-y-2.5">
-                  <div className="h-9 w-9 rounded-lg border border-[#E5E5E0] bg-[#FAFAF8] flex items-center justify-center text-[#3ecf8e]">
+                  <div className="h-9 w-9 rounded-lg border border-[#E5E5E0] bg-[#FAFAF8] flex items-center justify-center text-[#2E82F7]">
                     <Sparkles className="h-4.5 w-4.5" />
                   </div>
                   <h3 className="font-display font-bold text-lg text-[#0B0B0C]">Zed Market</h3>
@@ -532,7 +532,7 @@ export default function HomePage() {
             <FadeIn delay={0.2}>
               <div className="h-full rounded-xl border border-[#E5E5E0] bg-white p-6 space-y-3 flex flex-col justify-between">
                 <div className="space-y-2.5">
-                  <div className="h-9 w-9 rounded-lg border border-[#E5E5E0] bg-[#FAFAF8] flex items-center justify-center text-[#3ecf8e]">
+                  <div className="h-9 w-9 rounded-lg border border-[#E5E5E0] bg-[#FAFAF8] flex items-center justify-center text-[#2E82F7]">
                     <Radio className="h-4.5 w-4.5" />
                   </div>
                   <h3 className="font-display font-bold text-lg text-[#0B0B0C]">Zed SOS</h3>
@@ -556,7 +556,7 @@ export default function HomePage() {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
               <div className="lg:col-span-8 space-y-5">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#E5E5E0] bg-[#FAFAF8] text-[#57575e] font-mono text-xs uppercase tracking-wider font-medium">
-                  <Lock className="h-3 w-3 text-[#3ecf8e]" />
+                  <Lock className="h-3 w-3 text-[#2E82F7]" />
                   <span>Sovereign Identity Protection</span>
                 </div>
 
@@ -576,7 +576,7 @@ export default function HomePage() {
                 <div className="pt-2">
                   <Link
                     href="/privacy"
-                    className="inline-flex items-center gap-2 text-sm font-medium text-[#0B0B0C] hover:text-[#3ecf8e] transition-colors group"
+                    className="inline-flex items-center gap-2 text-sm font-medium text-[#0B0B0C] hover:text-[#2E82F7] transition-colors group"
                   >
                     <span>Read our full NDPA Data Privacy Policy</span>
                     <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
@@ -621,7 +621,7 @@ export default function HomePage() {
       <section id="faq" className="scroll-mt-24">
         <div className="max-w-site mx-auto px-4 sm:px-6 lg:px-8">
           <FadeIn className="text-center max-w-2xl mx-auto mb-12 sm:mb-14 space-y-3">
-            <div className="font-mono text-xs uppercase tracking-wider text-[#3ecf8e] font-semibold">
+            <div className="font-mono text-xs uppercase tracking-wider text-[#2E82F7] font-semibold">
               Got Questions?
             </div>
             <h2 className="font-display text-3xl sm:text-5xl font-bold tracking-tight text-[#0B0B0C]">

@@ -86,7 +86,7 @@ export function HeroMockup() {
         {/* Mockup Header Row */}
         <div className="flex flex-wrap items-center justify-between gap-3 pb-5 border-b border-[#E5E5E0]">
           <div className="flex items-center gap-3">
-            <div className="h-9 w-9 rounded-lg bg-[#3ecf8e]/10 flex items-center justify-center text-[#3ecf8e] border border-[#3ecf8e]/20">
+            <div className="h-9 w-9 rounded-lg bg-[#2E82F7]/10 flex items-center justify-center text-[#2E82F7] border border-[#2E82F7]/20">
               <FileText className="h-4 w-4" />
             </div>
             <div>
@@ -105,8 +105,8 @@ export function HeroMockup() {
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-mono font-medium bg-[#3ecf8e]/10 text-[#0e7048]">
-              <span className="h-1.5 w-1.5 rounded-full bg-[#3ecf8e] animate-pulse" />
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-mono font-medium bg-[#2E82F7]/10 text-[#1a4fad]">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#2E82F7] animate-pulse" />
               Verified Process
             </span>
           </div>
@@ -128,18 +128,18 @@ export function HeroMockup() {
                 width: `${progressVal}%`,
                 transition: shouldReduceMotion ? "none" : "width 900ms cubic-bezier(0.22, 1, 0.36, 1)",
               }}
-              className="h-full bg-[#3ecf8e] rounded-full"
+              className="h-full bg-[#2E82F7] rounded-full"
             />
           </div>
 
           {/* Steps Indicator Dots */}
           <div className="grid grid-cols-5 gap-2 mt-3 text-[11px] font-mono">
-            <div className="text-[#3ecf8e] font-medium flex items-center gap-1">
+            <div className="text-[#2E82F7] font-medium flex items-center gap-1">
               <Check className="h-3 w-3" />
               <span className="hidden sm:inline">1. Eligibility</span>
             </div>
             <div className="text-[#0B0B0C] font-bold flex items-center gap-1">
-              <span className="h-2 w-2 rounded-full bg-[#3ecf8e]" />
+              <span className="h-2 w-2 rounded-full bg-[#2E82F7]" />
               <span className="hidden sm:inline">2. Documents</span>
             </div>
             <div className="text-[#8a8a92] flex items-center gap-1">
@@ -173,7 +173,7 @@ export function HeroMockup() {
                 key={item.id}
                 className={`flex items-start justify-between p-3 rounded-lg border transition-all duration-300 ${
                   isTicked
-                    ? "border-[#3ecf8e]/30 bg-[#3ecf8e]/[0.03]"
+                    ? "border-[#2E82F7]/30 bg-[#2E82F7]/[0.03]"
                     : isCurrent
                     ? "border-[#0B0B0C]/20 bg-[#fafaf8]"
                     : "border-[#E5E5E0] bg-transparent opacity-75"
@@ -183,9 +183,9 @@ export function HeroMockup() {
                   <div
                     className={`mt-0.5 h-4 w-4 rounded-full flex items-center justify-center transition-colors duration-300 ${
                       isTicked
-                        ? "bg-[#3ecf8e] text-[#041f13]"
+                        ? "bg-[#2E82F7] text-[#0a2a5e]"
                         : isCurrent
-                        ? "border-2 border-[#3ecf8e]"
+                        ? "border-2 border-[#2E82F7]"
                         : "border border-[#8a8a92]"
                     }`}
                   >
@@ -212,9 +212,9 @@ export function HeroMockup() {
 
                 <span className="font-mono text-[11px] text-[#57575e] flex-shrink-0 pt-0.5">
                   {isTicked ? (
-                    <span className="text-[#0e7048] font-semibold">Checked</span>
+                    <span className="text-[#1a4fad] font-semibold">Checked</span>
                   ) : isCurrent ? (
-                    <span className="text-[#3ecf8e] font-semibold">Next</span>
+                    <span className="text-[#2E82F7] font-semibold">Next</span>
                   ) : (
                     "Pending"
                   )}
@@ -227,7 +227,7 @@ export function HeroMockup() {
         {/* Mockup Footer Notice */}
         <div className="mt-4 pt-3 border-t border-[#E5E5E0] flex items-center justify-between text-xs font-mono text-[#57575e]">
           <span className="flex items-center gap-1.5">
-            <ShieldCheck className="h-3.5 w-3.5 text-[#3ecf8e]" />
+            <ShieldCheck className="h-3.5 w-3.5 text-[#2E82F7]" />
             Audited against NIS Official Circular
           </span>
           <span className="hidden sm:inline">Offline ready • 0 bytes network used</span>

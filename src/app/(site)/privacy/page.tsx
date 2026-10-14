@@ -117,7 +117,7 @@ export default function PrivacyPolicyPage() {
             Zed enforces an architectural invariant:
           </p>
           <div className="p-4 rounded-lg border border-[#E5E5E0] dark:border-white/10 bg-[#ffffff] dark:bg-[#141416] text-xs font-mono text-[#fafaf8]  space-y-2">
-            <span className="font-bold text-[#3ecf8e] uppercase block">
+            <span className="font-bold text-[#2E82F7] uppercase block">
               MANDATORY TECHNICAL PROTOCOL:
             </span>
             <p>
@@ -345,7 +345,7 @@ export default function PrivacyPolicyPage() {
             <strong>Data Protection Officer</strong><br />
             Zed Technologies Nigeria<br />
             Yaba Technology Corridor, Lagos State, Nigeria.<br />
-            Email: <a href="mailto:privacy@zedproject.ng" className="text-[#3ecf8e] underline">privacy@zedproject.ng</a>
+            Email: <a href="mailto:privacy@zedproject.ng" className="text-[#2E82F7] underline">privacy@zedproject.ng</a>
           </div>
           <p className="pt-2">
             You also have the statutory right to lodge a complaint directly with the primary supervisory authority:
@@ -353,7 +353,7 @@ export default function PrivacyPolicyPage() {
           <div className="p-4 rounded-lg border border-[#E5E5E0] dark:border-white/10 bg-[#ffffff] dark:bg-[#141416] text-xs font-mono space-y-1 text-[#fafaf8] ">
             <strong>NIGERIA DATA PROTECTION COMMISSION (NDPC)</strong><br />
             No. 5, Charles de Gaulle Street, Asokoro, Abuja, Nigeria.<br />
-            Official Portal: <a href="https://ndpc.gov.ng" target="_blank" rel="noopener noreferrer" className="text-[#3ecf8e] underline">ndpc.gov.ng</a><br />
+            Official Portal: <a href="https://ndpc.gov.ng" target="_blank" rel="noopener noreferrer" className="text-[#2E82F7] underline">ndpc.gov.ng</a><br />
             Email: info@ndpc.gov.ng
           </div>
         </div>

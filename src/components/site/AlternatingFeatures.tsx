@@ -33,7 +33,7 @@ export function AlternatingFeatures() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-center">
           {/* Text Left */}
           <div className="lg:col-span-5 space-y-5">
-            <div className="font-mono text-xs uppercase tracking-widest text-[#3ecf8e] font-medium">
+            <div className="font-mono text-xs uppercase tracking-widest text-[#2E82F7] font-medium">
               Adaptive Procedural Flow
             </div>
             <h3 className="font-display text-2xl sm:text-4xl font-bold tracking-tight text-[#0B0B0C] leading-tight">
@@ -48,7 +48,7 @@ export function AlternatingFeatures() {
             <div className="pt-2">
               <Link
                 href="/signup"
-                className="inline-flex items-center gap-2 text-sm font-medium text-[#0B0B0C] hover:text-[#3ecf8e] transition-colors group"
+                className="inline-flex items-center gap-2 text-sm font-medium text-[#0B0B0C] hover:text-[#2E82F7] transition-colors group"
               >
                 <span>Try the interactive guide builder</span>
                 <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
@@ -62,7 +62,7 @@ export function AlternatingFeatures() {
               {/* Branch Selector Switch */}
               <div className="flex flex-wrap items-center justify-between gap-3 pb-5 border-b border-[#E8E8E4]">
                 <div className="flex items-center gap-2">
-                  <GitBranch className="h-4 w-4 text-[#3ecf8e]" />
+                  <GitBranch className="h-4 w-4 text-[#2E82F7]" />
                   <span className="font-mono text-xs uppercase tracking-wider font-semibold text-[#0B0B0C]">
                     Filing Path:
                   </span>
@@ -109,38 +109,38 @@ export function AlternatingFeatures() {
                         ? "3 required documents • Estimated time: 2 weeks"
                         : "6 required documents • Estimated time: 4-6 weeks"}
                     </span>
-                    <span className="text-[#3ecf8e] font-semibold">₦35,000 NIS Fee</span>
+                    <span className="text-[#2E82F7] font-semibold">₦35,000 NIS Fee</span>
                   </div>
 
                   <div className="space-y-2.5">
                     {passportBranch === "renewal" ? (
                       <>
-                        <div className="flex items-center justify-between p-3 rounded-lg border border-[#3ecf8e]/25 bg-[#3ecf8e]/[0.03]">
+                        <div className="flex items-center justify-between p-3 rounded-lg border border-[#2E82F7]/25 bg-[#2E82F7]/[0.03]">
                           <div className="flex items-center gap-2.5">
-                            <Check className="h-4 w-4 text-[#3ecf8e]" />
+                            <Check className="h-4 w-4 text-[#2E82F7]" />
                             <span className="text-sm font-medium text-[#0B0B0C]">
                               Previous Expired Passport Booklet
                             </span>
                           </div>
-                          <span className="font-mono text-xs text-[#0e7048]">Ready</span>
+                          <span className="font-mono text-xs text-[#1a4fad]">Ready</span>
                         </div>
-                        <div className="flex items-center justify-between p-3 rounded-lg border border-[#3ecf8e]/25 bg-[#3ecf8e]/[0.03]">
+                        <div className="flex items-center justify-between p-3 rounded-lg border border-[#2E82F7]/25 bg-[#2E82F7]/[0.03]">
                           <div className="flex items-center gap-2.5">
-                            <Check className="h-4 w-4 text-[#3ecf8e]" />
+                            <Check className="h-4 w-4 text-[#2E82F7]" />
                             <span className="text-sm font-medium text-[#0B0B0C]">
                               National Identity Number (NIN) Slip
                             </span>
                           </div>
-                          <span className="font-mono text-xs text-[#0e7048]">Matched</span>
+                          <span className="font-mono text-xs text-[#1a4fad]">Matched</span>
                         </div>
-                        <div className="flex items-center justify-between p-3 rounded-lg border border-[#3ecf8e]/25 bg-[#3ecf8e]/[0.03]">
+                        <div className="flex items-center justify-between p-3 rounded-lg border border-[#2E82F7]/25 bg-[#2E82F7]/[0.03]">
                           <div className="flex items-center gap-2.5">
-                            <Check className="h-4 w-4 text-[#3ecf8e]" />
+                            <Check className="h-4 w-4 text-[#2E82F7]" />
                             <span className="text-sm font-medium text-[#0B0B0C]">
                               35×45mm Passport Photograph
                             </span>
                           </div>
-                          <span className="font-mono text-xs text-[#0e7048]">Audited</span>
+                          <span className="font-mono text-xs text-[#1a4fad]">Audited</span>
                         </div>
                         <div className="p-3 rounded-lg border border-dashed border-[#E8E8E4] text-xs text-[#57575e] font-mono">
                           ✓ Bypassed: Guarantor Form &amp; State of Origin Certificate (Not required for renewal)
@@ -148,41 +148,41 @@ export function AlternatingFeatures() {
                       </>
                     ) : (
                       <>
-                        <div className="flex items-center justify-between p-3 rounded-lg border border-[#3ecf8e]/25 bg-[#3ecf8e]/[0.03]">
+                        <div className="flex items-center justify-between p-3 rounded-lg border border-[#2E82F7]/25 bg-[#2E82F7]/[0.03]">
                           <div className="flex items-center gap-2.5">
-                            <Check className="h-4 w-4 text-[#3ecf8e]" />
+                            <Check className="h-4 w-4 text-[#2E82F7]" />
                             <span className="text-sm font-medium text-[#0B0B0C]">
                               Local Government Certificate of Origin
                             </span>
                           </div>
-                          <span className="font-mono text-xs text-[#0e7048]">Stamped</span>
+                          <span className="font-mono text-xs text-[#1a4fad]">Stamped</span>
                         </div>
-                        <div className="flex items-center justify-between p-3 rounded-lg border border-[#3ecf8e]/25 bg-[#3ecf8e]/[0.03]">
+                        <div className="flex items-center justify-between p-3 rounded-lg border border-[#2E82F7]/25 bg-[#2E82F7]/[0.03]">
                           <div className="flex items-center gap-2.5">
-                            <Check className="h-4 w-4 text-[#3ecf8e]" />
+                            <Check className="h-4 w-4 text-[#2E82F7]" />
                             <span className="text-sm font-medium text-[#0B0B0C]">
                               NPC Birth Certificate or Age Declaration
                             </span>
                           </div>
-                          <span className="font-mono text-xs text-[#0e7048]">Verified</span>
+                          <span className="font-mono text-xs text-[#1a4fad]">Verified</span>
                         </div>
-                        <div className="flex items-center justify-between p-3 rounded-lg border border-[#3ecf8e]/25 bg-[#3ecf8e]/[0.03]">
+                        <div className="flex items-center justify-between p-3 rounded-lg border border-[#2E82F7]/25 bg-[#2E82F7]/[0.03]">
                           <div className="flex items-center gap-2.5">
-                            <Check className="h-4 w-4 text-[#3ecf8e]" />
+                            <Check className="h-4 w-4 text-[#2E82F7]" />
                             <span className="text-sm font-medium text-[#0B0B0C]">
                               Guarantor&apos;s Form + High Court Attestation
                             </span>
                           </div>
-                          <span className="font-mono text-xs text-[#0e7048]">Sworn</span>
+                          <span className="font-mono text-xs text-[#1a4fad]">Sworn</span>
                         </div>
-                        <div className="flex items-center justify-between p-3 rounded-lg border border-[#3ecf8e]/25 bg-[#3ecf8e]/[0.03]">
+                        <div className="flex items-center justify-between p-3 rounded-lg border border-[#2E82F7]/25 bg-[#2E82F7]/[0.03]">
                           <div className="flex items-center gap-2.5">
-                            <Check className="h-4 w-4 text-[#3ecf8e]" />
+                            <Check className="h-4 w-4 text-[#2E82F7]" />
                             <span className="text-sm font-medium text-[#0B0B0C]">
                               Guarantor&apos;s Valid National ID Copy
                             </span>
                           </div>
-                          <span className="font-mono text-xs text-[#0e7048]">Attached</span>
+                          <span className="font-mono text-xs text-[#1a4fad]">Attached</span>
                         </div>
                       </>
                     )}
@@ -192,7 +192,7 @@ export function AlternatingFeatures() {
 
               <div className="pt-3 border-t border-[#E8E8E4] flex items-center justify-between text-xs font-mono text-[#57575e]">
                 <span>Deterministic rules engine</span>
-                <span className="text-[#3ecf8e]">Zero guesswork</span>
+                <span className="text-[#2E82F7]">Zero guesswork</span>
               </div>
             </div>
           </div>
@@ -207,7 +207,7 @@ export function AlternatingFeatures() {
             <div className="rounded-xl border border-[#E8E8E4] bg-white p-5 sm:p-7 shadow-lg shadow-black/[0.05]">
               <div className="flex items-center justify-between pb-4 border-b border-[#E8E8E4]">
                 <div className="flex items-center gap-2.5">
-                  <FileCheck2 className="h-5 w-5 text-[#3ecf8e]" />
+                  <FileCheck2 className="h-5 w-5 text-[#2E82F7]" />
                   <div>
                     <h4 className="font-display font-semibold text-base text-[#0B0B0C]">
                       Client-Side Document Auditor
@@ -224,7 +224,7 @@ export function AlternatingFeatures() {
                   aria-label="Re-run document auditor"
                   className="px-3 py-1.5 text-xs font-mono rounded-lg border border-[#E8E8E4] text-[#57575e] hover:text-[#0B0B0C] hover:bg-[#F5F5F0] flex items-center gap-1.5 transition-colors cursor-pointer"
                 >
-                  <RefreshCw className={`h-3 w-3 ${auditing ? "animate-spin text-[#3ecf8e]" : ""}`} />
+                  <RefreshCw className={`h-3 w-3 ${auditing ? "animate-spin text-[#2E82F7]" : ""}`} />
                   <span>Re-audit</span>
                 </button>
               </div>
@@ -239,7 +239,7 @@ export function AlternatingFeatures() {
                       142KB &bull; 820×1054px &bull; White background (RGB 255, 255, 255)
                     </div>
                   </div>
-                  <span className="inline-flex items-center gap-1 text-[11px] font-mono font-semibold text-[#0e7048] bg-[#3ecf8e]/10 px-2 py-0.5 rounded-full">
+                  <span className="inline-flex items-center gap-1 text-[11px] font-mono font-semibold text-[#1a4fad] bg-[#2E82F7]/10 px-2 py-0.5 rounded-full">
                     <Check className="h-3 w-3" />
                     Passed
                   </span>
@@ -254,7 +254,7 @@ export function AlternatingFeatures() {
                       142KB conforms to NIS portal strict 200KB upload ceiling
                     </div>
                   </div>
-                  <span className="inline-flex items-center gap-1 text-[11px] font-mono font-semibold text-[#0e7048] bg-[#3ecf8e]/10 px-2 py-0.5 rounded-full">
+                  <span className="inline-flex items-center gap-1 text-[11px] font-mono font-semibold text-[#1a4fad] bg-[#2E82F7]/10 px-2 py-0.5 rounded-full">
                     <Check className="h-3 w-3" />
                     Passed
                   </span>
@@ -269,7 +269,7 @@ export function AlternatingFeatures() {
                       11-digit numerical length and formatting validated
                     </div>
                   </div>
-                  <span className="inline-flex items-center gap-1 text-[11px] font-mono font-semibold text-[#0e7048] bg-[#3ecf8e]/10 px-2 py-0.5 rounded-full">
+                  <span className="inline-flex items-center gap-1 text-[11px] font-mono font-semibold text-[#1a4fad] bg-[#2E82F7]/10 px-2 py-0.5 rounded-full">
                     <Check className="h-3 w-3" />
                     Passed
                   </span>
@@ -277,7 +277,7 @@ export function AlternatingFeatures() {
               </div>
 
               <div className="pt-3 border-t border-[#E8E8E4] flex items-center gap-1.5 text-xs font-mono text-[#57575e]">
-                <ShieldCheck className="h-3.5 w-3.5 text-[#3ecf8e]" />
+                <ShieldCheck className="h-3.5 w-3.5 text-[#2E82F7]" />
                 Zero cloud storage: files analyzed in temporary memory
               </div>
             </div>
@@ -285,7 +285,7 @@ export function AlternatingFeatures() {
 
           {/* Text Right */}
           <div className="lg:col-span-5 order-1 lg:order-2 space-y-5">
-            <div className="font-mono text-xs uppercase tracking-widest text-[#3ecf8e] font-medium">
+            <div className="font-mono text-xs uppercase tracking-widest text-[#2E82F7] font-medium">
               Pre-Flight Document Validation
             </div>
             <h3 className="font-display text-2xl sm:text-4xl font-bold tracking-tight text-[#0B0B0C] leading-tight">
@@ -300,7 +300,7 @@ export function AlternatingFeatures() {
             <div className="pt-2">
               <Link
                 href="/signup"
-                className="inline-flex items-center gap-2 text-sm font-medium text-[#0B0B0C] hover:text-[#3ecf8e] transition-colors group"
+                className="inline-flex items-center gap-2 text-sm font-medium text-[#0B0B0C] hover:text-[#2E82F7] transition-colors group"
               >
                 <span>Audit your documents in Zed</span>
                 <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
@@ -315,7 +315,7 @@ export function AlternatingFeatures() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-center">
           {/* Text Left */}
           <div className="lg:col-span-5 space-y-5">
-            <div className="font-mono text-xs uppercase tracking-widest text-[#3ecf8e] font-medium">
+            <div className="font-mono text-xs uppercase tracking-widest text-[#2E82F7] font-medium">
               Resilient Local-First Architecture
             </div>
             <h3 className="font-display text-2xl sm:text-4xl font-bold tracking-tight text-[#0B0B0C] leading-tight">
@@ -330,7 +330,7 @@ export function AlternatingFeatures() {
             <div className="pt-2">
               <Link
                 href="/signup"
-                className="inline-flex items-center gap-2 text-sm font-medium text-[#0B0B0C] hover:text-[#3ecf8e] transition-colors group"
+                className="inline-flex items-center gap-2 text-sm font-medium text-[#0B0B0C] hover:text-[#2E82F7] transition-colors group"
               >
                 <span>Get started with offline playbooks</span>
                 <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
@@ -346,7 +346,7 @@ export function AlternatingFeatures() {
                   {isOffline ? (
                     <WifiOff className="h-4 w-4 text-amber-500" />
                   ) : (
-                    <Wifi className="h-4 w-4 text-[#3ecf8e]" />
+                    <Wifi className="h-4 w-4 text-[#2E82F7]" />
                   )}
                   <span className="font-mono text-xs uppercase tracking-wider font-semibold text-[#0B0B0C]">
                     Network Simulation:
@@ -384,14 +384,14 @@ export function AlternatingFeatures() {
                   className={`p-4 rounded-lg border transition-all duration-300 ${
                     isOffline
                       ? "border-amber-500/30 bg-amber-500/[0.05]"
-                      : "border-[#3ecf8e]/25 bg-[#3ecf8e]/[0.03]"
+                      : "border-[#2E82F7]/25 bg-[#2E82F7]/[0.03]"
                   }`}
                 >
                   <div className="flex items-center justify-between mb-2">
                     <span className="font-mono text-xs font-semibold text-[#0B0B0C] flex items-center gap-2">
                       <span
                         className={`h-2 w-2 rounded-full ${
-                          isOffline ? "bg-amber-500" : "bg-[#3ecf8e] animate-pulse"
+                          isOffline ? "bg-amber-500" : "bg-[#2E82F7] animate-pulse"
                         }`}
                       />
                       {isOffline ? "Offline Mode (Service Worker Active)" : "Online (Lagos Edge Connected)"}
@@ -411,22 +411,22 @@ export function AlternatingFeatures() {
                 <div className="space-y-2 font-mono text-xs">
                   <div className="flex items-center justify-between p-2.5 rounded-lg border border-[#E8E8E4]">
                     <span className="text-[#0B0B0C]">Passport Renewal Checklist Cache</span>
-                    <span className="text-[#3ecf8e] font-semibold">Ready locally</span>
+                    <span className="text-[#2E82F7] font-semibold">Ready locally</span>
                   </div>
                   <div className="flex items-center justify-between p-2.5 rounded-lg border border-[#E8E8E4]">
                     <span className="text-[#0B0B0C]">Official Statutory Fee Table</span>
-                    <span className="text-[#3ecf8e] font-semibold">Ready locally</span>
+                    <span className="text-[#2E82F7] font-semibold">Ready locally</span>
                   </div>
                   <div className="flex items-center justify-between p-2.5 rounded-lg border border-[#E8E8E4]">
                     <span className="text-[#0B0B0C]">Document Auditor Engine</span>
-                    <span className="text-[#3ecf8e] font-semibold">Runs in WebWorker</span>
+                    <span className="text-[#2E82F7] font-semibold">Runs in WebWorker</span>
                   </div>
                 </div>
               </div>
 
               <div className="pt-3 border-t border-[#E8E8E4] flex items-center justify-between text-xs font-mono text-[#57575e]">
                 <span>Progressive Web App</span>
-                <span className="text-[#3ecf8e]">Installable on iOS &amp; Android</span>
+                <span className="text-[#2E82F7]">Installable on iOS &amp; Android</span>
               </div>
             </div>
           </div>

@@ -13,7 +13,7 @@ export default function NotFound() {
     <main
       id="main-content"
       role="main"
-      className="min-h-dvh flex flex-col justify-between bg-[#FAFAF8] dark:bg-[#0B0B0C] text-[#0B0B0C] dark:text-[#FAFAF8] px-4 sm:px-6 lg:px-8 py-12 selection:bg-[#3ecf8e] selection:text-[#041f13]"
+      className="min-h-dvh flex flex-col justify-between bg-[#FAFAF8] dark:bg-[#0B0B0C] text-[#0B0B0C] dark:text-[#FAFAF8] px-4 sm:px-6 lg:px-8 py-12 selection:bg-[#2E82F7] selection:text-[#0a2a5e]"
     >
       {/* Top Header Row */}
       <header className="max-w-site mx-auto w-full flex items-center justify-between border-b border-[#E5E5E0] dark:border-white/10 pb-6">
@@ -57,7 +57,7 @@ export default function NotFound() {
         <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
           <Link
             href="/"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-[#3ecf8e] hover:bg-[#34b77d] text-[#041f13] font-medium text-sm rounded-lg shadow-sm transition-all"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-[#2E82F7] hover:bg-[#2567d4] text-[#0a2a5e] font-medium text-sm rounded-lg shadow-sm transition-all"
           >
             <Home className="h-4 w-4" />
             <span>Return to overview</span>
@@ -67,7 +67,7 @@ export default function NotFound() {
             href="/#how-it-works"
             className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg border border-[#E5E5E0] dark:border-white/10 bg-[#ffffff] dark:bg-[#141416] hover:bg-[#f4f4f0] dark:hover:bg-white/[0.04] text-[#0B0B0C] dark:text-[#FAFAF8] text-sm font-medium transition-all"
           >
-            <Compass className="h-4 w-4 text-[#3ecf8e]" />
+            <Compass className="h-4 w-4 text-[#2E82F7]" />
             <span>Browse Zed Nav</span>
           </Link>
         </div>

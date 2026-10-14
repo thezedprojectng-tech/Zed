@@ -11,11 +11,11 @@ export function ClosingCTA() {
   return (
     <section className="w-full bg-[#0B0B0C] text-white py-20 sm:py-28 border-t border-white/10 relative overflow-hidden">
       {/* Subtle green stripe accent at top */}
-      <div aria-hidden="true" className="absolute top-0 left-1/2 -translate-x-1/2 h-[2px] w-32 bg-[#3ecf8e] opacity-70" />
+      <div aria-hidden="true" className="absolute top-0 left-1/2 -translate-x-1/2 h-[2px] w-32 bg-[#2E82F7] opacity-70" />
 
       <div className="max-w-site mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <FadeIn className="max-w-3xl mx-auto space-y-7">
-          <div className="font-mono text-xs uppercase tracking-widest text-[#3ecf8e] font-medium">
+          <div className="font-mono text-xs uppercase tracking-widest text-[#2E82F7] font-medium">
             Ready to begin?
           </div>
 
@@ -32,7 +32,7 @@ export function ClosingCTA() {
             {isAuthenticated ? (
               <Link
                 href="/home"
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#3ecf8e] hover:bg-[#34b77d] text-[#041f13] text-sm font-semibold rounded-lg transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3ecf8e]"
+                className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#2E82F7] hover:bg-[#2567d4] text-[#0a2a5e] text-sm font-semibold rounded-lg transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2E82F7]"
               >
                 <span>Open Zed</span>
                 <ArrowUpRight className="h-4 w-4" />
@@ -41,7 +41,7 @@ export function ClosingCTA() {
               <>
                 <Link
                   href="/signup"
-                  className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#3ecf8e] hover:bg-[#34b77d] text-[#041f13] text-sm font-semibold rounded-lg transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3ecf8e]"
+                  className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#2E82F7] hover:bg-[#2567d4] text-[#0a2a5e] text-sm font-semibold rounded-lg transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2E82F7]"
                 >
                   <span>Get started free</span>
                   <ArrowRight className="h-4 w-4" />
@@ -51,7 +51,7 @@ export function ClosingCTA() {
                   Already have an account?{" "}
                   <Link
                     href="/login"
-                    className="text-white underline underline-offset-4 hover:text-[#3ecf8e] transition-colors"
+                    className="text-white underline underline-offset-4 hover:text-[#2E82F7] transition-colors"
                   >
                     Sign in
                   </Link>

@@ -93,7 +93,7 @@ export default function RootLayout({
       data-scroll-behavior="smooth"
       className={`${cabinetGrotesk.variable} ${GeistSans.variable} ${GeistMono.variable} ${instrumentSerif.variable}`}
     >
-      <body className="min-h-dvh bg-background text-foreground antialiased font-sans selection:bg-[#3ecf8e]/20 selection:text-[#3ecf8e]">
+      <body className="min-h-dvh bg-background text-foreground antialiased font-sans selection:bg-[#2E82F7]/20 selection:text-[#2E82F7]">
         <ThemeProvider
           attribute="class"
           defaultTheme="light"

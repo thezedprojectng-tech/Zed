@@ -127,7 +127,7 @@ export function Sidebar() {
         ) : (
           <Link href="/home" className="flex items-center justify-center mx-auto" aria-label="Zed Dashboard">
             <Image
-              src="/icons/zed-logo-mark-dark.png"
+              src="/icons/zed-logo-mark-light.png"
               alt="Zed"
               width={28}
               height={35}
@@ -135,7 +135,7 @@ export function Sidebar() {
               className="h-7 w-auto object-contain dark:hidden"
             />
             <Image
-              src="/icons/zed-logo-mark-light.png"
+              src="/icons/zed-logo-mark-dark.png"
               alt="Zed"
               width={28}
               height={35}

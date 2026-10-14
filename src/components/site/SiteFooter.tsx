@@ -38,7 +38,7 @@ export function SiteFooter() {
   };
 
   return (
-    <footer className="w-full bg-[#0D0D0F] text-white selection:bg-[#3ecf8e] selection:text-[#041f13]">
+    <footer className="w-full bg-[#0D0D0F] text-white selection:bg-[#2E82F7] selection:text-[#0a2a5e]">
 
       {/* ── Top divider bar ──────────────────────────────────────────────── */}
       <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
@@ -52,7 +52,7 @@ export function SiteFooter() {
             {/* Brand Logo */}
             <Link
               href="/"
-              className="inline-flex items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3ecf8e] rounded-sm py-1"
+              className="inline-flex items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2E82F7] rounded-sm py-1"
               aria-label="The Zed Project Home"
             >
               <Image
@@ -73,7 +73,7 @@ export function SiteFooter() {
             {isAuthenticated ? (
               <Link
                 href="/home"
-                className="inline-flex items-center gap-1.5 text-sm font-medium text-[#3ecf8e] hover:text-white transition-colors group"
+                className="inline-flex items-center gap-1.5 text-sm font-medium text-[#2E82F7] hover:text-white transition-colors group"
               >
                 <span>Open your dashboard</span>
                 <ArrowUpRight className="h-4 w-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
@@ -81,7 +81,7 @@ export function SiteFooter() {
             ) : (
               <Link
                 href="/signup"
-                className="inline-flex items-center gap-1.5 text-sm font-medium text-[#3ecf8e] hover:text-white transition-colors group"
+                className="inline-flex items-center gap-1.5 text-sm font-medium text-[#2E82F7] hover:text-white transition-colors group"
               >
                 <span>Create a free account</span>
                 <ArrowUpRight className="h-4 w-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
@@ -90,7 +90,7 @@ export function SiteFooter() {
 
             {/* Location badge */}
             <div className="inline-flex items-center gap-1.5 text-xs text-[#5a5a64] font-mono">
-              <MapPin className="h-3 w-3 text-[#3ecf8e]" />
+              <MapPin className="h-3 w-3 text-[#2E82F7]" />
               <span>Lagos, Nigeria</span>
             </div>
           </div>
@@ -118,7 +118,7 @@ export function SiteFooter() {
                   <li>
                     <Link
                       href="/home"
-                      className="font-sans text-sm text-[#3ecf8e] hover:text-white transition-colors inline-flex items-center gap-1"
+                      className="font-sans text-sm text-[#2E82F7] hover:text-white transition-colors inline-flex items-center gap-1"
                     >
                       <span>Open Zed</span>
                       <ArrowUpRight className="h-3 w-3" />

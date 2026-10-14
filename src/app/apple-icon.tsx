@@ -39,7 +39,7 @@ export default function AppleIcon() {
             strokeLinejoin="round"
           />
           {/* Signature Zed emerald dot */}
-          <circle cx="25" cy="23.5" r="2.2" fill="#3ECF8E" />
+          <circle cx="25" cy="23.5" r="2.2" fill="#2E82F7" />
         </svg>
       </div>
     ),

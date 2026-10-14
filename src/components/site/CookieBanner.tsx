@@ -116,7 +116,7 @@ export function CookieBanner() {
         <div className="space-y-4">
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-[#3ecf8e]" />
+              <span className="h-2 w-2 rounded-full bg-[#2E82F7]" />
               <h3 className="font-display font-semibold text-sm text-[#0B0B0C] dark:text-[#FAFAF8]">
                 Cookie &amp; Local Storage
               </h3>
@@ -135,7 +135,7 @@ export function CookieBanner() {
             Zed uses cookies and client-side storage to enable offline PWA guides, preserve session security, and cache low-data resources across Nigerian networks. Zero third-party ad tracking or data sales.{" "}
             <Link
               href="/cookies"
-              className="underline text-[#0B0B0C] dark:text-[#FAFAF8] hover:text-[#3ecf8e]"
+              className="underline text-[#0B0B0C] dark:text-[#FAFAF8] hover:text-[#2E82F7]"
             >
               Cookie Policy
             </Link>
@@ -146,7 +146,7 @@ export function CookieBanner() {
             <button
               type="button"
               onClick={handleAcceptAll}
-              className="w-full py-2 px-3 bg-[#3ecf8e] hover:bg-[#34b77d] text-[#041f13] text-xs font-medium rounded-lg shadow-sm transition-all cursor-pointer"
+              className="w-full py-2 px-3 bg-[#2E82F7] hover:bg-[#2567d4] text-[#0a2a5e] text-xs font-medium rounded-lg shadow-sm transition-all cursor-pointer"
             >
               Accept all
             </button>
@@ -195,7 +195,7 @@ export function CookieBanner() {
                   Service Worker caches &amp; session tokens. Always active.
                 </p>
               </div>
-              <span className="font-mono text-[10px] text-[#3ecf8e] font-semibold uppercase pt-0.5">
+              <span className="font-mono text-[10px] text-[#2E82F7] font-semibold uppercase pt-0.5">
                 Required
               </span>
             </div>
@@ -216,7 +216,7 @@ export function CookieBanner() {
                 onChange={(e) =>
                   setPreferences({ ...preferences, preferences: e.target.checked })
                 }
-                className="mt-1 h-4 w-4 accent-[#3ecf8e] rounded cursor-pointer"
+                className="mt-1 h-4 w-4 accent-[#2E82F7] rounded cursor-pointer"
               />
             </label>
 
@@ -236,7 +236,7 @@ export function CookieBanner() {
                 onChange={(e) =>
                   setPreferences({ ...preferences, analytics: e.target.checked })
                 }
-                className="mt-1 h-4 w-4 accent-[#3ecf8e] rounded cursor-pointer"
+                className="mt-1 h-4 w-4 accent-[#2E82F7] rounded cursor-pointer"
               />
             </label>
           </div>
@@ -245,7 +245,7 @@ export function CookieBanner() {
             <button
               type="button"
               onClick={handleSaveCustom}
-              className="flex-1 py-2 px-3 bg-[#3ecf8e] hover:bg-[#34b77d] text-[#041f13] text-xs font-medium rounded-lg shadow-sm transition-all cursor-pointer"
+              className="flex-1 py-2 px-3 bg-[#2E82F7] hover:bg-[#2567d4] text-[#0a2a5e] text-xs font-medium rounded-lg shadow-sm transition-all cursor-pointer"
             >
               Save preferences
             </button>

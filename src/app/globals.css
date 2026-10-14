@@ -15,7 +15,7 @@
     --popover: #121214;
     --popover-foreground: #ededed;
 
-    --primary: #3ecf8e;
+    --primary: #2E82F7;
     --primary-foreground: #051a11;
 
     --secondary: #18181b;
@@ -25,14 +25,14 @@
     --muted-foreground: #a1a1aa;
 
     --accent: #11261d;
-    --accent-foreground: #3ecf8e;
+    --accent-foreground: #2E82F7;
 
     --destructive: #7f1d1d;
     --destructive-foreground: #fecaca;
 
     --border: rgba(255, 255, 255, 0.09);
     --input: rgba(255, 255, 255, 0.1);
-    --ring: #3ecf8e;
+    --ring: #2E82F7;
 
     --radius: 0.5rem;
     --radius-sm: 0.375rem;
@@ -41,7 +41,7 @@
     --sidebar-background: #0d0d0e;
     --sidebar-foreground: #ededed;
     --sidebar-border: rgba(255, 255, 255, 0.07);
-    --sidebar-primary: #3ecf8e;
+    --sidebar-primary: #2E82F7;
     --sidebar-accent: rgba(255, 255, 255, 0.04);
 
     /* ── Chart Tokens (Dark Theme) ─────────────────────────────────── */
@@ -61,11 +61,11 @@
     --site-border: rgba(255, 255, 255, 0.09);
     --site-border-subtle: rgba(255, 255, 255, 0.05);
     --site-border-strong: rgba(255, 255, 255, 0.18);
-    --site-accent: #3ecf8e;
-    --site-accent-hover: #34b77d;
+    --site-accent: #2E82F7;
+    --site-accent-hover: #2E82F7;
     --site-accent-subtle: rgba(62, 207, 142, 0.12);
-    --site-vermilion: #3ecf8e;
-    --site-vermilion-hover: #34b77d;
+    --site-vermilion: #2E82F7;
+    --site-vermilion-hover: #2E82F7;
     --site-vermilion-subtle: rgba(62, 207, 142, 0.12);
     --site-grid-line: rgba(255, 255, 255, 0.04);
 
@@ -87,8 +87,8 @@
     --popover: #ffffff;
     --popover-foreground: #09090b;
 
-    --primary: #3ecf8e;
-    --primary-foreground: #041f13;
+    --primary: #2E82F7;
+    --primary-foreground: #0a2a5e;
 
     --secondary: #f8fafc;
     --secondary-foreground: #0f172a;
@@ -104,12 +104,12 @@
 
     --border: #e2e8f0;
     --input: #e2e8f0;
-    --ring: #3ecf8e;
+    --ring: #2E82F7;
 
     --sidebar-background: #ffffff;
     --sidebar-foreground: #09090b;
     --sidebar-border: #e2e8f0;
-    --sidebar-primary: #3ecf8e;
+    --sidebar-primary: #2E82F7;
     --sidebar-accent: #f8fafc;
 
     /* ── Chart Tokens (Light Theme) ────────────────────────────────── */
@@ -129,11 +129,11 @@
     --site-border: #e6e6e2;
     --site-border-subtle: #f0f0eb;
     --site-border-strong: #d0d0c8;
-    --site-accent: #3ecf8e;
-    --site-accent-hover: #34b77d;
+    --site-accent: #2E82F7;
+    --site-accent-hover: #2E82F7;
     --site-accent-subtle: rgba(62, 207, 142, 0.12);
-    --site-vermilion: #3ecf8e;
-    --site-vermilion-hover: #34b77d;
+    --site-vermilion: #2E82F7;
+    --site-vermilion-hover: #2E82F7;
     --site-vermilion-subtle: rgba(62, 207, 142, 0.12);
     --site-grid-line: rgba(11, 11, 12, 0.03);
   }

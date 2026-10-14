@@ -22,7 +22,7 @@ export function HeroSection() {
             transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
             className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#D8D8D2] bg-[#F5F5F0] text-[#57575e] font-mono text-xs uppercase tracking-widest font-medium"
           >
-            <span className="h-1.5 w-1.5 rounded-full bg-[#3ecf8e]" />
+            <span className="h-1.5 w-1.5 rounded-full bg-[#2E82F7]" />
             <span>The Digital OS for Nigerian Youth</span>
           </motion.div>
 
@@ -66,7 +66,7 @@ export function HeroSection() {
             {isAuthenticated ? (
               <Link
                 href="/home"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-[#0B0B0C] hover:bg-[#1a1a1e] text-white text-sm font-semibold rounded-lg transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3ecf8e]"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-[#0B0B0C] hover:bg-[#1a1a1e] text-white text-sm font-semibold rounded-lg transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2E82F7]"
               >
                 <span>Open Zed</span>
                 <ArrowUpRight className="h-4 w-4" />
@@ -75,7 +75,7 @@ export function HeroSection() {
               <>
                 <Link
                   href="/signup"
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-[#0B0B0C] hover:bg-[#1a1a1e] text-white text-sm font-semibold rounded-lg transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3ecf8e]"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-[#0B0B0C] hover:bg-[#1a1a1e] text-white text-sm font-semibold rounded-lg transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2E82F7]"
                 >
                   <span>Get started free</span>
                   <ArrowRight className="h-4 w-4" />
@@ -83,7 +83,7 @@ export function HeroSection() {
 
                 <a
                   href="#how-it-works"
-                  className="w-full sm:w-auto inline-flex items-center justify-center px-7 py-3.5 rounded-lg border border-[#D8D8D2] bg-white hover:bg-[#F5F5F0] text-[#0B0B0C] text-sm font-medium transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3ecf8e]"
+                  className="w-full sm:w-auto inline-flex items-center justify-center px-7 py-3.5 rounded-lg border border-[#D8D8D2] bg-white hover:bg-[#F5F5F0] text-[#0B0B0C] text-sm font-medium transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2E82F7]"
                 >
                   See how it works
                 </a>
@@ -112,7 +112,7 @@ export function HeroSection() {
             {/* URL Bar */}
             <div className="flex-1 flex items-center justify-center">
               <div className="flex items-center gap-1.5 bg-white border border-[#D8D8D2] rounded-md px-3 py-1 text-xs text-[#57575e] font-mono max-w-xs w-full justify-center">
-                <Lock className="h-3 w-3 text-[#3ecf8e] flex-shrink-0" />
+                <Lock className="h-3 w-3 text-[#2E82F7] flex-shrink-0" />
                 <span>app.zedproject.ng</span>
               </div>
             </div>

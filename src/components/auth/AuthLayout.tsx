@@ -84,7 +84,7 @@ export function AuthLayout({
             noise={0.2}
             shape="corners"
             frame={2854.5}
-            colors={["#0A0A0B", "#059669", "#3ECF8E", "#0A0A0B"]}
+            colors={["#0A0A0B", "#059669", "#2E82F7", "#0A0A0B"]}
             colorBack="#0A0A0B"
             className="absolute inset-0 bg-[#0a0a0b]"
           />

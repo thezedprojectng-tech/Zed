@@ -140,7 +140,7 @@ export function TabbedShowcase() {
                 key={tab.id}
                 type="button"
                 onClick={() => setActiveTabId(tab.id)}
-                className={`relative py-3.5 px-3 text-sm font-medium transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3ecf8e] rounded-sm whitespace-nowrap ${
+                className={`relative py-3.5 px-3 text-sm font-medium transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2E82F7] rounded-sm whitespace-nowrap ${
                   isActive
                     ? "text-[#0B0B0C] font-semibold"
                     : "text-[#57575e] hover:text-[#0B0B0C]"
@@ -150,7 +150,7 @@ export function TabbedShowcase() {
                 {isActive && (
                   <motion.div
                     layoutId="tab-underline"
-                    className="absolute inset-x-0 -bottom-[1px] h-[2px] bg-[#3ecf8e]"
+                    className="absolute inset-x-0 -bottom-[1px] h-[2px] bg-[#2E82F7]"
                     transition={{ type: "spring", stiffness: 380, damping: 30 }}
                   />
                 )}
@@ -173,7 +173,7 @@ export function TabbedShowcase() {
           {/* Left Column */}
           <div className="lg:col-span-5 space-y-6">
             <div>
-              <div className="font-mono text-xs uppercase tracking-widest text-[#3ecf8e] font-medium mb-2">
+              <div className="font-mono text-xs uppercase tracking-widest text-[#2E82F7] font-medium mb-2">
                 {activeTab.agency}
               </div>
               <h3 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-[#0B0B0C] leading-tight">
@@ -188,7 +188,7 @@ export function TabbedShowcase() {
             <ul className="space-y-3 pt-2">
               {activeTab.bullets.map((bullet, idx) => (
                 <li key={idx} className="flex items-start gap-3">
-                  <div className="mt-1 h-4 w-4 rounded-full bg-[#3ecf8e]/10 text-[#3ecf8e] flex items-center justify-center flex-shrink-0">
+                  <div className="mt-1 h-4 w-4 rounded-full bg-[#2E82F7]/10 text-[#2E82F7] flex items-center justify-center flex-shrink-0">
                     <Check className="h-2.5 w-2.5 stroke-[3]" />
                   </div>
                   <span className="text-sm text-[#0B0B0C] leading-snug">{bullet}</span>
@@ -199,7 +199,7 @@ export function TabbedShowcase() {
             <div className="pt-2">
               <Link
                 href="/signup"
-                className="inline-flex items-center gap-2 text-sm font-medium text-[#0B0B0C] hover:text-[#3ecf8e] transition-colors group"
+                className="inline-flex items-center gap-2 text-sm font-medium text-[#0B0B0C] hover:text-[#2E82F7] transition-colors group"
               >
                 <span>Follow the {activeTab.label} guide in Zed</span>
                 <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
@@ -219,7 +219,7 @@ export function TabbedShowcase() {
                     {activeTab.mockup.fee}
                   </p>
                 </div>
-                <span className="font-mono text-xs px-2.5 py-1 rounded-full bg-[#3ecf8e]/10 text-[#0e7048] font-medium">
+                <span className="font-mono text-xs px-2.5 py-1 rounded-full bg-[#2E82F7]/10 text-[#1a4fad] font-medium">
                   {activeTab.mockup.badge}
                 </span>
               </div>
@@ -236,7 +236,7 @@ export function TabbedShowcase() {
                       </div>
                       <div className="text-xs text-[#57575e] mt-0.5">{item.detail}</div>
                     </div>
-                    <span className="inline-flex items-center gap-1 text-[11px] font-mono font-semibold text-[#0e7048] self-start sm:self-auto">
+                    <span className="inline-flex items-center gap-1 text-[11px] font-mono font-semibold text-[#1a4fad] self-start sm:self-auto">
                       <Check className="h-3 w-3" />
                       {item.status}
                     </span>
@@ -246,7 +246,7 @@ export function TabbedShowcase() {
 
               <div className="pt-3 border-t border-[#E8E8E4] flex items-center justify-between text-xs font-mono text-[#57575e]">
                 <span className="flex items-center gap-1.5">
-                  <ShieldCheck className="h-3.5 w-3.5 text-[#3ecf8e]" />
+                  <ShieldCheck className="h-3.5 w-3.5 text-[#2E82F7]" />
                   {activeTab.mockup.footerNote}
                 </span>
                 <span className="hidden sm:inline">Offline ready</span>

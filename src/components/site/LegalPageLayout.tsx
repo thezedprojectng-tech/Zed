@@ -46,7 +46,7 @@ export function LegalPageLayout({
         aria-label="Statutory notice"
         className="mb-10 p-3.5 rounded-lg border border-[#E5E5E0] bg-white text-[#57575e] flex items-center gap-3 text-xs font-mono"
       >
-        <span className="h-2 w-2 rounded-full bg-[#3ecf8e] flex-shrink-0" />
+        <span className="h-2 w-2 rounded-full bg-[#2E82F7] flex-shrink-0" />
         <span>
           <strong>Notice:</strong> Draft – to be reviewed by a qualified Nigerian lawyer before launch. Outlines governance under NDPA 2023.
         </span>
@@ -54,7 +54,7 @@ export function LegalPageLayout({
 
       {/* Header Block */}
       <header className="border-b border-[#E5E5E0] pb-8 mb-12">
-        <div className="font-mono text-xs uppercase tracking-wider text-[#3ecf8e] font-semibold mb-2">
+        <div className="font-mono text-xs uppercase tracking-wider text-[#2E82F7] font-semibold mb-2">
           Regulatory &amp; Legal Framework
         </div>
         <h1 className="font-display text-3xl sm:text-5xl font-bold tracking-tight text-[#0B0B0C] mb-4">

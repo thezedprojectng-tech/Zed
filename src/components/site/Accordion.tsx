@@ -57,20 +57,20 @@ export function Accordion({
               aria-expanded={isOpen}
               aria-controls={panelId}
               onClick={() => toggleItem(idx)}
-              className="w-full py-5 sm:py-6 text-left flex items-center justify-between gap-4 transition-colors hover:text-[#3ecf8e] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3ecf8e] rounded-sm cursor-pointer"
+              className="w-full py-5 sm:py-6 text-left flex items-center justify-between gap-4 transition-colors hover:text-[#2E82F7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2E82F7] rounded-sm cursor-pointer"
             >
               <div className="flex items-center gap-4 sm:gap-6">
                 <span className="font-mono text-xs text-[#A0A09A] font-medium select-none">
                   0{idx + 1}
                 </span>
-                <span className="font-display text-base sm:text-lg font-semibold tracking-tight text-[#0B0B0C] group-hover:text-[#3ecf8e] transition-colors">
+                <span className="font-display text-base sm:text-lg font-semibold tracking-tight text-[#0B0B0C] group-hover:text-[#2E82F7] transition-colors">
                   {item.question}
                 </span>
               </div>
 
               <div
                 className={`flex-shrink-0 h-7 w-7 rounded-full border border-[#E8E8E4] flex items-center justify-center text-[#57575e] transition-all duration-200 ${
-                  isOpen ? "rotate-180 bg-[#3ecf8e]/10 text-[#0e7048] border-[#3ecf8e]/30" : "bg-transparent"
+                  isOpen ? "rotate-180 bg-[#2E82F7]/10 text-[#1a4fad] border-[#2E82F7]/30" : "bg-transparent"
                 }`}
                 aria-hidden="true"
               >
