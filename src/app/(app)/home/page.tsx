@@ -132,7 +132,7 @@ export default function HomePage() {
   const progressPercent = Math.round((completedCount / totalSteps) * 100);
 
   return (
-    <div className="mx-auto max-w-[1200px] px-4 md:px-8 py-8 md:py-10 space-y-10">
+    <div className="mx-auto max-w-8xl px-4 md:px-8 py-8 md:py-10 space-y-10">
 
       {/* ── 1. Header & Time-aware Greeting ───────────────────────────── */}
       <section className="space-y-2 border-hairline-b pb-8">

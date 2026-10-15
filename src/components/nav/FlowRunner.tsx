@@ -25,6 +25,8 @@ import { DocumentCheckStepRenderer } from "./steps/DocumentCheckStepRenderer";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useIsMounted } from "@/lib/hooks";
 import { CheckCircle2, RotateCcw } from "lucide-react";
 
 interface FlowRunnerProps {
@@ -32,6 +34,7 @@ interface FlowRunnerProps {
 }
 
 export function FlowRunner({ flow }: FlowRunnerProps) {
+  const isMounted = useIsMounted();
   const { setProgress, getProgress: storeGet, clearProgress } = useNavProgressStore();
 
   // Initialise or rehydrate progress from store
@@ -43,11 +46,11 @@ export function FlowRunner({ flow }: FlowRunnerProps) {
 
   // Persist initial state on first mount or reset if stale
   useEffect(() => {
-    if (!rawProgress || isStale) {
+    if (isMounted && (!rawProgress || isStale)) {
       setProgress(flow.id, initProgress(flow));
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [flow.id, isStale]);
+  }, [flow.id, isStale, isMounted]);
 
   const currentStep = getCurrentStep(flow, progress);
   const percent = getProgress(flow, progress);
@@ -121,6 +124,25 @@ export function FlowRunner({ flow }: FlowRunnerProps) {
     setProgress(flow.id, initProgress(flow));
   }
 
+  // ── Loading skeleton during SSR/hydration to prevent localStorage mismatch ──
+  if (!isMounted) {
+    return (
+      <div className="space-y-5 animate-pulse" aria-busy="true">
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Skeleton className="h-5 w-16" />
+              <Skeleton className="h-4 w-20" />
+            </div>
+            <Skeleton className="h-4 w-12" />
+          </div>
+          <Skeleton className="h-1 w-full rounded-full" />
+        </div>
+        <Skeleton className="h-64 w-full rounded-xl" />
+      </div>
+    );
+  }
+
   // ── Completion Screen ──────────────────────────────────────────────────────
 
   if (completed) {
@@ -160,7 +182,10 @@ export function FlowRunner({ flow }: FlowRunnerProps) {
             >
               {currentStep.type}
             </Badge>
-            <span className="font-mono text-[11px] text-muted-foreground">
+            <span
+              className="font-mono text-[11px] text-muted-foreground"
+              suppressHydrationWarning
+            >
               {progress.completed_steps.length}/{flow.steps.length} done
             </span>
           </div>

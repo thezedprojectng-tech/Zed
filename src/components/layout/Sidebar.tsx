@@ -19,6 +19,7 @@ import {
   LayoutDashboard,
   Users,
   FileText,
+  FileSearch,
   LayoutGrid,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -57,6 +58,8 @@ const sections: NavSection[] = [
     items: [
       { href: "/nav/passport", label: "Nigerian Passport", icon: BookOpen },
       { href: "/nav/nysc", label: "NYSC Mobilisation", icon: GraduationCap },
+      { href: "/nav/nysc/call-up", label: "Call-up Parser", icon: FileSearch },
+      { href: "/nav/nysc/cds", label: "CDS Logger", icon: FileText },
       { href: "/nav/nin-bvn", label: "NIN & BVN", icon: Fingerprint },
       { href: "/nav/cac", label: "CAC Registration", icon: Building2 },
     ],

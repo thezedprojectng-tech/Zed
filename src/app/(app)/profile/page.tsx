@@ -53,7 +53,7 @@ export default function ProfilePage() {
   return (
     <>
       <Header title="Your Profile" subtitle="Manage your account details and progression." />
-      <section className="container-mobile py-6 space-y-6 max-w-7xl mx-auto">
+      <section className="container-mobile px-3 py-6 space-y-6 max-w-7xl mx-auto">
         {/* Verification & Level Status Banner */}
         <div className="rounded-xl border border-hairline bg-card p-5 space-y-4">
           <div className="flex items-center justify-between">
