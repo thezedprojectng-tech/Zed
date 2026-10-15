@@ -406,7 +406,7 @@ export function CenterTracker() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2 w-full sm:w-auto">
+        <div className="flex items-center gap-2 w-full ">
           <Button
             variant="outline"
             size="sm"
@@ -461,7 +461,7 @@ export function CenterTracker() {
         </div>
 
         {/* Sort Selector */}
-        <div className="flex items-center justify-between md:justify-start gap-2 shrink-0 border-t md:border-t-0 md:border-l border-hairline pt-2.5 md:pt-0 md:pl-3">
+        <div className="flex items-center justify-between md:justify-start gap-2 shrink-0 border-t md:border-t-0 md:border-l border-hairline max-md:pb-2.5 max-md:pt-2.5 px-2 md:pt-0 md:pl-3">
           <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
             <ArrowUpDown className="h-3.5 w-3.5" />
             <span className="md:hidden font-mono text-[11px] uppercase">Sort:</span>
@@ -555,7 +555,7 @@ export function CenterTracker() {
                       </div>
 
                       {/* Wait Time Display */}
-                      <div className="py-2.5 border-y border-hairline">
+                      <div className="py-2.5 px-2.5 rounded border-y border-hairline">
                         <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
                           {center.avgWaitMinutes !== null ? (
                             <>

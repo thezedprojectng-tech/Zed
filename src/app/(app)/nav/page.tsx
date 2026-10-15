@@ -65,6 +65,9 @@ interface ComingNextItem {
   description: string;
   icon: React.ElementType;
   code: string;
+  /** If set, the item is live and links here */
+  href?: string;
+  live?: boolean;
 }
 
 const COMING_NEXT: ComingNextItem[] = [
@@ -78,9 +81,11 @@ const COMING_NEXT: ComingNextItem[] = [
   {
     label: "CDS Logger",
     description:
-      "Log Community Development Service attendance, generate printable monthly summary sheets, and stay ahead of the 2-CDS-per-week minimum requirement.",
+      "Log Community Development Service attendance and track your hours across sessions — your personal record, not an official NYSC document.",
     icon: FileText,
     code: "NYSC-06",
+    href: "/nav/nysc/cds",
+    live: true,
   },
   {
     label: "Call-up Letter Parser",
@@ -100,7 +105,7 @@ const COMING_NEXT: ComingNextItem[] = [
 
 export default function NavPage() {
   return (
-    <div className="mx-auto max-w-6xl px-4 py-6 md:px-8 space-y-10">
+    <div className="mx-auto max-w-8xl px-3 py-6 md:px-8 space-y-10">
       {/* Header */}
       <section className="space-y-1.5 border-hairline-b pb-6">
         <span className="font-mono text-xs uppercase tracking-wider text-muted-foreground">
@@ -177,25 +182,31 @@ export default function NavPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {COMING_NEXT.map((item) => {
             const Icon = item.icon;
-            return (
+            const inner = (
               <div
-                key={item.code}
-                className="rounded-xl border-hairline bg-card/40 p-5 space-y-3 opacity-70"
+                className={`rounded-xl border-hairline bg-card/40 p-5 space-y-3 ${
+                  item.live ? "opacity-100 hover:bg-card/70 hover:border-border transition-all group" : "opacity-70"
+                }`}
               >
                 <div className="flex items-center justify-between">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-md border-hairline bg-secondary/60 text-muted-foreground">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-md border-hairline bg-secondary/60 text-muted-foreground group-hover:text-primary transition-colors">
                     <Icon className="h-3.5 w-3.5" aria-hidden="true" />
                   </div>
                   <Badge
                     variant="outline"
-                    className="font-mono text-[10px] border-border text-muted-foreground px-1.5 py-0"
+                    className={`font-mono text-[10px] px-1.5 py-0 ${
+                      item.live
+                        ? "border-primary/30 bg-primary/10 text-primary"
+                        : "border-border text-muted-foreground"
+                    }`}
                   >
-                    Coming soon
+                    {item.live ? "Live" : "Coming soon"}
                   </Badge>
                 </div>
                 <div className="space-y-1">
-                  <h3 className="text-xs font-semibold text-foreground font-sans">
+                  <h3 className="text-xs font-semibold text-foreground font-sans flex items-center justify-between">
                     {item.label}
+                    {item.live && <ArrowRight className="h-3.5 w-3.5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />}
                   </h3>
                   <p className="type-small text-muted-foreground leading-relaxed">
                     {item.description}
@@ -205,6 +216,18 @@ export default function NavPage() {
                   REF: {item.code}
                 </div>
               </div>
+            );
+
+            return item.live && item.href ? (
+              <Link
+                key={item.code}
+                href={item.href}
+                className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-xl"
+              >
+                {inner}
+              </Link>
+            ) : (
+              <div key={item.code}>{inner}</div>
             );
           })}
         </div>

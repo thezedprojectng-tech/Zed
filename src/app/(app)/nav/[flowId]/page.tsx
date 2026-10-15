@@ -73,7 +73,7 @@ export default async function FlowPage({
         }
       />
 
-      <div className="mx-auto max-w-2xl px-4 py-6 md:px-8">
+      <div className="mx-auto max-w-8xl px-4 py-6">
         {/* Flow meta */}
         <div className="mb-6 flex items-center justify-between border-hairline-b pb-4">
           <p className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">

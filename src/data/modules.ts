@@ -16,6 +16,7 @@
 import type { LucideIcon } from "lucide-react";
 import {
   Compass,
+  FileText,
   Briefcase,
   ShoppingBag,
   MessageSquare,
@@ -69,6 +70,16 @@ export const MODULES: ZedModule[] = [
     phase: "Phase 1",
     href: "/nav",
     what: "Zed Nav provides end-to-end bureaucratic navigation across official Nigerian civil processes. Every step is vetted against active agency requirements, with statutory fee tables, document checklists, and offline support.",
+  },
+  {
+    slug: "cds-logger",
+    name: "CDS Logger",
+    tagline: "Personal CDS attendance tracker for NYSC corps members.",
+    icon: FileText,
+    status: "live",
+    phase: "Phase 1",
+    href: "/nav/nysc/cds",
+    what: "CDS Logger lets corps members record Community Development Service sessions, track hours, and export a personal attendance log. It is a personal record — not an official NYSC document.",
   },
 
   // -- Coming soon -----------------------------------------------------------

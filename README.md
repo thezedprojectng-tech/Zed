@@ -20,7 +20,8 @@ Live: https://zedng.vercel.app
 | Centre tracker | Built |
 | Admin console (users, reports, audit log, charts) | Built (extra) |
 | Marketing site, privacy, terms, cookies | Built (extra) |
-| PPA Hub, CDS Logger, call-up letter parser | Planned |
+| CDS Logger (personal attendance tracker) | Built |
+| PPA Hub, call-up letter parser | Planned |
 | Phone OTP sign-in | Planned |
 | Zed Skill, Market, Meet, Communities, Campus Hubs, Live Audio Rooms, Creator Lab, Zed SOS, $ZED rewards | Planned (Phases 2-3), shown as Coming soon |
 
@@ -64,6 +65,7 @@ SQL migrations are in `supabase/migrations/`. Run them in order in the Supabase 
 2. `0002_admin_role.sql`: role column, `is_admin()`, admin policies
 3. `0003_admin_audit_log.sql`: append-only audit log
 4. `0004_module_interest.sql`: module interest registry
+5. `0005_cds_logs.sql`: CDS logs table with RLS (user-scoped + admin select)
 
 Authentication is configured with email + password. The sign-up flow creates a `public.users` row from auth metadata through a security-definer trigger.
 
