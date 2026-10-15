@@ -16,6 +16,7 @@
 import type { LucideIcon } from "lucide-react";
 import {
   Compass,
+  FileText,
   Briefcase,
   ShoppingBag,
   MessageSquare,
@@ -71,17 +72,27 @@ export const MODULES: ZedModule[] = [
     href: "/nav",
     what: "Zed Nav provides end-to-end bureaucratic navigation across official Nigerian civil processes. Every step is vetted against active agency requirements, with statutory fee tables, document checklists, and offline support.",
   },
-  {
-    slug: "callup-parser",
-    name: "Call-up Letter Parser",
-    tagline:
-      "Client-side NYSC call-up letter extraction and reporting countdown.",
-    icon: FileSearch,
-    status: "live",
-    phase: "Phase 1",
-    href: "/nav/nysc/call-up",
-    what: "Extract your NYSC state code, deployed state, camp details, and reporting countdown directly in your browser. All parsing runs on-device with zero server uploads.",
-  },
+  // {
+  //   slug: "callup-parser",
+  //   name: "Call-up Letter Parser",
+  //   tagline:
+  //     "Client-side NYSC call-up letter extraction and reporting countdown.",
+  //   icon: FileSearch,
+  //   status: "live",
+  //   phase: "Phase 1",
+  //   href: "/nav/nysc/call-up",
+  //   what: "Extract your NYSC state code, deployed state, camp details, and reporting countdown directly in your browser. All parsing runs on-device with zero server uploads.",
+  // },
+  // {
+  //   slug: "cds-logger",
+  //   name: "CDS Logger",
+  //   tagline: "Personal CDS attendance tracker for NYSC corps members.",
+  //   icon: FileText,
+  //   status: "live",
+  //   phase: "Phase 1",
+  //   href: "/nav/nysc/cds",
+  //   what: "CDS Logger lets corps members record Community Development Service sessions, track hours, and export a personal attendance log. It is a personal record — not an official NYSC document.",
+  // },
 
   // -- Coming soon -----------------------------------------------------------
   {

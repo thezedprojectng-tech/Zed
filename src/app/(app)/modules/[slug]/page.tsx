@@ -34,7 +34,7 @@ export default async function ModulePlaceholderPage({ params }: Props) {
   const Icon = mod.icon;
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-10 md:px-8 space-y-8">
+    <div className="mx-auto max-w-8xl px-4 py-10 md:px-8 space-y-8">
       {/* Back link */}
       <Link
         href="/home"

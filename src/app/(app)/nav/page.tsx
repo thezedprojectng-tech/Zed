@@ -89,9 +89,11 @@ const COMING_NEXT: ComingNextItem[] = [
   {
     label: "CDS Logger",
     description:
-      "Log Community Development Service attendance, generate printable monthly summary sheets, and stay ahead of the 2-CDS-per-week minimum requirement.",
+      "Log Community Development Service attendance and track your hours across sessions — your personal record, not an official NYSC document.",
     icon: FileText,
     code: "NYSC-06",
+    href: "/nav/nysc/cds",
+    live: true,
   },
   {
     label: "Phone OTP Sign-in",
@@ -104,7 +106,7 @@ const COMING_NEXT: ComingNextItem[] = [
 
 export default function NavPage() {
   return (
-    <div className="mx-auto max-w-6xl px-4 py-6 md:px-8 space-y-10">
+    <div className="mx-auto max-w-8xl px-3 py-6 md:px-8 space-y-10">
       {/* Header */}
       <section className="space-y-1.5 border-hairline-b pb-6">
         <span className="font-mono text-xs uppercase tracking-wider text-muted-foreground">
@@ -181,7 +183,7 @@ export default function NavPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {COMING_NEXT.map((item) => {
             const Icon = item.icon;
-            const cardContent = (
+            const card = (
               <div
                 className={`rounded-xl border-hairline p-5 space-y-3 transition-colors ${
                   item.live
@@ -232,12 +234,12 @@ export default function NavPage() {
             if (item.href && item.live) {
               return (
                 <Link key={item.code} href={item.href} className="block">
-                  {cardContent}
+                  {card}
                 </Link>
               );
             }
 
-            return <div key={item.code}>{cardContent}</div>;
+            return <div key={item.code}>{card}</div>;
           })}
         </div>
       </section>
