@@ -28,6 +28,7 @@ import {
   LifeBuoy,
   Search,
   BarChart2,
+  FileSearch,
 } from "lucide-react";
 
 export type ModuleStatus = "live" | "soon";
@@ -69,6 +70,17 @@ export const MODULES: ZedModule[] = [
     phase: "Phase 1",
     href: "/nav",
     what: "Zed Nav provides end-to-end bureaucratic navigation across official Nigerian civil processes. Every step is vetted against active agency requirements, with statutory fee tables, document checklists, and offline support.",
+  },
+  {
+    slug: "callup-parser",
+    name: "Call-up Letter Parser",
+    tagline:
+      "Client-side NYSC call-up letter extraction and reporting countdown.",
+    icon: FileSearch,
+    status: "live",
+    phase: "Phase 1",
+    href: "/nav/nysc/call-up",
+    what: "Extract your NYSC state code, deployed state, camp details, and reporting countdown directly in your browser. All parsing runs on-device with zero server uploads.",
   },
 
   // -- Coming soon -----------------------------------------------------------

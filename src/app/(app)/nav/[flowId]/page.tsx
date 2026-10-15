@@ -9,7 +9,7 @@ import { Header } from "@/components/layout/Header";
 import { FlowRunner } from "@/components/nav/FlowRunner";
 import { navFlowSchema } from "@/lib/nav/schema";
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, ArrowRight, FileSearch } from "lucide-react";
 
 // ── Flow registry ─────────────────────────────────────────────────────────────
 
@@ -93,6 +93,32 @@ export default async function FlowPage({
             Official Source ↗
           </a>
         </div>
+
+        {/* Call-up parser link for NYSC */}
+        {flowId === "nysc" && (
+          <aside className="mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 rounded-xl border border-primary/20 bg-primary/5 p-4">
+            <div className="flex items-center gap-3">
+              <div className="rounded-lg bg-primary/10 p-2 text-primary shrink-0">
+                <FileSearch className="h-5 w-5" />
+              </div>
+              <div className="space-y-0.5">
+                <p className="text-sm font-semibold text-foreground">
+                  Have your NYSC Call-up Letter?
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Extract your state code, camp location, and countdown timer on your device.
+                </p>
+              </div>
+            </div>
+            <Link
+              href="/nav/nysc/call-up"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors shrink-0"
+            >
+              Parse Call-up Letter
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </aside>
+        )}
 
         {/* Flow runner (client component) */}
         <FlowRunner flow={flow} />

@@ -20,7 +20,8 @@ Live: https://zedng.vercel.app
 | Centre tracker | Built |
 | Admin console (users, reports, audit log, charts) | Built (extra) |
 | Marketing site, privacy, terms, cookies | Built (extra) |
-| PPA Hub, CDS Logger, call-up letter parser | Planned |
+| NYSC Call-up Letter Parser (client-side) | Built |
+| PPA Hub, CDS Logger | Planned |
 | Phone OTP sign-in | Planned |
 | Zed Skill, Market, Meet, Communities, Campus Hubs, Live Audio Rooms, Creator Lab, Zed SOS, $ZED rewards | Planned (Phases 2-3), shown as Coming soon |
 

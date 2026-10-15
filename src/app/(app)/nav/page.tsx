@@ -65,9 +65,20 @@ interface ComingNextItem {
   description: string;
   icon: React.ElementType;
   code: string;
+  href?: string;
+  live?: boolean;
 }
 
 const COMING_NEXT: ComingNextItem[] = [
+  {
+    label: "Call-up Letter Parser",
+    description:
+      "Paste your NYSC call-up letter text to extract your state code, camp details, and reporting countdown entirely on your device with a pre-camp checklist.",
+    icon: FileSearch,
+    code: "NYSC-07",
+    href: "/nav/nysc/call-up",
+    live: true,
+  },
   {
     label: "PPA Hub",
     description:
@@ -81,13 +92,6 @@ const COMING_NEXT: ComingNextItem[] = [
       "Log Community Development Service attendance, generate printable monthly summary sheets, and stay ahead of the 2-CDS-per-week minimum requirement.",
     icon: FileText,
     code: "NYSC-06",
-  },
-  {
-    label: "Call-up Letter Parser",
-    description:
-      "Upload your NYSC call-up letter PDF and extract your state code, camp date, and reporting instructions automatically — no manual transcription errors.",
-    icon: FileSearch,
-    code: "NYSC-07",
   },
   {
     label: "Phone OTP Sign-in",
@@ -177,25 +181,43 @@ export default function NavPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {COMING_NEXT.map((item) => {
             const Icon = item.icon;
-            return (
+            const cardContent = (
               <div
-                key={item.code}
-                className="rounded-xl border-hairline bg-card/40 p-5 space-y-3 opacity-70"
+                className={`rounded-xl border-hairline p-5 space-y-3 transition-colors ${
+                  item.live
+                    ? "border-primary/30 bg-card hover:border-primary/60 cursor-pointer"
+                    : "bg-card/40 opacity-70"
+                }`}
               >
                 <div className="flex items-center justify-between">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-md border-hairline bg-secondary/60 text-muted-foreground">
+                  <div
+                    className={`flex h-8 w-8 items-center justify-center rounded-md border-hairline ${
+                      item.live
+                        ? "bg-primary/10 text-primary border-primary/20"
+                        : "bg-secondary/60 text-muted-foreground"
+                    }`}
+                  >
                     <Icon className="h-3.5 w-3.5" aria-hidden="true" />
                   </div>
                   <Badge
                     variant="outline"
-                    className="font-mono text-[10px] border-border text-muted-foreground px-1.5 py-0"
+                    className={`font-mono text-[10px] px-1.5 py-0 ${
+                      item.live
+                        ? "border-primary/40 text-primary bg-primary/5"
+                        : "border-border text-muted-foreground"
+                    }`}
                   >
-                    Coming soon
+                    {item.live ? "Live" : "Coming soon"}
                   </Badge>
                 </div>
                 <div className="space-y-1">
-                  <h3 className="text-xs font-semibold text-foreground font-sans">
+                  <h3 className="text-xs font-semibold text-foreground font-sans flex items-center justify-between">
                     {item.label}
+                    {item.live && (
+                      <span className="text-[11px] text-primary font-normal">
+                        Open tool →
+                      </span>
+                    )}
                   </h3>
                   <p className="type-small text-muted-foreground leading-relaxed">
                     {item.description}
@@ -206,6 +228,16 @@ export default function NavPage() {
                 </div>
               </div>
             );
+
+            if (item.href && item.live) {
+              return (
+                <Link key={item.code} href={item.href} className="block">
+                  {cardContent}
+                </Link>
+              );
+            }
+
+            return <div key={item.code}>{cardContent}</div>;
           })}
         </div>
       </section>
