@@ -53,8 +53,8 @@ export default function CookiesPolicyPage() {
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
           <p>
-            The Zed platform is engineered as a mobile-first PWA with an ultra-light bundle footprint (&lt; 1.8MB). 
-            To accommodate weak 3G and 4G networks (MTN, Airtel, Glo, 9mobile), Zed uses aggressive local caching:
+            The Zed platform is engineered as a mobile-first PWA built lightweight for weak networks. 
+            To accommodate patchy 3G and 4G networks (MTN, Airtel, Glo, 9mobile), Zed uses aggressive local caching:
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
             <div className="p-4 rounded-xl border border-[#E5E5E0] dark:border-white/10 bg-[#FAFAF8] dark:bg-[#141416] space-y-2">
@@ -243,7 +243,7 @@ export default function CookiesPolicyPage() {
           </p>
           <div className="p-4 rounded-lg border border-[#E5E5E0] dark:border-white/10 bg-[#FAFAF8] dark:bg-[#141416] text-xs font-mono space-y-1 text-[#fafaf8] ">
             <strong>Privacy &amp; Technical Governance</strong><br />
-            Zed Technologies Nigeria<br />
+            Zed Project<br />
             Email: <a href="mailto:privacy@zedproject.ng" className="text-[#2E82F7] underline">privacy@zedproject.ng</a>
           </div>
         </div>

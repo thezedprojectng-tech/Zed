@@ -86,8 +86,9 @@ export default function SignupPage() {
       } else {
         router.push("/login?registered=true");
       }
-    } catch (err: any) {
-      toast.error(err.message || "Failed to create account. Please try again.");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Failed to create account. Please try again.";
+      toast.error(message);
     } finally {
       setIsLoading(false);
     }
@@ -238,7 +239,7 @@ export default function SignupPage() {
               role="checkbox"
               aria-checked={!!termsAccepted}
               onClick={() =>
-                setValue("terms", !termsAccepted as any, { shouldValidate: true })
+                setValue("terms", !termsAccepted, { shouldValidate: true })
               }
               className={`relative mt-0.5 h-4 w-4 rounded border transition-colors flex items-center justify-center shrink-0 ${
                 termsAccepted

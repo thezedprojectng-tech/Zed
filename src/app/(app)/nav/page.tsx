@@ -92,7 +92,7 @@ const COMING_NEXT: ComingNextItem[] = [
   {
     label: "Phone OTP Sign-in",
     description:
-      "Sign in to Zed with your Nigerian phone number via one-time password, with no email required. Full NDPA-compliant OTP pipeline.",
+      "Sign in to Zed with your Nigerian phone number via one-time password, with no email required. Designed with data protection in mind.",
     icon: Smartphone,
     code: "AUTH-02",
   },

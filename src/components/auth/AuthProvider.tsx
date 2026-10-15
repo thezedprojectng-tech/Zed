@@ -7,6 +7,7 @@
 //  3. Automatically hydrate nav progress on user login.
 
 import { useEffect, useRef } from "react";
+import type { User } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
 import { useAuthStore, type UserProfile } from "@/store/useAuthStore";
 import { useNavProgressStore } from "@/store/useNavProgressStore";
@@ -41,7 +42,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     }
 
-    async function handleUserAuthenticated(user: any) {
+    async function handleUserAuthenticated(user: User) {
       setUser(user);
       const profile = await loadUserProfile(user.id);
       setProfile(profile);

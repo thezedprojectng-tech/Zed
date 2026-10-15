@@ -1,15 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useAuthStore } from "@/store/useAuthStore";
+import { useIsMounted } from "@/lib/hooks";
 
 export function useSiteAuth() {
-  const [mounted, setMounted] = useState(false);
+  const mounted = useIsMounted();
   const user = useAuthStore((s) => s.user);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   return {
     isAuthenticated: mounted && !!user,

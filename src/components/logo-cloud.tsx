@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import { AnimatedGroup } from "@/components/animated-group";
 
-interface LogoCloudProps extends React.HTMLAttributes<HTMLDivElement> {}
+type LogoCloudProps = React.HTMLAttributes<HTMLDivElement>;
 
 export default function LogoCloud({ className, ...props }: LogoCloudProps) {
   const logos = [

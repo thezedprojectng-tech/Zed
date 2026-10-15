@@ -377,7 +377,7 @@ export function CenterTracker() {
       );
       setIsDialogOpen(false);
       reset({ center_id: "", wait_minutes: 60 });
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Failed to insert center report:", err);
       toast.error("Unable to submit wait time report. Please check your connection and try again.");
     } finally {
@@ -468,7 +468,7 @@ export function CenterTracker() {
           </div>
           <select
             value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as any)}
+            onChange={(e) => setSortBy(e.target.value as "quietest" | "busiest" | "reports" | "name")}
             className="bg-transparent text-xs font-medium text-foreground outline-none cursor-pointer py-1 text-right md:text-left"
           >
             <option value="quietest" className="bg-popover text-popover-foreground">

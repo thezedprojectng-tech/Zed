@@ -56,8 +56,9 @@ function LoginForm() {
       // Hard navigate so middleware re-evaluates the fresh session cookie
       router.push("/home");
       router.refresh();
-    } catch (err: any) {
-      toast.error(err.message || "Sign in failed. Please try again.");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Sign in failed. Please try again.";
+      toast.error(message);
     } finally {
       setIsLoading(false);
     }

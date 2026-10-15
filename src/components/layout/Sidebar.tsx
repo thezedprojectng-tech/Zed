@@ -101,7 +101,7 @@ export function Sidebar() {
       )}
     >
       {/* Brand Header */}
-      <div className="flex h-14 items-center justify-between border-hairline-b px-4">
+      <div className="flex h-14 items-center justify-between border-hairline-b px-3">
         {!collapsed ? (
           <Link href="/home" className="flex items-center gap-2" aria-label="Zed Dashboard">
             <Image
@@ -118,7 +118,7 @@ export function Sidebar() {
               width={120}
               height={60}
               priority
-              className="h-7 w-auto object-contain dark:block "
+              className="h-7 w-auto object-contain hidden dark:block "
             />
             <span className="rounded bg-primary/10 border border-primary/20 px-1.5 py-0.5 font-mono text-[10px] font-medium text-primary">
               v1.0
@@ -127,7 +127,7 @@ export function Sidebar() {
         ) : (
           <Link href="/home" className="flex items-center justify-center mx-auto" aria-label="Zed Dashboard">
             <Image
-              src="/icons/zed-logo-mark-light.png"
+              src="/icons/zed-logo-mark-dark.png"
               alt="Zed"
               width={28}
               height={35}
@@ -135,7 +135,7 @@ export function Sidebar() {
               className="h-7 w-auto object-contain dark:hidden"
             />
             <Image
-              src="/icons/zed-logo-mark-dark.png"
+              src="/icons/zed-logo-mark-light.png"
               alt="Zed"
               width={28}
               height={35}
@@ -163,7 +163,7 @@ export function Sidebar() {
       </div>
 
       {/* Nav Section Lists */}
-      <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-6">
+      <nav className="flex-1 overflow-y-auto py-4 space-y-6">
         {sections
           .filter((s) => !s.adminOnly || isAdmin)
           .map((section) => (

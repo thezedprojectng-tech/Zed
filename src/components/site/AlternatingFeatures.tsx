@@ -9,9 +9,7 @@ import {
   WifiOff,
   GitBranch,
   FileCheck2,
-  AlertCircle,
   RefreshCw,
-  Clock,
   ArrowRight,
 } from "lucide-react";
 import Link from "next/link";
@@ -109,7 +107,7 @@ export function AlternatingFeatures() {
                         ? "3 required documents • Estimated time: 2 weeks"
                         : "6 required documents • Estimated time: 4-6 weeks"}
                     </span>
-                    <span className="text-[#2E82F7] font-semibold">₦35,000 NIS Fee</span>
+                    <span className="text-[#2E82F7] font-semibold">Check official NIS fee</span>
                   </div>
 
                   <div className="space-y-2.5">
@@ -394,17 +392,17 @@ export function AlternatingFeatures() {
                           isOffline ? "bg-amber-500" : "bg-[#2E82F7] animate-pulse"
                         }`}
                       />
-                      {isOffline ? "Offline Mode (Service Worker Active)" : "Online (Lagos Edge Connected)"}
+                      {isOffline ? "Offline Mode (Service Worker Active)" : "Online Mode (Illustration)"}
                     </span>
                     <span className="font-mono text-xs text-[#57575e]">
-                      {isOffline ? "0 kbps • 0 bytes network used" : "14ms latency • Sync active"}
+                      {isOffline ? "Offline ready" : "Connected"}
                     </span>
                   </div>
 
                   <p className="text-xs text-[#57575e] leading-relaxed">
                     {isOffline
                       ? "All procedural milestones, document checklists, and statutory fee calculations remain completely readable and responsive from your device's IndexedDB storage."
-                      : "Direct connection established with live Nigerian statutory fee databases. Verified updates downloaded in background."}
+                      : "Verified checklist updates and guidelines synced locally to your device in the background."}
                   </p>
                 </div>
 

@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
@@ -33,12 +32,12 @@ import {
   User,
   ShieldCheck,
   LogOut,
-  Sparkles,
   LayoutDashboard,
 } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { signOut } from "@/lib/auth/actions";
 import { getLevelName } from "@/types";
+import { useIsMounted, useIsOnline } from "@/lib/hooks";
 
 interface TopBarProps {
   onOpenCommand: () => void;
@@ -66,30 +65,14 @@ export function TopBar({ onOpenCommand }: TopBarProps) {
   const router = useRouter();
   const { theme, setTheme, resolvedTheme } = useTheme();
   const { user, profile, clearUser } = useAuthStore();
-  const [isOnline, setIsOnline] = useState(true);
-  const [mounted, setMounted] = useState(false);
+  const isOnline = useIsOnline();
+  const mounted = useIsMounted();
 
   const handleSignOut = async () => {
     clearUser();
     await signOut();
     router.push("/login");
   };
-
-  useEffect(() => {
-    setMounted(true);
-    setIsOnline(navigator.onLine);
-
-    const handleOnline = () => setIsOnline(true);
-    const handleOffline = () => setIsOnline(false);
-
-    window.addEventListener("online", handleOnline);
-    window.addEventListener("offline", handleOffline);
-
-    return () => {
-      window.removeEventListener("online", handleOnline);
-      window.removeEventListener("offline", handleOffline);
-    };
-  }, []);
 
   const currentTheme = resolvedTheme || theme || "dark";
 

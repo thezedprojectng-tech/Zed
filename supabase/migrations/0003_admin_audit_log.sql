@@ -1,5 +1,5 @@
 -- ─────────────────────────────────────────────────────────────────────────────
--- 0002_admin_audit_log.sql
+-- 0003_admin_audit_log.sql
 -- Zed Project: Admin Audit Logging Schema & Strict RLS Policies
 -- ─────────────────────────────────────────────────────────────────────────────
 
@@ -27,10 +27,7 @@ CREATE POLICY "admin_audit_log: admin select"
   ON public.admin_audit_log
   FOR SELECT
   USING (
-    EXISTS (
-      SELECT 1 FROM public.users
-      WHERE public.users.id = auth.uid() AND public.users.role = 'admin'
-    )
+    public.is_admin()
   );
 
 -- 5. Insert policy for authenticated admins and service role

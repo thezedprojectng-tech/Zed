@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogClose,
@@ -19,9 +18,7 @@ import {
   Trash2,
   Filter,
   MapPin,
-  Clock,
   Loader2,
-  Calendar,
   AlertTriangle,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -72,10 +69,10 @@ export function ReportsTableClient({
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [bulkDialogOpen, setBulkDialogOpen] = useState(false);
   const [isBulkPending, startBulkTransition] = useTransition();
+  const [now] = useState(() => Date.now());
 
   // Filter logic
   const filteredReports = useMemo(() => {
-    const now = Date.now();
     return reports.filter((r) => {
       if (filterState !== "all" && r.state !== filterState) return false;
       if (filterCentre !== "all" && r.center_name !== filterCentre) return false;
@@ -89,7 +86,7 @@ export function ReportsTableClient({
 
       return true;
     });
-  }, [reports, filterState, filterCentre, filterDate]);
+  }, [reports, filterState, filterCentre, filterDate, now]);
 
   // Bulk selection handlers
   const handleSelectAll = (checked: boolean) => {

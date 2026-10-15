@@ -51,7 +51,7 @@ export default function TermsPage() {
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
           <p>
             These Terms of Service (&quot;Terms&quot;) constitute a legally binding agreement between you 
-            (&quot;User&quot;, &quot;you&quot;, or &quot;your&quot;) and Zed Technologies Nigeria 
+            (&quot;User&quot;, &quot;you&quot;, or &quot;your&quot;) and the Zed Project 
             (&quot;Zed&quot;, &quot;we&quot;, &quot;us&quot;, or &quot;our&quot;), governing your access to and use of the Zed marketing website, 
             Progressive Web Application (PWA), and associated modular digital services (collectively, the &quot;Platform&quot;).
           </p>
@@ -196,7 +196,7 @@ export default function TermsPage() {
             The $ZED Token is an off-chain engagement loyalty point mechanism designed to encourage active civic learning and community contribution:
           </p>
           <ul className="list-disc pl-5 space-y-2">
-            <li><strong>Non-Securities Status:</strong> $ZED Tokens are not fiat currency, legal tender, investment contracts, shares, or digital asset securities under Nigerian law. They carry no voting rights or equity in Zed Technologies.</li>
+            <li><strong>Non-Securities Status:</strong> $ZED Tokens are not fiat currency, legal tender, investment contracts, shares, or digital asset securities under Nigerian law. They carry no voting rights or equity in the Zed project.</li>
             <li><strong>Zero-Fintech Architecture:</strong> Rewards are calculated off-chain. Conversions to Naira cashouts are funded via monthly platform revenue pools (ad revenue, recruitment fees, merchant voucher commissions) using the Dynamic Treasury Formula: <em>Conversion Rate = Monthly Cash Pool (NGN) / Total $ZED Submitted</em>.</li>
             <li><strong>Data Bundle Redemption:</strong> Tokens may alternatively be redeemed for discounted MTN, Airtel, Glo, and 9mobile data top-ups via third-party telecom APIs.</li>
             <li><strong>No Guaranteed Yield:</strong> Zed makes no warranty regarding the ongoing cash conversion rate of $ZED points. Fraudulent claims, script automation, or multiplier manipulation result in immediate token balance forfeiture.</li>
@@ -245,7 +245,7 @@ export default function TermsPage() {
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
           <p>
             All software code, user interface designs, logos, and proprietary workflow state machines are the exclusive intellectual 
-            property of Zed Technologies Nigeria. Creator Asset Lab resources (drum kits, overlays, Canva templates) are licensed 
+            property of the Zed Project. Creator Asset Lab resources (drum kits, overlays, Canva templates) are licensed 
             for personal and commercial creative projects under the terms specified in each asset download.
           </p>
         </div>
@@ -308,8 +308,8 @@ export default function TermsPage() {
           </p>
           <div className="p-4 rounded-lg border border-[#E5E5E0] dark:border-white/10 bg-[#FAFAF8] dark:bg-[#141416] text-xs font-mono space-y-1 text-[#FAFAF8] ">
             <strong>Legal Inquiries &amp; Compliance Desk</strong><br />
-            Zed Technologies Nigeria<br />
-            Yaba Technology Corridor, Lagos State, Nigeria.<br />
+            Zed Project<br />
+            Lagos, Nigeria.<br />
             Email: <a href="mailto:legal@zedproject.ng" className="text-[#2E82F7] underline">legal@zedproject.ng</a>
           </div>
         </div>

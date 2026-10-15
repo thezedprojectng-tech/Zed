@@ -1,7 +1,15 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import type { NavProgress } from "@/types/nav";
 import { createClient } from "@/lib/supabase/client";
+
+/** Shape of a nav_progress row returned from Supabase */
+interface NavProgressRow {
+  flow_id: string;
+  state: NavProgress;
+  updated_at: string | null;
+}
 
 /**
  * Persisted nav progress store – offline first with automatic Supabase sync.
@@ -15,7 +23,7 @@ interface NavProgressState {
   clearProgress: (flowId: string) => void;
   clearAll: () => void;
   /** Sync local progress with remote database on login (latest updatedAt wins) */
-  syncWithRemote: (userId: string, customClient?: any) => Promise<void>;
+  syncWithRemote: (userId: string, customClient?: SupabaseClient) => Promise<void>;
 }
 
 export const useNavProgressStore = create<NavProgressState>()(
@@ -73,7 +81,7 @@ export const useNavProgressStore = create<NavProgressState>()(
 
       clearAll: () => set({ progressMap: {} }),
 
-      syncWithRemote: async (userId: string, customClient?: any) => {
+      syncWithRemote: async (userId: string, customClient?: SupabaseClient) => {
         if (!userId) return;
 
         try {
@@ -124,7 +132,7 @@ export const useNavProgressStore = create<NavProgressState>()(
           }
 
           // If local has flows that remote doesn't have yet, push them to remote
-          const remoteFlowIds = new Set((remoteRows || []).map((r: any) => r.flow_id));
+          const remoteFlowIds = new Set((remoteRows || []).map((r: NavProgressRow) => r.flow_id));
           for (const [flowId, progress] of Object.entries(localMap)) {
             if (!remoteFlowIds.has(flowId)) {
               await supabase.from("nav_progress").upsert(

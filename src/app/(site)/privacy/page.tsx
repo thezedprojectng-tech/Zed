@@ -342,9 +342,9 @@ export default function PrivacyPolicyPage() {
             If you have questions, subject access requests, or believe your rights have not been respected, contact our Data Protection Officer:
           </p>
           <div className="p-4 rounded-lg border border-[#E5E5E0] dark:border-white/10 bg-[#FAFAF8] dark:bg-[#141416] text-xs font-mono space-y-1 text-[#fafaf8] ">
-            <strong>Data Protection Officer</strong><br />
-            Zed Technologies Nigeria<br />
-            Yaba Technology Corridor, Lagos State, Nigeria.<br />
+            <strong>Data Protection &amp; Privacy Desk</strong><br />
+            Zed Project<br />
+            Lagos, Nigeria.<br />
             Email: <a href="mailto:privacy@zedproject.ng" className="text-[#2E82F7] underline">privacy@zedproject.ng</a>
           </div>
           <p className="pt-2">

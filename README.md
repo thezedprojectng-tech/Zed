@@ -63,6 +63,7 @@ SQL migrations are in `supabase/migrations/`. Run them in order in the Supabase 
 1. `0001_init.sql`: users, trigger, RLS, nav progress, centre reports
 2. `0002_admin_role.sql`: role column, `is_admin()`, admin policies
 3. `0003_admin_audit_log.sql`: append-only audit log
+4. `0004_module_interest.sql`: module interest registry
 
 Authentication is configured with email + password. The sign-up flow creates a `public.users` row from auth metadata through a security-definer trigger.
 

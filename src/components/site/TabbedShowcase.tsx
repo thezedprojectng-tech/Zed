@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, ShieldCheck, ArrowRight, FileCheck, Landmark, UserCheck, Briefcase } from "lucide-react";
+import { Check, ShieldCheck, ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 interface FlowTab {
@@ -28,23 +28,23 @@ const TABS: FlowTab[] = [
     agency: "Nigeria Immigration Service",
     headline: "Standard & express e-passport renewal",
     caption:
-      "Avoid unofficial touts charging ₦80,000+ for a standard 32-page booklet. Zed calculates your official NIS statutory fees, verifies your photograph dimensions, and guides you through the capture appointment without surprises.",
+      "Avoid unofficial touts charging inflated markups for a standard booklet. Zed helps you check the official NIS fee, verifies your photograph dimensions, and guides you through the capture appointment without surprises.",
     bullets: [
-      "Exact NIS statutory fees verified monthly (₦35,000 for 32-page / 5-yr)",
+      "Check the official NIS fee on the immigration portal before payment",
       "Photo specification auditor prevents capture center desk rejection",
       "Queue mitigation timetable for high-volume passport offices in Ikoyi, Alausa & Abuja",
     ],
     mockup: {
       title: "e-Passport Renewal • 32 Pages (5 Years)",
       badge: "NIS Portal Direct",
-      fee: "₦35,000 Statutory Fee",
+      fee: "Check the official NIS fee",
       items: [
         { label: "Application Type", status: "Verified", detail: "Standard Adult Renewal (Existing Booklet)" },
         { label: "Document Pre-Flight", status: "Complete", detail: "4 of 4 required certificates verified locally" },
         { label: "Photo Check", status: "Passed", detail: "35×45mm • White background • 142KB" },
         { label: "Next Action", status: "Appointment", detail: "Book biometric capture date at preferred center" },
       ],
-      footerNote: "Verified against Official Gazette & NIS Circular 2024",
+      footerNote: "Aligned with official NIS published guidance",
     },
   },
   {
@@ -86,7 +86,7 @@ const TABS: FlowTab[] = [
     ],
     mockup: {
       title: "NIMC & BVN Record Alignment",
-      badge: "NDPA 2023 Compliant",
+      badge: "Data Protection Minded",
       fee: "₦15,000 NIMC Remita Fee (DOB Correction)",
       items: [
         { label: "Record Discrepancy", status: "Identified", detail: "Surname order inverted on legacy BVN registry" },
@@ -94,7 +94,7 @@ const TABS: FlowTab[] = [
         { label: "Enrolment Center", status: "Selected", detail: "NIMC State Headquarters biometric modification slot" },
         { label: "Bank Broadcast", status: "Pending", detail: "Present NIMC modification slip to bank compliance desk" },
       ],
-      footerNote: "Transmitted over HTTPS and hashed with a secret salt. Raw NIN is never stored.",
+      footerNote: "Designed with data protection in mind; NIN is hashed, never stored raw.",
     },
   },
   {

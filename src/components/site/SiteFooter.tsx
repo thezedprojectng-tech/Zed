@@ -7,9 +7,9 @@ import { openCookieSettings } from "./CookieBanner";
 import { useSiteAuth } from "./useSiteAuth";
 
 const PRODUCT_LINKS = [
-  { href: "/#how-it-works", label: "Zed Nav" },
+  { href: "/#zed-nav", label: "Zed Nav" },
   { href: "/#ecosystem", label: "Ecosystem" },
-  { href: "/#features", label: "Architecture" },
+  { href: "/#architecture", label: "Architecture" },
   { href: "/#token-engine", label: "$ZED Mining" },
   { href: "/#faq", label: "FAQ" },
 ];
@@ -198,7 +198,7 @@ export function SiteFooter() {
               &copy; {new Date().getFullYear()} Zed. All rights reserved.
             </p>
             <p className="font-mono text-xs text-[#3d3d46] max-w-md leading-relaxed">
-              Independent civic guide. Not affiliated with, endorsed by, or operated by any government agency.
+              Zed is an independent platform and is not affiliated with or endorsed by any government agency.
             </p>
           </div>
 

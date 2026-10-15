@@ -1,17 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
 import {
-  Search,
   Sun,
   Moon,
   ArrowLeft,
-  ShieldCheck,
   Menu,
-  X,
   LayoutDashboard,
   Users,
   FileText,
@@ -21,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { useIsMounted } from "@/lib/hooks";
 
 interface AdminTopBarProps {
   adminUser: {
@@ -41,12 +39,8 @@ const navItems = [
 export function AdminTopBar({ adminUser }: AdminTopBarProps) {
   const pathname = usePathname();
   const { theme, setTheme, resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
+  const mounted = useIsMounted();
   const [mobileOpen, setMobileOpen] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const currentTheme = resolvedTheme || theme || "dark";
 

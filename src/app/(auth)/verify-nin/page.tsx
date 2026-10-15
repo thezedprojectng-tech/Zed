@@ -13,7 +13,6 @@ import {
   ShieldCheck,
   Lock,
   ChevronRight,
-  AlertTriangle,
   FlaskConical,
 } from "lucide-react";
 
@@ -76,10 +75,12 @@ export default function VerifyNinPage() {
       toast.success(result.message || "National Identity verified successfully!");
       router.push("/home");
       router.refresh();
-    } catch (err: any) {
-      toast.error(
-        err.message || "Failed to verify NIN. Please check the digits and try again."
-      );
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Failed to verify NIN. Please check the digits and try again.";
+      toast.error(message);
     } finally {
       setIsLoading(false);
     }

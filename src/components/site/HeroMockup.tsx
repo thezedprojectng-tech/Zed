@@ -32,16 +32,13 @@ const CHECKLIST_ITEMS = [
 ];
 
 export function HeroMockup() {
-  const [tickedCount, setTickedCount] = useState(1);
   const shouldReduceMotion = useReducedMotion();
+  const [tickedCount, setTickedCount] = useState(() => (shouldReduceMotion ? 2 : 1));
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
 
   // Progressive micro-interaction: checklist ticks sequentially
   useEffect(() => {
-    if (shouldReduceMotion) {
-      setTickedCount(2);
-      return;
-    }
+    if (shouldReduceMotion) return;
 
     const interval = setInterval(() => {
       setTickedCount((prev) => (prev >= 4 ? 1 : prev + 1));
@@ -99,7 +96,7 @@ export function HeroMockup() {
                 </span>
               </div>
               <p className="font-mono text-xs text-[#57575e]">
-                Nigeria Immigration Service • Statutory fee: ₦35,000
+                Nigeria Immigration Service • Check the official NIS fee
               </p>
             </div>
           </div>
@@ -107,7 +104,7 @@ export function HeroMockup() {
           <div className="flex items-center gap-2">
             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-mono font-medium bg-[#2E82F7]/10 text-[#1a4fad]">
               <span className="h-1.5 w-1.5 rounded-full bg-[#2E82F7] animate-pulse" />
-              Verified Process
+              Illustration
             </span>
           </div>
         </div>
@@ -228,7 +225,7 @@ export function HeroMockup() {
         <div className="mt-4 pt-3 border-t border-[#E5E5E0] flex items-center justify-between text-xs font-mono text-[#57575e]">
           <span className="flex items-center gap-1.5">
             <ShieldCheck className="h-3.5 w-3.5 text-[#2E82F7]" />
-            Audited against NIS Official Circular
+            Aligned with official NIS requirements
           </span>
           <span className="hidden sm:inline">Offline ready • 0 bytes network used</span>
         </div>

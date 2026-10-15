@@ -52,22 +52,22 @@ const FAQ_ITEMS = [
   {
     question: "What is the $ZED Token and how does mining work?",
     answer:
-      "The $ZED Token is an off-chain engagement reward system that recognizes your active learning, course completions, alumni mentorship, and community reports. Mining rates scale from 1.0× to 10.0× based on your verified Proof-of-Engagement tier (from Rookie to Zed Legend). Tokens convert to Naira withdrawals via monthly platform revenue pools or are redeemable directly for discounted MTN, Airtel, Glo, and 9mobile data bundles.",
+      "Planned: coming in Phase 2. The $ZED Token is an upcoming off-chain engagement reward system designed to recognize active learning, course completions, and community reports. Mining rates will scale with your verified civic tier. In Phase 2, conversions to Naira or discounted mobile data bundles are planned once treasury mechanisms launch.",
   },
   {
     question: "How does the Zed Market escrow model protect buyers and sellers?",
     answer:
-      "Zed Market integrates with domestic payment gateways (Paystack and Flutterwave) to hold client funds securely in escrow until a project milestone is reviewed and formally approved. Payouts route directly to local Nigerian bank accounts (GTB, Kuda, OPay, Moniepoint, Zenith) or USDT wallet addresses.",
+      "Planned for Phase 2: Zed Market is an upcoming trust-first services marketplace. When launched, it is planned to use escrow protection to hold client funds until project milestones are approved before releasing payouts to verified Nigerian accounts.",
   },
   {
     question: "Does Zed work offline on weak mobile networks?",
     answer:
-      "Yes. Zed is engineered as a mobile-first Progressive Web App (PWA) with a bundle size under 1.8MB and aggressive Service Worker caching. Core procedural playbooks, requirement checklists, and statutory fee schedules are cached locally on your device via IndexedDB, enabling access in government basement offices with zero cellular signal.",
+      "Yes. Zed is built lightweight for weak networks with aggressive Service Worker caching. Core procedural playbooks, requirement checklists, and statutory fee schedules are cached locally on your device via IndexedDB, enabling access in government basement offices with zero cellular signal.",
   },
   {
     question: "What happens to my NIN and personal data?",
     answer:
-      "Zed never stores your raw 11-digit NIN or sensitive banking credentials. In our verification pipeline, your NIN is transmitted over an encrypted HTTPS connection and processed with a salted SHA-256 cryptographic digest on our servers. Only the irreversible hash token is persisted, ensuring full compliance with the Nigeria Data Protection Act (NDPA 2023).",
+      "Zed never stores your raw 11-digit NIN or sensitive banking credentials. In our verification pipeline, your NIN is transmitted over an encrypted HTTPS connection and processed with a salted SHA-256 cryptographic digest on our servers. Designed with data protection in mind; NIN is hashed, never stored raw.",
   },
   {
     question: "Which administrative playbooks are currently live in Zed Nav?",
@@ -77,19 +77,19 @@ const FAQ_ITEMS = [
   {
     question: "How do university students and alumni benefit from Zed?",
     answer:
-      "Campus Hubs provide partitioned spaces for Nigerian universities (including UNILAG, OAU, UI, FUTA, and ABU) featuring an Academic Vault with past examination questions, departmental lecture notes, and verified SIWES/IT listings, alongside 15-minute 1-on-1 Alumni Office Hours for career guidance.",
+      "Planned for Phase 2 & 3: Campus Hubs and Alumni Office Hours will provide campus-specific mobilization guides, departmental resources, and mentorship connections for Nigerian students and graduates.",
   },
   {
     question: "Is Zed official government advice?",
     answer:
-      "No. Zed is an independent civic platform created by Nigerian technologists and civil contributors. We are not affiliated with, endorsed by, or representing the Nigeria Immigration Service, NYSC, NIMC, CAC, or any federal ministry. We aggregate, verify, and simplify publicly gazetted procedures into plain language.",
+      "No. Zed is an independent platform and is not affiliated with or endorsed by any government agency. We aggregate, verify, and simplify publicly available civil procedures into plain, actionable checklists to help citizens navigate official processes independently.",
   },
 ];
 
 const ENGINEERING_DIRECTIVES = [
   {
     icon: Wifi,
-    title: "Low-Data PWA (< 1.8MB)",
+    title: "Low-Data PWA (Lightweight)",
     description:
       "Aggressive Service Worker caching for instant offline access to guides and checklists across 3G/4G networks (MTN, Airtel, Glo, 9mobile).",
   },
@@ -97,13 +97,13 @@ const ENGINEERING_DIRECTIVES = [
     icon: Coins,
     title: "Zero-Fintech Compliance",
     description:
-      "Off-chain $ZED rewards convert to Naira or discounted data bundles with direct payouts via Paystack and Flutterwave, eliminating banking license overhead.",
+      "Planned: Off-chain $ZED rewards are designed to convert to Naira or discounted data bundles with direct payouts, eliminating banking license overhead without present financial exposure.",
   },
   {
     icon: Lock,
     title: "Salted SHA-256 Privacy",
     description:
-      "Raw 11-digit NINs are never written to physical disk. Salted cryptographic tokenization ensures strict NDPR and NDPA 2023 compliance.",
+      "Raw 11-digit NINs are never written to physical disk. Designed with data protection in mind; NIN is hashed, never stored raw.",
   },
   {
     icon: Zap,
@@ -226,11 +226,12 @@ export default function HomePage() {
       </section>
 
       {/* ── Section 3: Zed Nav (Tabbed Showcase) ────────────────────────── */}
-      <section id="how-it-works" className="scroll-mt-24">
+      <section id="zed-nav" className="scroll-mt-24">
+        <span id="how-it-works" className="scroll-mt-24" />
         <div className="max-w-site mx-auto px-4 sm:px-6 lg:px-8">
           <FadeIn className="text-center max-w-2xl mx-auto mb-10 sm:mb-14 space-y-4">
             <div className="font-mono text-xs uppercase tracking-wider text-[#2E82F7] font-semibold">
-              Module 01 // Zed Nav (Live Engine)
+              Zed Nav // Live Engine
             </div>
             <h2 className="font-display text-3xl sm:text-5xl font-bold tracking-tight text-[#0B0B0C]">
               Zed Nav: Clear civic playbooks.
@@ -257,7 +258,7 @@ export default function HomePage() {
               The Zed Ecosystem
             </h2>
             <p className="font-sans text-base text-[#57575e] leading-relaxed">
-              Twelve integrated modules built for Nigerian youth across civic processes, practical skills, escrow freelance work, and campus communities.
+              {MODULES.length} integrated modules built for Nigerian youth across civic processes, practical skills, escrow freelance work, and campus communities.
             </p>
           </FadeIn>
 
@@ -343,7 +344,8 @@ export default function HomePage() {
       </section>
 
       {/* ── Section 6: Four Pillars Grid ──────────────────────────────── */}
-      <section id="features" className="scroll-mt-24">
+      <section id="architecture" className="scroll-mt-24">
+        <span id="features" className="scroll-mt-24" />
         <div className="max-w-site mx-auto px-4 sm:px-6 lg:px-8">
           <FadeIn className="text-center max-w-2xl mx-auto mb-12 sm:mb-16 space-y-4">
             <div className="font-mono text-xs uppercase tracking-wider text-[#2E82F7] font-semibold">
@@ -393,14 +395,14 @@ export default function HomePage() {
       <section id="token-engine" className="scroll-mt-24 py-6 sm:py-10">
         <div className="max-w-site mx-auto px-4 sm:px-6 lg:px-8">
           <FadeIn className="text-center max-w-3xl mx-auto mb-12 space-y-4">
-            <div className="font-mono text-xs uppercase tracking-wider text-[#2E82F7] font-semibold">
-              The Incentive Layer // Gamified Progression
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-[#2E82F7]/10 text-[#2E82F7] border border-[#2E82F7]/20">
+              Planned: coming in Phase 2
             </div>
             <h2 className="font-display text-3xl sm:text-5xl font-bold tracking-tight text-[#0B0B0C]">
               Earn as you grow. Proof-of-Engagement.
             </h2>
             <p className="font-sans text-base text-[#57575e] leading-relaxed">
-              The $ZED Token rewards active participation, course completions, alumni mentorship, and community updates. Mining rates scale dynamically with your verified civic tier.
+              Planned for Phase 2: The $ZED Token will reward active participation, course completions, alumni mentorship, and community updates. Mining rates scale dynamically with your verified civic tier.
             </p>
           </FadeIn>
 
@@ -446,14 +448,14 @@ export default function HomePage() {
                 <div className="flex items-center gap-2">
                   <Coins className="h-4 w-4 text-[#2E82F7]" />
                   <span>
-                    <strong>Dynamic Treasury Pool:</strong> $ZED converts directly to Naira withdrawals via Paystack/Monnify or discounted mobile data bundles (MTN, Airtel, Glo, 9mobile).
+                    <strong>Dynamic Treasury Pool (Planned):</strong> In Phase 2, $ZED is planned to convert to Naira withdrawals or discounted mobile data bundles (MTN, Airtel, Glo, 9mobile).
                   </span>
                 </div>
                 <Link
                   href="/signup"
                   className="font-medium text-[#0B0B0C] hover:text-[#2E82F7] flex items-center gap-1 shrink-0"
                 >
-                  <span>Start mining as Rookie</span>
+                  <span>Explore Level Matrix</span>
                   <ArrowRight className="h-3 w-3" />
                 </Link>
               </div>
@@ -605,10 +607,10 @@ export default function HomePage() {
 
                 <div className="p-4 rounded-lg border border-[#E5E5E0] bg-[#FAFAF8] space-y-1">
                   <div className="font-mono text-xs font-semibold text-[#0B0B0C]">
-                    NDPA 2023 Compliant
+                    Data Protection First
                   </div>
                   <div className="text-xs text-[#57575e]">
-                    Registered and auditable data controller protocols
+                    Designed with data protection in mind; NIN is hashed, never stored raw
                   </div>
                 </div>
               </div>

@@ -113,7 +113,7 @@ export function HeroSection() {
             <div className="flex-1 flex items-center justify-center">
               <div className="flex items-center gap-1.5 bg-white border border-[#D8D8D2] rounded-md px-3 py-1 text-xs text-[#57575e] font-mono max-w-xs w-full justify-center">
                 <Lock className="h-3 w-3 text-[#2E82F7] flex-shrink-0" />
-                <span>app.zedproject.ng</span>
+                <span>Illustration • Zed Dashboard Preview</span>
               </div>
             </div>
 

@@ -1,5 +1,5 @@
 -- ─── Zed Platform – Module Interest Registry ──────────────────────────────────
--- Migration: 0003_module_interest.sql
+-- Migration: 0004_module_interest.sql
 --
 -- Records user interest in coming-soon modules.
 -- This table is NOT automatically populated; client code calls an
@@ -23,6 +23,7 @@ create table if not exists public.module_interest (
 alter table public.module_interest enable row level security;
 
 -- Users can only insert their own interest rows.
+drop policy if exists "insert_own_interest" on public.module_interest;
 create policy "insert_own_interest"
   on public.module_interest
   for insert
@@ -30,6 +31,7 @@ create policy "insert_own_interest"
   with check (auth.uid() = user_id);
 
 -- Users can only read their own interest rows.
+drop policy if exists "select_own_interest" on public.module_interest;
 create policy "select_own_interest"
   on public.module_interest
   for select
@@ -37,6 +39,7 @@ create policy "select_own_interest"
   using (auth.uid() = user_id);
 
 -- Users can delete (withdraw) their own interest rows.
+drop policy if exists "delete_own_interest" on public.module_interest;
 create policy "delete_own_interest"
   on public.module_interest
   for delete
@@ -44,16 +47,12 @@ create policy "delete_own_interest"
   using (auth.uid() = user_id);
 
 -- Admins can read all interest rows for analytics.
+drop policy if exists "admin_read_all_interest" on public.module_interest;
 create policy "admin_read_all_interest"
   on public.module_interest
   for select
   to authenticated
-  using (
-    exists (
-      select 1 from public.users u
-      where u.id = auth.uid() and u.role = 'admin'
-    )
-  );
+  using (public.is_admin());
 
 -- ── Index ─────────────────────────────────────────────────────────────────────
 
