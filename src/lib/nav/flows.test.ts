@@ -157,7 +157,7 @@ describe("Zed Nav Flow Schemas & Graph Integrity", () => {
       expect(step?.title).toBe("Medical certificate");
       if (step && step.type === "checklist") {
         expect(step.items).toHaveLength(3);
-        const labels = step.items.map((i) => i.label);
+        const labels = (step.items ?? []).map((i) => i.label);
         expect(labels).toContain("Use a government-recognised hospital");
         expect(labels).toContain("Keep the original and a copy");
         expect(labels).toContain("Confirm requirements with NYSC before you go");
@@ -171,7 +171,7 @@ describe("Zed Nav Flow Schemas & Graph Integrity", () => {
       expect(step?.title).toBe("Primary Assignment (PPA) and relocation");
       if (step && step.type === "checklist") {
         expect(step.items).toHaveLength(3);
-        const labels = step.items.map((i) => i.label);
+        const labels = (step.items ?? []).map((i) => i.label);
         expect(labels).toContain("Get your posting letter");
         expect(labels).toContain("Speak to your Local Government Inspector or state coordinator");
         expect(labels).toContain("Prepare any supporting documents they ask for");
