@@ -49,14 +49,14 @@ export function AdminSidebar({ adminUser }: AdminSidebarProps) {
       <div className="flex h-13 items-center justify-between border-b border-border px-4">
         <Link href="/admin" className="flex items-center gap-2" aria-label="Zed Admin Console">
           <Image
-            src="/icons/zed-logo-full-light.png"
+            src="/icons/zed-logo-full-dark.png"
             alt="The Zed Project"
             width={100}
             height={50}
             className="h-6 w-auto object-contain dark:hidden"
           />
           <Image
-            src="/icons/zed-logo-full-dark.png"
+            src="/icons/zed-logo-full-light.png"
             alt="The Zed Project"
             width={100}
             height={50}
