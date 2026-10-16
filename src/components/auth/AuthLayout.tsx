@@ -84,7 +84,7 @@ export function AuthLayout({
             noise={0.2}
             shape="corners"
             frame={2854.5}
-            colors={["#0A0A0B", "#059669", "#2E82F7", "#0A0A0B"]}
+            colors={["#2E82F7", "#2E82F7", "#2E82F7", "#2E82F7"]}
             colorBack="#0A0A0B"
             className="absolute inset-0 bg-[#0a0a0b]"
           />
@@ -93,8 +93,8 @@ export function AuthLayout({
           <div className="relative z-10 flex h-full w-full flex-col justify-between">
             {/* Top Tag */}
             <div className="flex items-center gap-2">
-              <ShieldCheck className="h-4 w-4 text-emerald-400" />
-              <span className="font-mono text-[11px] uppercase tracking-widest text-emerald-300 font-semibold">
+              <ShieldCheck className="h-4 w-4 text-[#2E82F7]" />
+              <span className="font-mono text-[11px] uppercase tracking-widest text-[#2E82F7] font-semibold">
                 NIGERIAN CIVIC INFRASTRUCTURE · 2026
               </span>
             </div>
@@ -107,7 +107,7 @@ export function AuthLayout({
                     Every next move,
                     <br />
                     in one{" "}
-                    <span className="font-serif italic font-normal text-emerald-400">
+                    <span className="font-serif italic font-normal">
                       place.
                     </span>
                   </>
@@ -122,7 +122,7 @@ export function AuthLayout({
             {/* Bottom Status Card */}
             <div className="flex items-center justify-between border-t border-white/10 pt-4 font-mono text-[11px] text-white/60">
               <span>{rightFooterLeft || "FEDERATION WIDE COVERAGE"}</span>
-              <span className="text-emerald-400">{rightFooterRight || "SECURE HTTPS"}</span>
+              <span className="text-[#2E82F7]">{rightFooterRight || "SECURE HTTPS"}</span>
             </div>
           </div>
         </div>

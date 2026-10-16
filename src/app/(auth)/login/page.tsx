@@ -178,7 +178,7 @@ export default function LoginPage() {
           Welcome back to
           <br />
           citizen{" "}
-          <span className="font-serif italic font-normal text-emerald-400">
+          <span className="font-serif italic font-normal text-[#2E82F7]">
             clarity.
           </span>
         </>

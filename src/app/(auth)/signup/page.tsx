@@ -103,7 +103,7 @@ export default function SignupPage() {
           Every next move,
           <br />
           in one{" "}
-          <span className="font-serif italic font-normal text-emerald-400">
+          <span className="font-serif italic font-normal text-[#2E82F7]">
             place.
           </span>
         </>
