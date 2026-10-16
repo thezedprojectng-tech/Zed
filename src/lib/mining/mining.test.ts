@@ -7,6 +7,7 @@ import {
   msUntilNextLagosMidnight,
   formatCountdown,
 } from "@/lib/mining/helpers";
+import { mapTurnstileErrorCodes } from "@/lib/mining/turnstile";
 
 // ─── Level Matrix ─────────────────────────────────────────────────────────────
 
@@ -187,5 +188,35 @@ describe("formatCountdown", () => {
   it("formats exactly 23:59:59", () => {
     const ms = (23 * 3600 + 59 * 60 + 59) * 1000;
     expect(formatCountdown(ms)).toBe("23:59:59");
+  });
+});
+
+// ─── Turnstile error-code mapping ─────────────────────────────────────────────
+
+describe("mapTurnstileErrorCodes", () => {
+  it("returns TURNSTILE_EXPIRED for timeout-or-duplicate", () => {
+    expect(mapTurnstileErrorCodes(["timeout-or-duplicate"])).toBe("TURNSTILE_EXPIRED");
+  });
+
+  it("returns TURNSTILE_MISSING for missing-input-response", () => {
+    expect(mapTurnstileErrorCodes(["missing-input-response"])).toBe("TURNSTILE_MISSING");
+  });
+
+  it("returns TURNSTILE_FAILED for unknown codes", () => {
+    expect(mapTurnstileErrorCodes(["invalid-input-response"])).toBe("TURNSTILE_FAILED");
+    expect(mapTurnstileErrorCodes(["bad-request"])).toBe("TURNSTILE_FAILED");
+    expect(mapTurnstileErrorCodes([])).toBe("TURNSTILE_FAILED");
+  });
+
+  it("prioritises timeout-or-duplicate over other codes in the same response", () => {
+    expect(
+      mapTurnstileErrorCodes(["invalid-input-response", "timeout-or-duplicate"])
+    ).toBe("TURNSTILE_EXPIRED");
+  });
+
+  it("prioritises missing-input-response over unknown codes", () => {
+    expect(
+      mapTurnstileErrorCodes(["bad-request", "missing-input-response"])
+    ).toBe("TURNSTILE_MISSING");
   });
 });

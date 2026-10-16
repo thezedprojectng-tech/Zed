@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { mapTurnstileErrorCodes } from "@/lib/mining/turnstile";
 
 interface ClaimResult {
   ok: true;
@@ -12,7 +13,14 @@ interface ClaimResult {
 
 interface ClaimError {
   ok: false;
-  error: "NOT_SIGNED_IN" | "NOT_VERIFIED" | "ALREADY_CLAIMED" | "INTERNAL" | "TURNSTILE_FAILED";
+  error:
+    | "NOT_SIGNED_IN"
+    | "NOT_VERIFIED"
+    | "ALREADY_CLAIMED"
+    | "INTERNAL"
+    | "TURNSTILE_FAILED"
+    | "TURNSTILE_EXPIRED"
+    | "TURNSTILE_MISSING";
 }
 
 export type ClaimDailyMiningResult = ClaimResult | ClaimError;
@@ -42,12 +50,13 @@ export async function claimDailyMining(
 
   if (secret) {
     if (!turnstileToken || (isProd && turnstileToken === "bypass")) {
-      return { ok: false, error: "TURNSTILE_FAILED" };
+      return { ok: false, error: "TURNSTILE_MISSING" };
     }
 
     const body = new URLSearchParams({
       secret,
       response: turnstileToken,
+      // NOTE: never log `secret` or `turnstileToken` below this point
     });
 
     try {
@@ -57,14 +66,24 @@ export async function claimDailyMining(
       );
 
       if (!tsRes.ok) {
+        // HTTP-level failure – not a token problem
+        console.error("[Turnstile] siteverify HTTP error:", tsRes.status);
         return { ok: false, error: "TURNSTILE_FAILED" };
       }
 
-      const tsJson = (await tsRes.json()) as { success: boolean };
+      const tsJson = (await tsRes.json()) as {
+        success: boolean;
+        "error-codes"?: string[];
+      };
+
       if (!tsJson.success) {
-        return { ok: false, error: "TURNSTILE_FAILED" };
+        const codes: string[] = tsJson["error-codes"] ?? [];
+        // Log raw Cloudflare codes for ops visibility – no PII, no secret, no token
+        console.error("[Turnstile] verification failed. error-codes:", codes);
+        return { ok: false, error: mapTurnstileErrorCodes(codes) };
       }
-    } catch {
+    } catch (err) {
+      console.error("[Turnstile] network/parse error:", (err as Error).message);
       return { ok: false, error: "TURNSTILE_FAILED" };
     }
   }
