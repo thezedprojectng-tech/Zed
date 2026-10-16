@@ -25,7 +25,9 @@ import {
   Sun,
   ShieldCheck,
   ArrowRight,
+  ArrowUpRight,
 } from "lucide-react";
+import { SOCIAL_LINKS, XIcon, InstagramIcon, WhatsAppIcon } from "@/data/socials";
 
 interface CommandMenuProps {
   open: boolean;
@@ -243,6 +245,67 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
                 Currently using {isDark ? "Dark" : "Light"} theme
               </span>
             </div>
+          </CommandItem>
+        </CommandGroup>
+
+        <CommandSeparator />
+
+        <CommandGroup heading="Community & Socials">
+          <CommandItem
+            onSelect={() =>
+              handleSelect(() =>
+                window.open(SOCIAL_LINKS.whatsapp.href, "_blank", "noopener,noreferrer")
+              )
+            }
+          >
+            <div className="flex h-7 w-7 items-center justify-center rounded-md border-hairline bg-[#25D366]/10 border-[#25D366]/20 shrink-0 text-[#25D366]">
+              <WhatsAppIcon className="h-3.5 w-3.5" />
+            </div>
+            <div className="flex flex-col flex-1 min-w-0">
+              <span className="font-medium text-foreground">WhatsApp Channel</span>
+              <span className="text-[11px] text-muted-foreground">
+                Join the official Zed community channel on WhatsApp
+              </span>
+            </div>
+            <ArrowUpRight className="h-3.5 w-3.5 text-muted-foreground opacity-60" />
+          </CommandItem>
+
+          <CommandItem
+            onSelect={() =>
+              handleSelect(() =>
+                window.open(SOCIAL_LINKS.x.href, "_blank", "noopener,noreferrer")
+              )
+            }
+          >
+            <div className="flex h-7 w-7 items-center justify-center rounded-md border-hairline bg-secondary shrink-0 text-foreground">
+              <XIcon className="h-3 w-3" />
+            </div>
+            <div className="flex flex-col flex-1 min-w-0">
+              <span className="font-medium text-foreground">Follow on X (Twitter)</span>
+              <span className="text-[11px] text-muted-foreground">
+                @thezedprojectng – updates, announcements, and guides
+              </span>
+            </div>
+            <ArrowUpRight className="h-3.5 w-3.5 text-muted-foreground opacity-60" />
+          </CommandItem>
+
+          <CommandItem
+            onSelect={() =>
+              handleSelect(() =>
+                window.open(SOCIAL_LINKS.instagram.href, "_blank", "noopener,noreferrer")
+              )
+            }
+          >
+            <div className="flex h-7 w-7 items-center justify-center rounded-md border-hairline bg-[#E4405F]/10 border-[#E4405F]/20 shrink-0 text-[#E4405F]">
+              <InstagramIcon className="h-3.5 w-3.5" />
+            </div>
+            <div className="flex flex-col flex-1 min-w-0">
+              <span className="font-medium text-foreground">Follow on Instagram</span>
+              <span className="text-[11px] text-muted-foreground">
+                @thezedprojectng – visual guides, infographics, and highlights
+              </span>
+            </div>
+            <ArrowUpRight className="h-3.5 w-3.5 text-muted-foreground opacity-60" />
           </CommandItem>
         </CommandGroup>
       </CommandList>

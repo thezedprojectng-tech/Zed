@@ -26,6 +26,8 @@ export const metadata: Metadata = {
     title: "Zed – Nigerian paperwork, made simple",
     description:
       "Step-by-step guides for your passport, NYSC, NIN and BVN, and business registration.",
+    site: "@thezedprojectng",
+    creator: "@thezedprojectng",
   },
 };
 

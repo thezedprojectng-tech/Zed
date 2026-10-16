@@ -5,6 +5,7 @@ import Image from "next/image";
 import { ArrowUpRight, ArrowUp, MapPin } from "lucide-react";
 import { openCookieSettings } from "./CookieBanner";
 import { useSiteAuth } from "./useSiteAuth";
+import { SOCIAL_LINKS, XIcon, InstagramIcon, WhatsAppIcon } from "@/data/socials";
 
 const PRODUCT_LINKS = [
   { href: "/#zed-nav", label: "Zed Nav" },
@@ -93,10 +94,46 @@ export function SiteFooter() {
               <MapPin className="h-3 w-3 text-[#2E82F7]" />
               <span>Lagos, Nigeria</span>
             </div>
+
+            {/* Social handles */}
+            <div className="pt-2 space-y-2">
+              <span className="block font-mono text-[11px] uppercase tracking-wider text-[#5a5a64]">
+                Join the Community
+              </span>
+              <div className="flex items-center gap-2">
+                <a
+                  href={SOCIAL_LINKS.whatsapp.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={SOCIAL_LINKS.whatsapp.ariaLabel}
+                  className="h-8 w-8 rounded-lg border border-white/10 bg-white/5 flex items-center justify-center text-[#9c9ca8] hover:text-[#25D366] hover:border-[#25D366]/40 hover:bg-[#25D366]/10 transition-colors"
+                >
+                  <WhatsAppIcon className="h-4 w-4" />
+                </a>
+                <a
+                  href={SOCIAL_LINKS.x.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={SOCIAL_LINKS.x.ariaLabel}
+                  className="h-8 w-8 rounded-lg border border-white/10 bg-white/5 flex items-center justify-center text-[#9c9ca8] hover:text-white hover:border-white/30 hover:bg-white/10 transition-colors"
+                >
+                  <XIcon className="h-3.5 w-3.5" />
+                </a>
+                <a
+                  href={SOCIAL_LINKS.instagram.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={SOCIAL_LINKS.instagram.ariaLabel}
+                  className="h-8 w-8 rounded-lg border border-white/10 bg-white/5 flex items-center justify-center text-[#9c9ca8] hover:text-[#E4405F] hover:border-[#E4405F]/40 hover:bg-[#E4405F]/10 transition-colors"
+                >
+                  <InstagramIcon className="h-4 w-4" />
+                </a>
+              </div>
+            </div>
           </div>
 
           {/* ── Link columns ─────────────────────────────────────────────── */}
-          <div className="lg:col-span-8 grid grid-cols-2 sm:grid-cols-3 gap-8 lg:gap-6 lg:pl-8">
+          <div className="lg:col-span-8 grid grid-cols-2 sm:grid-cols-4 gap-8 lg:gap-6 lg:pl-8">
 
             {/* Product */}
             <div>
@@ -157,6 +194,48 @@ export function SiteFooter() {
                     </Link>
                   </li>
                 ))}
+              </ul>
+            </div>
+
+            {/* Community */}
+            <div>
+              <h4 className="font-mono text-[11px] uppercase tracking-widest text-[#5a5a64] font-medium mb-5">
+                Community
+              </h4>
+              <ul className="space-y-3">
+                <li>
+                  <a
+                    href={SOCIAL_LINKS.whatsapp.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-sans text-sm text-[#9c9ca8] hover:text-white transition-colors inline-flex items-center gap-1.5 group"
+                  >
+                    <span>WhatsApp</span>
+                    <ArrowUpRight className="h-3 w-3 text-[#5a5a64] group-hover:text-white transition-colors" />
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href={SOCIAL_LINKS.x.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-sans text-sm text-[#9c9ca8] hover:text-white transition-colors inline-flex items-center gap-1.5 group"
+                  >
+                    <span>X (Twitter)</span>
+                    <ArrowUpRight className="h-3 w-3 text-[#5a5a64] group-hover:text-white transition-colors" />
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href={SOCIAL_LINKS.instagram.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-sans text-sm text-[#9c9ca8] hover:text-white transition-colors inline-flex items-center gap-1.5 group"
+                  >
+                    <span>Instagram</span>
+                    <ArrowUpRight className="h-3 w-3 text-[#5a5a64] group-hover:text-white transition-colors" />
+                  </a>
+                </li>
               </ul>
             </div>
 

@@ -71,13 +71,19 @@ export default function Footer25() {
           <div className="hidden h-px flex-1 bg-white/20 md:block md:mr-16 lg:mr-32" />
           
           <div className="flex w-full flex-wrap items-center justify-between gap-6 md:w-auto md:justify-end sm:gap-8 lg:gap-12">
-            {["INSTAGRAM", "FACEBOOK", "TWITTER", "BEHANCE"].map((social) => (
+            {[
+              { label: "WHATSAPP", href: "https://whatsapp.com/channel/0029VbEaT84IN9ipSi6ieN1P" },
+              { label: "X (TWITTER)", href: "https://x.com/thezedprojectng" },
+              { label: "INSTAGRAM", href: "https://www.instagram.com/thezedprojectng?rpxt=bmwyNTdxMDl0Zzk4" },
+            ].map((social) => (
               <a
-                key={social}
-                href="#"
+                key={social.label}
+                href={social.href}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="group flex items-center gap-2 text-xs font-bold tracking-[0.15em] text-zinc-200 transition-colors hover:text-white sm:text-sm"
               >
-                {social}
+                {social.label}
                 <HugeiconsIcon
                   icon={ArrowUpRight01Icon}
                   className="size-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"

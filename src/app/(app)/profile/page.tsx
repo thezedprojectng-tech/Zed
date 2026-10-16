@@ -13,6 +13,7 @@ import {
   ShieldCheck,
   ShieldAlert,
   ArrowRight,
+  ArrowUpRight,
   Award,
 } from "lucide-react";
 
@@ -22,6 +23,7 @@ import { Badge } from "@/components/ui/badge";
 import { useAuthStore } from "@/store/useAuthStore";
 import { signOut } from "@/lib/auth/actions";
 import { getLevelName } from "@/types";
+import { SOCIAL_LINKS, XIcon, InstagramIcon, WhatsAppIcon } from "@/data/socials";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -156,6 +158,74 @@ export default function ProfilePage() {
                 </div>
               </div>
             )}
+          </div>
+        </div>
+
+        {/* Community & Support */}
+        <div className="rounded-xl border border-hairline bg-card p-5 space-y-3">
+          <div>
+            <h2 className="text-sm font-semibold text-foreground">
+              Official Community & Channels
+            </h2>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Connect with fellow Nigerian youths, get real-time center alerts, and follow updates.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
+            <a
+              href={SOCIAL_LINKS.whatsapp.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2.5 p-3 rounded-lg border border-hairline bg-secondary/30 hover:bg-secondary hover:border-[#25D366]/40 transition-colors group"
+            >
+              <div className="h-8 w-8 rounded-md bg-[#25D366]/10 text-[#25D366] flex items-center justify-center shrink-0">
+                <WhatsAppIcon className="h-4 w-4" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-medium text-foreground group-hover:text-[#25D366] transition-colors truncate">
+                  WhatsApp
+                </p>
+                <p className="text-[10px] text-muted-foreground truncate">Official Channel</p>
+              </div>
+              <ArrowUpRight className="h-3.5 w-3.5 text-muted-foreground group-hover:text-foreground transition-colors shrink-0" />
+            </a>
+
+            <a
+              href={SOCIAL_LINKS.x.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2.5 p-3 rounded-lg border border-hairline bg-secondary/30 hover:bg-secondary transition-colors group"
+            >
+              <div className="h-8 w-8 rounded-md bg-secondary text-foreground flex items-center justify-center shrink-0 border border-border">
+                <XIcon className="h-3.5 w-3.5" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-medium text-foreground truncate">
+                  X (Twitter)
+                </p>
+                <p className="text-[10px] text-muted-foreground truncate">@thezedprojectng</p>
+              </div>
+              <ArrowUpRight className="h-3.5 w-3.5 text-muted-foreground group-hover:text-foreground transition-colors shrink-0" />
+            </a>
+
+            <a
+              href={SOCIAL_LINKS.instagram.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2.5 p-3 rounded-lg border border-hairline bg-secondary/30 hover:bg-secondary hover:border-[#E4405F]/40 transition-colors group"
+            >
+              <div className="h-8 w-8 rounded-md bg-[#E4405F]/10 text-[#E4405F] flex items-center justify-center shrink-0">
+                <InstagramIcon className="h-4 w-4" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-medium text-foreground group-hover:text-[#E4405F] transition-colors truncate">
+                  Instagram
+                </p>
+                <p className="text-[10px] text-muted-foreground truncate">@thezedprojectng</p>
+              </div>
+              <ArrowUpRight className="h-3.5 w-3.5 text-muted-foreground group-hover:text-foreground transition-colors shrink-0" />
+            </a>
           </div>
         </div>
 

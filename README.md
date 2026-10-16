@@ -23,9 +23,10 @@ Live: https://zedng.vercel.app
 | CDS Logger (personal attendance tracker) | Built |
 | NYSC Call-up Letter Parser (client-side) | Built |
 | Zed Mining (daily $ZED point claim, level matrix, Turnstile) | Built |
+| Zed Skill (career playbooks, lesson progress, skill points) | Built |
 | PPA Hub | Planned |
 | Phone OTP sign-in | Planned |
-| Zed Skill, Market, Meet, Communities, Campus Hubs, Live Audio Rooms, Creator Lab, Zed SOS, $ZED rewards | Planned (Phases 2-3), shown as Coming soon |
+| Zed Market, Meet, Communities, Campus Hubs, Live Audio Rooms, Creator Lab, Zed SOS, $ZED rewards | Planned (Phases 2-3), shown as Coming soon |
 
 ## Tech stack
 
@@ -71,6 +72,7 @@ SQL migrations are in `supabase/migrations/`. Run them in order in the Supabase 
 4. `0004_module_interest.sql`: module interest registry
 5. `0005_cds_logs.sql`: CDS logs table with RLS (user-scoped + admin select)
 6. `0006_zed_mining.sql`: `token_wallets`, `mining_logs`, and `claim_daily_mining()` RPC (auth.uid() security definer, no user id parameter, unique(user_id, claim_date))
+7. `0007_zed_skill.sql`: `skill_tracks`, `skill_lessons`, `skill_progress`, and `complete_lesson()` RPC (auth.uid() security definer, idempotent)
 
 Authentication is configured with email + password. The sign-up flow creates a `public.users` row from auth metadata through a security-definer trigger.
 

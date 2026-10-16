@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowUpRight, Menu, X } from "lucide-react";
 import { useSiteAuth } from "./useSiteAuth";
+import { SOCIAL_LINKS, XIcon, InstagramIcon, WhatsAppIcon } from "@/data/socials";
 
 const NAV_LINKS = [
   { href: "/#features", label: "Features" },
@@ -196,6 +197,40 @@ export function SiteHeader() {
                 </Link>
               </>
             )}
+
+            {/* Social handles in mobile menu */}
+            <div className="pt-3 border-t border-[#E8E8E4] flex items-center justify-between text-xs text-[#57575e]">
+              <span className="font-mono text-[11px] uppercase tracking-wider">Community</span>
+              <div className="flex items-center gap-2">
+                <a
+                  href={SOCIAL_LINKS.whatsapp.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={SOCIAL_LINKS.whatsapp.ariaLabel}
+                  className="h-8 w-8 rounded-lg border border-[#E8E8E4] flex items-center justify-center text-[#57575e] hover:text-[#25D366] hover:border-[#25D366]/40 transition-colors"
+                >
+                  <WhatsAppIcon className="h-4 w-4" />
+                </a>
+                <a
+                  href={SOCIAL_LINKS.x.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={SOCIAL_LINKS.x.ariaLabel}
+                  className="h-8 w-8 rounded-lg border border-[#E8E8E4] flex items-center justify-center text-[#57575e] hover:text-[#0B0B0C] hover:border-black/30 transition-colors"
+                >
+                  <XIcon className="h-3.5 w-3.5" />
+                </a>
+                <a
+                  href={SOCIAL_LINKS.instagram.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={SOCIAL_LINKS.instagram.ariaLabel}
+                  className="h-8 w-8 rounded-lg border border-[#E8E8E4] flex items-center justify-center text-[#57575e] hover:text-[#E4405F] hover:border-[#E4405F]/40 transition-colors"
+                >
+                  <InstagramIcon className="h-4 w-4" />
+                </a>
+              </div>
+            </div>
           </div>
         </div>
       )}

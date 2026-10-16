@@ -22,6 +22,7 @@ import {
   FileSearch,
   LayoutGrid,
   Pickaxe,
+  Briefcase,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -32,6 +33,7 @@ import {
 import { getLevelName } from "@/types";
 import { useAuthStore } from "@/store/useAuthStore";
 import { MODULES } from "@/data/modules";
+import { SOCIAL_LINKS, XIcon, InstagramIcon, WhatsAppIcon } from "@/data/socials";
 
 interface NavItem {
   href: string;
@@ -51,6 +53,7 @@ const sections: NavSection[] = [
     items: [
       { href: "/home", label: "Dashboard", icon: Home },
       { href: "/nav", label: "Zed Nav", icon: Compass },
+      { href: "/skill", label: "Zed Skill", icon: Briefcase },
       { href: "/nav/passport/centers", label: "Centers Tracker", icon: MapPin },
       { href: "/mining", label: "Zed Mining", icon: Pickaxe },
     ],
@@ -326,6 +329,63 @@ export function Sidebar() {
         )}
       </nav>
 
+
+      {/* Community Links */}
+      {!collapsed ? (
+        <div className="px-3 py-2 border-hairline-t flex items-center justify-between">
+          <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground/70">
+            Community
+          </span>
+          <div className="flex items-center gap-1">
+            <a
+              href={SOCIAL_LINKS.whatsapp.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={SOCIAL_LINKS.whatsapp.ariaLabel}
+              className="p-1.5 rounded-md text-muted-foreground hover:text-[#25D366] hover:bg-secondary transition-colors"
+            >
+              <WhatsAppIcon className="h-3.5 w-3.5" />
+            </a>
+            <a
+              href={SOCIAL_LINKS.x.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={SOCIAL_LINKS.x.ariaLabel}
+              className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+            >
+              <XIcon className="h-3 w-3" />
+            </a>
+            <a
+              href={SOCIAL_LINKS.instagram.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={SOCIAL_LINKS.instagram.ariaLabel}
+              className="p-1.5 rounded-md text-muted-foreground hover:text-[#E4405F] hover:bg-secondary transition-colors"
+            >
+              <InstagramIcon className="h-3.5 w-3.5" />
+            </a>
+          </div>
+        </div>
+      ) : (
+        <div className="py-2 border-hairline-t flex justify-center">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <a
+                href={SOCIAL_LINKS.whatsapp.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-2 rounded-md text-muted-foreground hover:text-[#25D366] hover:bg-secondary transition-colors"
+                aria-label={SOCIAL_LINKS.whatsapp.ariaLabel}
+              >
+                <WhatsAppIcon className="h-3.5 w-3.5" />
+              </a>
+            </TooltipTrigger>
+            <TooltipContent side="right" className="font-sans text-xs">
+              WhatsApp Community
+            </TooltipContent>
+          </Tooltip>
+        </div>
+      )}
 
       {/* Bottom User Card */}
       <div className="border-hairline-t p-3">

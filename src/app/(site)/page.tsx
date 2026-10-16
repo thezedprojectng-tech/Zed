@@ -40,6 +40,8 @@ export const metadata: Metadata = {
     title: "Zed – The Digital Operating System for Nigerian Youth",
     description:
       "The all-in-one digital OS for Nigerian Gen Z. Civic administration guides, skill tracks, freelance escrow marketplace, and campus community hubs.",
+    site: "@thezedprojectng",
+    creator: "@thezedprojectng",
   },
 };
 
@@ -52,7 +54,7 @@ const FAQ_ITEMS = [
   {
     question: "What is the $ZED Token and how does mining work?",
     answer:
-      "Planned: coming in Phase 2. The $ZED Token is an upcoming off-chain engagement reward system designed to recognize active learning, course completions, and community reports. Mining rates will scale with your verified civic tier. In Phase 2, conversions to Naira or discounted mobile data bundles are planned once treasury mechanisms launch.",
+      "Planned: coming in Phase 2. The $ZED Token is an upcoming off-chain engagement reward system designed to recognize active learning, course completions, and community reports. Mining rates will scale with your verified tier. In Phase 2, conversions to Naira or discounted mobile data bundles are planned once treasury mechanisms launch.",
   },
   {
     question: "How does the Zed Market escrow model protect buyers and sellers?",
@@ -402,7 +404,7 @@ export default function HomePage() {
               Earn as you grow. Proof-of-Engagement.
             </h2>
             <p className="font-sans text-base text-[#57575e] leading-relaxed">
-              Planned for Phase 2: The $ZED Token will reward active participation, course completions, alumni mentorship, and community updates. Mining rates scale dynamically with your verified civic tier.
+              Planned for Phase 2: The $ZED Token will reward active participation, course completions, alumni mentorship, and community updates. Mining rates scale dynamically with your verified tier.
             </p>
           </FadeIn>
 
