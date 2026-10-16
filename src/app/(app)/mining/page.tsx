@@ -5,6 +5,9 @@ import { getMiningData } from "@/lib/mining/actions";
 import { getLagosDate } from "@/lib/mining/helpers";
 import { MiningClient } from "./MiningClient";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: "Zed Mining — Daily $ZED Claim",
   description:

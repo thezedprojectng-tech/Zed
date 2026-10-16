@@ -124,15 +124,27 @@ export async function claimDailyMining(
  */
 export async function getMiningData() {
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return {
+      wallet: null,
+      logs: [],
+    };
+  }
 
   const [walletResult, logsResult] = await Promise.all([
     supabase
       .from("token_wallets")
       .select("balance_zed, total_mined, streak_days, last_mined_at")
-      .single(),
+      .eq("user_id", user.id)
+      .maybeSingle(),
     supabase
       .from("mining_logs")
       .select("id, amount_mined, multiplier_applied, claim_date, mined_at")
+      .eq("user_id", user.id)
       .order("mined_at", { ascending: false })
       .limit(14),
   ]);
