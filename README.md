@@ -22,6 +22,7 @@ Live: https://zedng.vercel.app
 | Marketing site, privacy, terms, cookies | Built (extra) |
 | CDS Logger (personal attendance tracker) | Built |
 | NYSC Call-up Letter Parser (client-side) | Built |
+| Zed Mining (daily $ZED point claim, level matrix, Turnstile) | Built |
 | PPA Hub | Planned |
 | Phone OTP sign-in | Planned |
 | Zed Skill, Market, Meet, Communities, Campus Hubs, Live Audio Rooms, Creator Lab, Zed SOS, $ZED rewards | Planned (Phases 2-3), shown as Coming soon |
@@ -55,6 +56,8 @@ Open http://localhost:3000.
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Browser and server | Public anon key |
 | `SUPABASE_SERVICE_ROLE_KEY` | **Server only** | Never expose or commit. Used for admin actions |
 | `NIN_HASH_SALT` | **Server only** | At least 32 characters. Generate with `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"` |
+| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Browser | Cloudflare Turnstile site key. Omit in dev to use the always-pass test key. |
+| `TURNSTILE_SECRET_KEY` | **Server only** | Cloudflare Turnstile secret key. Required in production. |
 
 Never commit `.env.local`. Set the same variables in Vercel for Production **and** Preview.
 
@@ -67,6 +70,7 @@ SQL migrations are in `supabase/migrations/`. Run them in order in the Supabase 
 3. `0003_admin_audit_log.sql`: append-only audit log
 4. `0004_module_interest.sql`: module interest registry
 5. `0005_cds_logs.sql`: CDS logs table with RLS (user-scoped + admin select)
+6. `0006_zed_mining.sql`: `token_wallets`, `mining_logs`, and `claim_daily_mining()` RPC (auth.uid() security definer, no user id parameter, unique(user_id, claim_date))
 
 Authentication is configured with email + password. The sign-up flow creates a `public.users` row from auth metadata through a security-definer trigger.
 
@@ -115,3 +119,15 @@ Flows are JSON files in `src/data/nav/` and are validated against a Zod schema. 
 - Days 1-30: Core Foundation (this repository)
 - Days 31-60: Zed Meet, database expansion, daily $ZED mining, campus hubs
 - Days 61-90: Paystack/Flutterwave escrow, Zed SOS, creator asset library, beta launch
+
+## Zed Mining
+
+$ZED is an **off-chain engagement point with no cash value** in Phase 1.
+
+- Users claim once per Lagos calendar day (Africa/Lagos timezone).
+- Level 1 (Rookie) gives 100 $ZED/day with a 1.0× multiplier. Levels 2-5 are locked.
+- Claims are bot-protected via Cloudflare Turnstile.
+
+**Planned (not yet implemented):**
+- Device fingerprinting (additional bot protection layer)
+- $ZED conversion and withdrawal to real value

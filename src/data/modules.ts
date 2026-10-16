@@ -96,6 +96,16 @@ export const MODULES: ZedModule[] = [
 
   // -- Coming soon -----------------------------------------------------------
   {
+    slug: "zed-mining",
+    name: "Zed Mining",
+    tagline: "Claim your daily $ZED engagement points. No cash value – conversion planned for a later phase.",
+    icon: Pickaxe,
+    status: "live",
+    phase: "Phase 1",
+    href: "/mining",
+    what: "Zed Mining lets verified users claim daily $ZED engagement points. Points have no cash value in Phase 1; conversion and withdrawal are planned for a later phase. Daily claims are capped per your Civic Level.",
+  },
+  {
     slug: "zed-skill",
     name: "Zed Skill",
     tagline: "Practical career playbooks and technical roadmaps for Nigerian youth.",
@@ -122,15 +132,7 @@ export const MODULES: ZedModule[] = [
     phase: "Phase 2",
     what: "Zed Chat will provide persistent community channels and direct messaging so users can share tips, coordinate queue strategies, and support one another across all Zed modules in real time.",
   },
-  {
-    slug: "zed-mining",
-    name: "Zed Mining",
-    tagline: "Earn $ZED rewards for active platform participation and contributions.",
-    icon: Pickaxe,
-    status: "soon",
-    phase: "Phase 3",
-    what: "Zed Mining will track meaningful platform activity—guide completions, verified field reports, and community contributions—and convert that engagement into $ZED utility tokens redeemable within the ecosystem.",
-  },
+  
   {
     slug: "campus-hubs",
     name: "Campus Hubs",

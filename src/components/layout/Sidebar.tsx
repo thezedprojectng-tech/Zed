@@ -21,6 +21,7 @@ import {
   FileText,
   FileSearch,
   LayoutGrid,
+  Pickaxe,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -51,6 +52,7 @@ const sections: NavSection[] = [
       { href: "/home", label: "Dashboard", icon: Home },
       { href: "/nav", label: "Zed Nav", icon: Compass },
       { href: "/nav/passport/centers", label: "Centers Tracker", icon: MapPin },
+      { href: "/mining", label: "Zed Mining", icon: Pickaxe },
     ],
   },
   {

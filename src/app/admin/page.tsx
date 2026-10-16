@@ -16,6 +16,7 @@ import {
   Clock,
   ArrowRight,
   UserPlus,
+  Pickaxe,
 } from "lucide-react";
 import { SignupsAreaChart, SignupDataPoint } from "@/components/admin/charts/SignupsAreaChart";
 import { FlowsGroupedBarChart, FlowGuideStat } from "@/components/admin/charts/FlowsGroupedBarChart";
@@ -93,6 +94,8 @@ async function fetchOverviewMetrics() {
     { count: signupsPrev7d },
     { count: reports24h },
     { count: totalReports },
+    { count: miningClaimsToday },
+    { data: miningTotalRaw },
     { data: recentUsersRaw },
     { data: recentReportsRaw },
     { data: signups90dRaw },
@@ -110,6 +113,8 @@ async function fetchOverviewMetrics() {
       .lt("created_at", sevenDaysAgo),
     admin.from("center_reports").select("*", { count: "exact", head: true }).gte("reported_at", twentyFourHoursAgo),
     admin.from("center_reports").select("*", { count: "exact", head: true }),
+    admin.from("mining_logs").select("*", { count: "exact", head: true }).gte("mined_at", twentyFourHoursAgo),
+    admin.from("token_wallets").select("total_mined"),
     admin
       .from("users")
       .select("id, full_name, avatar_url, phone_number, level_id, is_verified, created_at")
@@ -144,6 +149,12 @@ async function fetchOverviewMetrics() {
       .gte("reported_at", fourteenDaysAgo)
       .order("reported_at", { ascending: true }),
   ]);
+
+  // Mining totals
+  const totalZedIssued = (miningTotalRaw ?? []).reduce(
+    (sum, row) => sum + Number((row as { total_mined: number }).total_mined ?? 0),
+    0
+  );
 
   // Signups 90d map
   const signupsMap: Record<string, number> = {};
@@ -257,6 +268,8 @@ async function fetchOverviewMetrics() {
     totalFlowsCompleted,
     reports24h: reports24h ?? 0,
     totalReports: totalReports ?? 0,
+    miningClaimsToday: miningClaimsToday ?? 0,
+    totalZedIssued,
     signups90d,
     flowGuideStats,
     levelData,
@@ -322,8 +335,8 @@ async function OverviewContent() {
 
   return (
     <div className="space-y-6 max-w-[1400px] mx-auto">
-      {/* KPI Cards (6 metrics) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
+      {/* KPI Cards (8 metrics) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-3">
         {/* 1. Total Users */}
         <KPICard
           label="Total Users"
@@ -401,6 +414,24 @@ async function OverviewContent() {
           subtext={`${data.totalReports} total all-time`}
           icon={Clock}
           accent="border-amber-500/20 text-amber-500"
+        />
+
+        {/* 7. Mining Claims Today */}
+        <KPICard
+          label="Mining Claims (24h)"
+          value={data.miningClaimsToday.toLocaleString()}
+          subtext="verified daily claims"
+          icon={Pickaxe}
+          accent="border-violet-500/20 text-violet-400"
+        />
+
+        {/* 8. Total $ZED Issued */}
+        <KPICard
+          label="$ZED Issued (all-time)"
+          value={data.totalZedIssued.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+          subtext="off-chain engagement points"
+          icon={Pickaxe}
+          accent="border-primary/20 text-primary"
         />
       </div>
 
