@@ -6,7 +6,7 @@
   "estimatedMinutes": 60,
   "difficulty": "involved",
   "sourceUrl": "https://portal.nysc.org.ng",
-  "lastVerified": "2026-10-14",
+  "lastVerified": "2026-10-16",
   "steps": [
     {
       "type": "decision",
@@ -120,6 +120,29 @@
         "Save digital PDF copies on your phone and Google Drive / cloud storage."
       ],
       "warning": "Never use third-party agents claiming to change your deployed state for a fee; all official postings are generated directly on the portal.",
+      "next": "medical-certificate"
+    },
+    {
+      "type": "checklist",
+      "id": "medical-certificate",
+      "title": "Medical certificate",
+      "items": [
+        {
+          "id": "use-govt-hospital",
+          "label": "Use a government-recognised hospital",
+          "hint": "You may need a medical fitness certificate for camp registration or for requesting a change of posting or relocation, depending on your situation."
+        },
+        {
+          "id": "keep-original-and-copy",
+          "label": "Keep the original and a copy",
+          "hint": "Keep your original medical certificate safe for physical registration and retain copies for your records."
+        },
+        {
+          "id": "confirm-nysc-requirements",
+          "label": "Confirm requirements with NYSC before you go",
+          "hint": "Requirements vary. Confirm with NYSC."
+        }
+      ],
       "next": "pre-camp-checklist"
     },
     {
@@ -181,6 +204,29 @@
         "Never stay in an unapproved PPA without official documentation; unauthorized absence can lead to extension of service.",
         "Ask your employer early about accommodation or transport support.",
         "Keep a stamped copy of your employer's acceptance letter for your LGI documentation."
+      ],
+      "next": "ppa-and-relocation"
+    },
+    {
+      "type": "checklist",
+      "id": "ppa-and-relocation",
+      "title": "Primary Assignment (PPA) and relocation",
+      "items": [
+        {
+          "id": "get-posting-letter",
+          "label": "Get your posting letter",
+          "hint": "After camp you are posted to a Place of Primary Assignment, and you can ask to be relocated through the NYSC state office."
+        },
+        {
+          "id": "speak-to-lgi-or-coordinator",
+          "label": "Speak to your Local Government Inspector or state coordinator",
+          "hint": "Discuss posting placement or relocation procedures with your assigned officials."
+        },
+        {
+          "id": "prepare-supporting-documents",
+          "label": "Prepare any supporting documents they ask for",
+          "hint": "Rules differ by state and change often. Confirm with your NYSC state secretariat."
+        }
       ],
       "next": "cds-and-clearance"
     },
