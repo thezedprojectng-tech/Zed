@@ -9,12 +9,15 @@ import {
   advance,
   goBack,
   getProgress,
+  getCompletedStepsCount,
   resolveBranch,
   toggleChecklistItem,
-  isChecklistComplete,
   toggleDocumentItem,
-  isDocumentCheckComplete,
   isFlowComplete,
+  reconcileProgress,
+  completeFlow,
+  getIncompleteEarlierSteps,
+  getFlowVersion,
 } from "@/lib/nav/engine";
 
 import { InfoStepRenderer } from "./steps/InfoStepRenderer";
@@ -27,7 +30,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useIsMounted } from "@/lib/hooks";
-import { CheckCircle2, RotateCcw } from "lucide-react";
+import { CheckCircle2, RotateCcw, AlertTriangle } from "lucide-react";
 
 interface FlowRunnerProps {
   flow: NavFlow;
@@ -37,20 +40,27 @@ export function FlowRunner({ flow }: FlowRunnerProps) {
   const isMounted = useIsMounted();
   const { setProgress, getProgress: storeGet, clearProgress } = useNavProgressStore();
 
-  // Initialise or rehydrate progress from store
+  // Reconcile persisted progress against the current flow definition
   const rawProgress = storeGet(flow.id);
-  const isStale =
-    rawProgress != null &&
-    !flow.steps.some((s) => s.id === rawProgress.current_step);
-  const progress = rawProgress && !isStale ? rawProgress : initProgress(flow);
+  const progress = useMemo(() => {
+    return reconcileProgress(flow, rawProgress);
+  }, [flow, rawProgress]);
 
-  // Persist initial state on first mount or reset if stale
+  // Persist reconciled progress if state was missing or migrated
   useEffect(() => {
-    if (isMounted && (!rawProgress || isStale)) {
-      setProgress(flow.id, initProgress(flow));
+    if (!isMounted) return;
+    const currentVersion = getFlowVersion(flow);
+    const needsMigration =
+      !rawProgress ||
+      rawProgress.flow_version !== currentVersion ||
+      progress.completed_steps.length !== (rawProgress.completed_steps ?? []).length ||
+      progress.current_step !== rawProgress.current_step ||
+      Boolean(progress.completed) !== Boolean(rawProgress.completed);
+
+    if (needsMigration) {
+      setProgress(flow.id, progress);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [flow.id, isStale, isMounted]);
+  }, [flow, rawProgress, progress, isMounted, setProgress]);
 
   const currentStep = getCurrentStep(flow, progress);
   const percent = getProgress(flow, progress);
@@ -68,12 +78,17 @@ export function FlowRunner({ flow }: FlowRunnerProps) {
     return idx > 0;
   }, [flow.steps, currentStep.id]);
 
+  // Incomplete earlier steps along the path before the current step
+  const incompleteEarlierSteps = useMemo(() => {
+    return isLast ? getIncompleteEarlierSteps(flow, progress, currentStep.id) : [];
+  }, [flow, progress, currentStep.id, isLast]);
+
   // ── Handlers ───────────────────────────────────────────────────────────────
 
   function handleAdvance() {
     const next = advance(flow, progress);
     if (next) {
-      // If we are now on the last step after advancing, mark it complete too
+      // If we are now on the last step after advancing, check if terminal
       const advancedToLastStep =
         flow.steps.findIndex((s) => s.id === next.current_step) ===
         flow.steps.length - 1;
@@ -86,15 +101,9 @@ export function FlowRunner({ flow }: FlowRunnerProps) {
         setProgress(flow.id, next);
       }
     } else {
-      // Terminal step: mark current as complete
-      const finalCompleted = Array.from(
-        new Set([...progress.completed_steps, currentStep.id])
-      );
-      setProgress(flow.id, {
-        ...progress,
-        completed_steps: finalCompleted,
-        updated_at: new Date().toISOString(),
-      });
+      // Terminal step: always finish the flow cleanly
+      const nextProgress = completeFlow(flow, progress);
+      setProgress(flow.id, nextProgress);
     }
   }
 
@@ -117,6 +126,15 @@ export function FlowRunner({ flow }: FlowRunnerProps) {
   function handleDocumentToggle(docId: string) {
     const next = toggleDocumentItem(progress, currentStep.id, docId);
     setProgress(flow.id, next);
+  }
+
+  function handleJumpToStep(stepId: string) {
+    setProgress(flow.id, {
+      ...progress,
+      current_step: stepId,
+      completed: false,
+      updated_at: new Date().toISOString(),
+    });
   }
 
   function handleReset() {
@@ -146,6 +164,7 @@ export function FlowRunner({ flow }: FlowRunnerProps) {
   // ── Completion Screen ──────────────────────────────────────────────────────
 
   if (completed) {
+    const incompleteEarlier = getIncompleteEarlierSteps(flow, progress);
     return (
       <div className="space-y-6 text-center py-8">
         <div className="flex justify-center">
@@ -160,6 +179,30 @@ export function FlowRunner({ flow }: FlowRunnerProps) {
             Keep your documents and reference numbers safe.
           </p>
         </div>
+
+        {incompleteEarlier.length > 0 && (
+          <div className="rounded-lg border border-border bg-card p-4 max-w-md mx-auto text-left space-y-2">
+            <p className="text-xs font-semibold text-foreground">
+              Note: Finished with {incompleteEarlier.length} uncompleted earlier step{incompleteEarlier.length > 1 ? "s" : ""}:
+            </p>
+            <ul className="list-disc list-inside text-xs text-muted-foreground space-y-0.5">
+              {incompleteEarlier.map((s) => (
+                <li key={s.id}>{s.title}</li>
+              ))}
+            </ul>
+            <div className="pt-1">
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-xs h-7"
+                onClick={() => handleJumpToStep(incompleteEarlier[0].id)}
+              >
+                Review {incompleteEarlier[0].title}
+              </Button>
+            </div>
+          </div>
+        )}
+
         <Button variant="outline" size="sm" onClick={handleReset}>
           <RotateCcw className="h-3.5 w-3.5 mr-1.5" />
           Start Over
@@ -186,7 +229,7 @@ export function FlowRunner({ flow }: FlowRunnerProps) {
               className="font-mono text-[11px] text-muted-foreground"
               suppressHydrationWarning
             >
-              {progress.completed_steps.length}/{flow.steps.length} done
+              {getCompletedStepsCount(flow, progress)}/{flow.steps.length} done
             </span>
           </div>
           <button
@@ -213,6 +256,40 @@ export function FlowRunner({ flow }: FlowRunnerProps) {
           />
         </div>
       </div>
+
+      {/* Earlier incomplete steps banner on the final step */}
+      {isLast && incompleteEarlierSteps.length > 0 && (
+        <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-4 space-y-2 text-left">
+          <div className="flex items-start gap-2.5">
+            <AlertTriangle className="h-4 w-4 text-amber-500 shrink-0 mt-0.5" />
+            <div className="space-y-1">
+              <p className="type-body font-semibold text-foreground text-xs">
+                Earlier required steps were not completed
+              </p>
+              <p className="type-small text-muted-foreground text-xs leading-relaxed">
+                You reached the final step, but some earlier steps in this guide were skipped or added recently:
+              </p>
+              <ul className="list-disc list-inside type-small text-muted-foreground space-y-0.5 pt-1">
+                {incompleteEarlierSteps.map((s) => (
+                  <li key={s.id} className="text-xs">
+                    <span className="text-foreground font-medium">{s.title}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 pt-1">
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-xs h-7 border-amber-500/30 hover:bg-amber-500/20 text-foreground"
+              onClick={() => handleJumpToStep(incompleteEarlierSteps[0].id)}
+            >
+              Jump to {incompleteEarlierSteps[0].title}
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* Step title */}
       <h2 className="type-h2 text-foreground">{currentStep.title}</h2>

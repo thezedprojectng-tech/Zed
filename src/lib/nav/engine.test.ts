@@ -12,6 +12,11 @@ import {
   toggleDocumentItem,
   isFlowComplete,
   getCurrentStep,
+  reconcileProgress,
+  completeFlow,
+  getCompletedStepsCount,
+  getIncompleteEarlierSteps,
+  getFlowVersion,
 } from "@/lib/nav/engine";
 
 // ── Fixture helpers ───────────────────────────────────────────────────────────
@@ -317,6 +322,89 @@ describe("getCurrentStep resilient recovery", () => {
     };
     const step = getCurrentStep(flow, staleProgress);
     expect(step.id).toBe("step-1");
+  });
+});
+
+describe("reconcileProgress & flow evolution", () => {
+  it("drops stale completed ids that no longer exist in the flow", () => {
+    const flow = makeLinearFlow(); // steps: step-1, step-2, step-3
+    const staleProgress: NavProgress = {
+      ...initProgress(flow),
+      current_step: "step-2",
+      completed_steps: ["step-1", "removed-old-step-x", "removed-old-step-y"],
+    };
+
+    const reconciled = reconcileProgress(flow, staleProgress);
+    expect(reconciled.completed_steps).toEqual(["step-1"]);
+    expect(getCompletedStepsCount(flow, reconciled)).toBe(1);
+    expect(getProgress(flow, reconciled)).toBe(33); // 1 / 3
+  });
+
+  it("moves to the first incomplete step when saved current step is missing or invalid", () => {
+    const flow = makeLinearFlow(); // steps: step-1, step-2, step-3
+    const staleProgress: NavProgress = {
+      ...initProgress(flow),
+      current_step: "deleted-step-id",
+      completed_steps: ["step-1"],
+    };
+
+    const reconciled = reconcileProgress(flow, staleProgress);
+    // step-1 is already done, so the first incomplete step is step-2
+    expect(reconciled.current_step).toBe("step-2");
+    expect(reconciled.completed_steps).toEqual(["step-1"]);
+  });
+
+  it("gracefully migrates when a flow gains new steps after user has progressed", () => {
+    const flow = makeLinearFlow(); // step-1, step-2, step-3
+    const oldVersion = "step-1>step-3";
+    const savedProgress: NavProgress = {
+      flow_id: flow.id,
+      current_step: "step-3", // was on terminal step in old 2-step flow
+      completed_steps: ["step-1"],
+      checklist_state: {},
+      document_state: {},
+      flow_version: oldVersion,
+      updated_at: new Date().toISOString(),
+    };
+
+    const reconciled = reconcileProgress(flow, savedProgress);
+
+    // Version updated to match new flow
+    expect(reconciled.flow_version).toBe(getFlowVersion(flow));
+    expect(reconciled.flow_version).not.toBe(oldVersion);
+
+    // Preserves valid completed steps
+    expect(reconciled.completed_steps).toEqual(["step-1"]);
+
+    // Since step-3 exists in flow, current_step is preserved
+    expect(reconciled.current_step).toBe("step-3");
+
+    // Identifies earlier missing steps along path (step-2)
+    const missing = getIncompleteEarlierSteps(flow, reconciled, "step-3");
+    expect(missing.map((s) => s.id)).toEqual(["step-2"]);
+
+    // Progress percentage is correctly computed against the 3 steps (1 / 3 = 33%)
+    expect(getCompletedStepsCount(flow, reconciled)).toBe(1);
+    expect(getProgress(flow, reconciled)).toBe(33);
+  });
+
+  it("finishing from the final step always marks the flow as complete", () => {
+    const flow = makeLinearFlow(); // step-1, step-2, step-3
+    // User reached step-3 (final step) but skipped step-2
+    const progressAtFinalStep: NavProgress = {
+      ...initProgress(flow),
+      current_step: "step-3",
+      completed_steps: ["step-1"],
+    };
+
+    expect(isFlowComplete(flow, progressAtFinalStep)).toBe(false);
+
+    // Completing from the final step
+    const finished = completeFlow(flow, progressAtFinalStep);
+
+    expect(finished.completed).toBe(true);
+    expect(finished.completed_steps).toContain("step-3");
+    expect(isFlowComplete(flow, finished)).toBe(true);
   });
 });
 

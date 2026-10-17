@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getSkillLevelProgress, SkillProgressSummary } from "@/data/skill-levels";
+import { mapSkillRpcError } from "@/lib/skill/errors";
 
 export interface SkillTrackSummary {
   id: string;
@@ -238,7 +239,7 @@ export type CompleteLessonResult =
     }
   | {
       ok: false;
-      error: "NOT_SIGNED_IN" | "NOT_VERIFIED" | "LESSON_NOT_FOUND" | "INTERNAL";
+      error: string;
     };
 
 /**
@@ -248,42 +249,42 @@ export async function completeLessonAction(
   lessonId: string,
   trackSlug?: string
 ): Promise<CompleteLessonResult> {
-  const supabase = await createClient();
+  try {
+    const supabase = await createClient();
 
-  const { data, error } = await supabase.rpc("complete_lesson", {
-    p_lesson_id: lessonId,
-  });
+    const { data, error } = await supabase.rpc("complete_lesson", {
+      p_lesson_id: lessonId,
+    });
 
-  if (error) {
-    const msg = error.message.toLowerCase();
-    if (msg.includes("not authenticated")) {
-      return { ok: false, error: "NOT_SIGNED_IN" };
+    if (error) {
+      console.error("[Skill complete_lesson RPC error]:", error);
+      return { ok: false, error: mapSkillRpcError(error.message) };
     }
-    if (msg.includes("not verified")) {
-      return { ok: false, error: "NOT_VERIFIED" };
+
+    const result = data as {
+      ok?: boolean;
+      points_awarded?: number;
+      total_skill_points?: number;
+      already_completed?: boolean;
+    };
+
+    revalidatePath("/skill");
+    revalidatePath("/skill/[slug]", "page");
+    if (trackSlug) {
+      revalidatePath(`/skill/${trackSlug}`);
     }
-    if (msg.includes("not found")) {
-      return { ok: false, error: "LESSON_NOT_FOUND" };
-    }
-    return { ok: false, error: "INTERNAL" };
+
+    return {
+      ok: true,
+      points_awarded: Number(result?.points_awarded ?? 0),
+      total_skill_points: Number(result?.total_skill_points ?? 0),
+      already_completed: Boolean(result?.already_completed),
+    };
+  } catch (err) {
+    console.error("[Skill completeLessonAction uncaught error]:", err);
+    return {
+      ok: false,
+      error: mapSkillRpcError(err instanceof Error ? err.message : String(err)),
+    };
   }
-
-  const result = data as {
-    ok?: boolean;
-    points_awarded?: number;
-    total_skill_points?: number;
-    already_completed?: boolean;
-  };
-
-  revalidatePath("/skill");
-  if (trackSlug) {
-    revalidatePath(`/skill/${trackSlug}`);
-  }
-
-  return {
-    ok: true,
-    points_awarded: Number(result?.points_awarded ?? 0),
-    total_skill_points: Number(result?.total_skill_points ?? 0),
-    already_completed: Boolean(result?.already_completed),
-  };
 }

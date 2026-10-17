@@ -110,4 +110,8 @@ export interface NavProgress {
   /** Document state: stepId → array of confirmed doc ids */
   document_state: Record<string, string[]>;
   updated_at: string;
+  /** Version signature based on flow step structure */
+  flow_version?: string;
+  /** Whether the flow has been explicitly finished */
+  completed?: boolean;
 }

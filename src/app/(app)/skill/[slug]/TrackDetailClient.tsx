@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import {
   ArrowLeft,
@@ -11,6 +12,7 @@ import {
   Sparkles,
   AlertTriangle,
   BookOpen,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -20,6 +22,7 @@ import { completeLessonAction, TrackDetailData } from "@/lib/skill/actions";
 import { LessonMarkdown } from "@/components/skill/LessonMarkdown";
 
 export function TrackDetailClient({ data }: { data: TrackDetailData }) {
+  const router = useRouter();
   const { track, lessons: initialLessons, isVerified } = data;
   const [lessons, setLessons] = useState(initialLessons);
   const [expandedLessonId, setExpandedLessonId] = useState<string | null>(
@@ -27,6 +30,12 @@ export function TrackDetailClient({ data }: { data: TrackDetailData }) {
   );
   const [isPending, startTransition] = useTransition();
   const [completingId, setCompletingId] = useState<string | null>(null);
+
+  const [prevDataLessons, setPrevDataLessons] = useState(initialLessons);
+  if (data.lessons !== prevDataLessons) {
+    setPrevDataLessons(data.lessons);
+    setLessons(data.lessons);
+  }
 
   const completedCount = lessons.filter((l) => l.completed).length;
   const totalCount = lessons.length;
@@ -43,39 +52,43 @@ export function TrackDetailClient({ data }: { data: TrackDetailData }) {
 
   function handleComplete(lessonId: string) {
     if (!isVerified) {
-      toast.error("Please verify your account first to earn skill points.");
+      toast.error("Verify your account to earn skill points.");
       return;
     }
 
     setCompletingId(lessonId);
     startTransition(async () => {
-      const res = await completeLessonAction(lessonId, track.slug);
-      setCompletingId(null);
+      try {
+        const res = await completeLessonAction(lessonId, track.slug);
 
-      if (res.ok) {
-        setLessons((prev) =>
-          prev.map((l) =>
-            l.id === lessonId
-              ? { ...l, completed: true, completed_at: new Date().toISOString() }
-              : l
-          )
-        );
+        if (res.ok) {
+          // Immediately update local state optimistically: mark lesson completed,
+          // update the track progress bar, and earned points.
+          setLessons((prev) =>
+            prev.map((l) =>
+              l.id === lessonId
+                ? { ...l, completed: true, completed_at: l.completed_at ?? new Date().toISOString() }
+                : l
+            )
+          );
 
-        if (res.already_completed) {
-          toast.info("Lesson already marked complete.");
+          if (res.already_completed) {
+            toast.info("Already completed");
+          } else {
+            toast.success(`+${res.points_awarded} Skill Points earned!`, {
+              description: `Total: ${res.total_skill_points} points`,
+            });
+          }
+
+          router.refresh();
         } else {
-          toast.success(`+${res.points_awarded} Skill Points earned!`, {
-            description: `Total: ${res.total_skill_points} points`,
-          });
+          toast.error(res.error);
         }
-      } else {
-        const errorMessages: Record<string, string> = {
-          NOT_SIGNED_IN: "Sign in to record your progress.",
-          NOT_VERIFIED: "Verify your NIN to record lesson completions.",
-          LESSON_NOT_FOUND: "Lesson not found.",
-          INTERNAL: "Could not save progress. Please try again.",
-        };
-        toast.error(errorMessages[res.error] ?? "Failed to complete lesson.");
+      } catch (err) {
+        console.error("[TrackDetailClient handleComplete error]:", err);
+        toast.error("Could not complete the lesson. Please try again.");
+      } finally {
+        setCompletingId(null);
       }
     });
   }
@@ -261,10 +274,14 @@ export function TrackDetailClient({ data }: { data: TrackDetailData }) {
                             e.stopPropagation();
                             handleComplete(lesson.id);
                           }}
-                          disabled={!isVerified || isCurrentPending}
+                          disabled={!isVerified || isPending}
                           className="font-semibold gap-1.5"
                         >
-                          <BookOpen className="h-4 w-4" aria-hidden="true" />
+                          {isCurrentPending ? (
+                            <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                          ) : (
+                            <BookOpen className="h-4 w-4" aria-hidden="true" />
+                          )}
                           <span>
                             {isCurrentPending
                               ? "Marking complete…"

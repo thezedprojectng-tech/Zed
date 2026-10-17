@@ -52,7 +52,6 @@ const IS_PROD = process.env.NODE_ENV === "production";
 // ── Debug logger (dev only) ────────────────────────────────────────────────────
 function dbg(...args: unknown[]) {
   if (process.env.NODE_ENV !== "production") {
-    // eslint-disable-next-line no-console
     console.debug("[turnstile]", ...args);
   }
 }

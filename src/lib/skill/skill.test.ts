@@ -9,6 +9,7 @@ import {
   formatEligibleLevelLabel,
 } from "@/data/skill-levels";
 import { LessonMarkdown } from "@/components/skill/LessonMarkdown";
+import { mapSkillRpcError } from "@/lib/skill/errors";
 
 describe("Zed Skill – Level Thresholds & Config", () => {
   it("has 5 levels with ascending point thresholds", () => {
@@ -239,4 +240,34 @@ describe("LessonMarkdown component", () => {
     expect(html).toContain("Professional Summary");
   });
 });
+
+describe("mapSkillRpcError", () => {
+  it("maps 'not authenticated' to 'Please sign in again.'", () => {
+    expect(mapSkillRpcError("Not authenticated")).toBe("Please sign in again.");
+    expect(mapSkillRpcError("Error: user not authenticated")).toBe("Please sign in again.");
+  });
+
+  it("maps 'not verified' to 'Verify your account to earn skill points.'", () => {
+    expect(
+      mapSkillRpcError("User is not verified. Account must be verified to complete lessons.")
+    ).toBe("Verify your account to earn skill points.");
+    expect(mapSkillRpcError("Not verified")).toBe("Verify your account to earn skill points.");
+  });
+
+  it("maps 'lesson not found' to 'This lesson is no longer available.'", () => {
+    expect(mapSkillRpcError("Lesson not found")).toBe("This lesson is no longer available.");
+    expect(mapSkillRpcError("lesson not found")).toBe("This lesson is no longer available.");
+    expect(mapSkillRpcError("Record not found")).toBe("This lesson is no longer available.");
+  });
+
+  it("maps unknown or null/empty errors to safe fallback message", () => {
+    expect(mapSkillRpcError("Database connection timeout")).toBe(
+      "Could not complete the lesson. Please try again."
+    );
+    expect(mapSkillRpcError(null)).toBe("Could not complete the lesson. Please try again.");
+    expect(mapSkillRpcError(undefined)).toBe("Could not complete the lesson. Please try again.");
+    expect(mapSkillRpcError("")).toBe("Could not complete the lesson. Please try again.");
+  });
+});
+
 
