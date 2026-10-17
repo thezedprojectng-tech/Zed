@@ -3,7 +3,7 @@
 import { useState, useEffect, useTransition, useRef, useCallback } from "react";
 import Script from "next/script";
 import { toast } from "sonner";
-import { Pickaxe, Flame, Zap, AlertTriangle, ShieldCheck, Info } from "lucide-react";
+import { Pickaxe, Flame, Zap, AlertTriangle, ShieldCheck, Info, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -49,6 +49,14 @@ const TURNSTILE_SITEKEY =
 const DEV_TEST_KEY = "1x00000000000000000000AA";
 const IS_PROD = process.env.NODE_ENV === "production";
 
+// ── Debug logger (dev only) ────────────────────────────────────────────────────
+function dbg(...args: unknown[]) {
+  if (process.env.NODE_ENV !== "production") {
+    // eslint-disable-next-line no-console
+    console.debug("[turnstile]", ...args);
+  }
+}
+
 // ── Narrow Turnstile API type ──────────────────────────────────────────────────
 type TurnstileAPI = {
   render: (el: HTMLElement, opts: Record<string, unknown>) => string;
@@ -92,6 +100,8 @@ export function MiningClient({
   const [isPending, startTransition] = useTransition();
   /** Whether the next/script tag has reported onReady */
   const [scriptReady, setScriptReady] = useState(false);
+  /** Turnstile Cloudflare error code, set by error-callback */
+  const [turnstileError, setTurnstileError] = useState<string | null>(null);
 
   /**
    * `turnstileToken` state:
@@ -100,11 +110,31 @@ export function MiningClient({
    */
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
 
-  const containerRef = useRef<HTMLDivElement>(null);
+  /**
+   * containerNode: the actual DOM element. We use a *state* value (not just a
+   * ref) so that React re-renders – and the widget-mount effect re-runs – the
+   * instant the container is attached to the DOM.
+   *
+   * Why state instead of ref?  useEffect dependencies only react to state/prop
+   * changes. If we stored the node only in a ref we would have to guess when
+   * to call renderWidget; with state, the effect fires automatically.
+   */
+  const [containerNode, setContainerNode] = useState<HTMLDivElement | null>(null);
+
   /** The widget ID returned by turnstile.render(). null when no widget is mounted. */
   const widgetIdRef = useRef<string | null>(null);
-  /** Guards against React Strict-Mode double-mount rendering two widgets. */
-  const mountedRef = useRef(false);
+  /**
+   * Guards against React Strict-Mode double-mount rendering two widgets.
+   * Reset to false in destroyWidget so a fresh mount always renders.
+   */
+  const renderingRef = useRef(false);
+
+  // Callback ref: called by React whenever the div mounts or unmounts.
+  // Storing in state triggers the widget-mount effect.
+  const containerCallbackRef = useCallback((node: HTMLDivElement | null) => {
+    dbg("container callback ref fired, node:", node);
+    setContainerNode(node);
+  }, []);
 
   // ── Countdown timer ────────────────────────────────────────────────────────
   useEffect(() => {
@@ -120,78 +150,104 @@ export function MiningClient({
     const w = window as unknown as TurnstileWindow;
     if (w.turnstile && widgetIdRef.current !== null) {
       try { w.turnstile.remove(widgetIdRef.current); } catch { /* ignore */ }
+      dbg("widget removed, id was:", widgetIdRef.current);
       widgetIdRef.current = null;
     }
-    mountedRef.current = false;
+    renderingRef.current = false;
   }, []);
 
   const resetWidget = useCallback(() => {
     const w = window as unknown as TurnstileWindow;
     if (w.turnstile && widgetIdRef.current !== null) {
       try { w.turnstile.reset(widgetIdRef.current); } catch { /* ignore */ }
+      dbg("widget reset, id:", widgetIdRef.current);
     }
     clearToken();
+    setTurnstileError(null);
   }, [clearToken]);
 
   /**
    * Actually renders the widget into the container div.
-   * Safe to call multiple times – guarded by mountedRef.
+   * Safe to call multiple times – guarded by renderingRef so only one
+   * widget is ever mounted at a time. renderingRef is reset by destroyWidget.
    */
-  const renderWidget = useCallback(() => {
-    if (mountedRef.current) return;       // already rendered this mount
-    if (!resolvedSitekey) return;         // no key available
-    const el = containerRef.current;
-    if (!el) return;
-    const w = window as unknown as TurnstileWindow;
-    if (!w.turnstile) return;
+  const renderWidget = useCallback(
+    (el: HTMLDivElement) => {
+      if (renderingRef.current) {
+        dbg("render skipped – already rendering/rendered");
+        return;
+      }
+      if (!resolvedSitekey) {
+        dbg("render skipped – no sitekey");
+        return;
+      }
+      const w = window as unknown as TurnstileWindow;
+      if (!w.turnstile) {
+        dbg("render skipped – window.turnstile not available yet");
+        return;
+      }
 
-    mountedRef.current = true;
-    widgetIdRef.current = w.turnstile.render(el, {
-      sitekey: resolvedSitekey,
-      theme: "auto",
-      size: "normal",
-      callback: (token: string) => setTurnstileToken(token),
-      "expired-callback": clearToken,
-      "error-callback": clearToken,
-      "timeout-callback": clearToken,
-    });
-  }, [clearToken]);
+      renderingRef.current = true;
+      dbg("render called on el:", el);
+      widgetIdRef.current = w.turnstile.render(el, {
+        sitekey: resolvedSitekey,
+        theme: "auto",
+        size: "normal",
+        callback: (token: string) => {
+          dbg("token received (length):", token.length);
+          setTurnstileToken(token);
+          setTurnstileError(null);
+        },
+        "expired-callback": () => {
+          dbg("token expired");
+          clearToken();
+        },
+        "error-callback": (code: string) => {
+          dbg("error-callback code:", code);
+          setTurnstileError(code ?? "unknown");
+          clearToken();
+        },
+        "timeout-callback": () => {
+          dbg("timeout-callback fired");
+          clearToken();
+        },
+      });
+      dbg("widgetId assigned:", widgetIdRef.current);
+    },
+    [clearToken],
+  );
 
-  // ── Turnstile widget – mount / unmount ────────────────────────────────────
+  // ── Turnstile widget – mount / unmount ─────────────────────────────────────
   //
-  // This effect runs when:
-  //   • scriptReady flips to true (first full-page load)
-  //   • the component mounts on client-side navigation
-  //     (scriptReady starts as false, so we also check window.turnstile directly)
+  // Runs when:
+  //   • containerNode changes (the div just mounted via callback ref)
+  //   • scriptReady flips to true (first page load – script just loaded)
+  //   • claimed / isVerified change (cleanup)
   //
-  // The key insight: on client-side navigation the Next.js Script component
-  // may not fire onReady again if the script is already cached.  So we check
-  // window.turnstile at mount time AND rely on scriptReady for first load.
+  // This fixes the client-side navigation bug: on navigate-to-/mining the
+  // component mounts, containerCallbackRef fires → containerNode is set →
+  // this effect runs.  window.turnstile is already present (script cached),
+  // so renderWidget() succeeds immediately. No stale mountedRef blocks it.
   useEffect(() => {
-    if (!isVerified || claimed) return;
+    dbg("widget effect fired – scriptReady:", scriptReady, "containerNode:", containerNode, "claimed:", claimed, "isVerified:", isVerified);
+
+    if (!isVerified || claimed || !containerNode) return;
 
     const w = window as unknown as TurnstileWindow;
-
     if (w.turnstile) {
-      // Script is already loaded (e.g. client-side navigation back to /mining)
-      renderWidget();
+      dbg("script ready (window.turnstile present) – calling renderWidget");
+      renderWidget(containerNode);
+    } else {
+      dbg("window.turnstile not yet present; will retry when scriptReady fires");
     }
-    // If scriptReady is true but turnstile isn't on window yet (race), the
-    // Script onReady handler below will call renderWidget() directly.
 
     return () => {
-      // Clean up on unmount (navigation away) so back-navigation gets a fresh widget.
+      dbg("widget effect cleanup – destroying widget");
       destroyWidget();
     };
+  // containerNode & scriptReady are the two triggers; the rest are guards.
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isVerified, claimed, scriptReady]);
-
-  // Separate effect: call renderWidget when scriptReady flips (first load).
-  useEffect(() => {
-    if (scriptReady && isVerified && !claimed) {
-      renderWidget();
-    }
-  }, [scriptReady, isVerified, claimed, renderWidget]);
+  }, [containerNode, scriptReady, isVerified, claimed]);
 
   // ── Claim handler ──────────────────────────────────────────────────────────
   function handleClaim() {
@@ -232,24 +288,29 @@ export function MiningClient({
     ? "Verifying you're human…"
     : `Claim ${level.dailyCap} $ZED`;
 
+  const needsWidget = isVerified && !claimed && Boolean(resolvedSitekey);
+
   return (
     <>
       {/*
        * Load the Turnstile script via next/script.
        *
-       * strategy="lazyOnload" loads after the page is interactive.
-       * onReady fires whenever Next.js hydrates this component – crucially,
-       * it fires on EVERY mount (full load AND client-side navigation) when
-       * the script was already cached, unlike a raw <script> onload which
-       * only fires once.
+       * strategy="afterInteractive" fires sooner than "lazyOnload" and
+       * guarantees onReady fires on every mount – full page load AND
+       * client-side navigation – because Next.js re-registers the onReady
+       * callback each time this component mounts.
        *
-       * Only render the Script tag when we actually need the widget.
+       * The Script tag is always rendered when needed so Next.js never
+       * loses track of the callback.
        */}
-      {isVerified && !claimed && resolvedSitekey && (
+      {needsWidget && (
         <Script
           src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
-          strategy="lazyOnload"
-          onReady={() => setScriptReady(true)}
+          strategy="afterInteractive"
+          onReady={() => {
+            dbg("script onReady fired – setting scriptReady");
+            setScriptReady(true);
+          }}
         />
       )}
 
@@ -352,8 +413,33 @@ export function MiningClient({
               </div>
             )}
 
+            {/* Turnstile error banner with retry */}
+            {turnstileError && (
+              <div className="flex items-start gap-2 rounded-md border border-destructive/20 bg-destructive/10 p-3 text-xs text-destructive">
+                <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" aria-hidden="true" />
+                <span className="flex-1">
+                  Verification failed
+                  {!IS_PROD && ` (code: ${turnstileError})`}
+                  . Tap to retry.
+                </span>
+                <button
+                  type="button"
+                  aria-label="Retry verification"
+                  onClick={resetWidget}
+                  className="shrink-0 rounded p-0.5 hover:bg-destructive/20 transition-colors"
+                >
+                  <RefreshCw className="h-3.5 w-3.5" aria-hidden="true" />
+                </button>
+              </div>
+            )}
+
             {/*
              * Turnstile widget container.
+             *
+             * ALWAYS rendered when a widget is needed (isVerified && !claimed &&
+             * resolvedSitekey) – even before the script loads – so that the
+             * containerCallbackRef fires and the DOM node is ready when
+             * window.turnstile becomes available.
              *
              * Sizing requirements for iOS Safari and small screens:
              *   • min-w-[300px] – Cloudflare's minimum widget width.
@@ -364,9 +450,9 @@ export function MiningClient({
              *   • NEVER use display:none or visibility:hidden here – Cloudflare
              *     will not render into a hidden element.
              */}
-            {isVerified && !claimed && resolvedSitekey && (
+            {needsWidget && (
               <div
-                ref={containerRef}
+                ref={containerCallbackRef}
                 className="w-full min-w-[300px] min-h-[65px] overflow-hidden"
                 aria-label="Human verification widget"
               />
