@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useTransition, useRef, useCallback } from "react";
-import Script from "next/script";
+import { Turnstile, type TurnstileInstance } from "@marsidev/react-turnstile";
 import { toast } from "sonner";
 import { Pickaxe, Flame, Zap, AlertTriangle, ShieldCheck, Info, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -57,14 +57,6 @@ function dbg(...args: unknown[]) {
   }
 }
 
-// ── Narrow Turnstile API type ──────────────────────────────────────────────────
-type TurnstileAPI = {
-  render: (el: HTMLElement, opts: Record<string, unknown>) => string;
-  reset: (id: string) => void;
-  remove: (id: string) => void;
-};
-type TurnstileWindow = { turnstile?: TurnstileAPI };
-
 // ── Per-error user-facing messages ────────────────────────────────────────────
 const TURNSTILE_MESSAGES: Record<string, string> = {
   TURNSTILE_EXPIRED: "Verification expired. Please tap Claim again.",
@@ -98,9 +90,8 @@ export function MiningClient({
   const [currentStreak, setCurrentStreak] = useState(wallet?.streak_days ?? 0);
   const [countdown, setCountdown] = useState(() => formatCountdown(msUntilNextLagosMidnight()));
   const [isPending, startTransition] = useTransition();
-  /** Whether the next/script tag has reported onReady */
-  const [scriptReady, setScriptReady] = useState(false);
-  /** Turnstile Cloudflare error code, set by error-callback */
+
+  /** Turnstile Cloudflare error code, set by onError */
   const [turnstileError, setTurnstileError] = useState<string | null>(null);
 
   /**
@@ -110,31 +101,8 @@ export function MiningClient({
    */
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
 
-  /**
-   * containerNode: the actual DOM element. We use a *state* value (not just a
-   * ref) so that React re-renders – and the widget-mount effect re-runs – the
-   * instant the container is attached to the DOM.
-   *
-   * Why state instead of ref?  useEffect dependencies only react to state/prop
-   * changes. If we stored the node only in a ref we would have to guess when
-   * to call renderWidget; with state, the effect fires automatically.
-   */
-  const [containerNode, setContainerNode] = useState<HTMLDivElement | null>(null);
-
-  /** The widget ID returned by turnstile.render(). null when no widget is mounted. */
-  const widgetIdRef = useRef<string | null>(null);
-  /**
-   * Guards against React Strict-Mode double-mount rendering two widgets.
-   * Reset to false in destroyWidget so a fresh mount always renders.
-   */
-  const renderingRef = useRef(false);
-
-  // Callback ref: called by React whenever the div mounts or unmounts.
-  // Storing in state triggers the widget-mount effect.
-  const containerCallbackRef = useCallback((node: HTMLDivElement | null) => {
-    dbg("container callback ref fired, node:", node);
-    setContainerNode(node);
-  }, []);
+  /** Ref to the Turnstile instance for resetting the challenge. */
+  const turnstileRef = useRef<TurnstileInstance>(null);
 
   // ── Countdown timer ────────────────────────────────────────────────────────
   useEffect(() => {
@@ -146,108 +114,15 @@ export function MiningClient({
   // ── Helpers ────────────────────────────────────────────────────────────────
   const clearToken = useCallback(() => setTurnstileToken(null), []);
 
-  const destroyWidget = useCallback(() => {
-    const w = window as unknown as TurnstileWindow;
-    if (w.turnstile && widgetIdRef.current !== null) {
-      try { w.turnstile.remove(widgetIdRef.current); } catch { /* ignore */ }
-      dbg("widget removed, id was:", widgetIdRef.current);
-      widgetIdRef.current = null;
-    }
-    renderingRef.current = false;
-  }, []);
-
-  const resetWidget = useCallback(() => {
-    const w = window as unknown as TurnstileWindow;
-    if (w.turnstile && widgetIdRef.current !== null) {
-      try { w.turnstile.reset(widgetIdRef.current); } catch { /* ignore */ }
-      dbg("widget reset, id:", widgetIdRef.current);
+  const handleRetry = useCallback(() => {
+    try {
+      turnstileRef.current?.reset();
+    } catch {
+      /* ignore */
     }
     clearToken();
     setTurnstileError(null);
   }, [clearToken]);
-
-  /**
-   * Actually renders the widget into the container div.
-   * Safe to call multiple times – guarded by renderingRef so only one
-   * widget is ever mounted at a time. renderingRef is reset by destroyWidget.
-   */
-  const renderWidget = useCallback(
-    (el: HTMLDivElement) => {
-      if (renderingRef.current) {
-        dbg("render skipped – already rendering/rendered");
-        return;
-      }
-      if (!resolvedSitekey) {
-        dbg("render skipped – no sitekey");
-        return;
-      }
-      const w = window as unknown as TurnstileWindow;
-      if (!w.turnstile) {
-        dbg("render skipped – window.turnstile not available yet");
-        return;
-      }
-
-      renderingRef.current = true;
-      dbg("render called on el:", el);
-      widgetIdRef.current = w.turnstile.render(el, {
-        sitekey: resolvedSitekey,
-        theme: "auto",
-        size: "normal",
-        callback: (token: string) => {
-          dbg("token received (length):", token.length);
-          setTurnstileToken(token);
-          setTurnstileError(null);
-        },
-        "expired-callback": () => {
-          dbg("token expired");
-          clearToken();
-        },
-        "error-callback": (code: string) => {
-          dbg("error-callback code:", code);
-          setTurnstileError(code ?? "unknown");
-          clearToken();
-        },
-        "timeout-callback": () => {
-          dbg("timeout-callback fired");
-          clearToken();
-        },
-      });
-      dbg("widgetId assigned:", widgetIdRef.current);
-    },
-    [clearToken],
-  );
-
-  // ── Turnstile widget – mount / unmount ─────────────────────────────────────
-  //
-  // Runs when:
-  //   • containerNode changes (the div just mounted via callback ref)
-  //   • scriptReady flips to true (first page load – script just loaded)
-  //   • claimed / isVerified change (cleanup)
-  //
-  // This fixes the client-side navigation bug: on navigate-to-/mining the
-  // component mounts, containerCallbackRef fires → containerNode is set →
-  // this effect runs.  window.turnstile is already present (script cached),
-  // so renderWidget() succeeds immediately. No stale mountedRef blocks it.
-  useEffect(() => {
-    dbg("widget effect fired – scriptReady:", scriptReady, "containerNode:", containerNode, "claimed:", claimed, "isVerified:", isVerified);
-
-    if (!isVerified || claimed || !containerNode) return;
-
-    const w = window as unknown as TurnstileWindow;
-    if (w.turnstile) {
-      dbg("script ready (window.turnstile present) – calling renderWidget");
-      renderWidget(containerNode);
-    } else {
-      dbg("window.turnstile not yet present; will retry when scriptReady fires");
-    }
-
-    return () => {
-      dbg("widget effect cleanup – destroying widget");
-      destroyWidget();
-    };
-  // containerNode & scriptReady are the two triggers; the rest are guards.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [containerNode, scriptReady, isVerified, claimed]);
 
   // ── Claim handler ──────────────────────────────────────────────────────────
   function handleClaim() {
@@ -258,7 +133,13 @@ export function MiningClient({
 
       // Always reset the widget after every attempt so the next claim
       // (or retry) gets a fresh challenge – the core mobile fix.
-      resetWidget();
+      try {
+        turnstileRef.current?.reset();
+      } catch {
+        /* ignore */
+      }
+      clearToken();
+      setTurnstileError(null);
 
       if (result.ok) {
         setClaimed(true);
@@ -288,326 +169,316 @@ export function MiningClient({
     ? "Verifying you're human…"
     : `Claim ${level.dailyCap} $ZED`;
 
-  const needsWidget = isVerified && !claimed && Boolean(resolvedSitekey);
-
   return (
-    <>
-      {/*
-       * Load the Turnstile script via next/script.
-       *
-       * strategy="afterInteractive" fires sooner than "lazyOnload" and
-       * guarantees onReady fires on every mount – full page load AND
-       * client-side navigation – because Next.js re-registers the onReady
-       * callback each time this component mounts.
-       *
-       * The Script tag is always rendered when needed so Next.js never
-       * loses track of the callback.
-       */}
-      {needsWidget && (
-        <Script
-          src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
-          strategy="afterInteractive"
-          onReady={() => {
-            dbg("script onReady fired – setting scriptReady");
-            setScriptReady(true);
-          }}
-        />
-      )}
+    <div className="px-4 md:px-8 py-8 md:py-10 space-y-8">
+      {/* ── Header ─────────────────────────────────────────────────────── */}
+      <section className="space-y-1 border-hairline-b pb-6">
+        <p className="type-caption text-muted-foreground font-mono uppercase tracking-wider">
+          ZED MINING · PHASE 1
+        </p>
+        <h1 className="type-display text-foreground">Daily $ZED Claim</h1>
+        <p className="type-body text-muted-foreground max-w-xl">
+          Earn $ZED engagement points by claiming once per Lagos calendar day.
+        </p>
+        <p className="type-small text-muted-foreground/70 mt-1 flex items-center gap-1.5">
+          <Info className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+          $ZED points have no cash value yet. Conversion is planned for a later phase.
+        </p>
+      </section>
 
-      <div className="px-4 md:px-8 py-8 md:py-10 space-y-8">
-
-        {/* ── Header ─────────────────────────────────────────────────────── */}
-        <section className="space-y-1 border-hairline-b pb-6">
-          <p className="type-caption text-muted-foreground font-mono uppercase tracking-wider">
-            ZED MINING · PHASE 1
-          </p>
-          <h1 className="type-display text-foreground">Daily $ZED Claim</h1>
-          <p className="type-body text-muted-foreground max-w-xl">
-            Earn $ZED engagement points by claiming once per Lagos calendar day.
-          </p>
-          <p className="type-small text-muted-foreground/70 mt-1 flex items-center gap-1.5">
-            <Info className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-            $ZED points have no cash value yet. Conversion is planned for a later phase.
-          </p>
-        </section>
-
-        {/* ── Balance + Claim card ────────────────────────────────────────── */}
-        <section
-          aria-label="Mining claim"
-          className="grid grid-cols-1 md:grid-cols-2 gap-4"
-        >
-          {/* Balance card */}
-          <Card className="p-5 border-border bg-card shadow-xs flex flex-col justify-between gap-4">
-            <div className="flex items-start justify-between">
-              <p className="type-caption text-muted-foreground font-mono uppercase tracking-wider">
-                Your Balance
-              </p>
-              <div className="flex h-8 w-8 items-center justify-center rounded-md border border-primary/20 bg-primary/10 text-primary">
-                <Zap className="h-4 w-4" aria-hidden="true" />
-              </div>
+      {/* ── Balance + Claim card ────────────────────────────────────────── */}
+      <section
+        aria-label="Mining claim"
+        className="grid grid-cols-1 md:grid-cols-2 gap-4"
+      >
+        {/* Balance card */}
+        <Card className="p-5 border-border bg-card shadow-xs flex flex-col justify-between gap-4">
+          <div className="flex items-start justify-between">
+            <p className="type-caption text-muted-foreground font-mono uppercase tracking-wider">
+              Your Balance
+            </p>
+            <div className="flex h-8 w-8 items-center justify-center rounded-md border border-primary/20 bg-primary/10 text-primary">
+              <Zap className="h-4 w-4" aria-hidden="true" />
             </div>
-            <div>
-              <p className="text-3xl font-bold font-mono text-foreground">
-                {currentBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-              </p>
-              <p className="type-small text-muted-foreground mt-0.5">$ZED points</p>
-            </div>
-            <div className="flex items-center gap-3 pt-1 border-hairline-t">
-              <div className="flex items-center gap-1.5 text-amber-500">
-                <Flame className="h-3.5 w-3.5" aria-hidden="true" />
-                <span className="font-mono text-xs font-semibold">
-                  {currentStreak} day streak
-                </span>
-              </div>
-              <span className="text-muted-foreground/50 text-xs">·</span>
-              <span className="font-mono text-xs text-muted-foreground">
-                {(wallet?.total_mined ?? 0).toLocaleString()} total mined
+          </div>
+          <div>
+            <p className="text-3xl font-bold font-mono text-foreground">
+              {currentBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            </p>
+            <p className="type-small text-muted-foreground mt-0.5">$ZED points</p>
+          </div>
+          <div className="flex items-center gap-3 pt-1 border-hairline-t">
+            <div className="flex items-center gap-1.5 text-amber-500">
+              <Flame className="h-3.5 w-3.5" aria-hidden="true" />
+              <span className="font-mono text-xs font-semibold">
+                {currentStreak} day streak
               </span>
             </div>
-          </Card>
+            <span className="text-muted-foreground/50 text-xs">·</span>
+            <span className="font-mono text-xs text-muted-foreground">
+              {(wallet?.total_mined ?? 0).toLocaleString()} total mined
+            </span>
+          </div>
+        </Card>
 
-          {/* Claim card */}
-          <Card className="relative p-5 border-border bg-card shadow-xs overflow-hidden flex flex-col justify-between gap-4">
-            {/* Accent stripe */}
-            <div className="absolute inset-x-0 top-0 h-[2px] rounded-t-xl bg-primary" />
+        {/* Claim card */}
+        <Card className="relative p-5 border-border bg-card shadow-xs overflow-hidden flex flex-col justify-between gap-4">
+          {/* Accent stripe */}
+          <div className="absolute inset-x-0 top-0 h-[2px] rounded-t-xl bg-primary" />
 
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="type-caption text-muted-foreground font-mono uppercase tracking-wider">
-                  {claimed ? "Next Claim In" : "Claim Available"}
-                </p>
-                <p className="text-2xl font-mono font-bold text-foreground mt-1 tabular-nums">
-                  {claimed ? countdown : `+${level.dailyCap} $ZED`}
-                </p>
-              </div>
-              <Badge
-                variant="outline"
-                className="font-mono text-[10px] border-primary/20 bg-primary/10 text-primary px-1.5 py-0"
-              >
-                {level.name} · {level.multiplier}×
-              </Badge>
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="type-caption text-muted-foreground font-mono uppercase tracking-wider">
+                {claimed ? "Next Claim In" : "Claim Available"}
+              </p>
+              <p className="text-2xl font-mono font-bold text-foreground mt-1 tabular-nums">
+                {claimed ? countdown : `+${level.dailyCap} $ZED`}
+              </p>
             </div>
+            <Badge
+              variant="outline"
+              className="font-mono text-[10px] border-primary/20 bg-primary/10 text-primary px-1.5 py-0"
+            >
+              {level.name} · {level.multiplier}×
+            </Badge>
+          </div>
 
-            {/* Not verified callout */}
-            {!isVerified && (
-              <div className="flex items-start gap-2 rounded-md border border-amber-500/20 bg-amber-500/10 p-3 text-xs text-amber-600 dark:text-amber-400">
-                <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" aria-hidden="true" />
-                <span>
-                  You need to{" "}
-                  <Link href="/verify-nin" className="underline font-medium">
-                    verify your NIN
-                  </Link>{" "}
-                  before you can mine $ZED.
-                </span>
-              </div>
-            )}
+          {/* Not verified callout */}
+          {!isVerified && (
+            <div className="flex items-start gap-2 rounded-md border border-amber-500/20 bg-amber-500/10 p-3 text-xs text-amber-600 dark:text-amber-400">
+              <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" aria-hidden="true" />
+              <span>
+                You need to{" "}
+                <Link href="/verify-nin" className="underline font-medium">
+                  verify your NIN
+                </Link>{" "}
+                before you can mine $ZED.
+              </span>
+            </div>
+          )}
 
-            {/*
-             * Bot-check unavailable banner (production only, no sitekey configured).
-             * Keeps the page functional while making the failure obvious.
-             */}
-            {isVerified && !claimed && IS_PROD && !resolvedSitekey && (
-              <div className="flex items-start gap-2 rounded-md border border-amber-500/20 bg-amber-500/10 p-3 text-xs text-amber-600 dark:text-amber-400">
-                <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" aria-hidden="true" />
-                <span>Bot check unavailable. Please try again later.</span>
-              </div>
-            )}
+          {/*
+           * Bot-check unavailable banner (production only, no sitekey configured).
+           * Keeps the page functional while making the failure obvious.
+           */}
+          {isVerified && !claimed && IS_PROD && !resolvedSitekey && (
+            <div className="flex items-start gap-2 rounded-md border border-amber-500/20 bg-amber-500/10 p-3 text-xs text-amber-600 dark:text-amber-400">
+              <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" aria-hidden="true" />
+              <span>Bot check unavailable. Please try again later.</span>
+            </div>
+          )}
 
-            {/* Turnstile error banner with retry */}
-            {turnstileError && (
-              <div className="flex items-start gap-2 rounded-md border border-destructive/20 bg-destructive/10 p-3 text-xs text-destructive">
-                <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" aria-hidden="true" />
-                <span className="flex-1">
-                  Verification failed
-                  {!IS_PROD && ` (code: ${turnstileError})`}
-                  . Tap to retry.
-                </span>
-                <button
-                  type="button"
-                  aria-label="Retry verification"
-                  onClick={resetWidget}
-                  className="shrink-0 rounded p-0.5 hover:bg-destructive/20 transition-colors"
-                >
-                  <RefreshCw className="h-3.5 w-3.5" aria-hidden="true" />
-                </button>
-              </div>
-            )}
+          {/* Turnstile error banner with retry */}
+          {turnstileError && (
+            <div className="flex items-start gap-2 rounded-md border border-destructive/20 bg-destructive/10 p-3 text-xs text-destructive">
+              <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" aria-hidden="true" />
+              <span className="flex-1">
+                Verification failed
+                {!IS_PROD && ` (code: ${turnstileError})`}
+                . Tap to retry.
+              </span>
+              <button
+                type="button"
+                aria-label="Retry verification"
+                onClick={handleRetry}
+                className="shrink-0 rounded p-0.5 hover:bg-destructive/20 transition-colors"
+              >
+                <RefreshCw className="h-3.5 w-3.5" aria-hidden="true" />
+              </button>
+            </div>
+          )}
 
-            {/*
-             * Turnstile widget container.
-             *
-             * ALWAYS rendered when a widget is needed (isVerified && !claimed &&
-             * resolvedSitekey) – even before the script loads – so that the
-             * containerCallbackRef fires and the DOM node is ready when
-             * window.turnstile becomes available.
-             *
-             * Sizing requirements for iOS Safari and small screens:
-             *   • min-w-[300px] – Cloudflare's minimum widget width.
-             *   • min-h-[65px]  – reserves layout space before the iframe
-             *                     loads so the button doesn't jump.
-             *   • w-full        – fills available card width on narrow screens.
-             *   • overflow-hidden – clips iframe edge bleed on small viewports.
-             *   • NEVER use display:none or visibility:hidden here – Cloudflare
-             *     will not render into a hidden element.
-             */}
-            {needsWidget && (
-              <div
-                ref={containerCallbackRef}
-                className="w-full min-w-[300px] min-h-[65px] overflow-hidden"
-                aria-label="Human verification widget"
+          {/*
+           * Turnstile widget container.
+           *
+           * Always rendered with reserved dimensions to prevent layout shift:
+           *   • min-w-[300px] – Cloudflare's minimum widget width.
+           *   • min-h-[65px]  – Cloudflare's standard widget height.
+           *   • w-full        – fills available card width on narrow screens.
+           *   • overflow-hidden – clips iframe edge bleed on small viewports.
+           */}
+          <div
+            className="w-full min-w-[300px] min-h-[65px] flex items-center justify-center overflow-hidden"
+            aria-label="Human verification widget"
+          >
+            {isVerified && !claimed && resolvedSitekey && (
+              <Turnstile
+                ref={turnstileRef}
+                siteKey={resolvedSitekey}
+                options={{
+                  theme: "auto",
+                  size: "normal",
+                }}
+                onLoadScript={() => dbg("script loaded")}
+                onWidgetLoad={(widgetId) => dbg("widget loaded, id:", widgetId)}
+                onSuccess={(token) => {
+                  dbg("token received (length):", token.length);
+                  setTurnstileToken(token);
+                  setTurnstileError(null);
+                }}
+                onExpire={() => {
+                  dbg("token expired");
+                  clearToken();
+                }}
+                onError={(errorCode) => {
+                  dbg("error code:", errorCode);
+                  setTurnstileError(typeof errorCode === "string" ? errorCode : "unknown");
+                  clearToken();
+                }}
+                className="w-full"
               />
             )}
-
-            <Button
-              id="claim-zed-button"
-              onClick={handleClaim}
-              disabled={!canClaim}
-              className={cn(
-                "w-full font-semibold gap-2",
-                claimed && "cursor-default"
-              )}
-              aria-label={claimed ? "Already claimed today" : "Claim daily ZED"}
-            >
-              <Pickaxe className="h-4 w-4" aria-hidden="true" />
-              {claimButtonLabel}
-            </Button>
-          </Card>
-        </section>
-
-        {/* ── Level Ladder ───────────────────────────────────────────────── */}
-        <section aria-label="Mining level ladder" className="space-y-3">
-          <h2 className="type-caption text-muted-foreground font-semibold uppercase tracking-wider font-mono">
-            Level Matrix
-          </h2>
-          <div className="space-y-2">
-            {MINING_LEVELS.map((lvl) => {
-              const isCurrentLevel = lvl.id === level.id;
-              const isLocked = lvl.locked;
-              return (
-                <div
-                  key={lvl.id}
-                  className={cn(
-                    "flex items-center gap-4 rounded-xl border p-4 transition-colors",
-                    isCurrentLevel
-                      ? "border-primary/30 bg-primary/5"
-                      : "border-border bg-card",
-                    isLocked && !isCurrentLevel && "opacity-60"
-                  )}
-                >
-                  {/* Level badge */}
-                  <div
-                    className={cn(
-                      "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border font-mono text-sm font-bold",
-                      isCurrentLevel
-                        ? "border-primary/30 bg-primary/15 text-primary"
-                        : "border-border bg-secondary text-muted-foreground"
-                    )}
-                    aria-hidden="true"
-                  >
-                    {lvl.id}
-                  </div>
-
-                  {/* Name + unlock criteria */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span
-                        className={cn(
-                          "text-xs font-semibold",
-                          isCurrentLevel ? "text-foreground" : "text-muted-foreground"
-                        )}
-                      >
-                        {lvl.name}
-                      </span>
-                      {isCurrentLevel && (
-                        <Badge
-                          variant="outline"
-                          className="text-[9px] font-mono border-primary/20 bg-primary/10 text-primary px-1.5 py-0"
-                        >
-                          YOUR LEVEL
-                        </Badge>
-                      )}
-                      {isLocked && (
-                        <Badge
-                          variant="outline"
-                          className="text-[9px] font-mono border-border text-muted-foreground/60 px-1.5 py-0"
-                        >
-                          LOCKED
-                        </Badge>
-                      )}
-                    </div>
-                    <p className="type-small text-muted-foreground mt-0.5 truncate">
-                      {isLocked ? lvl.unlockCriteria : "Active – verified account."}
-                    </p>
-                  </div>
-
-                  {/* Cap + multiplier */}
-                  <div className="shrink-0 text-right">
-                    <p className="font-mono text-xs font-bold text-foreground">
-                      {lvl.dailyCap} $ZED
-                    </p>
-                    <p className="font-mono text-[10px] text-muted-foreground">
-                      {lvl.multiplier}× daily
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
           </div>
-        </section>
 
-        {/* ── Claim History ──────────────────────────────────────────────── */}
-        <section aria-label="Mining claim history" className="space-y-3">
-          <h2 className="type-caption text-muted-foreground font-semibold uppercase tracking-wider font-mono">
-            Recent Claims (last 14)
-          </h2>
+          <Button
+            id="claim-zed-button"
+            onClick={handleClaim}
+            disabled={!canClaim}
+            className={cn(
+              "w-full font-semibold gap-2",
+              claimed && "cursor-default"
+            )}
+            aria-label={claimed ? "Already claimed today" : "Claim daily ZED"}
+          >
+            <Pickaxe className="h-4 w-4" aria-hidden="true" />
+            {claimButtonLabel}
+          </Button>
+        </Card>
+      </section>
 
-          {logs.length === 0 ? (
-            <Card className="p-8 border-border bg-card text-center">
-              <ShieldCheck className="h-6 w-6 text-muted-foreground mx-auto mb-2" aria-hidden="true" />
-              <p className="text-xs text-muted-foreground font-mono">
-                No claims yet. Make your first claim above!
-              </p>
-            </Card>
-          ) : (
-            <Card className="border-border bg-card shadow-xs overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full text-xs">
-                  <thead>
-                    <tr className="border-b border-border/70 text-muted-foreground text-[10px] font-mono uppercase">
-                      <th className="text-left px-4 py-2.5">Claim Date (WAT)</th>
-                      <th className="text-left px-4 py-2.5">Amount</th>
-                      <th className="text-left px-4 py-2.5">Multiplier</th>
-                      <th className="text-right px-4 py-2.5">Mined At</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-border/50">
-                    {logs.map((log) => (
-                      <tr key={log.id} className="hover:bg-secondary/30 transition-colors">
-                        <td className="px-4 py-2.5 font-mono text-muted-foreground whitespace-nowrap">
-                          {log.claim_date}
-                        </td>
-                        <td className="px-4 py-2.5 font-mono font-semibold text-foreground whitespace-nowrap">
-                          +{Number(log.amount_mined).toFixed(2)} $ZED
-                        </td>
-                        <td className="px-4 py-2.5 font-mono text-primary whitespace-nowrap">
-                          {Number(log.multiplier_applied).toFixed(1)}×
-                        </td>
-                        <td className="px-4 py-2.5 text-right font-mono text-muted-foreground whitespace-nowrap">
-                          {new Date(log.mined_at).toLocaleTimeString("en-GB", {
-                            timeZone: "Africa/Lagos",
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })} WAT
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+      {/* ── Level Ladder ───────────────────────────────────────────────── */}
+      <section aria-label="Mining level ladder" className="space-y-3">
+        <h2 className="type-caption text-muted-foreground font-semibold uppercase tracking-wider font-mono">
+          Level Matrix
+        </h2>
+        <div className="space-y-2">
+          {MINING_LEVELS.map((lvl) => {
+            const isCurrentLevel = lvl.id === level.id;
+            const isLocked = lvl.locked;
+            return (
+              <div
+                key={lvl.id}
+                className={cn(
+                  "flex items-center gap-4 rounded-xl border p-4 transition-colors",
+                  isCurrentLevel
+                    ? "border-primary/30 bg-primary/5"
+                    : "border-border bg-card",
+                  isLocked && !isCurrentLevel && "opacity-60"
+                )}
+              >
+                {/* Level badge */}
+                <div
+                  className={cn(
+                    "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border font-mono text-sm font-bold",
+                    isCurrentLevel
+                      ? "border-primary/30 bg-primary/15 text-primary"
+                      : "border-border bg-secondary text-muted-foreground"
+                  )}
+                  aria-hidden="true"
+                >
+                  {lvl.id}
+                </div>
+
+                {/* Name + unlock criteria */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span
+                      className={cn(
+                        "text-xs font-semibold",
+                        isCurrentLevel ? "text-foreground" : "text-muted-foreground"
+                      )}
+                    >
+                      {lvl.name}
+                    </span>
+                    {isCurrentLevel && (
+                      <Badge
+                        variant="outline"
+                        className="text-[9px] font-mono border-primary/20 bg-primary/10 text-primary px-1.5 py-0"
+                      >
+                        YOUR LEVEL
+                      </Badge>
+                    )}
+                    {isLocked && (
+                      <Badge
+                        variant="outline"
+                        className="text-[9px] font-mono border-border text-muted-foreground/60 px-1.5 py-0"
+                      >
+                        LOCKED
+                      </Badge>
+                    )}
+                  </div>
+                  <p className="type-small text-muted-foreground mt-0.5 truncate">
+                    {isLocked ? lvl.unlockCriteria : "Active – verified account."}
+                  </p>
+                </div>
+
+                {/* Cap + multiplier */}
+                <div className="shrink-0 text-right">
+                  <p className="font-mono text-xs font-bold text-foreground">
+                    {lvl.dailyCap} $ZED
+                  </p>
+                  <p className="font-mono text-[10px] text-muted-foreground">
+                    {lvl.multiplier}× daily
+                  </p>
+                </div>
               </div>
-            </Card>
-          )}
-        </section>
-      </div>
-    </>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* ── Claim History ──────────────────────────────────────────────── */}
+      <section aria-label="Mining claim history" className="space-y-3">
+        <h2 className="type-caption text-muted-foreground font-semibold uppercase tracking-wider font-mono">
+          Recent Claims (last 14)
+        </h2>
+
+        {logs.length === 0 ? (
+          <Card className="p-8 border-border bg-card text-center">
+            <ShieldCheck className="h-6 w-6 text-muted-foreground mx-auto mb-2" aria-hidden="true" />
+            <p className="text-xs text-muted-foreground font-mono">
+              No claims yet. Make your first claim above!
+            </p>
+          </Card>
+        ) : (
+          <Card className="border-border bg-card shadow-xs overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="border-b border-border/70 text-muted-foreground text-[10px] font-mono uppercase">
+                    <th className="text-left px-4 py-2.5">Claim Date (WAT)</th>
+                    <th className="text-left px-4 py-2.5">Amount</th>
+                    <th className="text-left px-4 py-2.5">Multiplier</th>
+                    <th className="text-right px-4 py-2.5">Mined At</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border/50">
+                  {logs.map((log) => (
+                    <tr key={log.id} className="hover:bg-secondary/30 transition-colors">
+                      <td className="px-4 py-2.5 font-mono text-muted-foreground whitespace-nowrap">
+                        {log.claim_date}
+                      </td>
+                      <td className="px-4 py-2.5 font-mono font-semibold text-foreground whitespace-nowrap">
+                        +{Number(log.amount_mined).toFixed(2)} $ZED
+                      </td>
+                      <td className="px-4 py-2.5 font-mono text-primary whitespace-nowrap">
+                        {Number(log.multiplier_applied).toFixed(1)}×
+                      </td>
+                      <td className="px-4 py-2.5 text-right font-mono text-muted-foreground whitespace-nowrap">
+                        {new Date(log.mined_at).toLocaleTimeString("en-GB", {
+                          timeZone: "Africa/Lagos",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })} WAT
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+        )}
+      </section>
+    </div>
   );
 }
