@@ -44,6 +44,15 @@ export default async function MiningPage() {
       ? getLagosDate(new Date(wallet.last_mined_at)) === getLagosDate(new Date())
       : false;
 
+  // Fetch zed settings for withdrawals flag
+  const { data: zedSettings } = await supabase
+    .from("zed_settings")
+    .select("withdrawals_enabled")
+    .eq("id", 1)
+    .maybeSingle();
+
+  const withdrawalsEnabled = Boolean(zedSettings?.withdrawals_enabled);
+
   return (
     <MiningClient
       wallet={wallet}
@@ -51,6 +60,7 @@ export default async function MiningPage() {
       levelId={levelId}
       isVerified={isVerified}
       alreadyClaimed={alreadyClaimed}
+      withdrawalsEnabled={withdrawalsEnabled}
     />
   );
 }

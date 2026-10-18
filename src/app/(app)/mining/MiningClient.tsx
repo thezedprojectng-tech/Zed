@@ -34,6 +34,7 @@ interface MiningClientProps {
   levelId: number;
   isVerified: boolean;
   alreadyClaimed: boolean;
+  withdrawalsEnabled?: boolean;
 }
 
 /**
@@ -80,6 +81,7 @@ export function MiningClient({
   levelId,
   isVerified,
   alreadyClaimed: initialAlreadyClaimed,
+  withdrawalsEnabled = false,
 }: MiningClientProps) {
   const level = MINING_LEVEL_MAP[levelId as 1 | 2 | 3 | 4 | 5] ?? MINING_LEVEL_MAP[1];
 
@@ -181,7 +183,9 @@ export function MiningClient({
         </p>
         <p className="type-small text-muted-foreground/70 mt-1 flex items-center gap-1.5">
           <Info className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-          $ZED points have no cash value yet. Conversion is planned for a later phase.
+          {withdrawalsEnabled
+            ? "ZED can be withdrawn to a bank account once your request is approved."
+            : "$ZED points have no cash value yet. Conversion is planned for a later phase."}
         </p>
       </section>
 
@@ -200,11 +204,18 @@ export function MiningClient({
               <Zap className="h-4 w-4" aria-hidden="true" />
             </div>
           </div>
-          <div>
-            <p className="text-3xl font-bold font-mono text-foreground">
-              {currentBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-            </p>
-            <p className="type-small text-muted-foreground mt-0.5">$ZED points</p>
+          <div className="flex items-end justify-between gap-2">
+            <div>
+              <p className="text-3xl font-bold font-mono text-foreground">
+                {currentBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </p>
+              <p className="type-small text-muted-foreground mt-0.5">$ZED points</p>
+            </div>
+            <Button asChild variant="outline" size="sm" className="font-mono text-xs">
+              <Link href="/mining/withdraw">
+                Withdraw ZED
+              </Link>
+            </Button>
           </div>
           <div className="flex items-center gap-3 pt-1 border-hairline-t">
             <div className="flex items-center gap-1.5 text-amber-500">
