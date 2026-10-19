@@ -75,6 +75,7 @@ export default function Footer25() {
               { label: "WHATSAPP", href: "https://whatsapp.com/channel/0029VbEaT84IN9ipSi6ieN1P" },
               { label: "X (TWITTER)", href: "https://x.com/thezedprojectng" },
               { label: "INSTAGRAM", href: "https://www.instagram.com/thezedprojectng?rpxt=bmwyNTdxMDl0Zzk4" },
+              { label: "TIKTOK", href: "https://www.tiktok.com/@thezedprojectng?_r=1&_t=ZS-9AfWc88jf3U" },
             ].map((social) => (
               <a
                 key={social.label}

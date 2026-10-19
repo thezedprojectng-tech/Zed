@@ -3,13 +3,14 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Home, Compass, Briefcase, Pickaxe, User } from "lucide-react";
+import { Home, Compass, Briefcase, Pickaxe, User, UserPlus } from "lucide-react";
 
 const mobileNavItems = [
   { href: "/home", label: "Dashboard", icon: Home },
   { href: "/nav", label: "Zed Nav", icon: Compass },
   { href: "/skill", label: "Skill", icon: Briefcase },
   { href: "/mining", label: "Mining", icon: Pickaxe },
+  { href: "/referrals", label: "Referrals", icon: UserPlus },
   { href: "/profile", label: "Profile", icon: User },
 ] as const;
 

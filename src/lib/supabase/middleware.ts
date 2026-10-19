@@ -37,7 +37,8 @@ export async function updateSession(request: NextRequest) {
 
   const pathname = request.nextUrl.pathname;
 
-  // 1. Redirect unauthenticated users away from protected (app) routes to /login
+  // Public marketing & informational routes (never require authentication):
+  // '/', '/whitepaper', '/fund', '/privacy', '/terms', '/cookies'
   const isAppRoute =
     pathname.startsWith("/home") ||
     pathname.startsWith("/nav") ||

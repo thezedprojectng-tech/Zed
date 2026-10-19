@@ -13,6 +13,7 @@ import {
   Users,
   FileText,
   ScrollText,
+  Share2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -32,6 +33,8 @@ interface AdminTopBarProps {
 const navItems = [
   { href: "/admin", label: "Overview", icon: LayoutDashboard },
   { href: "/admin/users", label: "Users", icon: Users },
+  { href: "/admin/funding", label: "Funding", icon: Share2 },
+  { href: "/admin/referrals", label: "Referrals", icon: Share2 },
   { href: "/admin/reports", label: "Reports", icon: FileText },
   { href: "/admin/audit-log", label: "Audit Log", icon: ScrollText },
 ];
@@ -54,6 +57,10 @@ export function AdminTopBar({ adminUser }: AdminTopBarProps) {
   const getSectionTitle = () => {
     if (pathname === "/admin") return "Overview";
     if (pathname.startsWith("/admin/users")) return "Users Directory";
+    if (pathname.startsWith("/admin/funding")) return "Funding Submissions";
+    if (pathname.startsWith("/admin/referrals")) return "Referrals Management";
+    if (pathname.startsWith("/admin/withdrawals")) return "Withdrawals Queue";
+    if (pathname.startsWith("/admin/settings/zed")) return "ZED Token Settings";
     if (pathname.startsWith("/admin/reports")) return "Centre Reports";
     if (pathname.startsWith("/admin/audit-log")) return "Audit Log";
     return "Console";

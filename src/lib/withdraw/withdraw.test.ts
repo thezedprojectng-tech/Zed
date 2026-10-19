@@ -4,6 +4,7 @@ import {
   isAllowedStatusTransition,
   maskAccountNumber,
   mapWithdrawalError,
+  mergeWithdrawalsWithUsers,
 } from "./helpers";
 import {
   withdrawalRequestSchema,
@@ -241,5 +242,89 @@ describe("Zed Withdrawals - Zod Schemas Validation", () => {
       reject_reason: "Account name mismatch with NIN registration",
     };
     expect(adminReviewSchema.safeParse(rejectWithReason).success).toBe(true);
+  });
+});
+
+describe("Zed Withdrawals - Merge Function", () => {
+  const sampleRows = [
+    {
+      id: "req-1",
+      user_id: "user-alpha",
+      amount_zed: 1000,
+      price_ngn_snapshot: 15,
+      amount_ngn: 15000,
+      bank_name: "GTBank",
+      account_number: "0123456789",
+      account_name: "Alpha User",
+      status: "pending",
+      reject_reason: null,
+      admin_note: null,
+      created_at: "2026-10-18T10:00:00Z",
+      reviewed_at: null,
+      reviewed_by: null,
+    },
+    {
+      id: "req-2",
+      user_id: "user-missing",
+      amount_zed: 2000,
+      price_ngn_snapshot: 15,
+      amount_ngn: 30000,
+      bank_name: "Access Bank",
+      account_number: "9876543210",
+      account_name: "Deleted User",
+      status: "pending",
+      reject_reason: null,
+      admin_note: null,
+      created_at: "2026-10-18T11:00:00Z",
+      reviewed_at: null,
+      reviewed_by: null,
+    },
+  ];
+
+  it("merges known user info when present in lookup map", () => {
+    const usersMap = {
+      "user-alpha": {
+        id: "user-alpha",
+        full_name: "Alpha Citizen",
+        phone_number: "+2348012345678",
+      },
+    };
+
+    const merged = mergeWithdrawalsWithUsers(sampleRows, usersMap);
+
+    expect(merged).toHaveLength(2);
+    expect(merged[0].user_name).toBe("Alpha Citizen");
+    expect(merged[0].user_email).toBe("+2348012345678");
+  });
+
+  it("still lists rows when the matching user is missing or lookup failed", () => {
+    const usersMap = {
+      "user-alpha": {
+        id: "user-alpha",
+        full_name: "Alpha Citizen",
+        phone_number: "+2348012345678",
+      },
+      // "user-missing" is deliberately absent
+    };
+
+    const merged = mergeWithdrawalsWithUsers(sampleRows, usersMap);
+
+    expect(merged).toHaveLength(2);
+    // Missing user row is still listed with fallback citizen label
+    expect(merged[1].id).toBe("req-2");
+    expect(merged[1].user_name).toBe("Unknown Citizen");
+    expect(merged[1].user_email).toBe("");
+    expect(merged[1].amount_zed).toBe(2000);
+    expect(merged[1].status).toBe("pending");
+  });
+
+  it("preserves all rows even when user map is completely empty", () => {
+    const merged = mergeWithdrawalsWithUsers(sampleRows, {});
+
+    expect(merged).toHaveLength(2);
+    expect(merged[0].id).toBe("req-1");
+    expect(merged[0].user_name).toBe("Unknown Citizen");
+    expect(merged[1].id).toBe("req-2");
+    expect(merged[1].user_name).toBe("Unknown Citizen");
   });
 });

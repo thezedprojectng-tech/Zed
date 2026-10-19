@@ -10,9 +10,10 @@ import {
   FileText,
   ScrollText,
   ArrowLeft,
-  ShieldAlert,
   Banknote,
   Coins,
+  Share2,
+  Lightbulb,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -28,6 +29,8 @@ interface AdminSidebarProps {
 const navItems = [
   { href: "/admin", label: "Overview", icon: LayoutDashboard, exact: true },
   { href: "/admin/users", label: "Users", icon: Users, exact: false },
+  { href: "/admin/funding", label: "Funding", icon: Lightbulb, exact: false },
+  { href: "/admin/referrals", label: "Referrals", icon: Share2, exact: false },
   { href: "/admin/withdrawals", label: "Withdrawals", icon: Banknote, exact: false },
   { href: "/admin/settings/zed", label: "ZED Token", icon: Coins, exact: false },
   { href: "/admin/reports", label: "Reports", icon: FileText, exact: false },

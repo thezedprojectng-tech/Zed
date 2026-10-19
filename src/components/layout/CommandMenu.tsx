@@ -27,7 +27,7 @@ import {
   ArrowRight,
   ArrowUpRight,
 } from "lucide-react";
-import { SOCIAL_LINKS, XIcon, InstagramIcon, WhatsAppIcon } from "@/data/socials";
+import { SOCIAL_LINKS, XIcon, InstagramIcon, WhatsAppIcon, TikTokIcon } from "@/data/socials";
 
 interface CommandMenuProps {
   open: boolean;
@@ -303,6 +303,25 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
               <span className="font-medium text-foreground">Follow on Instagram</span>
               <span className="text-[11px] text-muted-foreground">
                 @thezedprojectng – visual guides, infographics, and highlights
+              </span>
+            </div>
+            <ArrowUpRight className="h-3.5 w-3.5 text-muted-foreground opacity-60" />
+          </CommandItem>
+
+          <CommandItem
+            onSelect={() =>
+              handleSelect(() =>
+                window.open(SOCIAL_LINKS.tiktok.href, "_blank", "noopener,noreferrer")
+              )
+            }
+          >
+            <div className="flex h-7 w-7 items-center justify-center rounded-md border-hairline bg-secondary shrink-0 text-foreground">
+              <TikTokIcon className="h-3.5 w-3.5" />
+            </div>
+            <div className="flex flex-col flex-1 min-w-0">
+              <span className="font-medium text-foreground">Follow on TikTok</span>
+              <span className="text-[11px] text-muted-foreground">
+                @thezedprojectng – short-form explainers, updates & community videos
               </span>
             </div>
             <ArrowUpRight className="h-3.5 w-3.5 text-muted-foreground opacity-60" />

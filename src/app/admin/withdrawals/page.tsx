@@ -15,7 +15,11 @@ export default async function AdminWithdrawalsPage() {
   await requireAdmin();
 
   const res = await adminGetWithdrawals("all");
-  const requests = res.ok ? res.data : [];
 
-  return <WithdrawalsQueueClient initialRequests={requests} />;
+  return (
+    <WithdrawalsQueueClient
+      initialRequests={res.ok ? res.data : []}
+      loadError={res.ok ? null : res.error}
+    />
+  );
 }

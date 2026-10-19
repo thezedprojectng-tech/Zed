@@ -23,6 +23,8 @@ import {
   LayoutGrid,
   Pickaxe,
   Briefcase,
+  UserPlus,
+  Lightbulb,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -33,7 +35,7 @@ import {
 import { getLevelName } from "@/types";
 import { useAuthStore } from "@/store/useAuthStore";
 import { MODULES } from "@/data/modules";
-import { SOCIAL_LINKS, XIcon, InstagramIcon, WhatsAppIcon } from "@/data/socials";
+import { SOCIAL_LINKS, XIcon, InstagramIcon, WhatsAppIcon, TikTokIcon } from "@/data/socials";
 
 interface NavItem {
   href: string;
@@ -71,7 +73,12 @@ const sections: NavSection[] = [
   },
   {
     title: "ACCOUNT",
-    items: [{ href: "/profile", label: "Profile", icon: User }],
+    items: [
+      { href: "/profile", label: "Profile", icon: User },
+      { href: "/referrals", label: "Referrals", icon: UserPlus },
+      { href: "/fund", label: "Fund your idea", icon: Lightbulb },
+      { href: "/whitepaper", label: "White Paper", icon: FileText },
+    ],
   },
   {
     title: "ADMIN",
@@ -79,6 +86,7 @@ const sections: NavSection[] = [
     items: [
       { href: "/admin", label: "Overview", icon: LayoutDashboard },
       { href: "/admin/users", label: "Users", icon: Users },
+      { href: "/admin/funding", label: "Funding", icon: Lightbulb },
       { href: "/admin/reports", label: "Reports", icon: FileText },
     ],
   },
@@ -363,6 +371,15 @@ export function Sidebar() {
               className="p-1.5 rounded-md text-muted-foreground hover:text-[#E4405F] hover:bg-secondary transition-colors"
             >
               <InstagramIcon className="h-3.5 w-3.5" />
+            </a>
+            <a
+              href={SOCIAL_LINKS.tiktok.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={SOCIAL_LINKS.tiktok.ariaLabel}
+              className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+            >
+              <TikTokIcon className="h-3 w-3" />
             </a>
           </div>
         </div>

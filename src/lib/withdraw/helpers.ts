@@ -1,6 +1,63 @@
+import type { WithdrawalRequest, WithdrawalStatus } from "./types";
+
+export interface RawWithdrawalRow {
+  id: string;
+  user_id: string;
+  amount_zed: number;
+  price_ngn_snapshot: number;
+  amount_ngn: number;
+  bank_name: string;
+  account_number: string;
+  account_name: string;
+  status: string;
+  reject_reason: string | null;
+  admin_note: string | null;
+  created_at: string;
+  reviewed_at: string | null;
+  reviewed_by: string | null;
+}
+
+export interface UserLookupInfo {
+  id: string;
+  full_name?: string | null;
+  phone_number?: string | null;
+  email?: string | null;
+}
+
 /**
  * Pure helpers for Zed Withdrawals & Token Pricing
  */
+
+/**
+ * Merges raw withdrawal request rows with user profile information.
+ * Ensures rows with missing or failed user lookups are never dropped.
+ */
+export function mergeWithdrawalsWithUsers(
+  requests: RawWithdrawalRow[],
+  usersMap: Record<string, UserLookupInfo>
+): WithdrawalRequest[] {
+  return requests.map((r) => {
+    const user = usersMap[r.user_id];
+    return {
+      id: String(r.id),
+      user_id: String(r.user_id),
+      amount_zed: Number(r.amount_zed),
+      price_ngn_snapshot: Number(r.price_ngn_snapshot),
+      amount_ngn: Number(r.amount_ngn),
+      bank_name: String(r.bank_name),
+      account_number: String(r.account_number),
+      account_name: String(r.account_name),
+      status: r.status as WithdrawalStatus,
+      reject_reason: r.reject_reason ? String(r.reject_reason) : null,
+      admin_note: r.admin_note ? String(r.admin_note) : null,
+      created_at: String(r.created_at),
+      reviewed_at: r.reviewed_at ? String(r.reviewed_at) : null,
+      reviewed_by: r.reviewed_by ? String(r.reviewed_by) : null,
+      user_name: user?.full_name?.trim() || "Unknown Citizen",
+      user_email: user?.phone_number || user?.email || "",
+    };
+  });
+}
 
 /**
  * Masks a bank account number showing only the last 4 digits (e.g. •••• •••• 1234).

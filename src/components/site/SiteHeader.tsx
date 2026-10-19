@@ -5,11 +5,13 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowUpRight, Menu, X } from "lucide-react";
 import { useSiteAuth } from "./useSiteAuth";
-import { SOCIAL_LINKS, XIcon, InstagramIcon, WhatsAppIcon } from "@/data/socials";
+import { SOCIAL_LINKS, XIcon, InstagramIcon, WhatsAppIcon, TikTokIcon } from "@/data/socials";
 
 const NAV_LINKS = [
   { href: "/#features", label: "Features" },
   { href: "/#how-it-works", label: "How it works" },
+  { href: "/fund", label: "Fund Your Idea" },
+  { href: "/whitepaper", label: "White Paper" },
   { href: "/#faq", label: "FAQ" },
 ];
 
@@ -228,6 +230,15 @@ export function SiteHeader() {
                   className="h-8 w-8 rounded-lg border border-[#E8E8E4] flex items-center justify-center text-[#57575e] hover:text-[#E4405F] hover:border-[#E4405F]/40 transition-colors"
                 >
                   <InstagramIcon className="h-4 w-4" />
+                </a>
+                <a
+                  href={SOCIAL_LINKS.tiktok.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={SOCIAL_LINKS.tiktok.ariaLabel}
+                  className="h-8 w-8 rounded-lg border border-[#E8E8E4] flex items-center justify-center text-[#57575e] hover:text-[#0B0B0C] hover:border-black/30 transition-colors"
+                >
+                  <TikTokIcon className="h-3.5 w-3.5" />
                 </a>
               </div>
             </div>

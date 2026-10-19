@@ -66,7 +66,7 @@ export function CallUpClient() {
         subtitle="Extract your NYSC state code, deployed state, and reporting countdown entirely on your device."
       />
 
-      <div className="mx-auto max-w-4xl px-4 py-6 md:px-8">
+      <div className=" px-4 py-6 md:px-8">
         {effectiveStep === "input" && (
           <CallUpInput
             onParsed={handleParsed}

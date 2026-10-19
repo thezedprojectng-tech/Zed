@@ -245,7 +245,7 @@ export function WithdrawClient({ overview }: WithdrawClientProps) {
   };
 
   return (
-    <div className="px-4 md:px-8 py-8 md:py-10 space-y-8 max-w-4xl mx-auto">
+    <div className="px-4 md:px-8 py-8 md:py-10 space-y-8">
       {/* ── Breadcrumb / Header ────────────────────────────────────────────── */}
       <section className="space-y-2 border-hairline-b pb-6">
         <Link

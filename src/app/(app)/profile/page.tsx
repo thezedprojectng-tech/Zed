@@ -23,7 +23,7 @@ import { Badge } from "@/components/ui/badge";
 import { useAuthStore } from "@/store/useAuthStore";
 import { signOut } from "@/lib/auth/actions";
 import { getLevelName } from "@/types";
-import { SOCIAL_LINKS, XIcon, InstagramIcon, WhatsAppIcon } from "@/data/socials";
+import { SOCIAL_LINKS, XIcon, InstagramIcon, WhatsAppIcon, TikTokIcon } from "@/data/socials";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -172,7 +172,7 @@ export default function ProfilePage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 pt-1">
             <a
               href={SOCIAL_LINKS.whatsapp.href}
               target="_blank"
@@ -221,6 +221,24 @@ export default function ProfilePage() {
               <div className="min-w-0 flex-1">
                 <p className="text-xs font-medium text-foreground group-hover:text-[#E4405F] transition-colors truncate">
                   Instagram
+                </p>
+                <p className="text-[10px] text-muted-foreground truncate">@thezedprojectng</p>
+              </div>
+              <ArrowUpRight className="h-3.5 w-3.5 text-muted-foreground group-hover:text-foreground transition-colors shrink-0" />
+            </a>
+
+            <a
+              href={SOCIAL_LINKS.tiktok.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2.5 p-3 rounded-lg border border-hairline bg-secondary/30 hover:bg-secondary transition-colors group"
+            >
+              <div className="h-8 w-8 rounded-md bg-secondary text-foreground flex items-center justify-center shrink-0 border border-border">
+                <TikTokIcon className="h-3.5 w-3.5" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-medium text-foreground truncate">
+                  TikTok
                 </p>
                 <p className="text-[10px] text-muted-foreground truncate">@thezedprojectng</p>
               </div>

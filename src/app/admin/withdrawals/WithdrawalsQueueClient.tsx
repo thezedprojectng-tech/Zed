@@ -17,6 +17,7 @@ import {
   Loader2,
   ArrowUpDown,
   Coins,
+  AlertCircle,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -38,14 +39,16 @@ import { cn } from "@/lib/utils";
 
 interface WithdrawalsQueueClientProps {
   initialRequests: WithdrawalRequest[];
+  loadError?: string | null;
 }
 
 export function WithdrawalsQueueClient({
   initialRequests,
+  loadError,
 }: WithdrawalsQueueClientProps) {
   const router = useRouter();
   const [requests, setRequests] = useState<WithdrawalRequest[]>(initialRequests);
-  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState<string>("pending");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [unmaskedIds, setUnmaskedIds] = useState<Record<string, boolean>>({});
   const [isPending, startTransition] = useTransition();
@@ -241,6 +244,19 @@ export function WithdrawalsQueueClient({
           </p>
         </div>
       </div>
+
+      {/* ── Error Callout Banner ─────────────────────────────────────────── */}
+      {loadError && (
+        <Card className="p-4 border-rose-500/30 bg-rose-500/10 flex items-start gap-3">
+          <AlertCircle className="h-5 w-5 text-rose-500 shrink-0 mt-0.5" />
+          <div className="text-xs space-y-1">
+            <p className="font-semibold text-foreground">
+              Failed to load withdrawal requests
+            </p>
+            <p className="text-muted-foreground">{loadError}</p>
+          </div>
+        </Card>
+      )}
 
       {/* ── Metric Summary Cards ─────────────────────────────────────────── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">

@@ -24,6 +24,8 @@ Live: https://zedng.vercel.app
 | NYSC Call-up Letter Parser (client-side) | Built |
 | Zed Mining (daily $ZED point claim, level matrix, Turnstile) | Built |
 | Zed Skill (career playbooks, lesson progress, skill points) | Built |
+| White Paper (`/whitepaper`, PDF download) | Built |
+| Fund your idea (`/fund`, submissions, admin review) | Built |
 | PPA Hub | Planned |
 | Phone OTP sign-in | Planned |
 | Zed Market, Meet, Communities, Campus Hubs, Live Audio Rooms, Creator Lab, Zed SOS, $ZED rewards | Planned (Phases 2-3), shown as Coming soon |
@@ -59,6 +61,10 @@ Open http://localhost:3000.
 | `NIN_HASH_SALT` | **Server only** | At least 32 characters. Generate with `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"` |
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Browser | Cloudflare Turnstile site key. Omit in dev to use the always-pass test key. |
 | `TURNSTILE_SECRET_KEY` | **Server only** | Cloudflare Turnstile secret key. Required in production. |
+| `FUNDING_IP_SALT` | **Server only** | Salt for client IP SHA-256 hash in /fund submissions (fail-closed if missing). |
+| `RESEND_API_KEY` | **Server only** | Resend API key for best-effort email notifications on funding submissions. |
+| `FUNDING_FROM_EMAIL` | **Server only** | Sender email address for funding emails (e.g. `Zed Funding <onboarding@resend.dev>`). |
+| `FUNDING_NOTIFY_EMAIL` | **Server only** | Team inbox receiving pitch submissions (defaults to `thezedprojectng@gmail.com`). |
 
 Never commit `.env.local`. Set the same variables in Vercel for Production **and** Preview.
 
@@ -73,6 +79,9 @@ SQL migrations are in `supabase/migrations/`. Run them in order in the Supabase 
 5. `0005_cds_logs.sql`: CDS logs table with RLS (user-scoped + admin select)
 6. `0006_zed_mining.sql`: `token_wallets`, `mining_logs`, and `claim_daily_mining()` RPC (auth.uid() security definer, no user id parameter, unique(user_id, claim_date))
 7. `0007_zed_skill.sql`: `skill_tracks`, `skill_lessons`, `skill_progress`, and `complete_lesson()` RPC (auth.uid() security definer, idempotent)
+8. `0008_zed_withdrawals.sql`: manual bank withdrawals and admin-set token price
+9. `0009_referrals.sql`: referral codes, attribution, and anti-abuse mechanisms
+10. `0010_funding_submissions.sql`: project idea submissions, salted IP rate limiting, admin review and audit logging
 
 Authentication is configured with email + password. The sign-up flow creates a `public.users` row from auth metadata through a security-definer trigger.
 

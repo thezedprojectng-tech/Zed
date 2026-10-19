@@ -2,7 +2,12 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { mapWithdrawalError } from "./helpers";
+import {
+  mapWithdrawalError,
+  mergeWithdrawalsWithUsers,
+  type RawWithdrawalRow,
+  type UserLookupInfo,
+} from "./helpers";
 import {
   withdrawalRequestSchema,
   adminSettingsSchema,
@@ -294,49 +299,60 @@ export async function adminGetWithdrawals(statusFilter?: string) {
     return { ok: false as const, error: "Unauthorized access" };
   }
 
+  // 1. Fetch withdrawal_requests without embedding users directly
   let query = supabase
     .from("withdrawal_requests")
-    .select(`
-      *,
-      users (
-        full_name,
-        phone_number
-      )
-    `)
+    .select("*")
     .order("created_at", { ascending: false });
 
   if (statusFilter && statusFilter !== "all") {
     query = query.eq("status", statusFilter);
   }
 
-  const { data, error } = await query;
+  const { data: requestsData, error: requestsError } = await query;
 
-  if (error) {
-    console.error("[Admin] adminGetWithdrawals error:", error.message);
-    return { ok: false as const, error: "Failed to fetch withdrawal requests" };
+  if (requestsError) {
+    console.error("[Admin] adminGetWithdrawals error:", requestsError.message);
+    return {
+      ok: false as const,
+      error: requestsError.message || "Failed to fetch withdrawal requests",
+    };
   }
 
-  const list = ((data ?? []) as Array<Record<string, unknown>>).map((r) => {
-    const userObj = r.users as { full_name?: string; phone_number?: string } | null;
-    return {
-      id: String(r.id),
-      user_id: String(r.user_id),
-      amount_zed: Number(r.amount_zed),
-      price_ngn_snapshot: Number(r.price_ngn_snapshot),
-      amount_ngn: Number(r.amount_ngn),
-      bank_name: String(r.bank_name),
-      account_number: String(r.account_number),
-      account_name: String(r.account_name),
-      status: r.status as WithdrawalStatus,
-      reject_reason: r.reject_reason ? String(r.reject_reason) : null,
-      admin_note: r.admin_note ? String(r.admin_note) : null,
-      created_at: String(r.created_at),
-      reviewed_at: r.reviewed_at ? String(r.reviewed_at) : null,
-      reviewed_by: r.reviewed_by ? String(r.reviewed_by) : null,
-      user_name: userObj?.full_name || "Unknown User",
-      user_email: userObj?.phone_number || "",
-    } as WithdrawalRequest;
-  });
+  const rawRows = (requestsData ?? []) as RawWithdrawalRow[];
+  const userIds = Array.from(
+    new Set(rawRows.map((r) => r.user_id).filter(Boolean))
+  );
+  const usersMap: Record<string, UserLookupInfo> = {};
+
+  // 2. Fetch matching users in a second query so a profile lookup issue never drops records
+  if (userIds.length > 0) {
+    const { data: usersData, error: usersError } = await supabase
+      .from("users")
+      .select("id, full_name, phone_number")
+      .in("id", userIds);
+
+    if (usersError) {
+      console.warn(
+        "[Admin] adminGetWithdrawals user lookup warning:",
+        usersError.message
+      );
+    } else {
+      for (const u of (usersData ?? []) as Array<{
+        id: string;
+        full_name?: string | null;
+        phone_number?: string | null;
+      }>) {
+        usersMap[u.id] = {
+          id: u.id,
+          full_name: u.full_name,
+          phone_number: u.phone_number,
+        };
+      }
+    }
+  }
+
+  const list = mergeWithdrawalsWithUsers(rawRows, usersMap);
 
   return { ok: true as const, data: list };
 }

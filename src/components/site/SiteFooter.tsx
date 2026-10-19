@@ -5,13 +5,15 @@ import Image from "next/image";
 import { ArrowUpRight, ArrowUp, MapPin } from "lucide-react";
 import { openCookieSettings } from "./CookieBanner";
 import { useSiteAuth } from "./useSiteAuth";
-import { SOCIAL_LINKS, XIcon, InstagramIcon, WhatsAppIcon } from "@/data/socials";
+import { SOCIAL_LINKS, XIcon, InstagramIcon, WhatsAppIcon, TikTokIcon } from "@/data/socials";
 
 const PRODUCT_LINKS = [
   { href: "/#zed-nav", label: "Zed Nav" },
   { href: "/#ecosystem", label: "Ecosystem" },
   { href: "/#architecture", label: "Architecture" },
   { href: "/#token-engine", label: "$ZED Mining" },
+  { href: "/fund", label: "Fund Your Idea" },
+  { href: "/whitepaper", label: "White Paper" },
   { href: "/#faq", label: "FAQ" },
 ];
 
@@ -127,6 +129,15 @@ export function SiteFooter() {
                   className="h-8 w-8 rounded-lg border border-white/10 bg-white/5 flex items-center justify-center text-[#9c9ca8] hover:text-[#E4405F] hover:border-[#E4405F]/40 hover:bg-[#E4405F]/10 transition-colors"
                 >
                   <InstagramIcon className="h-4 w-4" />
+                </a>
+                <a
+                  href={SOCIAL_LINKS.tiktok.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={SOCIAL_LINKS.tiktok.ariaLabel}
+                  className="h-8 w-8 rounded-lg border border-white/10 bg-white/5 flex items-center justify-center text-[#9c9ca8] hover:text-[#ff0050] hover:border-[#ff0050]/40 hover:bg-[#ff0050]/10 transition-colors"
+                >
+                  <TikTokIcon className="h-3.5 w-3.5" />
                 </a>
               </div>
             </div>
