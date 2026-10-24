@@ -268,6 +268,103 @@ describe("mapSkillRpcError", () => {
     expect(mapSkillRpcError(undefined)).toBe("Could not complete the lesson. Please try again.");
     expect(mapSkillRpcError("")).toBe("Could not complete the lesson. Please try again.");
   });
+
 });
 
+// ── New tests added for Step 3 UI fixes ──────────────────────────────────────
 
+/**
+ * Pure helper that mirrors the ternary in skill/page.tsx:
+ *   completedLessons === totalLessons && totalLessons > 0 => "Review"
+ *   completedLessons > 0                                  => "Continue"
+ *   else                                                   => "Start"
+ */
+function getTrackButtonLabel(
+  completedLessons: number,
+  totalLessons: number
+): string {
+  if (completedLessons === totalLessons && totalLessons > 0) return "Review";
+  if (completedLessons > 0) return "Continue";
+  return "Start";
+}
+
+describe("Track button label", () => {
+  it('shows "Start" when no lessons are completed', () => {
+    expect(getTrackButtonLabel(0, 3)).toBe("Start");
+  });
+
+  it('shows "Continue" when partially completed', () => {
+    expect(getTrackButtonLabel(1, 3)).toBe("Continue");
+    expect(getTrackButtonLabel(2, 3)).toBe("Continue");
+  });
+
+  it('shows "Review" when all lessons are completed', () => {
+    expect(getTrackButtonLabel(3, 3)).toBe("Review");
+  });
+
+  it('shows "Start" (not "Review") when track has 0 lessons', () => {
+    expect(getTrackButtonLabel(0, 0)).toBe("Start");
+  });
+});
+
+describe("getSkillLevelProgress – exact threshold boundaries", () => {
+  it("correctly computes next level at exact Level 3 threshold (250 pts)", () => {
+    const res = getSkillLevelProgress(250);
+    expect(res.currentEligibleLevel).toBe(3);
+    expect(res.currentEligibleLevelName).toBe("Builder");
+    expect(res.nextLevel).toBe(4);
+    expect(res.nextLevelName).toBe("Pro");
+    expect(res.pointsNeeded).toBe(250); // 500 - 250
+    expect(res.progressPercent).toBe(0);
+  });
+
+  it("correctly computes next level at exact Level 4 threshold (500 pts)", () => {
+    const res = getSkillLevelProgress(500);
+    expect(res.currentEligibleLevel).toBe(4);
+    expect(res.currentEligibleLevelName).toBe("Pro");
+    expect(res.nextLevel).toBe(5);
+    expect(res.nextLevelName).toBe("Zed Legend");
+    expect(res.pointsNeeded).toBe(500); // 1000 - 500
+    expect(res.progressPercent).toBe(0);
+  });
+
+  it("correctly computes no next level at exact Level 5 threshold (1000 pts)", () => {
+    const res = getSkillLevelProgress(1000);
+    expect(res.currentEligibleLevel).toBe(5);
+    expect(res.nextLevel).toBeNull();
+    expect(res.nextLevelName).toBeNull();
+    expect(res.pointsNeeded).toBe(0);
+    expect(res.progressPercent).toBe(100);
+  });
+
+  it("correctly computes no next level above Level 5 (e.g. 1500 pts)", () => {
+    const res = getSkillLevelProgress(1500);
+    expect(res.currentEligibleLevel).toBe(5);
+    expect(res.nextLevel).toBeNull();
+    expect(res.progressPercent).toBe(100);
+  });
+
+  it("computes midpoint of Level 3→4 band correctly (375 pts)", () => {
+    // Band: 250–500 (250 span). 375 is 125 into the band = 50%
+    const res = getSkillLevelProgress(375);
+    expect(res.currentEligibleLevel).toBe(3);
+    expect(res.nextLevel).toBe(4);
+    expect(res.pointsNeeded).toBe(125);
+    expect(res.progressPercent).toBe(50);
+  });
+
+  it("computes midpoint of Level 4→5 band correctly (750 pts)", () => {
+    // Band: 500–1000 (500 span). 750 is 250 into the band = 50%
+    const res = getSkillLevelProgress(750);
+    expect(res.currentEligibleLevel).toBe(4);
+    expect(res.nextLevel).toBe(5);
+    expect(res.pointsNeeded).toBe(250);
+    expect(res.progressPercent).toBe(50);
+  });
+
+  it("published points across 6 tracks (300 pts) correctly reach Level 3", () => {
+    // 2 original tracks × 50 pts + 4 new tracks × 50 pts = 300 pts total
+    const totalPublishedPoints = 300;
+    expect(computeEligibleLevel(totalPublishedPoints)).toBe(3);
+  });
+});

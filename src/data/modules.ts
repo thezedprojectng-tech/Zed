@@ -120,8 +120,9 @@ export const MODULES: ZedModule[] = [
     name: "Zed Market",
     tagline: "Transparent, escrow-secured marketplace connecting youth with vetted providers.",
     icon: ShoppingBag,
-    status: "soon",
-    phase: "Phase 2",
+    status: "live",
+    phase: "Phase 1",
+    href: "/market",
     what: "Zed Market will be a trust-first services marketplace where buyers and sellers transact through an escrow layer, eliminating fraud risk for freelance work, digital services, and physical goods.",
   },
   {

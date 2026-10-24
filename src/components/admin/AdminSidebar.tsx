@@ -14,6 +14,8 @@ import {
   Coins,
   Share2,
   Lightbulb,
+  GraduationCap,
+  ShoppingBag,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -29,10 +31,12 @@ interface AdminSidebarProps {
 const navItems = [
   { href: "/admin", label: "Overview", icon: LayoutDashboard, exact: true },
   { href: "/admin/users", label: "Users", icon: Users, exact: false },
+  { href: "/admin/skill", label: "Skill content", icon: GraduationCap, exact: false },
   { href: "/admin/funding", label: "Funding", icon: Lightbulb, exact: false },
   { href: "/admin/referrals", label: "Referrals", icon: Share2, exact: false },
   { href: "/admin/withdrawals", label: "Withdrawals", icon: Banknote, exact: false },
   { href: "/admin/settings/zed", label: "ZED Token", icon: Coins, exact: false },
+  { href: "/admin/market", label: "Market Moderation", icon: ShoppingBag, exact: false },
   { href: "/admin/reports", label: "Reports", icon: FileText, exact: false },
   { href: "/admin/audit-log", label: "Audit Log", icon: ScrollText, exact: false },
 ];
@@ -128,7 +132,7 @@ export function AdminSidebar({ adminUser }: AdminSidebarProps) {
             className="flex items-center gap-2.5 rounded-md px-2.5 py-2 text-xs font-medium text-muted-foreground hover:bg-secondary/60 hover:text-foreground border border-transparent transition-colors"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
-            <span>Back to citizen app</span>
+            <span>Back to user app</span>
           </Link>
         </div>
       </nav>

@@ -26,6 +26,7 @@ import {
   ShieldCheck,
   ArrowRight,
   ArrowUpRight,
+  ShoppingBag,
 } from "lucide-react";
 import { SOCIAL_LINKS, XIcon, InstagramIcon, WhatsAppIcon, TikTokIcon } from "@/data/socials";
 
@@ -128,6 +129,21 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
               <span className="font-medium text-foreground">Profile & Credentials</span>
               <span className="text-[11px] text-muted-foreground">
                 Verification status, progression levels, and saved records
+              </span>
+            </div>
+            <ArrowRight className="h-3.5 w-3.5 text-muted-foreground opacity-60" />
+          </CommandItem>
+
+          <CommandItem
+            onSelect={() => handleSelect(() => router.push("/market"))}
+          >
+            <div className="flex h-7 w-7 items-center justify-center rounded-md border-hairline bg-secondary shrink-0 text-muted-foreground">
+              <ShoppingBag className="h-3.5 w-3.5" />
+            </div>
+            <div className="flex flex-col flex-1 min-w-0">
+              <span className="font-medium text-foreground">Zed Market</span>
+              <span className="text-[11px] text-muted-foreground">
+                Buy and sell with verified users — phones, books, services, and more
               </span>
             </div>
             <ArrowRight className="h-3.5 w-3.5 text-muted-foreground opacity-60" />

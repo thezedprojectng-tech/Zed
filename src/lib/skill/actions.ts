@@ -74,14 +74,20 @@ export async function getSkillOverview(): Promise<SkillOverviewData | null> {
       .order("position", { ascending: true }),
     supabase
       .from("skill_progress")
-      .select("lesson_id, completed_at")
+      .select("lesson_id, points_awarded, completed_at")
       .eq("user_id", user.id),
   ]);
 
   const tracks = tracksResult.data ?? [];
   const lessons = lessonsResult.data ?? [];
-  const completedMap = new Map<string, string>(
-    (progressResult.data ?? []).map((p) => [p.lesson_id, p.completed_at])
+  const completedMap = new Map<string, { completed_at: string; points_awarded: number | null }>(
+    (progressResult.data ?? []).map((p) => [
+      p.lesson_id,
+      {
+        completed_at: p.completed_at,
+        points_awarded: typeof p.points_awarded === "number" ? p.points_awarded : null,
+      },
+    ])
   );
 
   // 3. Compute points and lesson counts per track
@@ -96,10 +102,12 @@ export async function getSkillOverview(): Promise<SkillOverviewData | null> {
 
     for (const l of trackLessons) {
       totalPoints += l.skill_points;
-      if (completedMap.has(l.id)) {
+      const progress = completedMap.get(l.id);
+      if (progress) {
         completedLessons += 1;
-        earnedPoints += l.skill_points;
-        userTotalPoints += l.skill_points;
+        const pts = progress.points_awarded ?? l.skill_points;
+        earnedPoints += pts;
+        userTotalPoints += pts;
       }
     }
 
@@ -187,12 +195,18 @@ export async function getTrackDetail(
       .order("position", { ascending: true }),
     supabase
       .from("skill_progress")
-      .select("lesson_id, completed_at")
+      .select("lesson_id, points_awarded, completed_at")
       .eq("user_id", user.id),
   ]);
 
-  const completedMap = new Map<string, string>(
-    (progressResult.data ?? []).map((p) => [p.lesson_id, p.completed_at])
+  const completedMap = new Map<string, { completed_at: string; points_awarded: number | null }>(
+    (progressResult.data ?? []).map((p) => [
+      p.lesson_id,
+      {
+        completed_at: p.completed_at,
+        points_awarded: typeof p.points_awarded === "number" ? p.points_awarded : null,
+      },
+    ])
   );
 
   let earnedPoints = 0;
@@ -200,10 +214,11 @@ export async function getTrackDetail(
   let completedCount = 0;
 
   const lessons: SkillLessonItem[] = (lessonsResult.data ?? []).map((l) => {
-    const isCompleted = completedMap.has(l.id);
+    const progress = completedMap.get(l.id);
+    const isCompleted = Boolean(progress);
     totalPoints += l.skill_points;
-    if (isCompleted) {
-      earnedPoints += l.skill_points;
+    if (isCompleted && progress) {
+      earnedPoints += progress.points_awarded ?? l.skill_points;
       completedCount += 1;
     }
     return {
@@ -216,7 +231,7 @@ export async function getTrackDetail(
       position: l.position,
       skill_points: l.skill_points,
       completed: isCompleted,
-      completed_at: completedMap.get(l.id) ?? null,
+      completed_at: progress?.completed_at ?? null,
     };
   });
 

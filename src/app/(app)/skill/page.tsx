@@ -119,7 +119,7 @@ export default async function SkillPage() {
                     {progressSummary.nextLevelName})
                   </>
                 ) : (
-                  "Highest level threshold achieved"
+                  "You reached the top level"
                 )}
               </p>
             </div>
@@ -127,7 +127,7 @@ export default async function SkillPage() {
               variant="outline"
               className="font-mono text-[10px] border-primary/20 bg-primary/10 text-primary px-1.5 py-0"
             >
-              Level 1 Active
+              Level {progressSummary.currentEligibleLevel} Active
             </Badge>
           </div>
 
@@ -234,7 +234,13 @@ export default async function SkillPage() {
                   <Button asChild size="sm" variant="outline" className="gap-1.5">
                     <Link href={`/skill/${track.slug}`}>
                       <BookOpen className="h-3.5 w-3.5" aria-hidden="true" />
-                      <span>{track.completedLessons > 0 ? "Continue" : "Start"}</span>
+                      <span>
+                        {track.completedLessons === track.totalLessons && track.totalLessons > 0
+                          ? "Review"
+                          : track.completedLessons > 0
+                          ? "Continue"
+                          : "Start"}
+                      </span>
                       <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
                     </Link>
                   </Button>

@@ -14,6 +14,7 @@ import {
   FileText,
   ScrollText,
   Share2,
+  GraduationCap,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -33,6 +34,7 @@ interface AdminTopBarProps {
 const navItems = [
   { href: "/admin", label: "Overview", icon: LayoutDashboard },
   { href: "/admin/users", label: "Users", icon: Users },
+  { href: "/admin/skill", label: "Skill content", icon: GraduationCap },
   { href: "/admin/funding", label: "Funding", icon: Share2 },
   { href: "/admin/referrals", label: "Referrals", icon: Share2 },
   { href: "/admin/reports", label: "Reports", icon: FileText },
@@ -57,6 +59,7 @@ export function AdminTopBar({ adminUser }: AdminTopBarProps) {
   const getSectionTitle = () => {
     if (pathname === "/admin") return "Overview";
     if (pathname.startsWith("/admin/users")) return "Users Directory";
+    if (pathname.startsWith("/admin/skill")) return "Skill Content";
     if (pathname.startsWith("/admin/funding")) return "Funding Submissions";
     if (pathname.startsWith("/admin/referrals")) return "Referrals Management";
     if (pathname.startsWith("/admin/withdrawals")) return "Withdrawals Queue";
