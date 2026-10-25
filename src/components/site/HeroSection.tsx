@@ -98,30 +98,11 @@ export function HeroSection() {
           initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 32 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.75, delay: 0.28, ease: [0.22, 1, 0.36, 1] }}
-          className="mt-14 sm:mt-16 max-w-5xl mx-auto"
+          className="mt-14 sm:mt-16 "
         >
-          {/* Browser Chrome Frame */}
-          <div className="rounded-t-2xl border border-b-0 border-[#D8D8D2] bg-[#F5F5F0] px-4 py-3 flex items-center gap-3">
-            {/* Window dots */}
-            <div className="flex items-center gap-1.5 flex-shrink-0">
-              <span className="h-3 w-3 rounded-full bg-[#FF5F56]" />
-              <span className="h-3 w-3 rounded-full bg-[#FFBD2E]" />
-              <span className="h-3 w-3 rounded-full bg-[#27C93F]" />
-            </div>
-
-            {/* URL Bar */}
-            <div className="flex-1 flex items-center justify-center">
-              <div className="flex items-center gap-1.5 bg-white border border-[#D8D8D2] rounded-md px-3 py-1 text-xs text-[#57575e] font-mono max-w-xs w-full justify-center">
-                <Lock className="h-3 w-3 text-[#2E82F7] flex-shrink-0" />
-                <span>Illustration • Zed Dashboard Preview</span>
-              </div>
-            </div>
-
-            <div className="flex-shrink-0 w-[54px]" />
-          </div>
 
           {/* Screenshot */}
-          <div className="border border-[#D8D8D2] rounded-b-2xl overflow-hidden shadow-2xl shadow-black/10">
+          <div className="rounded-b-2xl overflow-hidden shadow-2xl shadow-black/10">
             <Image
               src="/dashboard.png"
               alt="Zed civic dashboard showing civil guides, NIN verification prompt, and passport tracking"
@@ -129,8 +110,8 @@ export function HeroSection() {
               height={873}
               priority
               quality={95}
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 1152px"
-              className="w-full h-auto object-cover select-none block"
+              // sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 1152px"
+              className="w-full h-auto object-cover rounded select-none block"
             />
           </div>
         </motion.figure>
