@@ -12,10 +12,14 @@ export interface UserProfile {
   phone_number: string;
   nin_hash: string | null;
   full_name: string;
+  display_name: string | null;
+  username: string | null;
+  avatar_path: string | null;
   avatar_url: string | null;
   level_id: number;
   is_verified: boolean;
   role: "user" | "admin";
+  username_changed_at: string | null;
   created_at: string;
   updated_at: string;
 }

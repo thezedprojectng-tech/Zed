@@ -7,9 +7,13 @@ export interface ZedUser {
   phone_number: string;
   nin_hash?: string | null;
   full_name: string;
+  display_name?: string | null;
+  username?: string | null;
+  avatar_path?: string | null;
   avatar_url?: string | null;
   level_id: 1 | 2 | 3 | 4 | 5;
   is_verified: boolean;
+  username_changed_at?: string | null;
   created_at: string;
   updated_at: string;
 }

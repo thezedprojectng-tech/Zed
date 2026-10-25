@@ -16,7 +16,7 @@ import { describe, it, expect, vi } from "vitest";
 
 describe("MobileDrawer – open/close state", () => {
   it("starts closed", () => {
-    let isOpen = false;
+    const isOpen = false;
     expect(isOpen).toBe(false);
   });
 

@@ -34,9 +34,10 @@ import {
   Building2,
   CheckCircle2,
   Circle,
+  UserX,
 } from "lucide-react";
 import { toast } from "sonner";
-import { deleteUserAction, changeUserRoleAction } from "./actions";
+import { deleteUserAction, changeUserRoleAction, adminClearUserProfileAction } from "./actions";
 import { getLevelName } from "@/types";
 
 export interface UserDetail {
@@ -94,6 +95,11 @@ export function UserDetailDrawer({
 }: UserDetailDrawerProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [roleDialogOpen, setRoleDialogOpen] = useState(false);
+  const [clearProfileDialogOpen, setClearProfileDialogOpen] = useState(false);
+  const [clearUsername, setClearUsername] = useState(false);
+  const [clearDisplayName, setClearDisplayName] = useState(false);
+  const [clearAvatar, setClearAvatar] = useState(false);
+  const [clearReason, setClearReason] = useState("");
   const [typedEmail, setTypedEmail] = useState("");
   const [selectedRole, setSelectedRole] = useState<"user" | "admin">("user");
   const [isPending, startTransition] = useTransition();
@@ -139,6 +145,29 @@ export function UserDetailDrawer({
     });
   };
 
+  const handleClearProfile = () => {
+    startTransition(async () => {
+      const res = await adminClearUserProfileAction({
+        userId: user.id,
+        clearUsername,
+        clearDisplayName,
+        clearAvatar,
+        reason: clearReason,
+      });
+      if (!res.success) {
+        toast.error(res.error || "Failed to clear profile fields.");
+      } else {
+        toast.success(res.message || "Profile fields cleared.");
+        setClearProfileDialogOpen(false);
+        setClearUsername(false);
+        setClearDisplayName(false);
+        setClearAvatar(false);
+        setClearReason("");
+        onUserUpdated?.();
+      }
+    });
+  };
+
   return (
     <>
       <Sheet open={open} onOpenChange={onOpenChange}>
@@ -154,7 +183,7 @@ export function UserDetailDrawer({
               </Avatar>
               <div className="min-w-0 flex-1">
                 <SheetTitle className="text-base font-bold text-foreground truncate">
-                  {user.full_name || "Citizen"}
+                  {user.full_name || "User"}
                 </SheetTitle>
                 <SheetDescription className="text-xs font-mono text-muted-foreground truncate">
                   {user.email || user.masked_phone}
@@ -321,35 +350,55 @@ export function UserDetailDrawer({
                 Administrative Actions
               </h4>
 
-              <div className="grid grid-cols-2 gap-2">
-                {/* Change Role Button */}
+              <div className="space-y-2">
+                <div className="grid grid-cols-2 gap-2">
+                  {/* Change Role Button */}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setSelectedRole(user.role === "admin" ? "user" : "admin");
+                      setRoleDialogOpen(true);
+                    }}
+                    disabled={isSelf}
+                    className="gap-1.5 text-xs border-border hover:bg-secondary"
+                  >
+                    <UserCog className="h-3.5 w-3.5" />
+                    <span>{user.role === "admin" ? "Demote to User" : "Make Admin"}</span>
+                  </Button>
+
+                  {/* Delete User Button */}
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => {
+                      setTypedEmail("");
+                      setDeleteDialogOpen(true);
+                    }}
+                    disabled={isSelf || isTargetAdmin}
+                    className="gap-1.5 text-xs"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                    <span>Delete User</span>
+                  </Button>
+                </div>
+
+                {/* Clear Profile Moderation Button */}
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => {
-                    setSelectedRole(user.role === "admin" ? "user" : "admin");
-                    setRoleDialogOpen(true);
+                    setClearUsername(false);
+                    setClearDisplayName(false);
+                    setClearAvatar(false);
+                    setClearReason("");
+                    setClearProfileDialogOpen(true);
                   }}
                   disabled={isSelf}
-                  className="gap-1.5 text-xs border-border hover:bg-secondary"
+                  className="w-full gap-1.5 text-xs border-amber-500/30 text-amber-600 hover:bg-amber-500/10 hover:text-amber-700 dark:text-amber-400"
                 >
-                  <UserCog className="h-3.5 w-3.5" />
-                  <span>{user.role === "admin" ? "Demote to User" : "Make Admin"}</span>
-                </Button>
-
-                {/* Delete User Button */}
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  onClick={() => {
-                    setTypedEmail("");
-                    setDeleteDialogOpen(true);
-                  }}
-                  disabled={isSelf || isTargetAdmin}
-                  className="gap-1.5 text-xs"
-                >
-                  <Trash2 className="h-3.5 w-3.5" />
-                  <span>Delete User</span>
+                  <UserX className="h-3.5 w-3.5" />
+                  <span>Clear Profile Fields</span>
                 </Button>
               </div>
 
@@ -379,7 +428,7 @@ export function UserDetailDrawer({
             <DialogDescription className="text-xs text-muted-foreground pt-1 space-y-2">
               <p>
                 This action is irreversible. It will delete the user account from Supabase Auth and cascade
-                to all citizen profiles, documents, and guide progress.
+                to all user profiles, documents, and guide progress.
               </p>
               <div className="p-2.5 rounded-md border border-border bg-secondary/50 font-mono text-[11px] text-foreground">
                 To confirm, type the user&apos;s email address:
@@ -428,6 +477,104 @@ export function UserDetailDrawer({
         </DialogContent>
       </Dialog>
 
+      {/* Clear Profile Fields Dialog */}
+      <Dialog open={clearProfileDialogOpen} onOpenChange={setClearProfileDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-base flex items-center gap-2">
+              <UserX className="h-4 w-4 text-amber-500" />
+              Clear Profile Fields
+            </DialogTitle>
+            <DialogDescription className="text-xs text-muted-foreground pt-1">
+              Reset profile fields for{" "}
+              <strong className="text-foreground">{user.full_name}</strong> that violate community guidelines or impersonate official staff. An entry will be permanently logged in the audit ledger.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="py-3 space-y-4">
+            <div>
+              <label className="text-xs font-semibold text-foreground block mb-2">
+                Select fields to clear:
+              </label>
+              <div className="space-y-2">
+                <label className="flex items-center gap-2 text-xs text-foreground cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={clearUsername}
+                    onChange={(e) => setClearUsername(e.target.checked)}
+                    className="rounded border-border text-primary focus:ring-primary h-4 w-4"
+                  />
+                  <span>Username (resets to null)</span>
+                </label>
+                <label className="flex items-center gap-2 text-xs text-foreground cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={clearDisplayName}
+                    onChange={(e) => setClearDisplayName(e.target.checked)}
+                    className="rounded border-border text-primary focus:ring-primary h-4 w-4"
+                  />
+                  <span>Display Name (resets to null)</span>
+                </label>
+                <label className="flex items-center gap-2 text-xs text-foreground cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={clearAvatar}
+                    onChange={(e) => setClearAvatar(e.target.checked)}
+                    className="rounded border-border text-primary focus:ring-primary h-4 w-4"
+                  />
+                  <span>Avatar (resets to null &amp; deletes storage file)</span>
+                </label>
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="clear-reason" className="text-xs font-semibold text-foreground block mb-1">
+                Reason for action <span className="text-destructive">*</span>
+              </label>
+              <textarea
+                id="clear-reason"
+                value={clearReason}
+                onChange={(e) => setClearReason(e.target.value)}
+                rows={3}
+                placeholder="e.g. Offensive username, impersonation, or copyright infringement..."
+                className="w-full p-2.5 rounded-lg border border-border bg-secondary/40 text-xs text-foreground placeholder:text-muted-foreground outline-none focus:border-primary transition-colors resize-none"
+              />
+              <p className="text-[10px] text-muted-foreground mt-1">
+                Required for admin audit compliance (minimum 3 characters).
+              </p>
+            </div>
+          </div>
+
+          <DialogFooter className="gap-2 sm:gap-0">
+            <DialogClose asChild>
+              <Button variant="outline" size="sm" disabled={isPending}>
+                Cancel
+              </Button>
+            </DialogClose>
+            <Button
+              variant="destructive"
+              size="sm"
+              disabled={
+                isPending ||
+                (!clearUsername && !clearDisplayName && !clearAvatar) ||
+                clearReason.trim().length < 3
+              }
+              onClick={handleClearProfile}
+              className="gap-1.5"
+            >
+              {isPending ? (
+                <>
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  Clearing...
+                </>
+              ) : (
+                "Clear Selected Fields"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Change Role Safeguard Dialog */}
       <Dialog open={roleDialogOpen} onOpenChange={setRoleDialogOpen}>
         <DialogContent className="sm:max-w-md">
@@ -439,7 +586,7 @@ export function UserDetailDrawer({
             <DialogDescription className="text-xs text-muted-foreground pt-1">
               Change permissions for{" "}
               <strong className="text-foreground">{user.full_name}</strong>.
-              Administrators have full read access to all citizen data, moderation tools, and the audit ledger.
+              Administrators have full read access to all user data, moderation tools, and the audit ledger.
             </DialogDescription>
           </DialogHeader>
 
@@ -455,7 +602,7 @@ export function UserDetailDrawer({
                     : "border-border text-muted-foreground hover:bg-secondary/40"
                 }`}
               >
-                <span className="block font-medium">Citizen (User)</span>
+                <span className="block font-medium">Standard User</span>
                 <span className="text-[10px] text-muted-foreground">Standard access</span>
               </button>
               <button

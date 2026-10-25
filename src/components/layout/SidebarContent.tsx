@@ -110,8 +110,12 @@ export function SidebarContent({ onNavigate }: SidebarContentProps) {
     return parts[0].slice(0, 2).toUpperCase();
   };
 
-  const fullName = user?.user_metadata?.full_name as string | undefined;
-  const avatarUrl = user?.user_metadata?.avatar_url as string | undefined;
+  const fullName = profile?.full_name || (user?.user_metadata?.full_name as string | undefined);
+  const displayName = profile?.display_name || fullName;
+  const avatarPath = profile?.avatar_path;
+  const avatarUrl = avatarPath
+    ? `/api/avatar/${avatarPath}`
+    : profile?.avatar_url || (user?.user_metadata?.avatar_url as string | undefined);
 
   const isActive = (href: string) => {
     if (href === "/home") return pathname === "/home";
@@ -333,7 +337,7 @@ export function SidebarContent({ onNavigate }: SidebarContentProps) {
           </Avatar>
           <div className="flex flex-1 flex-col overflow-hidden text-left">
             <span className="truncate text-xs font-medium text-foreground">
-              {fullName || "User"}
+              {displayName || "User"}
             </span>
             <div className="flex items-center gap-1.5 mt-0.5">
               <span className="h-1.5 w-1.5 rounded-full bg-primary shrink-0" />

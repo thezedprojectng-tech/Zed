@@ -20,6 +20,7 @@ import {
 import { Header } from "@/components/layout/Header";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { EditProfileSection } from "@/components/profile/EditProfileSection";
 import { useAuthStore } from "@/store/useAuthStore";
 import { signOut } from "@/lib/auth/actions";
 import { getLevelName } from "@/types";
@@ -115,6 +116,9 @@ export default function ProfilePage() {
             </div>
           )}
         </div>
+
+        {/* Edit Profile Section */}
+        <EditProfileSection />
 
         {/* Profile Card */}
         <div className="rounded-xl border border-hairline bg-card p-5 space-y-4">

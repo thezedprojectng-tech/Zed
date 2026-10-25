@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { requireAdmin, maskPhone } from "@/lib/auth/admin-guard";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient } from "@/lib/supabase/server";
 import { logAdminAction } from "@/lib/audit/log";
 import { getLevelName } from "@/types";
 
@@ -233,3 +234,83 @@ export async function exportUsersCsvAction(): Promise<{
     return { success: false, error: "Failed to generate CSV export." };
   }
 }
+
+/**
+ * Server action: Clear profile fields (username, display name, avatar) for a user.
+ * Calls the admin_clear_user_profile SECURITY DEFINER RPC and removes the avatar file from storage.
+ */
+export async function adminClearUserProfileAction(params: {
+  userId: string;
+  clearUsername: boolean;
+  clearDisplayName: boolean;
+  clearAvatar: boolean;
+  reason: string;
+}): Promise<{ success: boolean; error?: string; message?: string }> {
+  try {
+    await requireAdmin();
+
+    if (!params.clearUsername && !params.clearDisplayName && !params.clearAvatar) {
+      return { success: false, error: "Please select at least one field to clear." };
+    }
+
+    if (!params.reason || params.reason.trim().length < 3) {
+      return { success: false, error: "A valid reason (at least 3 characters) is required." };
+    }
+
+    const admin = createAdminClient();
+
+    // Check if target has an avatar if clearAvatar is requested
+    let oldAvatarPath: string | null = null;
+    if (params.clearAvatar) {
+      const { data: targetUser } = await admin
+        .from("users")
+        .select("avatar_path")
+        .eq("id", params.userId)
+        .maybeSingle();
+
+      oldAvatarPath = targetUser?.avatar_path || null;
+    }
+
+    // Call RPC using authenticated client so auth.uid() reflects current admin
+    const supabase = await createClient();
+    const { data, error } = await supabase.rpc("admin_clear_user_profile", {
+      p_user_id: params.userId,
+      p_clear_username: params.clearUsername,
+      p_clear_display_name: params.clearDisplayName,
+      p_clear_avatar: params.clearAvatar,
+      p_reason: params.reason.trim(),
+    });
+
+    if (error) {
+      console.error("[adminClearUserProfileAction] RPC error:", error);
+      return { success: false, error: error.message || "Failed to clear profile fields." };
+    }
+
+    // Delete old avatar from storage with service role client
+    if (params.clearAvatar && oldAvatarPath) {
+      const { error: storageErr } = await admin.storage
+        .from("avatars")
+        .remove([oldAvatarPath]);
+
+      if (storageErr) {
+        console.warn("[adminClearUserProfileAction] Storage remove warning:", storageErr.message);
+      } else {
+        console.log("[adminClearUserProfileAction] Storage removed avatar file:", oldAvatarPath);
+      }
+    }
+
+    revalidatePath("/admin/users");
+    revalidatePath("/admin");
+    revalidatePath("/profile");
+
+    const res = data as { ok?: boolean; message?: string };
+    return { success: true, message: res?.message || "Profile fields cleared." };
+  } catch (err: unknown) {
+    console.error("[adminClearUserProfileAction] Unexpected error:", err);
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : "An unexpected error occurred.",
+    };
+  }
+}
+

@@ -99,7 +99,11 @@ export function TopBar({
   };
 
   const fullName = profile?.full_name || (user?.user_metadata?.full_name as string | undefined);
-  const avatarUrl = profile?.avatar_url || (user?.user_metadata?.avatar_url as string | undefined);
+  const displayName = profile?.display_name || fullName;
+  const avatarPath = profile?.avatar_path;
+  const avatarUrl = avatarPath
+    ? `/api/avatar/${avatarPath}`
+    : profile?.avatar_url || (user?.user_metadata?.avatar_url as string | undefined);
   const email = user?.email;
   const civicLevel = profile?.level_id || 1;
 
@@ -288,12 +292,18 @@ export function TopBar({
           >
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col space-y-1">
-                <p className="text-xs font-semibold leading-none text-foreground">
-                  {fullName || "User"}
+                <p className="text-xs font-semibold leading-none text-foreground truncate">
+                  {displayName || "User"}
                 </p>
-                <p className="text-[11px] leading-none text-muted-foreground font-mono">
-                  {email || ""}
-                </p>
+                {profile?.username ? (
+                  <p className="text-[11px] leading-none text-primary font-mono">
+                    @{profile.username}
+                  </p>
+                ) : (
+                  <p className="text-[11px] leading-none text-muted-foreground font-mono">
+                    {email || ""}
+                  </p>
+                )}
                 <div className="mt-1.5 flex items-center gap-1.5">
                   <Badge
                     variant="outline"
