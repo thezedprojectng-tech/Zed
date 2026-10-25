@@ -14,6 +14,7 @@ const PRODUCT_LINKS = [
   { href: "/#token-engine", label: "$ZED Mining" },
   { href: "/fund", label: "Fund Your Idea" },
   { href: "/whitepaper", label: "White Paper" },
+  { href: "/careers", label: "Careers" },
   { href: "/#faq", label: "FAQ" },
 ];
 

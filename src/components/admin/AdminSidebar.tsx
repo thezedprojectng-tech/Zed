@@ -16,6 +16,7 @@ import {
   Lightbulb,
   GraduationCap,
   ShoppingBag,
+  Briefcase,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -31,6 +32,7 @@ interface AdminSidebarProps {
 const navItems = [
   { href: "/admin", label: "Overview", icon: LayoutDashboard, exact: true },
   { href: "/admin/users", label: "Users", icon: Users, exact: false },
+  { href: "/admin/careers", label: "Careers", icon: Briefcase, exact: false },
   { href: "/admin/skill", label: "Skill content", icon: GraduationCap, exact: false },
   { href: "/admin/funding", label: "Funding", icon: Lightbulb, exact: false },
   { href: "/admin/referrals", label: "Referrals", icon: Share2, exact: false },
