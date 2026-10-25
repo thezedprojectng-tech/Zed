@@ -41,7 +41,7 @@ export function ScrollToTop() {
       type="button"
       onClick={scrollToTop}
       aria-label="Scroll to top of page"
-      className="fixed bottom-20 md:bottom-6 right-6 z-40 flex h-10 w-10 items-center justify-center rounded-full bg-card/90 text-foreground border-hairline shadow-md backdrop-blur-md transition-all hover:bg-secondary hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+      className="fixed bottom-6 right-6 z-40 flex h-10 w-10 items-center justify-center rounded-full bg-card/90 text-foreground border-hairline shadow-md backdrop-blur-md transition-all hover:bg-secondary hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
     >
       <svg
         className="absolute inset-0 h-10 w-10 -rotate-90 pointer-events-none"

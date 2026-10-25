@@ -3,13 +3,13 @@
 import { useState } from "react";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { TopBar } from "@/components/layout/TopBar";
-import { BottomNav } from "@/components/layout/BottomNav";
 import { CommandMenu } from "@/components/layout/CommandMenu";
 import { ScrollToTop } from "@/components/layout/ScrollToTop";
 import { PageTransition } from "@/components/layout/PageTransition";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const [commandOpen, setCommandOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   return (
     <div className="flex min-h-dvh w-full bg-background text-foreground">
@@ -18,11 +18,16 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
       {/* Main Content Area */}
       <div className="flex flex-1 flex-col overflow-x-hidden">
-        {/* Top Bar with Breadcrumbs, Search, Theme & Profile */}
-        <TopBar onOpenCommand={() => setCommandOpen(true)} />
+        {/* Top Bar — includes mobile hamburger on small screens */}
+        <TopBar
+          onOpenCommand={() => setCommandOpen(true)}
+          drawerOpen={drawerOpen}
+          onDrawerOpen={() => setDrawerOpen(true)}
+          onDrawerClose={() => setDrawerOpen(false)}
+        />
 
-        {/* Subtly dotted main area */}
-        <main className="flex-1 bg-dot-grid pb-24 md:pb-12">
+        {/* Main content — no bottom padding needed (BottomNav removed) */}
+        <main className="flex-1 bg-dot-grid pb-4 md:pb-12">
           <PageTransition>{children}</PageTransition>
         </main>
       </div>
@@ -35,9 +40,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
       {/* Floating Scroll-to-Top Button with circular progress ring */}
       <ScrollToTop />
-
-      {/* Mobile Bottom Tab Bar (never shown on desktop) */}
-      <BottomNav />
     </div>
   );
 }

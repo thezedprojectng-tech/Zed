@@ -38,9 +38,16 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { signOut } from "@/lib/auth/actions";
 import { getLevelName } from "@/types";
 import { useIsMounted, useIsOnline } from "@/lib/hooks";
+import { MobileDrawerTrigger } from "./MobileDrawer";
 
 interface TopBarProps {
   onOpenCommand: () => void;
+  /** Whether the mobile drawer is open */
+  drawerOpen: boolean;
+  /** Called to open the mobile drawer */
+  onDrawerOpen: () => void;
+  /** Called to close the mobile drawer */
+  onDrawerClose: () => void;
 }
 
 const routeLabels: Record<string, string> = {
@@ -60,7 +67,12 @@ const routeLabels: Record<string, string> = {
   reports: "Reports",
 };
 
-export function TopBar({ onOpenCommand }: TopBarProps) {
+export function TopBar({
+  onOpenCommand,
+  drawerOpen,
+  onDrawerOpen,
+  onDrawerClose,
+}: TopBarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const { theme, setTheme, resolvedTheme } = useTheme();
@@ -86,16 +98,23 @@ export function TopBar({ onOpenCommand }: TopBarProps) {
     return parts[0].slice(0, 2).toUpperCase();
   };
 
-  // Read profile metadata from profile or Supabase User object
   const fullName = profile?.full_name || (user?.user_metadata?.full_name as string | undefined);
   const avatarUrl = profile?.avatar_url || (user?.user_metadata?.avatar_url as string | undefined);
   const email = user?.email;
   const civicLevel = profile?.level_id || 1;
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 w-full items-center justify-between border-hairline-b bg-background/80 px-4 md:px-6 backdrop-blur-md">
-      {/* Left: Dynamic Breadcrumbs */}
-      <div className="flex items-center gap-2">
+    <header className="sticky top-0 z-30 flex h-14 w-full items-center justify-between border-hairline-b bg-background/80 px-2 md:px-6 backdrop-blur-md">
+      {/* Left: hamburger (mobile) + breadcrumbs / logo */}
+      <div className="flex items-center gap-1 min-w-0">
+        {/* Mobile hamburger — hidden on md+ */}
+        <MobileDrawerTrigger
+          open={drawerOpen}
+          onOpen={onDrawerOpen}
+          onClose={onDrawerClose}
+        />
+
+        {/* Desktop breadcrumbs — hidden on mobile */}
         <Breadcrumb className="hidden sm:flex">
           <BreadcrumbList className="text-xs">
             <BreadcrumbItem>
@@ -133,8 +152,8 @@ export function TopBar({ onOpenCommand }: TopBarProps) {
           </BreadcrumbList>
         </Breadcrumb>
 
-        {/* Mobile Title */}
-        <Link href="/home" className="sm:hidden flex items-center" aria-label="Zed Home">
+        {/* Mobile logo — visible only on xs (no hamburger text; hamburger is beside it) */}
+        <Link href="/home" className="sm:hidden flex items-center ml-1" aria-label="Zed Home">
           <Image
             src="/icons/zed-logo-full-dark.png"
             alt="Zed"
@@ -153,7 +172,7 @@ export function TopBar({ onOpenCommand }: TopBarProps) {
       </div>
 
       {/* Right: Actions & Tools */}
-      <div className="flex items-center gap-2 sm:gap-3">
+      <div className="flex items-center gap-2 sm:gap-3 shrink-0">
         {/* Offline Badge */}
         {!isOnline && (
           <Badge
