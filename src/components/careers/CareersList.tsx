@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { Briefcase, ArrowRight, MapPin, Clock, Flame, Sparkles } from "lucide-react";
+import { Briefcase, ArrowRight, MapPin, Clock, Flame } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { jobs as defaultJobs, type Job, type JobLocation } from "@/data/careers";
 import { getDepartments, buildApplyUrl, type DepartmentOption } from "@/lib/careers/helpers";
@@ -166,13 +166,12 @@ export function CareersList({
   };
 
   return (
-    <section className={cn("w-full bg-background py-8", className)}>
+    <section className={cn("w-full py-8", className)}>
       <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
         {/* Header section */}
         <header className="mb-10 space-y-4 sm:mb-12">
           {badge && (
             <div className="inline-flex items-center gap-1.5 rounded-full border border-border bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">
-              <Sparkles className="size-3 text-foreground" />
               <span>{badge}</span>
             </div>
           )}
