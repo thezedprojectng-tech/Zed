@@ -44,6 +44,8 @@ import {
 } from "@/lib/market/helpers";
 import { getListingContact, reportListing, markListingSold } from "@/lib/market/actions";
 import type { MarketListing, MarketReportReason } from "@/lib/market/types";
+import { VerifiedBadge } from "@/components/verification/VerifiedBadge";
+import { isVerifiedBadgeEnabled, shouldShowContactWarning } from "@/lib/verification/flags";
 
 interface ListingDetailClientProps {
   listing: MarketListing;
@@ -59,6 +61,8 @@ export function ListingDetailClient({
   const isOwner = currentUserId === listing.seller_id;
 
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [cautionModalOpen, setCautionModalOpen] = useState(false);
+  const [sellerVerified, setSellerVerified] = useState<boolean>(listing.seller_verified ?? false);
   const [contactState, setContactState] = useState<{
     loading: boolean;
     whatsapp: string | null;
@@ -89,20 +93,7 @@ export function ListingDetailClient({
   const conditionMeta = CONDITION_LABELS[listing.condition];
   const statusMeta = STATUS_LABELS[currentStatus];
 
-  const handleRevealContact = async () => {
-    if (!currentUserId) {
-      window.location.href = `/login?redirect=/market/${listing.id}`;
-      return;
-    }
-
-    if (!isCurrentUserVerified) {
-      setContactState((prev) => ({
-        ...prev,
-        error: "Only verified users can view seller WhatsApp contacts. Please complete verification on your profile.",
-      }));
-      return;
-    }
-
+  const executeRevealContact = async () => {
     setContactState((prev) => ({ ...prev, loading: true, error: null }));
 
     const res = await getListingContact(listing.id);
@@ -117,6 +108,10 @@ export function ListingDetailClient({
       return;
     }
 
+    if (typeof res.seller_verified === "boolean") {
+      setSellerVerified(res.seller_verified);
+    }
+
     setContactState({
       loading: false,
       whatsapp: res.whatsapp || null,
@@ -129,6 +124,20 @@ export function ListingDetailClient({
       const waUrl = buildWhatsAppLink(res.whatsapp, listing.title);
       window.open(waUrl, "_blank", "noopener,noreferrer");
     }
+  };
+
+  const handleRevealContact = () => {
+    if (!currentUserId) {
+      window.location.href = `/login?redirect=/market/${listing.id}`;
+      return;
+    }
+
+    if (shouldShowContactWarning(sellerVerified)) {
+      setCautionModalOpen(true);
+      return;
+    }
+
+    executeRevealContact();
   };
 
   const handleCopyPhone = () => {
@@ -316,9 +325,12 @@ export function ListingDetailClient({
           <div className="rounded-2xl border border-border bg-card p-5 space-y-4">
             {/* Category & Status */}
             <div className="flex items-center justify-between gap-2">
-              <Badge variant="secondary" className="text-xs font-medium">
-                {categoryMeta?.label || listing.category}
-              </Badge>
+              <div className="flex items-center gap-2">
+                <Badge variant="secondary" className="text-xs font-medium">
+                  {categoryMeta?.label || listing.category}
+                </Badge>
+                <VerifiedBadge isVerified={sellerVerified} />
+              </div>
               <Badge variant="outline" className={`text-xs ${statusMeta.badgeClass}`}>
                 {statusMeta.label}
               </Badge>
@@ -363,11 +375,11 @@ export function ListingDetailClient({
                   {listing.seller_name_masked.slice(0, 2).toUpperCase()}
                 </div>
                 <div>
-                  <div className="text-xs font-semibold text-foreground flex items-center gap-1">
+                  <div className="text-xs font-semibold text-foreground flex items-center gap-1.5">
                     <span>{listing.seller_name_masked}</span>
-                    <ShieldCheck className="h-3.5 w-3.5 text-emerald-500" />
+                    <VerifiedBadge isVerified={sellerVerified} />
                   </div>
-                  <div className="text-[11px] text-muted-foreground">Level 1+ Verified Seller</div>
+                  <div className="text-[11px] text-muted-foreground">Seller</div>
                 </div>
               </div>
             </div>
@@ -557,6 +569,44 @@ export function ListingDetailClient({
           )}
         </DialogContent>
       </Dialog>
+
+      {/* ── Unverified Seller Caution Dialog ──────────────────────────────── */}
+      {isVerifiedBadgeEnabled() && (
+        <Dialog open={cautionModalOpen} onOpenChange={setCautionModalOpen}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="text-base font-semibold text-foreground flex items-center gap-2">
+                <ShieldAlert className="h-5 w-5 text-amber-500" />
+                <span>Unverified Seller Notice</span>
+              </DialogTitle>
+              <DialogDescription className="text-xs text-foreground/80 pt-2 leading-relaxed">
+                This seller is not verified. Deal at your own risk. Never pay before you see the item.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter className="pt-3 gap-2 sm:gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setCautionModalOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                className="bg-amber-600 hover:bg-amber-700 text-white font-medium"
+                onClick={() => {
+                  setCautionModalOpen(false);
+                  executeRevealContact();
+                }}
+              >
+                Continue
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }

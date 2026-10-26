@@ -30,6 +30,7 @@ export interface MarketListing {
   updated_at: string;
   expires_at: string;
   report_count: number;
+  seller_verified: boolean;
 }
 
 export interface MarketListingContact {

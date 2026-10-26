@@ -28,6 +28,7 @@ import {
   calculateNairaAmount,
   maskAccountNumber,
 } from "@/lib/withdraw/helpers";
+import { isVerifiedBadgeEnabled } from "@/lib/verification/flags";
 import {
   requestWithdrawalAction,
   cancelWithdrawalAction,
@@ -303,13 +304,24 @@ export function WithdrawClient({ overview }: WithdrawClientProps) {
             <Card className="p-4 border-amber-500/30 bg-amber-500/10 flex items-start gap-3">
               <AlertCircle className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />
               <div className="text-xs space-y-1">
-                <p className="font-semibold text-foreground">NIN Verification Required</p>
-                <p className="text-muted-foreground">
-                  You must verify your identity before you can make bank withdrawals.{" "}
-                  <Link href="/nin" className="text-primary underline font-medium">
-                    Verify NIN now
-                  </Link>
-                </p>
+                {isVerifiedBadgeEnabled() ? (
+                  <>
+                    <p className="font-semibold text-foreground">NIN verification required</p>
+                    <p className="text-muted-foreground">
+                      You must verify your identity before you can make bank withdrawals.{" "}
+                      <Link href="/nin" className="text-primary underline font-medium">
+                        Verify NIN now
+                      </Link>
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <p className="font-semibold text-foreground">Withdrawals are not open yet.</p>
+                    <p className="text-muted-foreground">
+                      Bank withdrawals will be enabled in a future phase. Keep mining and accumulating your $ZED.
+                    </p>
+                  </>
+                )}
               </div>
             </Card>
           )}

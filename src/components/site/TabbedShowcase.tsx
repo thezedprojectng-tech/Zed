@@ -78,45 +78,45 @@ const TABS: FlowTab[] = [
     agency: "NIMC & Central Bank of Nigeria",
     headline: "Identity synchronization & record harmonization",
     caption:
-      "When your BVN date of birth doesn't match your NIN, bank accounts get frozen and transactions stall. Zed lays out the exact sequence to reconcile official identity records without infinite bank branch visits.",
+      "Conflicting date of birth, misspelled surname, or mismatched phone number between your BVN and National Identity Number? Zed maps the exact modification procedures across licensed NIMC enrollment partners.",
     bullets: [
-      "Step-by-step procedure for name order and date-of-birth modifications",
-      "Cross-bank BVN harmonization instructions to unlock restricted accounts",
-      "Zero raw NIN storage — salted SHA-256 hashing on our server protects your privacy",
+      "Date of birth and surname rectification documentation checklist",
+      "NIMC approved self-service modification portal fee schedules",
+      "Bank BVN integration guidelines preventing account freeze restrictions",
     ],
     mockup: {
-      title: "NIMC & BVN Record Alignment",
-      badge: "Data Protection Minded",
-      fee: "₦15,000 NIMC Remita Fee (DOB Correction)",
+      title: "NIN Modification & BVN Harmonization",
+      badge: "NIMC Verified Schema",
+      fee: "Official Statutory Modification Fees",
       items: [
-        { label: "Record Discrepancy", status: "Identified", detail: "Surname order inverted on legacy BVN registry" },
-        { label: "Remita Retrieval RRR", status: "Generated", detail: "Official Treasury Single Account code for NIMC" },
-        { label: "Enrolment Center", status: "Selected", detail: "NIMC State Headquarters biometric modification slot" },
-        { label: "Bank Broadcast", status: "Pending", detail: "Present NIMC modification slip to bank compliance desk" },
+        { label: "Field Identification", status: "Selected", detail: "Date of Birth & Surname order harmonization" },
+        { label: "Required Supporting Doc", status: "Verified", detail: "Attestation letter & NPC birth certificate scan" },
+        { label: "Enrolment Center", status: "Mapped", detail: "Designated NIMC center appointment scheduled" },
+        { label: "Bank Notification Slip", status: "Prepared", detail: "NIMC update slip generated for commercial bank submission" },
       ],
-      footerNote: "Designed with data protection in mind; NIN is hashed, never stored raw.",
+      footerNote: "Cryptographic hash security: your NIN is never stored in plaintext",
     },
   },
   {
     id: "cac",
-    label: "CAC",
+    label: "CAC Business",
     agency: "Corporate Affairs Commission",
-    headline: "Business Name & Company Registration",
+    headline: "Business Name & Enterprise incorporation",
     caption:
-      "Register your business or startup directly on the CAC Companies Registration Portal (CRP) without paying ₦50,000+ agent markups. Follow our verified filing playbook and receive your status report and certificate online.",
+      "Register your business or startup independently. Reserve your business name with the Corporate Affairs Commission, verify non-restricted industry classifications, and download your verified Certificate of Incorporation.",
     bullets: [
-      "CRP portal navigation guide without paying agent markups",
-      "Standard memorandum & objective clauses for digital and service enterprises",
-      "Automated JTB TIN generation checklist upon CAC certificate issuance",
+      "Real-time name search availability verification tips",
+      "Standard nature of business classification selection without legal consultant fees",
+      "Post-incorporation Tax Identification Number (TIN) extraction guide",
     ],
     mockup: {
       title: "CAC Business Name Registration",
-      badge: "CRP Online Registry",
-      fee: "₦10,000 Statutory Filing Fee",
+      badge: "Self-Service Filing",
+      fee: "₦10,000 Official Statutory Filing Fee",
       items: [
-        { label: "Name Availability", status: "Reserved", detail: "Two proposed names checked against CAC registry" },
-        { label: "Principal Nature", status: "Drafted", detail: "Software development & business consultancy clauses" },
-        { label: "Proprietor Details", status: "Verified", detail: "NIN identity and recognized government ID attached" },
+        { label: "Name Availability Search", status: "Reserved", detail: "Business Name approved by CAC registrar" },
+        { label: "Proprietor Details", status: "Entered", detail: "ID document & verified residential address" },
+        { label: "Statutory Fee Remita", status: "Audited", detail: "Exact ₦10,000 statutory payment without agent surcharge" },
         { label: "Tax Identification", status: "Linked", detail: "Joint Tax Board TIN generated upon registration" },
       ],
       footerNote: "Direct self-service filing without accredited agent surcharges",
@@ -130,9 +130,9 @@ export function TabbedShowcase() {
 
   return (
     <div className="w-full">
-      {/* Tabs Row */}
-      <div className="flex items-center justify-start sm:justify-center border-b border-[#E8E8E4] overflow-x-auto no-scrollbar mb-10 sm:mb-14">
-        <div className="flex space-x-2 sm:space-x-8 px-2">
+      {/* Modern Rounded-Full Pill Tabs Bar */}
+      <div className="flex justify-center mb-10 sm:mb-14 overflow-x-auto no-scrollbar px-2">
+        <div className="inline-flex p-1.5 rounded-full border border-[#E5E5E0] dark:border-white/10 bg-[#EFEFEA]/80 dark:bg-[#161619] backdrop-blur-md shadow-xs">
           {TABS.map((tab) => {
             const isActive = tab.id === activeTabId;
             return (
@@ -140,20 +140,20 @@ export function TabbedShowcase() {
                 key={tab.id}
                 type="button"
                 onClick={() => setActiveTabId(tab.id)}
-                className={`relative py-3.5 px-3 text-sm font-medium transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2E82F7] rounded-sm whitespace-nowrap ${
+                className={`relative px-4 sm:px-6 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2E82F7] ${
                   isActive
-                    ? "text-[#0B0B0C] font-semibold"
-                    : "text-[#57575e] hover:text-[#0B0B0C]"
+                    ? "text-[#0B0B0C] dark:text-white"
+                    : "text-[#57575e] dark:text-zinc-400 hover:text-[#0B0B0C] dark:hover:text-white"
                 }`}
               >
-                <span>{tab.label}</span>
                 {isActive && (
                   <motion.div
-                    layoutId="tab-underline"
-                    className="absolute inset-x-0 -bottom-[1px] h-[2px] bg-[#2E82F7]"
+                    layoutId="tabbed-showcase-pill"
+                    className="absolute inset-0 rounded-full bg-white dark:bg-[#202024] shadow-xs"
                     transition={{ type: "spring", stiffness: 380, damping: 30 }}
                   />
                 )}
+                <span className="relative z-10">{tab.label}</span>
               </button>
             );
           })}
@@ -171,17 +171,18 @@ export function TabbedShowcase() {
           className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center"
         >
           {/* Left Column */}
-          <div className="lg:col-span-5 space-y-6">
+          <div className="lg:col-span-5 space-y-5">
             <div>
-              <div className="font-mono text-xs uppercase tracking-widest text-[#2E82F7] font-medium mb-2">
-                {activeTab.agency}
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-[#D8D8D2] dark:border-white/10 bg-white dark:bg-[#141416] text-[#2E82F7] text-xs font-semibold mb-3">
+                <span className="h-1.5 w-1.5 rounded-full bg-[#2E82F7]" />
+                <span>{activeTab.agency}</span>
               </div>
-              <h3 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-[#0B0B0C] leading-tight">
+              <h3 className="font-display text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-[#0B0B0C] dark:text-[#FAFAF8] leading-tight">
                 {activeTab.headline}
               </h3>
             </div>
 
-            <p className="font-sans text-sm sm:text-base text-[#57575e] leading-relaxed">
+            <p className="font-sans text-sm sm:text-base text-[#57575e] dark:text-zinc-400 leading-relaxed">
               {activeTab.caption}
             </p>
 
@@ -191,7 +192,7 @@ export function TabbedShowcase() {
                   <div className="mt-1 h-4 w-4 rounded-full bg-[#2E82F7]/10 text-[#2E82F7] flex items-center justify-center flex-shrink-0">
                     <Check className="h-2.5 w-2.5 stroke-[3]" />
                   </div>
-                  <span className="text-sm text-[#0B0B0C] leading-snug">{bullet}</span>
+                  <span className="text-sm text-[#0B0B0C] dark:text-zinc-200 leading-snug">{bullet}</span>
                 </li>
               ))}
             </ul>
@@ -199,27 +200,27 @@ export function TabbedShowcase() {
             <div className="pt-2">
               <Link
                 href="/signup"
-                className="inline-flex items-center gap-2 text-sm font-medium text-[#0B0B0C] hover:text-[#2E82F7] transition-colors group"
+                className="inline-flex items-center gap-2 text-sm font-semibold text-[#0B0B0C] dark:text-white hover:text-[#2E82F7] dark:hover:text-[#2E82F7] transition-colors group"
               >
                 <span>Follow the {activeTab.label} guide in Zed</span>
-                <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform text-[#2E82F7]" />
               </Link>
             </div>
           </div>
 
-          {/* Right Column: Mockup */}
+          {/* Right Column: Mockup Card */}
           <div className="lg:col-span-7">
-            <div className="rounded-xl border border-[#E8E8E4] bg-white p-5 sm:p-6 shadow-lg shadow-black/[0.05]">
-              <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-[#E8E8E4]">
+            <div className="rounded-2xl sm:rounded-3xl border border-[#EAEAE6] dark:border-white/10 bg-white dark:bg-[#141416] p-5 sm:p-7 shadow-xl shadow-blue-500/5">
+              <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-[#EAEAE6] dark:border-white/8">
                 <div>
-                  <h4 className="font-display font-semibold text-base text-[#0B0B0C]">
+                  <h4 className="font-display font-semibold text-base sm:text-lg text-[#0B0B0C] dark:text-[#FAFAF8]">
                     {activeTab.mockup.title}
                   </h4>
-                  <p className="font-mono text-xs text-[#57575e] mt-0.5">
+                  <p className="font-mono text-xs text-[#57575e] dark:text-zinc-400 mt-0.5">
                     {activeTab.mockup.fee}
                   </p>
                 </div>
-                <span className="font-mono text-xs px-2.5 py-1 rounded-full bg-[#2E82F7]/10 text-[#1a4fad] font-medium">
+                <span className="font-mono text-xs px-3 py-1 rounded-full bg-[#2E82F7]/10 text-[#2E82F7] border border-[#2E82F7]/20 font-medium">
                   {activeTab.mockup.badge}
                 </span>
               </div>
@@ -228,15 +229,15 @@ export function TabbedShowcase() {
                 {activeTab.mockup.items.map((item, idx) => (
                   <div
                     key={idx}
-                    className="flex flex-col sm:flex-row sm:items-center justify-between p-3 rounded-lg border border-[#E8E8E4] bg-[#FAFAF8] gap-1 sm:gap-4"
+                    className="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 rounded-xl border border-[#EAEAE6] dark:border-white/6 bg-[#FAFAF8] dark:bg-[#17171a] gap-1 sm:gap-4"
                   >
                     <div>
-                      <div className="text-xs font-mono font-medium text-[#0B0B0C]">
+                      <div className="text-xs font-mono font-semibold text-[#0B0B0C] dark:text-[#FAFAF8]">
                         {item.label}
                       </div>
-                      <div className="text-xs text-[#57575e] mt-0.5">{item.detail}</div>
+                      <div className="text-xs text-[#57575e] dark:text-zinc-400 mt-0.5">{item.detail}</div>
                     </div>
-                    <span className="inline-flex items-center gap-1 text-[11px] font-mono font-semibold text-[#1a4fad] self-start sm:self-auto">
+                    <span className="inline-flex items-center gap-1 text-[11px] font-mono font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full self-start sm:self-auto">
                       <Check className="h-3 w-3" />
                       {item.status}
                     </span>
@@ -244,12 +245,12 @@ export function TabbedShowcase() {
                 ))}
               </div>
 
-              <div className="pt-3 border-t border-[#E8E8E4] flex items-center justify-between text-xs font-mono text-[#57575e]">
+              <div className="pt-3 border-t border-[#EAEAE6] dark:border-white/8 flex items-center justify-between text-xs font-mono text-[#57575e] dark:text-zinc-400">
                 <span className="flex items-center gap-1.5">
                   <ShieldCheck className="h-3.5 w-3.5 text-[#2E82F7]" />
                   {activeTab.mockup.footerNote}
                 </span>
-                <span className="hidden sm:inline">Offline ready</span>
+                <span className="hidden sm:inline text-emerald-600 dark:text-emerald-400 font-semibold">Offline ready</span>
               </div>
             </div>
           </div>

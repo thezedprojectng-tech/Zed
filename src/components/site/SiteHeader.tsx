@@ -67,16 +67,18 @@ export function SiteHeader() {
 
   return (
     <header
-      className={`sticky top-0 z-50 w-full transition-all duration-300 ${
+      className={`sticky top-0 z-50 w-full transition-all duration-300 pt-3 sm:pt-4 pointer-events-none ${
         isScrolledDown && !isMobileMenuOpen ? "-translate-y-full" : "translate-y-0"
-      } ${
-        hasScrolled
-          ? "bg-white/95 backdrop-blur-sm shadow-[0_1px_0_0_#E8E8E4]"
-          : "bg-transparent "
       }`}
     >
       <div className="max-w-site mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 sm:h-[72px]">
+        <div
+          className={`pointer-events-auto flex items-center justify-between h-14 sm:h-16 px-4 sm:px-6 rounded-full transition-all duration-200 ${
+            hasScrolled
+              ? "bg-white/95 dark:bg-[#141416]/95 backdrop-blur-md border border-[#E5E5E0] dark:border-white/10 shadow-[0_4px_24px_-4px_rgba(0,0,0,0.1)]"
+              : "bg-white/85 dark:bg-[#141416]/85 backdrop-blur-md border border-[#E8E8E4] dark:border-white/10 shadow-xs"
+          }`}
+        >
           {/* Brand Logo */}
           <Link
             href="/"
@@ -114,7 +116,7 @@ export function SiteHeader() {
               {isAuthenticated ? (
                 <Link
                   href="/home"
-                  className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#0B0B0C] hover:bg-[#1a1a1e] text-white text-sm font-medium rounded-lg transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2E82F7]"
+                  className="inline-flex items-center gap-1.5 px-5 py-2 bg-[#0B0B0C] dark:bg-white hover:bg-[#1a1a1e] dark:hover:bg-zinc-200 text-white dark:text-[#0B0B0C] text-sm font-semibold rounded-full shadow-xs transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2E82F7]"
                 >
                   <span>Open Zed</span>
                   <ArrowUpRight className="h-4 w-4" />
@@ -123,13 +125,13 @@ export function SiteHeader() {
                 <>
                   <Link
                     href="/login"
-                    className="text-sm font-medium text-[#57575e] hover:text-[#0B0B0C] px-3 py-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2E82F7] rounded-sm"
+                    className="text-sm font-medium text-[#57575e] dark:text-zinc-300 hover:text-[#0B0B0C] dark:hover:text-white px-3 py-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2E82F7] rounded-full"
                   >
                     Sign in
                   </Link>
                   <Link
                     href="/signup"
-                    className="inline-flex items-center justify-center px-4 py-2 bg-[#0B0B0C] hover:bg-[#1a1a1e] text-white text-sm font-medium rounded-lg transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2E82F7]"
+                    className="inline-flex items-center justify-center px-5 py-2 bg-[#0B0B0C] dark:bg-white hover:bg-[#1a1a1e] dark:hover:bg-zinc-200 text-white dark:text-[#0B0B0C] text-sm font-semibold rounded-full shadow-xs transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2E82F7]"
                   >
                     Get started
                   </Link>
@@ -143,7 +145,7 @@ export function SiteHeader() {
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
               aria-expanded={isMobileMenuOpen}
-              className="md:hidden h-9 w-9 rounded-lg border border-[#E8E8E4] flex items-center justify-center text-[#0B0B0C] hover:bg-[#f4f4f0] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2E82F7] cursor-pointer transition-colors"
+              className="md:hidden h-9 w-9 rounded-full border border-[#E8E8E4] dark:border-white/10 flex items-center justify-center text-[#0B0B0C] dark:text-white hover:bg-[#f4f4f0] dark:hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2E82F7] cursor-pointer transition-colors"
             >
               {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
@@ -157,7 +159,7 @@ export function SiteHeader() {
           role="dialog"
           aria-modal="true"
           aria-label="Navigation Menu"
-          className="md:hidden bg-white border-b border-[#E8E8E4] px-5 pt-4 pb-6 space-y-5"
+          className="md:hidden pointer-events-auto bg-white dark:bg-[#141416] border-b border-[#E8E8E4] dark:border-white/10 px-5 pt-4 pb-6 space-y-5 shadow-xl mt-2 mx-4 rounded-2xl"
         >
           <nav className="flex flex-col space-y-1">
             {NAV_LINKS.map((link) => (

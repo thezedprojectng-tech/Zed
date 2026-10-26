@@ -16,10 +16,14 @@ interface AccordionProps {
   defaultOpenIndex?: number;
 }
 
+/**
+ * Accordion styled as individual rounded cards with smooth expand/collapse,
+ * matching the 2-column FAQ reference design.
+ */
 export function Accordion({
   items,
   allowMultiple = false,
-  defaultOpenIndex,
+  defaultOpenIndex = 0,
 }: AccordionProps) {
   const baseId = useId();
   const [openIndices, setOpenIndices] = useState<number[]>(
@@ -43,34 +47,36 @@ export function Accordion({
   };
 
   return (
-    <div className="divide-y divide-[#E8E8E4] border-y border-[#E8E8E4]">
+    <div className="space-y-3 sm:space-y-3.5">
       {items.map((item, idx) => {
         const isOpen = openIndices.includes(idx);
         const headerId = `${baseId}-header-${idx}`;
         const panelId = `${baseId}-panel-${idx}`;
 
         return (
-          <div key={idx} className="group">
+          <div
+            key={idx}
+            className={`rounded-2xl border transition-all duration-200 overflow-hidden ${
+              isOpen
+                ? "border-[#2E82F7]/40 dark:border-[#2E82F7]/50 bg-white dark:bg-[#141416] shadow-xs"
+                : "border-[#EAEAE6] dark:border-white/8 bg-white/90 dark:bg-[#141416]/70 hover:border-[#D8D8D2] dark:hover:border-white/15"
+            }`}
+          >
             <button
               id={headerId}
               type="button"
               aria-expanded={isOpen}
               aria-controls={panelId}
               onClick={() => toggleItem(idx)}
-              className="w-full py-5 sm:py-6 text-left flex items-center justify-between gap-4 transition-colors hover:text-[#2E82F7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2E82F7] rounded-sm cursor-pointer"
+              className="w-full p-5 sm:p-6 text-left flex items-center justify-between gap-4 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2E82F7] rounded-2xl"
             >
-              <div className="flex items-center gap-4 sm:gap-6">
-                <span className="font-mono text-xs text-[#A0A09A] font-medium select-none">
-                  0{idx + 1}
-                </span>
-                <span className="font-display text-base sm:text-lg font-semibold tracking-tight text-[#0B0B0C] group-hover:text-[#2E82F7] transition-colors">
-                  {item.question}
-                </span>
-              </div>
+              <span className="font-display text-sm sm:text-base font-semibold tracking-tight text-[#0B0B0C] dark:text-[#FAFAF8] pr-2">
+                {item.question}
+              </span>
 
               <div
-                className={`flex-shrink-0 h-7 w-7 rounded-full border border-[#E8E8E4] flex items-center justify-center text-[#57575e] transition-all duration-200 ${
-                  isOpen ? "rotate-180 bg-[#2E82F7]/10 text-[#1a4fad] border-[#2E82F7]/30" : "bg-transparent"
+                className={`flex-shrink-0 h-7 w-7 rounded-full flex items-center justify-center text-[#57575e] dark:text-zinc-400 transition-transform duration-200 ${
+                  isOpen ? "rotate-180 text-[#2E82F7]" : ""
                 }`}
                 aria-hidden="true"
               >
@@ -87,10 +93,10 @@ export function Accordion({
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: "auto" }}
                   exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+                  transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
                   className="overflow-hidden"
                 >
-                  <div className="pb-6 pl-8 sm:pl-12 font-sans text-sm sm:text-base text-[#57575e] leading-relaxed max-w-3xl">
+                  <div className="px-5 sm:px-6 pb-5 sm:pb-6 font-sans text-xs sm:text-sm text-[#57575e] dark:text-zinc-400 leading-relaxed border-t border-[#F0F0EC] dark:border-white/5 pt-3.5">
                     {item.answer}
                   </div>
                 </motion.div>

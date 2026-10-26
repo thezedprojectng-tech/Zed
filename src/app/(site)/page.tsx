@@ -1,18 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import {
   ArrowRight,
+  ArrowUpRight,
   Lock,
   Wifi,
   Coins,
-  ShieldCheck,
   Zap,
   GraduationCap,
   Sparkles,
   Users,
   Radio,
-  FileCheck2,
-  TrendingUp,
 } from "lucide-react";
 import { HeroSection } from "@/components/site/HeroSection";
 import { TabbedShowcase } from "@/components/site/TabbedShowcase";
@@ -191,31 +190,32 @@ export default function HomePage() {
       <HeroSection />
 
       {/* ── Section 2: Core Engineering Directives ────────────────────── */}
-      <section aria-label="Engineering Directives" className="border-y border-[#E5E5E0] py-10 bg-[#FAFAF8]/70">
+      <section id="features" aria-label="Engineering Directives" className="scroll-mt-24 py-10 sm:py-14 border-y border-[#EAEAE6] dark:border-white/10 bg-[#FAFAF8]/70 dark:bg-[#0E0E10]/70">
         <div className="max-w-site mx-auto px-4 sm:px-6 lg:px-8">
-          <FadeIn className="text-center space-y-3 mb-8">
-            <p className="font-mono text-xs uppercase tracking-widest text-[#2E82F7] font-semibold">
-              System Directives // Version 2.0.0
-            </p>
-            <h2 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-[#0B0B0C]">
+          <FadeIn className="text-center space-y-3 mb-10 sm:mb-12">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-[#D8D8D2] dark:border-white/10 bg-white dark:bg-[#141416] text-[#2E82F7] text-xs font-semibold shadow-2xs">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#2E82F7]" />
+              <span>System Directives // Version 2.0.0</span>
+            </div>
+            <h2 className="font-display text-2xl sm:text-4xl font-bold tracking-tight text-[#0B0B0C] dark:text-[#FAFAF8]">
               Engineered for Nigerian network realities.
             </h2>
           </FadeIn>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
             {ENGINEERING_DIRECTIVES.map((directive, idx) => {
               const Icon = directive.icon;
               return (
                 <FadeIn key={directive.title} delay={idx * 0.06}>
-                  <div className="h-full rounded-xl border border-[#E5E5E0] bg-white p-5 space-y-3 flex flex-col justify-between shadow-xs">
-                    <div className="space-y-2.5">
-                      <div className="h-9 w-9 rounded-lg border border-[#E5E5E0] bg-[#FAFAF8] flex items-center justify-center text-[#2E82F7]">
-                        <Icon className="h-4.5 w-4.5" />
+                  <div className="h-full rounded-2xl border border-[#EAEAE6] dark:border-white/10 bg-white dark:bg-[#141416] p-6 space-y-4 flex flex-col justify-between shadow-xs hover:shadow-lg hover:border-[#2E82F7]/40 transition-all">
+                    <div className="space-y-3">
+                      <div className="h-10 w-10 rounded-xl bg-[#2E82F7]/10 text-[#2E82F7] flex items-center justify-center">
+                        <Icon className="h-5 w-5" />
                       </div>
-                      <h3 className="font-display font-bold text-base text-[#0B0B0C]">
+                      <h3 className="font-display font-bold text-base sm:text-lg text-[#0B0B0C] dark:text-[#FAFAF8]">
                         {directive.title}
                       </h3>
-                      <p className="font-sans text-xs text-[#57575e] leading-relaxed">
+                      <p className="font-sans text-xs sm:text-sm text-[#57575e] dark:text-zinc-400 leading-relaxed">
                         {directive.description}
                       </p>
                     </div>
@@ -228,17 +228,18 @@ export default function HomePage() {
       </section>
 
       {/* ── Section 3: Zed Nav (Tabbed Showcase) ────────────────────────── */}
-      <section id="zed-nav" className="scroll-mt-24">
+      <section id="zed-nav" className="scroll-mt-24 py-8 sm:py-14">
         <span id="how-it-works" className="scroll-mt-24" />
         <div className="max-w-site mx-auto px-4 sm:px-6 lg:px-8">
-          <FadeIn className="text-center max-w-2xl mx-auto mb-10 sm:mb-14 space-y-4">
-            <div className="font-mono text-xs uppercase tracking-wider text-[#2E82F7] font-semibold">
-              Zed Nav // Live Engine
+          <FadeIn className="text-center max-w-2xl mx-auto mb-10 sm:mb-14 space-y-3.5">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-[#D8D8D2] dark:border-white/10 bg-white dark:bg-[#141416] text-[#2E82F7] text-xs font-semibold shadow-2xs">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#2E82F7]" />
+              <span>Zed Nav // Live Engine</span>
             </div>
-            <h2 className="font-display text-3xl sm:text-5xl font-bold tracking-tight text-[#0B0B0C]">
-              Zed Nav: Clear civic playbooks.
+            <h2 className="font-display text-3xl sm:text-5xl font-bold tracking-tight text-[#0B0B0C] dark:text-[#FAFAF8]">
+              Clear civil playbooks.
             </h2>
-            <p className="font-sans text-base text-[#57575e] leading-relaxed">
+            <p className="font-sans text-sm sm:text-base text-[#57575e] dark:text-zinc-400 leading-relaxed">
               Explore key screens, requirements, and verified statutory fees across our four core civil flows. Step-by-step guidance designed to remove the middleman.
             </p>
           </FadeIn>
@@ -250,57 +251,58 @@ export default function HomePage() {
       </section>
 
       {/* ── Section 4: The Zed Ecosystem Grid ───────────────────────────── */}
-      <section id="ecosystem" className="scroll-mt-24">
+      <section id="ecosystem" className="scroll-mt-24 py-8 sm:py-14">
         <div className="max-w-site mx-auto px-4 sm:px-6 lg:px-8">
-          <FadeIn className="text-center max-w-2xl mx-auto mb-10 sm:mb-14 space-y-4">
-            <div className="font-mono text-xs uppercase tracking-wider text-[#2E82F7] font-semibold">
-              The Platform
+          <FadeIn className="text-center max-w-2xl mx-auto mb-10 sm:mb-14 space-y-3.5">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-[#D8D8D2] dark:border-white/10 bg-white dark:bg-[#141416] text-[#2E82F7] text-xs font-semibold shadow-2xs">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#2E82F7]" />
+              <span>The Platform</span>
             </div>
-            <h2 className="font-display text-3xl sm:text-5xl font-bold tracking-tight text-[#0B0B0C]">
+            <h2 className="font-display text-3xl sm:text-5xl font-bold tracking-tight text-[#0B0B0C] dark:text-[#FAFAF8]">
               The Zed Ecosystem
             </h2>
-            <p className="font-sans text-base text-[#57575e] leading-relaxed">
+            <p className="font-sans text-sm sm:text-base text-[#57575e] dark:text-zinc-400 leading-relaxed">
               {MODULES.length} integrated modules built for Nigerian youth across civic processes, practical skills, escrow freelance work, and campus communities.
             </p>
           </FadeIn>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
             {MODULES.map((mod, idx) => {
               const isLive = mod.status === "live";
               const cardHref = isLive ? mod.href! : `/modules/${mod.slug}`;
               const CardInner = (
                 <div
-                  className={`h-full rounded-xl border p-5 space-y-3 flex flex-col justify-between transition-all ${
+                  className={`h-full rounded-2xl border p-5 sm:p-6 space-y-4 flex flex-col justify-between transition-all ${
                     isLive
-                      ? "border-[#2E82F7]/50 bg-white shadow-sm hover:border-[#2E82F7] hover:shadow-md cursor-pointer"
-                      : "border-[#E5E5E0] bg-white opacity-95 hover:border-[#D8D8D2]"
+                      ? "border-[#2E82F7]/40 dark:border-[#2E82F7]/40 bg-white dark:bg-[#141416] shadow-xs hover:border-[#2E82F7] hover:shadow-lg cursor-pointer"
+                      : "border-[#EAEAE6] dark:border-white/8 bg-white/90 dark:bg-[#141416]/70 hover:border-[#D8D8D2] dark:hover:border-white/15"
                   }`}
                 >
-                  <div className="space-y-2">
+                  <div className="space-y-2.5">
                     <div className="flex items-center justify-between gap-2">
-                      <h3 className="font-display font-bold text-base text-[#0B0B0C] flex items-center gap-1.5">
+                      <h3 className="font-display font-bold text-base text-[#0B0B0C] dark:text-[#FAFAF8] flex items-center gap-1.5">
                         {mod.name}
                         {isLive && <ArrowRight className="h-3.5 w-3.5 text-[#2E82F7]" />}
                       </h3>
                       {isLive ? (
-                        <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full border border-[#2E82F7]/30 bg-[#2E82F7]/10 text-[#2567d4] font-mono text-[10px] font-semibold uppercase tracking-wider">
-                          <span className="h-1.5 w-1.5 rounded-full bg-[#2E82F7] animate-pulse" />
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-mono text-[10px] font-semibold uppercase tracking-wider">
+                          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
                           LIVE
                         </span>
                       ) : (
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-full border border-[#E5E5E0] bg-[#F5F5F0] text-[#8a8a92] font-mono text-[10px] font-medium uppercase tracking-wider">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full border border-[#EAEAE6] dark:border-white/8 bg-[#FAFAF8] dark:bg-white/5 text-[#707078] dark:text-zinc-400 font-mono text-[10px] font-medium uppercase tracking-wider">
                           Coming soon
                         </span>
                       )}
                     </div>
-                    <p className="font-sans text-xs text-[#57575e] leading-relaxed">
+                    <p className="font-sans text-xs sm:text-sm text-[#57575e] dark:text-zinc-400 leading-relaxed">
                       {mod.tagline}
                     </p>
                   </div>
                   {isLive && (
                     <div className="pt-2 text-xs font-semibold text-[#2E82F7] flex items-center gap-1">
                       <span>Get started with Zed Nav</span>
-                      <ArrowRight className="h-3 w-3" />
+                      <ArrowRight className="h-3.5 w-3.5" />
                     </div>
                   )}
                 </div>
@@ -310,7 +312,7 @@ export default function HomePage() {
                 <FadeIn key={mod.slug} delay={idx * 0.03}>
                   <Link
                     href={cardHref}
-                    className="block h-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2E82F7] rounded-xl"
+                    className="block h-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2E82F7] rounded-2xl"
                   >
                     {CardInner}
                   </Link>
@@ -322,18 +324,19 @@ export default function HomePage() {
       </section>
 
       {/* ── Section 5: Problem / Solution Statement ───────────────────── */}
-      <section className="py-4 sm:py-8">
+      <section className="py-6 sm:py-10">
         <div className="max-w-site mx-auto px-4 sm:px-6 lg:px-8">
-          <FadeIn className="max-w-3xl mx-auto rounded-xl border border-[#E5E5E0] bg-white p-8 sm:p-12 shadow-sm space-y-6">
-            <div className="font-mono text-xs uppercase tracking-wider text-[#2E82F7] font-semibold">
-              The Reality of Nigerian Youth Navigation
+          <FadeIn className="max-w-3xl mx-auto rounded-3xl border border-[#EAEAE6] dark:border-white/10 bg-white dark:bg-[#141416] p-8 sm:p-14 shadow-xl shadow-blue-500/5 space-y-6">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-[#D8D8D2] dark:border-white/10 bg-[#FAFAF8] dark:bg-[#1a1a1e] text-[#2E82F7] text-xs font-semibold">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#2E82F7]" />
+              <span>The Reality of Nigerian Youth Navigation</span>
             </div>
 
-            <h2 className="font-display text-2xl sm:text-4xl font-bold tracking-tight text-[#0B0B0C] leading-snug">
+            <h2 className="font-display text-2xl sm:text-4xl font-bold tracking-tight text-[#0B0B0C] dark:text-[#FAFAF8] leading-snug">
               Government processes shouldn&apos;t require a middleman. Earning shouldn&apos;t require luck.
             </h2>
 
-            <div className="font-sans text-base text-[#57575e] space-y-4 leading-relaxed">
+            <div className="font-sans text-sm sm:text-base text-[#57575e] dark:text-zinc-400 space-y-4 leading-relaxed">
               <p>
                 Every year, millions of young Nigerians lose days of work and study to conflicting requirements, broken portals, and middleman markups. Official instructions sit scattered across outdated gazettes, unofficial blogs, and handwritten posters on counter windows. A simple renewal turns into multiple wasted trips.
               </p>
@@ -346,36 +349,36 @@ export default function HomePage() {
       </section>
 
       {/* ── Section 6: Four Pillars Grid ──────────────────────────────── */}
-      <section id="architecture" className="scroll-mt-24">
-        <span id="features" className="scroll-mt-24" />
+      <section id="architecture" className="scroll-mt-24 py-8 sm:py-14">
         <div className="max-w-site mx-auto px-4 sm:px-6 lg:px-8">
-          <FadeIn className="text-center max-w-2xl mx-auto mb-12 sm:mb-16 space-y-4">
-            <div className="font-mono text-xs uppercase tracking-wider text-[#2E82F7] font-semibold">
-              Zed Architecture
+          <FadeIn className="text-center max-w-2xl mx-auto mb-12 sm:mb-16 space-y-3.5">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-[#D8D8D2] dark:border-white/10 bg-white dark:bg-[#141416] text-[#2E82F7] text-xs font-semibold shadow-2xs">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#2E82F7]" />
+              <span>Zed Architecture</span>
             </div>
-            <h2 className="font-display text-3xl sm:text-5xl font-bold tracking-tight text-[#0B0B0C]">
+            <h2 className="font-display text-3xl sm:text-5xl font-bold tracking-tight text-[#0B0B0C] dark:text-[#FAFAF8]">
               Built with purpose.
             </h2>
-            <p className="font-sans text-base text-[#57575e] leading-relaxed">
+            <p className="font-sans text-sm sm:text-base text-[#57575e] dark:text-zinc-400 leading-relaxed">
               Four design principles guiding how Zed protects your time, your money, and your privacy.
             </p>
           </FadeIn>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
             {PILLARS.map((pillar, idx) => (
               <FadeIn key={pillar.eyebrow} delay={idx * 0.06}>
-                <div className="h-full rounded-xl border border-[#E5E5E0] bg-white p-6 space-y-4 flex flex-col justify-between">
+                <div className="h-full rounded-2xl border border-[#EAEAE6] dark:border-white/10 bg-white dark:bg-[#141416] p-6 space-y-4 flex flex-col justify-between shadow-xs hover:shadow-lg hover:border-[#2E82F7]/40 transition-all">
                   <div className="space-y-3">
-                    <span className="font-mono text-[11px] uppercase tracking-wider text-[#8a8a92] font-medium block">
+                    <span className="font-mono text-[11px] uppercase tracking-wider text-[#8a8a92] dark:text-zinc-500 font-medium block">
                       {pillar.eyebrow}
                     </span>
-                    <h3 className="font-display text-xl font-bold text-[#0B0B0C]">
+                    <h3 className="font-display text-xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
                       {pillar.title}
                     </h3>
                     <p className="font-mono text-xs text-[#2E82F7] font-semibold">
                       {pillar.subtitle}
                     </p>
-                    <p className="font-sans text-sm text-[#57575e] leading-relaxed">
+                    <p className="font-sans text-xs sm:text-sm text-[#57575e] dark:text-zinc-400 leading-relaxed">
                       {pillar.description}
                     </p>
                   </div>
@@ -387,33 +390,34 @@ export default function HomePage() {
       </section>
 
       {/* ── Section 7: Alternating Feature Blocks with Mockups ────────── */}
-      <section>
+      <section className="py-8 sm:py-14">
         <div className="max-w-site mx-auto px-4 sm:px-6 lg:px-8">
           <AlternatingFeatures />
         </div>
       </section>
 
       {/* ── Section 8: Gamified $ZED Token & Level Matrix ─────────────── */}
-      <section id="token-engine" className="scroll-mt-24 py-6 sm:py-10">
+      <section id="token-engine" className="scroll-mt-24 py-8 sm:py-14">
         <div className="max-w-site mx-auto px-4 sm:px-6 lg:px-8">
-          <FadeIn className="text-center max-w-3xl mx-auto mb-12 space-y-4">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-[#2E82F7]/10 text-[#2E82F7] border border-[#2E82F7]/20">
-              Planned: coming in Phase 2
+          <FadeIn className="text-center max-w-3xl mx-auto mb-12 space-y-3.5">
+            <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-mono font-semibold bg-[#2E82F7]/10 text-[#2E82F7] border border-[#2E82F7]/20">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#2E82F7]" />
+              <span>Phase 2 Architecture</span>
             </div>
-            <h2 className="font-display text-3xl sm:text-5xl font-bold tracking-tight text-[#0B0B0C]">
+            <h2 className="font-display text-3xl sm:text-5xl font-bold tracking-tight text-[#0B0B0C] dark:text-[#FAFAF8]">
               Earn as you grow. Proof-of-Engagement.
             </h2>
-            <p className="font-sans text-base text-[#57575e] leading-relaxed">
-              Planned for Phase 2: The $ZED Token will reward active participation, course completions, alumni mentorship, and community updates. Mining rates scale dynamically with your verified tier.
+            <p className="font-sans text-sm sm:text-base text-[#57575e] dark:text-zinc-400 leading-relaxed">
+              Planned for Phase 2: The $ZED Token will reward active participation, course completions, alumni mentorship, and community updates. Mining rates scale dynamically with your level.
             </p>
           </FadeIn>
 
           <FadeIn delay={0.1}>
-            <div className="rounded-xl border border-[#E5E5E0] bg-white overflow-hidden shadow-xs">
+            <div className="rounded-3xl border border-[#EAEAE6] dark:border-white/10 bg-white dark:bg-[#141416] overflow-hidden shadow-xl shadow-blue-500/5">
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                   <thead>
-                    <tr className="border-b border-[#E5E5E0] bg-[#FAFAF8] text-[#57575e] font-mono text-[11px] uppercase tracking-wider">
+                    <tr className="border-b border-[#EAEAE6] dark:border-white/8 bg-[#FAFAF8] dark:bg-[#17171a] text-[#57575e] dark:text-zinc-400 font-mono text-[11px] uppercase tracking-wider">
                       <th className="py-4 px-5 font-semibold">Tier</th>
                       <th className="py-4 px-5 font-semibold">Level Name</th>
                       <th className="py-4 px-5 font-semibold">Unlock Criteria (Proof-of-Engagement)</th>
@@ -421,23 +425,23 @@ export default function HomePage() {
                       <th className="py-4 px-5 font-semibold">Daily Cap</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#E5E5E0] text-sm">
+                  <tbody className="divide-y divide-[#EAEAE6] dark:divide-white/6 text-sm">
                     {LEVEL_MATRIX.map((tier) => (
-                      <tr key={tier.level} className="hover:bg-[#FAFAF8]/50 transition-colors">
-                        <td className="py-3.5 px-5 font-mono text-xs font-semibold text-[#8a8a92]">
+                      <tr key={tier.level} className="hover:bg-[#FAFAF8]/60 dark:hover:bg-white/[0.02] transition-colors">
+                        <td className="py-4 px-5 font-mono text-xs font-semibold text-[#8a8a92] dark:text-zinc-500">
                           Lvl {tier.level}
                         </td>
-                        <td className="py-3.5 px-5 font-display font-bold text-[#0B0B0C] flex items-center gap-2">
+                        <td className="py-4 px-5 font-display font-bold text-[#0B0B0C] dark:text-[#FAFAF8] flex items-center gap-2">
                           <span className="h-2 w-2 rounded-full bg-[#2E82F7]" />
                           {tier.name}
                         </td>
-                        <td className="py-3.5 px-5 text-[#57575e] text-xs">
+                        <td className="py-4 px-5 text-[#57575e] dark:text-zinc-400 text-xs">
                           {tier.criteria}
                         </td>
-                        <td className="py-3.5 px-5 font-mono text-xs font-bold text-[#2E82F7]">
+                        <td className="py-4 px-5 font-mono text-xs font-bold text-[#2E82F7]">
                           {tier.multiplier}
                         </td>
-                        <td className="py-3.5 px-5 font-mono text-xs text-[#0B0B0C] font-semibold">
+                        <td className="py-4 px-5 font-mono text-xs text-[#0B0B0C] dark:text-[#FAFAF8] font-semibold">
                           {tier.cap}
                         </td>
                       </tr>
@@ -446,7 +450,7 @@ export default function HomePage() {
                 </table>
               </div>
 
-              <div className="p-5 border-t border-[#E5E5E0] bg-[#FAFAF8]/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-[#57575e]">
+              <div className="p-5 border-t border-[#EAEAE6] dark:border-white/8 bg-[#FAFAF8]/70 dark:bg-[#17171a] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-[#57575e] dark:text-zinc-400">
                 <div className="flex items-center gap-2">
                   <Coins className="h-4 w-4 text-[#2E82F7]" />
                   <span>
@@ -455,10 +459,10 @@ export default function HomePage() {
                 </div>
                 <Link
                   href="/signup"
-                  className="font-medium text-[#0B0B0C] hover:text-[#2E82F7] flex items-center gap-1 shrink-0"
+                  className="font-semibold text-[#0B0B0C] dark:text-white hover:text-[#2E82F7] dark:hover:text-[#2E82F7] flex items-center gap-1 shrink-0"
                 >
                   <span>Explore Level Matrix</span>
-                  <ArrowRight className="h-3 w-3" />
+                  <ArrowRight className="h-3.5 w-3.5 text-[#2E82F7]" />
                 </Link>
               </div>
             </div>
@@ -467,84 +471,85 @@ export default function HomePage() {
       </section>
 
       {/* ── Section 9: Campus, Social & Safety Network ─────────────────── */}
-      <section className="py-6 sm:py-10">
+      <section className="py-8 sm:py-14">
         <div className="max-w-site mx-auto px-4 sm:px-6 lg:px-8">
-          <FadeIn className="text-center max-w-2xl mx-auto mb-10 space-y-3">
-            <div className="font-mono text-xs uppercase tracking-wider text-[#2E82F7] font-semibold">
-              Community & Safety
+          <FadeIn className="text-center max-w-2xl mx-auto mb-10 space-y-3.5">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-[#D8D8D2] dark:border-white/10 bg-white dark:bg-[#141416] text-[#2E82F7] text-xs font-semibold shadow-2xs">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#2E82F7]" />
+              <span>Community & Safety</span>
             </div>
-            <h2 className="font-display text-3xl sm:text-4xl font-bold tracking-tight text-[#0B0B0C]">
+            <h2 className="font-display text-3xl sm:text-4xl font-bold tracking-tight text-[#0B0B0C] dark:text-[#FAFAF8]">
               Social connection with built-in safety.
             </h2>
-            <p className="font-sans text-sm sm:text-base text-[#57575e] leading-relaxed">
+            <p className="font-sans text-sm sm:text-base text-[#57575e] dark:text-zinc-400 leading-relaxed">
               Designed for real-world peer connection, university academic support, and crowd-sourced transit safety.
             </p>
           </FadeIn>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
             <FadeIn delay={0.05}>
-              <div className="h-full rounded-xl border border-[#E5E5E0] bg-white p-6 space-y-3 flex flex-col justify-between">
-                <div className="space-y-2.5">
-                  <div className="h-9 w-9 rounded-lg border border-[#E5E5E0] bg-[#FAFAF8] flex items-center justify-center text-[#2E82F7]">
-                    <GraduationCap className="h-4.5 w-4.5" />
+              <div className="h-full rounded-2xl border border-[#EAEAE6] dark:border-white/10 bg-white dark:bg-[#141416] p-6 space-y-4 flex flex-col justify-between shadow-xs hover:shadow-lg hover:border-[#2E82F7]/40 transition-all">
+                <div className="space-y-3">
+                  <div className="h-10 w-10 rounded-xl bg-[#2E82F7]/10 text-[#2E82F7] flex items-center justify-center">
+                    <GraduationCap className="h-5 w-5" />
                   </div>
-                  <h3 className="font-display font-bold text-lg text-[#0B0B0C]">Campus Hubs</h3>
-                  <p className="font-sans text-xs text-[#57575e] leading-relaxed">
+                  <h3 className="font-display font-bold text-lg text-[#0B0B0C] dark:text-[#FAFAF8]">Campus Hubs</h3>
+                  <p className="font-sans text-xs sm:text-sm text-[#57575e] dark:text-zinc-400 leading-relaxed">
                     Dedicated university spaces (UNILAG, OAU, UI, FUTA, ABU, Covenant) featuring an Academic Vault for past exams, departmental lecture notes, and verified SIWES/IT listings.
                   </p>
                 </div>
-                <span className="font-mono text-[10px] text-[#8a8a92] uppercase tracking-wider">
+                <span className="font-mono text-[10px] text-[#8a8a92] dark:text-zinc-500 uppercase tracking-wider">
                   Phase 2 // Coming soon
                 </span>
               </div>
             </FadeIn>
 
             <FadeIn delay={0.1}>
-              <div className="h-full rounded-xl border border-[#E5E5E0] bg-white p-6 space-y-3 flex flex-col justify-between">
-                <div className="space-y-2.5">
-                  <div className="h-9 w-9 rounded-lg border border-[#E5E5E0] bg-[#FAFAF8] flex items-center justify-center text-[#2E82F7]">
-                    <Users className="h-4.5 w-4.5" />
+              <div className="h-full rounded-2xl border border-[#EAEAE6] dark:border-white/10 bg-white dark:bg-[#141416] p-6 space-y-4 flex flex-col justify-between shadow-xs hover:shadow-lg hover:border-[#2E82F7]/40 transition-all">
+                <div className="space-y-3">
+                  <div className="h-10 w-10 rounded-xl bg-[#2E82F7]/10 text-[#2E82F7] flex items-center justify-center">
+                    <Users className="h-5 w-5" />
                   </div>
-                  <h3 className="font-display font-bold text-lg text-[#0B0B0C]">Zed Meet</h3>
-                  <p className="font-sans text-xs text-[#57575e] leading-relaxed">
+                  <h3 className="font-display font-bold text-lg text-[#0B0B0C] dark:text-[#FAFAF8]">Zed Meet</h3>
+                  <p className="font-sans text-xs sm:text-sm text-[#57575e] dark:text-zinc-400 leading-relaxed">
                     WebRTC 1-on-1 text and audio speed networking with interest tags (Tech, NYSC, Campus, Creative). Includes 1-tap blocking and verified identity safeguards.
                   </p>
                 </div>
-                <span className="font-mono text-[10px] text-[#8a8a92] uppercase tracking-wider">
+                <span className="font-mono text-[10px] text-[#8a8a92] dark:text-zinc-500 uppercase tracking-wider">
                   Phase 2 // Coming soon
                 </span>
               </div>
             </FadeIn>
 
             <FadeIn delay={0.15}>
-              <div className="h-full rounded-xl border border-[#E5E5E0] bg-white p-6 space-y-3 flex flex-col justify-between">
-                <div className="space-y-2.5">
-                  <div className="h-9 w-9 rounded-lg border border-[#E5E5E0] bg-[#FAFAF8] flex items-center justify-center text-[#2E82F7]">
-                    <Sparkles className="h-4.5 w-4.5" />
+              <div className="h-full rounded-2xl border border-[#EAEAE6] dark:border-white/10 bg-white dark:bg-[#141416] p-6 space-y-4 flex flex-col justify-between shadow-xs hover:shadow-lg hover:border-[#2E82F7]/40 transition-all">
+                <div className="space-y-3">
+                  <div className="h-10 w-10 rounded-xl bg-[#2E82F7]/10 text-[#2E82F7] flex items-center justify-center">
+                    <Sparkles className="h-5 w-5" />
                   </div>
-                  <h3 className="font-display font-bold text-lg text-[#0B0B0C]">Zed Market</h3>
-                  <p className="font-sans text-xs text-[#57575e] leading-relaxed">
+                  <h3 className="font-display font-bold text-lg text-[#0B0B0C] dark:text-[#FAFAF8]">Zed Market</h3>
+                  <p className="font-sans text-xs sm:text-sm text-[#57575e] dark:text-zinc-400 leading-relaxed">
                     Escrow-backed micro-gigs. Milestone-locked client funds are released upon approval directly to Nigerian banks or USDT wallet addresses.
                   </p>
                 </div>
-                <span className="font-mono text-[10px] text-[#8a8a92] uppercase tracking-wider">
+                <span className="font-mono text-[10px] text-[#8a8a92] dark:text-zinc-500 uppercase tracking-wider">
                   Phase 2 // Coming soon
                 </span>
               </div>
             </FadeIn>
 
             <FadeIn delay={0.2}>
-              <div className="h-full rounded-xl border border-[#E5E5E0] bg-white p-6 space-y-3 flex flex-col justify-between">
-                <div className="space-y-2.5">
-                  <div className="h-9 w-9 rounded-lg border border-[#E5E5E0] bg-[#FAFAF8] flex items-center justify-center text-[#2E82F7]">
-                    <Radio className="h-4.5 w-4.5" />
+              <div className="h-full rounded-2xl border border-[#EAEAE6] dark:border-white/10 bg-white dark:bg-[#141416] p-6 space-y-4 flex flex-col justify-between shadow-xs hover:shadow-lg hover:border-[#2E82F7]/40 transition-all">
+                <div className="space-y-3">
+                  <div className="h-10 w-10 rounded-xl bg-[#2E82F7]/10 text-[#2E82F7] flex items-center justify-center">
+                    <Radio className="h-5 w-5" />
                   </div>
-                  <h3 className="font-display font-bold text-lg text-[#0B0B0C]">Zed SOS</h3>
-                  <p className="font-sans text-xs text-[#57575e] leading-relaxed">
+                  <h3 className="font-display font-bold text-lg text-[#0B0B0C] dark:text-[#FAFAF8]">Zed SOS</h3>
+                  <p className="font-sans text-xs sm:text-sm text-[#57575e] dark:text-zinc-400 leading-relaxed">
                     PostGIS-powered geospatial safety reporting. Crowd-sourced real-time alerts for road hazards, police checkpoints, and transit emergencies across Nigerian cities.
                   </p>
                 </div>
-                <span className="font-mono text-[10px] text-[#8a8a92] uppercase tracking-wider">
+                <span className="font-mono text-[10px] text-[#8a8a92] dark:text-zinc-500 uppercase tracking-wider">
                   Phase 2 // Coming soon
                 </span>
               </div>
@@ -554,21 +559,21 @@ export default function HomePage() {
       </section>
 
       {/* ── Section 10: Sovereign Privacy & NDPR Section ───────────────── */}
-      <section className="py-6 sm:py-10">
+      <section className="py-8 sm:py-14">
         <div className="max-w-site mx-auto px-4 sm:px-6 lg:px-8">
-          <FadeIn className="rounded-xl border border-[#E5E5E0] bg-white p-8 sm:p-12 shadow-sm">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+          <FadeIn className="rounded-3xl border border-[#EAEAE6] dark:border-white/10 bg-white dark:bg-[#141416] p-8 sm:p-14 shadow-xl shadow-blue-500/5">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-center">
               <div className="lg:col-span-8 space-y-5">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#E5E5E0] bg-[#FAFAF8] text-[#57575e] font-mono text-xs uppercase tracking-wider font-medium">
-                  <Lock className="h-3 w-3 text-[#2E82F7]" />
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-[#D8D8D2] dark:border-white/10 bg-[#FAFAF8] dark:bg-[#1a1a1e] text-[#2E82F7] text-xs font-semibold">
+                  <Lock className="h-3.5 w-3.5 text-[#2E82F7]" />
                   <span>Sovereign Identity Protection</span>
                 </div>
 
-                <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-[#0B0B0C]">
+                <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-[#0B0B0C] dark:text-[#FAFAF8]">
                   Your NIN stays yours.
                 </h2>
 
-                <div className="font-sans text-sm sm:text-base text-[#57575e] space-y-3 leading-relaxed">
+                <div className="font-sans text-sm sm:text-base text-[#57575e] dark:text-zinc-400 space-y-3.5 leading-relaxed">
                   <p>
                     Your National Identity Number is the master key to your civil, banking, and travel records. Storing raw identity numbers in cloud databases creates an unacceptable attack surface for identity theft.
                   </p>
@@ -580,38 +585,38 @@ export default function HomePage() {
                 <div className="pt-2">
                   <Link
                     href="/privacy"
-                    className="inline-flex items-center gap-2 text-sm font-medium text-[#0B0B0C] hover:text-[#2E82F7] transition-colors group"
+                    className="inline-flex items-center gap-2 text-sm font-semibold text-[#0B0B0C] dark:text-white hover:text-[#2E82F7] dark:hover:text-[#2E82F7] transition-colors group"
                   >
                     <span>Read our full NDPA Data Privacy Policy</span>
-                    <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                    <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform text-[#2E82F7]" />
                   </Link>
                 </div>
               </div>
 
-              <div className="lg:col-span-4 space-y-3">
-                <div className="p-4 rounded-lg border border-[#E5E5E0] bg-[#FAFAF8] space-y-1">
-                  <div className="font-mono text-xs font-semibold text-[#0B0B0C]">
+              <div className="lg:col-span-4 space-y-3.5">
+                <div className="p-4 rounded-xl border border-[#EAEAE6] dark:border-white/8 bg-[#FAFAF8] dark:bg-[#17171a] space-y-1">
+                  <div className="font-mono text-xs font-semibold text-[#0B0B0C] dark:text-[#FAFAF8]">
                     Salted SHA-256 Digest
                   </div>
-                  <div className="text-xs text-[#57575e]">
+                  <div className="text-xs text-[#57575e] dark:text-zinc-400">
                     One-way irreversible identity token
                   </div>
                 </div>
 
-                <div className="p-4 rounded-lg border border-[#E5E5E0] bg-[#FAFAF8] space-y-1">
-                  <div className="font-mono text-xs font-semibold text-[#0B0B0C]">
+                <div className="p-4 rounded-xl border border-[#EAEAE6] dark:border-white/8 bg-[#FAFAF8] dark:bg-[#17171a] space-y-1">
+                  <div className="font-mono text-xs font-semibold text-[#0B0B0C] dark:text-[#FAFAF8]">
                     Zero Plaintext Cloud Storage
                   </div>
-                  <div className="text-xs text-[#57575e]">
+                  <div className="text-xs text-[#57575e] dark:text-zinc-400">
                     Raw NIN never written to physical disk
                   </div>
                 </div>
 
-                <div className="p-4 rounded-lg border border-[#E5E5E0] bg-[#FAFAF8] space-y-1">
-                  <div className="font-mono text-xs font-semibold text-[#0B0B0C]">
+                <div className="p-4 rounded-xl border border-[#EAEAE6] dark:border-white/8 bg-[#FAFAF8] dark:bg-[#17171a] space-y-1">
+                  <div className="font-mono text-xs font-semibold text-[#0B0B0C] dark:text-[#FAFAF8]">
                     Data Protection First
                   </div>
-                  <div className="text-xs text-[#57575e]">
+                  <div className="text-xs text-[#57575e] dark:text-zinc-400">
                     Designed with data protection in mind; NIN is hashed, never stored raw
                   </div>
                 </div>
@@ -621,24 +626,66 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Section 11: FAQ Accordion ─────────────────────────────────── */}
-      <section id="faq" className="scroll-mt-24">
+      {/* ── Section 11: FAQ Section (2-Column Layout matching reference design) ── */}
+      <section id="faq" className="scroll-mt-24 py-6 sm:py-10">
         <div className="max-w-site mx-auto px-4 sm:px-6 lg:px-8">
-          <FadeIn className="text-center max-w-2xl mx-auto mb-12 sm:mb-14 space-y-3">
-            <div className="font-mono text-xs uppercase tracking-wider text-[#2E82F7] font-semibold">
-              Got Questions?
-            </div>
-            <h2 className="font-display text-3xl sm:text-5xl font-bold tracking-tight text-[#0B0B0C]">
-              Frequently asked questions
-            </h2>
-            <p className="font-sans text-sm sm:text-base text-[#57575e]">
-              Straight answers on how Zed operates, the $ZED token, and data privacy.
-            </p>
-          </FadeIn>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-start">
+            {/* Left Column: Eyebrow, Heading, Subtitle, and Support Card (5 cols) */}
+            <div className="lg:col-span-5 space-y-6 sm:space-y-7 lg:sticky lg:top-28">
+              <FadeIn className="space-y-3.5">
+                {/* Eyebrow Pill */}
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-[#D8D8D2] dark:border-white/10 bg-white dark:bg-[#141416] text-[#0B0B0C] dark:text-[#FAFAF8] text-xs font-semibold shadow-2xs">
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#2E82F7]" />
+                  <span>FAQs</span>
+                </div>
 
-          <FadeIn delay={0.1} className="max-w-3xl mx-auto">
-            <Accordion items={FAQ_ITEMS} defaultOpenIndex={0} />
-          </FadeIn>
+                {/* Heading */}
+                <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-[#0B0B0C] dark:text-[#FAFAF8] leading-[1.08]">
+                  Got Questions?
+                </h2>
+
+                {/* Subtitle */}
+                <p className="font-sans text-sm sm:text-base text-[#57575e] dark:text-zinc-400 leading-relaxed">
+                  Everything you need to know about using Zed, from civic playbooks and $ZED mining to data privacy and security.
+                </p>
+              </FadeIn>
+
+              {/* Support Specialist Image Card */}
+              <FadeIn delay={0.1}>
+                <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden aspect-[4/3] sm:aspect-[16/10] lg:aspect-[4/3] shadow-md border border-[#EAEAE6] dark:border-white/10 group">
+                  <Image
+                    src="/support-agent.jpg"
+                    alt="Zed community support team specialist"
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 450px"
+                    className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                  />
+                  {/* Gradient Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end p-5 sm:p-6 text-white space-y-2.5">
+                    <p className="font-sans text-xs sm:text-sm text-white/90 leading-relaxed">
+                      Still have questions or need help? Our community team is always ready to help you navigate, learn, and grow with Zed.
+                    </p>
+                    <div>
+                      <a
+                        href="mailto:thezedprojectng@gmail.com"
+                        className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-white hover:text-[#2E82F7] transition-colors group/link"
+                      >
+                        <span>Contact us</span>
+                        <ArrowUpRight className="h-3.5 w-3.5 group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5 transition-transform" />
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </FadeIn>
+            </div>
+
+            {/* Right Column: Accordion Cards (7 cols) */}
+            <div className="lg:col-span-7">
+              <FadeIn delay={0.15}>
+                <Accordion items={FAQ_ITEMS} defaultOpenIndex={0} />
+              </FadeIn>
+            </div>
+          </div>
         </div>
       </section>
 

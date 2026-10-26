@@ -25,6 +25,7 @@ import ninBvnFlow from "@/data/nav/nin-bvn.flow.json";
 import cacFlow from "@/data/nav/cac.flow.json";
 import type { NavFlow } from "@/types/nav";
 import { MODULES } from "@/data/modules";
+import { isVerifiedBadgeEnabled } from "@/lib/verification/flags";
 
 function getTimeGreeting(): string {
   const hour = new Date().getHours();
@@ -119,6 +120,21 @@ export default function HomePage() {
   const firstName = fullName ? fullName.trim().split(" ")[0] : "there";
   const isVerified = Boolean(profile?.is_verified);
   const civicLevel = profile?.level_id || 1;
+  const showGetVerifiedCard = isVerifiedBadgeEnabled() && !isVerified;
+  const [getVerifiedDismissed, setGetVerifiedDismissed] = useState(() => {
+    try {
+      return localStorage.getItem("zed_get_verified_dismissed") === "1";
+    } catch {
+      return false;
+    }
+  });
+
+  function dismissGetVerified() {
+    try {
+      localStorage.setItem("zed_get_verified_dismissed", "1");
+    } catch { /* ignore */ }
+    setGetVerifiedDismissed(true);
+  }
 
   const activeFlow = progressMap["passport"] || {
     flow_id: "passport",
@@ -156,11 +172,10 @@ export default function HomePage() {
         </p>
       </section>
 
-      {/* ── 2. Verification Banner (Hidden when verified) ─────────────── */}
-      {!isVerified && (
-        <section aria-label="Identity Verification">
+      {/* ── 2. "Get verified" card (dismissible, flag-gated) ────────────── */}
+      {showGetVerifiedCard && !getVerifiedDismissed && (
+        <section aria-label="Get verified">
           <Card className="p-0 border-hairline bg-card relative overflow-hidden">
-            {/* 2px accent line at top */}
             <div className="absolute inset-x-0 top-0 h-[2px] bg-primary rounded-t-xl" />
             <div className="p-5 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-5">
               <div className="space-y-3 max-w-xl">
@@ -168,27 +183,15 @@ export default function HomePage() {
                   <div className="flex h-6 w-6 items-center justify-center rounded-md bg-primary/10 text-primary border border-primary/20">
                     <ShieldAlert className="h-3.5 w-3.5" />
                   </div>
-                  <span className="type-caption text-primary">
-                    IDENTITY VERIFICATION
-                  </span>
+                  <span className="type-caption text-primary">IDENTITY VERIFICATION</span>
                 </div>
-                <h2 className="type-h2 text-foreground">
-                  Verify your NIN to level up
-                </h2>
+                <h2 className="type-h2 text-foreground">Verify your NIN to level up</h2>
                 <p className="type-small text-muted-foreground">
-                  Verify your 11-digit National Identity Number to confirm your verified status and unlock your next progression level.
+                  Verify your 11-digit National Identity Number to confirm your identity and unlock your next progression level.
                 </p>
-                <div className="flex items-center gap-3">
-                  <div className="w-48">
-                    <Progress value={33} className="h-1.5 bg-secondary" />
-                  </div>
-                  <span className="font-mono text-[11px] text-muted-foreground">
-                    Level: {getLevelName(civicLevel)}
-                  </span>
-                </div>
               </div>
 
-              <div className="shrink-0">
+              <div className="flex items-center gap-3 shrink-0">
                 <Button
                   asChild
                   className="bg-primary text-primary-foreground hover:bg-primary/90 font-medium px-5"
@@ -198,11 +201,21 @@ export default function HomePage() {
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-muted-foreground hover:text-foreground"
+                  onClick={dismissGetVerified}
+                  aria-label="Dismiss verification prompt"
+                >
+                  Dismiss
+                </Button>
               </div>
             </div>
           </Card>
         </section>
       )}
+
 
       {/* ── 3. Active Civil Application ───────────────────────────────── */}
       <section aria-label="In-progress civil flow">

@@ -158,14 +158,12 @@ export function MiningClient({
   // Claim button is enabled only when we have a token (or dev bypass)
   const hasSitekey = Boolean(resolvedSitekey);
   const tokenReady = Boolean(turnstileToken) || (!IS_PROD && !hasSitekey);
-  const canClaim = isVerified && !claimed && !isPending && tokenReady;
+  const canClaim = !claimed && !isPending && tokenReady;
 
   const claimButtonLabel = isPending
     ? "Claiming…"
     : claimed
     ? "Claimed today ✓"
-    : !isVerified
-    ? "Verify to Mine"
     : !tokenReady
     ? "Verifying you're human…"
     : `Claim ${level.dailyCap} $ZED`;
@@ -253,25 +251,11 @@ export function MiningClient({
             </Badge>
           </div>
 
-          {/* Not verified callout */}
-          {!isVerified && (
-            <div className="flex items-start gap-2 rounded-md border border-amber-500/20 bg-amber-500/10 p-3 text-xs text-amber-600 dark:text-amber-400">
-              <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" aria-hidden="true" />
-              <span>
-                You need to{" "}
-                <Link href="/verify-nin" className="underline font-medium">
-                  verify your NIN
-                </Link>{" "}
-                before you can mine $ZED.
-              </span>
-            </div>
-          )}
-
           {/*
            * Bot-check unavailable banner (production only, no sitekey configured).
            * Keeps the page functional while making the failure obvious.
            */}
-          {isVerified && !claimed && IS_PROD && !resolvedSitekey && (
+          {!claimed && IS_PROD && !resolvedSitekey && (
             <div className="flex items-start gap-2 rounded-md border border-amber-500/20 bg-amber-500/10 p-3 text-xs text-amber-600 dark:text-amber-400">
               <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" aria-hidden="true" />
               <span>Bot check unavailable. Please try again later.</span>
@@ -311,7 +295,7 @@ export function MiningClient({
             className="w-full min-w-[300px] min-h-[65px] flex items-center justify-center overflow-hidden"
             aria-label="Human verification widget"
           >
-            {isVerified && !claimed && resolvedSitekey && (
+            {!claimed && resolvedSitekey && (
               <Turnstile
                 ref={turnstileRef}
                 siteKey={resolvedSitekey}

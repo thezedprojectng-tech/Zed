@@ -12,7 +12,6 @@ import {
   CheckCircle2,
   BookOpen,
   Info,
-  AlertTriangle,
 } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -51,24 +50,6 @@ export default async function SkillPage() {
         </p>
       </section>
 
-      {/* ── Verification Warning if unverified ────────────────────────── */}
-      {!user.is_verified && (
-        <div className="flex items-start gap-3 rounded-lg border border-amber-500/20 bg-amber-500/10 p-4 text-xs text-amber-600 dark:text-amber-400">
-          <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" aria-hidden="true" />
-          <div className="space-y-1">
-            <p className="font-semibold text-amber-700 dark:text-amber-300">
-              Account Verification Required
-            </p>
-            <p className="leading-relaxed">
-              You can read all lessons freely, but you must{" "}
-              <Link href="/verify-nin" className="underline font-semibold">
-                verify your NIN
-              </Link>{" "}
-              to mark lessons complete and earn skill points.
-            </p>
-          </div>
-        </div>
-      )}
 
       {/* ── Points & Level Progression Header ─────────────────────────── */}
       <section

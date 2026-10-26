@@ -29,6 +29,7 @@ import {
   SAFETY_DISCLAIMER,
 } from "@/lib/market/helpers";
 import type { MarketCategory, MarketListing } from "@/lib/market/types";
+import { VerifiedBadge } from "@/components/verification/VerifiedBadge";
 
 interface MarketFeedClientProps {
   initialListings: MarketListing[];
@@ -333,9 +334,9 @@ export function MarketFeedClient({
                         <span className="truncate">{listing.location}</span>
                       </div>
                       <div className="flex items-center justify-between text-[11px] text-muted-foreground/80 pt-1 border-t border-border/50">
-                        <span className="flex items-center gap-1 font-medium">
-                          <UserCheck className="h-3 w-3 text-emerald-500" />
-                          {listing.seller_name_masked}
+                        <span className="flex items-center gap-1.5 font-medium truncate">
+                          <span className="truncate">{listing.seller_name_masked}</span>
+                          <VerifiedBadge isVerified={listing.seller_verified} />
                         </span>
                         <span className="text-[10px]">
                           {new Date(listing.created_at).toLocaleDateString("en-NG", {

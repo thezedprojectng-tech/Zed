@@ -35,7 +35,7 @@ export async function getListings(params: MarketFilterParams = {}): Promise<{
   let query = supabase
     .from("market_listings")
     .select(
-      "id, seller_id, seller_name_masked, title, description, category, price_ngn, condition, location, image_paths, status, removed_reason, created_at, updated_at, expires_at, report_count",
+      "id, seller_id, seller_name_masked, title, description, category, price_ngn, condition, location, image_paths, status, removed_reason, created_at, updated_at, expires_at, report_count, seller_verified",
       { count: "exact" }
     )
     .eq("status", "active")
@@ -77,7 +77,7 @@ export async function getListingById(id: string): Promise<MarketListing | null> 
   const { data, error } = await supabase
     .from("market_listings")
     .select(
-      "id, seller_id, seller_name_masked, title, description, category, price_ngn, condition, location, image_paths, status, removed_reason, created_at, updated_at, expires_at, report_count"
+      "id, seller_id, seller_name_masked, title, description, category, price_ngn, condition, location, image_paths, status, removed_reason, created_at, updated_at, expires_at, report_count, seller_verified"
     )
     .eq("id", id)
     .maybeSingle();
@@ -105,7 +105,7 @@ export async function getMyListings(): Promise<MarketListing[]> {
   const { data, error } = await supabase
     .from("market_listings")
     .select(
-      "id, seller_id, seller_name_masked, title, description, category, price_ngn, condition, location, image_paths, status, removed_reason, created_at, updated_at, expires_at, report_count"
+      "id, seller_id, seller_name_masked, title, description, category, price_ngn, condition, location, image_paths, status, removed_reason, created_at, updated_at, expires_at, report_count, seller_verified"
     )
     .eq("seller_id", user.id)
     .order("created_at", { ascending: false });
@@ -284,6 +284,7 @@ export async function getListingContact(listingId: string): Promise<{
   success: boolean;
   has_contact: boolean;
   whatsapp?: string | null;
+  seller_verified?: boolean;
   error?: string;
 }> {
   try {
@@ -300,6 +301,7 @@ export async function getListingContact(listingId: string): Promise<{
       success: boolean;
       has_contact: boolean;
       whatsapp: string | null;
+      seller_verified?: boolean;
       message?: string;
     };
 
@@ -307,6 +309,7 @@ export async function getListingContact(listingId: string): Promise<{
       success: res.success,
       has_contact: res.has_contact,
       whatsapp: res.whatsapp,
+      seller_verified: Boolean(res.seller_verified),
     };
   } catch (err) {
     return { success: false, has_contact: false, error: mapMarketError(err) };

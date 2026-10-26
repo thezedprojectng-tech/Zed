@@ -25,6 +25,7 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { signOut } from "@/lib/auth/actions";
 import { getLevelName } from "@/types";
 import { SOCIAL_LINKS, XIcon, InstagramIcon, WhatsAppIcon, TikTokIcon } from "@/data/socials";
+import { isVerifiedBadgeEnabled } from "@/lib/verification/flags";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -105,7 +106,7 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          {!isVerified && (
+          {!isVerified && isVerifiedBadgeEnabled() && (
             <div className="pt-2">
               <Button asChild size="sm" className="w-full gap-2">
                 <Link href="/verify-nin">

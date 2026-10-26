@@ -2,33 +2,34 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowUpRight, ArrowUp, MapPin } from "lucide-react";
+import { ArrowUp, ArrowUpRight } from "lucide-react";
 import { openCookieSettings } from "./CookieBanner";
 import { useSiteAuth } from "./useSiteAuth";
 import { SOCIAL_LINKS, XIcon, InstagramIcon, WhatsAppIcon, TikTokIcon } from "@/data/socials";
 
 const PRODUCT_LINKS = [
+  { href: "/", label: "Landing Page" },
+  { href: "/#features", label: "Features" },
   { href: "/#zed-nav", label: "Zed Nav" },
-  { href: "/#ecosystem", label: "Ecosystem" },
-  { href: "/#architecture", label: "Architecture" },
-  { href: "/#token-engine", label: "$ZED Mining" },
+  { href: "/mining", label: "$ZED Mining" },
+  { href: "/skill", label: "Skill Academy" },
+  { href: "/market", label: "Zed Market" },
+];
+
+const COMPANY_LINKS = [
+  { href: "/#how-it-works", label: "About Zed" },
   { href: "/fund", label: "Fund Your Idea" },
   { href: "/whitepaper", label: "White Paper" },
   { href: "/careers", label: "Careers" },
-  { href: "/#faq", label: "FAQ" },
-];
-
-const GUIDES_LINKS = [
-  { href: "/nav/passport", label: "Nigerian Passport" },
-  { href: "/nav/nysc", label: "NYSC Mobilization" },
-  { href: "/nav/nin-bvn", label: "NIN & BVN" },
-  { href: "/nav/cac", label: "CAC Registration" },
-];
-
-const LEGAL_LINKS = [
   { href: "/privacy", label: "Privacy Policy" },
-  { href: "/terms", label: "Terms of Service" },
+  { href: "/terms", label: "Terms & Conditions" },
+];
+
+const SUPPORT_LINKS = [
+  { href: "/#faq", label: "Frequently Asked Questions" },
+  { href: "/nav/passport", label: "Civic Fee Schedules" },
   { href: "/cookies", label: "Cookie Policy" },
+  { href: "mailto:thezedprojectng@gmail.com", label: "Contact Support", external: true },
 ];
 
 export function SiteFooter() {
@@ -42,266 +43,214 @@ export function SiteFooter() {
   };
 
   return (
-    <footer className="w-full bg-[#0D0D0F] text-white selection:bg-[#2E82F7] selection:text-[#0a2a5e]">
+    <footer className="w-full bg-[#FAFAF8] dark:bg-[#0B0B0C] text-[#0B0B0C] dark:text-[#FAFAF8] transition-colors border-t border-[#EAEAE6] dark:border-white/10">
+      <div className="max-w-site mx-auto px-4 sm:px-6 lg:px-8 pt-12 sm:pt-16 pb-12">
+        {/* ── Watermark & Copyright Section (Inspired by reference screenshot) ── */}
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 pb-10 sm:pb-14 border-b border-[#EAEAE6] dark:border-white/10">
+          {/* Giant Faint Brand Watermark */}
+          <div
+            aria-hidden="true"
+            className="font-display text-[72px] sm:text-[110px] md:text-[140px] lg:text-[170px] font-black tracking-tighter text-[#0B0B0C]/[0.06] dark:text-white/[0.05] select-none leading-none -mb-3 sm:-mb-6 pointer-events-none"
+          >
+            Zed
+          </div>
 
-      {/* ── Top divider bar ──────────────────────────────────────────────── */}
-      <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+          {/* Right-aligned metadata */}
+          <div className="sm:text-right space-y-1 text-xs sm:text-sm text-[#707078] dark:text-zinc-400 font-sans">
+            <p className="font-medium text-[#0B0B0C] dark:text-zinc-200">
+              All Rights Reserved.
+            </p>
+            <p>
+              &copy; {new Date().getFullYear()} The Zed Project. Built for Nigerian Youth.
+            </p>
+          </div>
+        </div>
 
-      {/* ── Main footer body ─────────────────────────────────────────────── */}
-      <div className="max-w-site mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-12">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8">
-
-          {/* ── Brand column ─────────────────────────────────────────────── */}
-          <div className="lg:col-span-4 space-y-6">
-            {/* Brand Logo */}
+        {/* ── 4-Column Footer Navigation ─────────────────────────────────── */}
+        <div className="pt-12 sm:pt-16 grid grid-cols-1 md:grid-cols-12 gap-10 sm:gap-8">
+          {/* Column 1: Brand & Socials (md:col-span-4) */}
+          <div className="md:col-span-4 space-y-5">
             <Link
               href="/"
               className="inline-flex items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2E82F7] rounded-sm py-1"
               aria-label="The Zed Project Home"
             >
+              {/* Logo: dark image for light background, light image for dark background */}
+              <Image
+                src="/icons/zed-logo-full-dark.png"
+                alt="The Zed Project"
+                width={150}
+                height={75}
+                className="h-8 w-auto object-contain dark:hidden"
+              />
               <Image
                 src="/icons/zed-logo-full-light.png"
                 alt="The Zed Project"
-                width={160}
-                height={80}
-                className="h-8 sm:h-9 w-auto object-contain"
+                width={150}
+                height={75}
+                className="h-8 w-auto object-contain hidden dark:block"
               />
             </Link>
 
-            {/* Mission statement */}
-            <p className="font-sans text-sm text-[#8a8a94] leading-relaxed max-w-xs">
-              The digital operating system for Nigerian Gen Z. Demystifying civil procedures, unlocking practical digital skills, escrow freelance micro-gigs, and campus communities.
+            <p className="font-sans text-xs sm:text-sm text-[#57575e] dark:text-zinc-400 leading-relaxed max-w-sm">
+              Zed is the all-in-one digital operating system for Nigerian youth.
+              Demystifying civil procedures, unlocking practical digital skills,
+              and empowering the next generation.
             </p>
 
-            {/* CTA */}
-            {isAuthenticated ? (
-              <Link
-                href="/home"
-                className="inline-flex items-center gap-1.5 text-sm font-medium text-[#2E82F7] hover:text-white transition-colors group"
+            {/* Circular Social Buttons (styled matching screenshot) */}
+            <div className="flex items-center gap-2.5 pt-1">
+              <a
+                href={SOCIAL_LINKS.x.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={SOCIAL_LINKS.x.ariaLabel}
+                className="h-9 w-9 rounded-full bg-[#0B0B0C] dark:bg-white/10 text-white flex items-center justify-center hover:bg-[#2E82F7] dark:hover:bg-[#2E82F7] transition-colors shadow-xs"
               >
-                <span>Open your dashboard</span>
-                <ArrowUpRight className="h-4 w-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-              </Link>
-            ) : (
-              <Link
-                href="/signup"
-                className="inline-flex items-center gap-1.5 text-sm font-medium text-[#2E82F7] hover:text-white transition-colors group"
+                <XIcon className="h-4 w-4" />
+              </a>
+              <a
+                href={SOCIAL_LINKS.instagram.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={SOCIAL_LINKS.instagram.ariaLabel}
+                className="h-9 w-9 rounded-full bg-[#0B0B0C] dark:bg-white/10 text-white flex items-center justify-center hover:bg-[#2E82F7] dark:hover:bg-[#2E82F7] transition-colors shadow-xs"
               >
-                <span>Create a free account</span>
-                <ArrowUpRight className="h-4 w-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-              </Link>
-            )}
-
-            {/* Location badge */}
-            <div className="inline-flex items-center gap-1.5 text-xs text-[#5a5a64] font-mono">
-              <MapPin className="h-3 w-3 text-[#2E82F7]" />
-              <span>Lagos, Nigeria</span>
-            </div>
-
-            {/* Social handles */}
-            <div className="pt-2 space-y-2">
-              <span className="block font-mono text-[11px] uppercase tracking-wider text-[#5a5a64]">
-                Join the Community
-              </span>
-              <div className="flex items-center gap-2">
-                <a
-                  href={SOCIAL_LINKS.whatsapp.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={SOCIAL_LINKS.whatsapp.ariaLabel}
-                  className="h-8 w-8 rounded-lg border border-white/10 bg-white/5 flex items-center justify-center text-[#9c9ca8] hover:text-[#25D366] hover:border-[#25D366]/40 hover:bg-[#25D366]/10 transition-colors"
-                >
-                  <WhatsAppIcon className="h-4 w-4" />
-                </a>
-                <a
-                  href={SOCIAL_LINKS.x.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={SOCIAL_LINKS.x.ariaLabel}
-                  className="h-8 w-8 rounded-lg border border-white/10 bg-white/5 flex items-center justify-center text-[#9c9ca8] hover:text-white hover:border-white/30 hover:bg-white/10 transition-colors"
-                >
-                  <XIcon className="h-3.5 w-3.5" />
-                </a>
-                <a
-                  href={SOCIAL_LINKS.instagram.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={SOCIAL_LINKS.instagram.ariaLabel}
-                  className="h-8 w-8 rounded-lg border border-white/10 bg-white/5 flex items-center justify-center text-[#9c9ca8] hover:text-[#E4405F] hover:border-[#E4405F]/40 hover:bg-[#E4405F]/10 transition-colors"
-                >
-                  <InstagramIcon className="h-4 w-4" />
-                </a>
-                <a
-                  href={SOCIAL_LINKS.tiktok.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={SOCIAL_LINKS.tiktok.ariaLabel}
-                  className="h-8 w-8 rounded-lg border border-white/10 bg-white/5 flex items-center justify-center text-[#9c9ca8] hover:text-[#ff0050] hover:border-[#ff0050]/40 hover:bg-[#ff0050]/10 transition-colors"
-                >
-                  <TikTokIcon className="h-3.5 w-3.5" />
-                </a>
-              </div>
+                <InstagramIcon className="h-4 w-4" />
+              </a>
+              <a
+                href={SOCIAL_LINKS.whatsapp.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={SOCIAL_LINKS.whatsapp.ariaLabel}
+                className="h-9 w-9 rounded-full bg-[#0B0B0C] dark:bg-white/10 text-white flex items-center justify-center hover:bg-[#2E82F7] dark:hover:bg-[#2E82F7] transition-colors shadow-xs"
+              >
+                <WhatsAppIcon className="h-4 w-4" />
+              </a>
+              <a
+                href={SOCIAL_LINKS.tiktok.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={SOCIAL_LINKS.tiktok.ariaLabel}
+                className="h-9 w-9 rounded-full bg-[#0B0B0C] dark:bg-white/10 text-white flex items-center justify-center hover:bg-[#2E82F7] dark:hover:bg-[#2E82F7] transition-colors shadow-xs"
+              >
+                <TikTokIcon className="h-4 w-4" />
+              </a>
             </div>
           </div>
 
-          {/* ── Link columns ─────────────────────────────────────────────── */}
-          <div className="lg:col-span-8 grid grid-cols-2 sm:grid-cols-4 gap-8 lg:gap-6 lg:pl-8">
+          {/* Column 2: Product (md:col-span-3) */}
+          <div className="md:col-span-3 space-y-4">
+            <h3 className="font-display font-semibold text-xs uppercase tracking-wider text-[#0B0B0C] dark:text-[#FAFAF8]">
+              Product
+            </h3>
+            <ul className="space-y-2.5 text-xs sm:text-sm">
+              {PRODUCT_LINKS.map((link) => (
+                <li key={link.label}>
+                  <Link
+                    href={link.href}
+                    className="text-[#57575e] dark:text-zinc-400 hover:text-[#2E82F7] dark:hover:text-[#2E82F7] transition-colors"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+              {isAuthenticated ? (
+                <li>
+                  <Link
+                    href="/home"
+                    className="text-[#2E82F7] font-medium hover:underline inline-flex items-center gap-1"
+                  >
+                    <span>Dashboard</span>
+                    <ArrowUpRight className="h-3 w-3" />
+                  </Link>
+                </li>
+              ) : (
+                <li>
+                  <Link
+                    href="/signup"
+                    className="text-[#2E82F7] font-medium hover:underline inline-flex items-center gap-1"
+                  >
+                    <span>Get Started</span>
+                    <ArrowUpRight className="h-3 w-3" />
+                  </Link>
+                </li>
+              )}
+            </ul>
+          </div>
 
-            {/* Product */}
-            <div>
-              <h4 className="font-mono text-[11px] uppercase tracking-widest text-[#5a5a64] font-medium mb-5">
-                Product
-              </h4>
-              <ul className="space-y-3">
-                {PRODUCT_LINKS.map((link) => (
-                  <li key={link.href}>
+          {/* Column 3: Company (md:col-span-3) */}
+          <div className="md:col-span-3 space-y-4">
+            <h3 className="font-display font-semibold text-xs uppercase tracking-wider text-[#0B0B0C] dark:text-[#FAFAF8]">
+              Company
+            </h3>
+            <ul className="space-y-2.5 text-xs sm:text-sm">
+              {COMPANY_LINKS.map((link) => (
+                <li key={link.label}>
+                  <Link
+                    href={link.href}
+                    className="text-[#57575e] dark:text-zinc-400 hover:text-[#2E82F7] dark:hover:text-[#2E82F7] transition-colors"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Column 4: Support (md:col-span-2) */}
+          <div className="md:col-span-2 space-y-4">
+            <h3 className="font-display font-semibold text-xs uppercase tracking-wider text-[#0B0B0C] dark:text-[#FAFAF8]">
+              Support
+            </h3>
+            <ul className="space-y-2.5 text-xs sm:text-sm">
+              {SUPPORT_LINKS.map((link) => (
+                <li key={link.label}>
+                  {link.external ? (
                     <a
                       href={link.href}
-                      className="font-sans text-sm text-[#9c9ca8] hover:text-white transition-colors"
+                      className="text-[#57575e] dark:text-zinc-400 hover:text-[#2E82F7] dark:hover:text-[#2E82F7] transition-colors"
                     >
                       {link.label}
                     </a>
-                  </li>
-                ))}
-                {isAuthenticated ? (
-                  <li>
-                    <Link
-                      href="/home"
-                      className="font-sans text-sm text-[#2E82F7] hover:text-white transition-colors inline-flex items-center gap-1"
-                    >
-                      <span>Open Zed</span>
-                      <ArrowUpRight className="h-3 w-3" />
-                    </Link>
-                  </li>
-                ) : (
-                  <>
-                    <li>
-                      <Link href="/login" className="font-sans text-sm text-[#9c9ca8] hover:text-white transition-colors">
-                        Sign in
-                      </Link>
-                    </li>
-                    <li>
-                      <Link href="/signup" className="font-sans text-sm text-[#9c9ca8] hover:text-white transition-colors">
-                        Create account
-                      </Link>
-                    </li>
-                  </>
-                )}
-              </ul>
-            </div>
-
-            {/* Guides */}
-            <div>
-              <h4 className="font-mono text-[11px] uppercase tracking-widest text-[#5a5a64] font-medium mb-5">
-                Guides
-              </h4>
-              <ul className="space-y-3">
-                {GUIDES_LINKS.map((link) => (
-                  <li key={link.label}>
+                  ) : (
                     <Link
                       href={link.href}
-                      className="font-sans text-sm text-[#9c9ca8] hover:text-white transition-colors"
+                      className="text-[#57575e] dark:text-zinc-400 hover:text-[#2E82F7] dark:hover:text-[#2E82F7] transition-colors"
                     >
                       {link.label}
                     </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Community */}
-            <div>
-              <h4 className="font-mono text-[11px] uppercase tracking-widest text-[#5a5a64] font-medium mb-5">
-                Community
-              </h4>
-              <ul className="space-y-3">
-                <li>
-                  <a
-                    href={SOCIAL_LINKS.whatsapp.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-sans text-sm text-[#9c9ca8] hover:text-white transition-colors inline-flex items-center gap-1.5 group"
-                  >
-                    <span>WhatsApp</span>
-                    <ArrowUpRight className="h-3 w-3 text-[#5a5a64] group-hover:text-white transition-colors" />
-                  </a>
+                  )}
                 </li>
-                <li>
-                  <a
-                    href={SOCIAL_LINKS.x.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-sans text-sm text-[#9c9ca8] hover:text-white transition-colors inline-flex items-center gap-1.5 group"
-                  >
-                    <span>X (Twitter)</span>
-                    <ArrowUpRight className="h-3 w-3 text-[#5a5a64] group-hover:text-white transition-colors" />
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href={SOCIAL_LINKS.instagram.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-sans text-sm text-[#9c9ca8] hover:text-white transition-colors inline-flex items-center gap-1.5 group"
-                  >
-                    <span>Instagram</span>
-                    <ArrowUpRight className="h-3 w-3 text-[#5a5a64] group-hover:text-white transition-colors" />
-                  </a>
-                </li>
-              </ul>
-            </div>
-
-            {/* Legal */}
-            <div>
-              <h4 className="font-mono text-[11px] uppercase tracking-widest text-[#5a5a64] font-medium mb-5">
-                Legal
-              </h4>
-              <ul className="space-y-3">
-                {LEGAL_LINKS.map((link) => (
-                  <li key={link.href}>
-                    <Link
-                      href={link.href}
-                      className="font-sans text-sm text-[#9c9ca8] hover:text-white transition-colors"
-                    >
-                      {link.label}
-                    </Link>
-                  </li>
-                ))}
-                <li>
-                  <button
-                    type="button"
-                    onClick={openCookieSettings}
-                    className="font-sans text-sm text-[#9c9ca8] hover:text-white transition-colors text-left cursor-pointer"
-                  >
-                    Cookie settings
-                  </button>
-                </li>
-              </ul>
-            </div>
+              ))}
+              <li>
+                <button
+                  type="button"
+                  onClick={openCookieSettings}
+                  className="text-[#57575e] dark:text-zinc-400 hover:text-[#2E82F7] dark:hover:text-[#2E82F7] transition-colors text-left cursor-pointer"
+                >
+                  Cookie Settings
+                </button>
+              </li>
+            </ul>
           </div>
         </div>
 
-        {/* ── Bottom bar ───────────────────────────────────────────────────── */}
-        <div className="mt-14 pt-6 border-t border-white/[0.07] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-
-          <div className="space-y-1.5">
-            <p className="font-mono text-xs text-[#5a5a64]">
-              &copy; {new Date().getFullYear()} Zed. All rights reserved.
-            </p>
-            <p className="font-mono text-xs text-[#3d3d46] max-w-md leading-relaxed">
-              Zed is an independent platform and is not affiliated with or endorsed by any government agency.
-            </p>
-          </div>
+        {/* ── Sub-footer disclaimer & Scroll-to-top ──────────────────────── */}
+        <div className="mt-12 sm:mt-16 pt-6 border-t border-[#EAEAE6] dark:border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <p className="font-sans text-[11px] text-[#707078] dark:text-zinc-500 max-w-xl leading-relaxed">
+            Zed is an independent platform and is not affiliated with, endorsed by, or representing any Nigerian government agency.
+          </p>
 
           <button
             type="button"
             onClick={scrollToTop}
             aria-label="Back to top"
-            className="inline-flex items-center gap-2 text-xs font-mono text-[#5a5a64] hover:text-white transition-colors group cursor-pointer flex-shrink-0"
+            className="inline-flex items-center gap-2 text-xs font-medium text-[#707078] dark:text-zinc-400 hover:text-[#0B0B0C] dark:hover:text-white transition-colors cursor-pointer shrink-0"
           >
             <span>Back to top</span>
-            <span className="h-7 w-7 rounded-full border border-white/10 flex items-center justify-center group-hover:border-white/25 transition-colors">
-              <ArrowUp className="h-3.5 w-3.5 group-hover:-translate-y-0.5 transition-transform" />
+            <span className="h-7 w-7 rounded-full border border-[#D8D8D2] dark:border-white/10 flex items-center justify-center">
+              <ArrowUp className="h-3.5 w-3.5" />
             </span>
           </button>
         </div>

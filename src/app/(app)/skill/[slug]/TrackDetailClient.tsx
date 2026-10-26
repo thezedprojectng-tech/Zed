@@ -10,7 +10,6 @@ import {
   ChevronDown,
   ChevronUp,
   Sparkles,
-  AlertTriangle,
   BookOpen,
   Loader2,
 } from "lucide-react";
@@ -51,11 +50,6 @@ export function TrackDetailClient({ data }: { data: TrackDetailData }) {
   }
 
   function handleComplete(lessonId: string) {
-    if (!isVerified) {
-      toast.error("Verify your account to earn skill points.");
-      return;
-    }
-
     setCompletingId(lessonId);
     startTransition(async () => {
       try {
@@ -146,26 +140,6 @@ export function TrackDetailClient({ data }: { data: TrackDetailData }) {
           </div>
         </div>
       </section>
-
-      {/* ── Verification Warning ─────────────────────────────────────── */}
-      {!isVerified && (
-        <div className="flex items-start gap-3 rounded-lg border border-amber-500/20 bg-amber-500/10 p-4 text-xs text-amber-600 dark:text-amber-400">
-          <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" aria-hidden="true" />
-          <div className="space-y-1">
-            <p className="font-semibold text-amber-700 dark:text-amber-300">
-              Verification Required to Earn Points
-            </p>
-            <p className="leading-relaxed">
-              You can read these playbooks right now. To save your completion and
-              earn skill points toward Level 2,{" "}
-              <Link href="/verify-nin" className="underline font-semibold">
-                verify your NIN
-              </Link>
-              .
-            </p>
-          </div>
-        </div>
-      )}
 
       {/* ── Lessons List ─────────────────────────────────────────────── */}
       <section aria-label="Lessons" className="space-y-4">
@@ -274,7 +248,7 @@ export function TrackDetailClient({ data }: { data: TrackDetailData }) {
                             e.stopPropagation();
                             handleComplete(lesson.id);
                           }}
-                          disabled={!isVerified || isPending}
+                          disabled={isPending}
                           className="font-semibold gap-1.5"
                         >
                           {isCurrentPending ? (
@@ -283,11 +257,7 @@ export function TrackDetailClient({ data }: { data: TrackDetailData }) {
                             <BookOpen className="h-4 w-4" aria-hidden="true" />
                           )}
                           <span>
-                            {isCurrentPending
-                              ? "Marking complete…"
-                              : isVerified
-                              ? "Mark complete"
-                              : "Verify to complete"}
+                            {isCurrentPending ? "Marking complete…" : "Mark complete"}
                           </span>
                         </Button>
                       )}

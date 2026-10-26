@@ -33,6 +33,19 @@ async function verifyNinWithProvider(
  * 6. Handles duplicate nin_hash unique constraint gracefully (409 Conflict).
  */
 export async function POST(request: Request) {
+  // ── Production guard ──────────────────────────────────────────────────────
+  // If we are in production and no real NIN provider is wired up, refuse the
+  // request immediately. The mock must never silently verify users in prod.
+  if (
+    process.env.NODE_ENV === "production" &&
+    !process.env.NIN_PROVIDER
+  ) {
+    return NextResponse.json(
+      { success: false, error: "Verification is not available yet." },
+      { status: 503 }
+    );
+  }
+
   try {
     // 1. Authenticate user from session cookies
     const supabase = await createClient();
