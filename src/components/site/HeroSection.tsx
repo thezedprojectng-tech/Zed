@@ -76,7 +76,7 @@ export function HeroSection() {
             {isAuthenticated ? (
               <Link
                 href="/home"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-[#2E82F7] hover:bg-[#256fd8] text-white text-sm font-semibold rounded-full shadow-sm hover:shadow-md transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2E82F7]"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-[#2E82F7] hover:bg-[#256fd8] text-white text-sm font-semibold rounded shadow-sm hover:shadow-md transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2E82F7]"
               >
                 <span>Open Zed</span>
                 <ArrowUpRight className="h-4 w-4" />
@@ -85,7 +85,7 @@ export function HeroSection() {
               <>
                 <Link
                   href="/signup"
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-[#2E82F7] hover:bg-[#256fd8] text-white text-sm font-semibold rounded-full shadow-sm hover:shadow-md transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2E82F7]"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-[#2E82F7] hover:bg-[#256fd8] text-white text-sm font-semibold rounded shadow-sm hover:shadow-md transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2E82F7]"
                 >
                   <span>Get started free</span>
                   <ArrowRight className="h-4 w-4" />
@@ -93,7 +93,7 @@ export function HeroSection() {
 
                 <a
                   href="#features"
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-7 py-3.5 rounded-full border border-[#D8D8D2] dark:border-white/15 bg-white dark:bg-[#141416] hover:bg-[#F5F5F0] dark:hover:bg-[#1a1a1e] text-[#0B0B0C] dark:text-[#FAFAF8] text-sm font-semibold shadow-xs transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2E82F7]"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-7 py-3.5 rounded border border-[#D8D8D2] dark:border-white/15 bg-white dark:bg-[#141416] hover:bg-[#F5F5F0] dark:hover:bg-[#1a1a1e] text-[#0B0B0C] dark:text-[#FAFAF8] text-sm font-semibold shadow-xs transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2E82F7]"
                 >
                   <span>See what Zed does</span>
                   <ArrowUpRight className="h-3.5 w-3.5 text-muted-foreground" />

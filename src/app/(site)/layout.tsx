@@ -38,7 +38,7 @@ export default function SiteLayout({
 }) {
   return (
     <SmoothScrollProvider>
-      <div className="min-h-dvh bg-[#FAFAF8] text-[#0B0B0C] flex flex-col font-sans selection:bg-[#2E82F7] selection:text-[#0a2a5e]">
+      <div className="min-h-dvh bg-[#FAFAF8] dark:bg-[#0B0B0C] text-[#0B0B0C] dark:text-[#FAFAF8] flex flex-col font-sans selection:bg-[#2E82F7] selection:text-[#0a2a5e]">
         {/* Skip to Content for Keyboard Accessibility */}
         <a
           href="#main-content"

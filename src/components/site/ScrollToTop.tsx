@@ -38,49 +38,58 @@ export function ScrollToTop() {
     });
   };
 
-  // Circular progress ring parameters
-  const radius = 18;
-  const circumference = 2 * Math.PI * radius;
-  const strokeDashoffset = circumference - (progress / 100) * circumference;
+  // Square progress ring parameters
+  const size = 44;
+  const strokeWidth = 2.5;
+  const padding = 4;
+  const innerSize = size - padding * 2;
+  const perimeter = innerSize * 4;
+  const strokeDashoffset = perimeter - (progress / 100) * perimeter;
 
   return (
     <button
       type="button"
       onClick={scrollToTop}
       aria-label="Scroll back to top"
-      className={`fixed bottom-6 right-6 z-50 group flex items-center justify-center h-12 w-12 rounded-full border border-border/80 bg-card/90 backdrop-blur-md text-foreground shadow-xl transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary cursor-pointer ${
+      className={`fixed bottom-6 right-6 z-50 group flex items-center justify-center h-11 w-11 rounded-xl border border-[#E5E5E0] dark:border-white/10 bg-white dark:bg-[#141416] text-[#0B0B0C] dark:text-[#FAFAF8] shadow-md backdrop-blur-sm transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2E82F7] cursor-pointer ${
         isVisible
           ? "opacity-100 translate-y-0 pointer-events-auto"
           : "opacity-0 translate-y-4 pointer-events-none"
-      } hover:border-primary hover:bg-primary hover:text-primary-foreground hover:shadow-2xl hover:scale-105 active:scale-95`}
+      } hover:border-[#2E82F7] hover:bg-[#2E82F7] hover:text-white dark:hover:bg-[#2E82F7] dark:hover:text-white hover:shadow-lg hover:shadow-[#2E82F7]/20 active:scale-95`}
     >
-      {/* SVG Progress Ring */}
+      {/* Square SVG Progress Outline */}
       <svg
-        className="absolute inset-0 h-full w-full -rotate-90 p-1 pointer-events-none"
+        aria-hidden="true"
+        className="absolute inset-0 h-full w-full pointer-events-none"
         viewBox="0 0 44 44"
       >
-        {/* Background Track Circle */}
-        <circle
-          cx="22"
-          cy="22"
-          r={radius}
+        {/* Background track square */}
+        <rect
+          x={padding}
+          y={padding}
+          width={innerSize}
+          height={innerSize}
+          rx="9"
           fill="none"
           stroke="currentColor"
-          strokeWidth="2.5"
-          className="text-muted/40 group-hover:text-primary-foreground/20 transition-colors"
+          strokeWidth={strokeWidth}
+          className="text-[#E5E5E0] dark:text-white/10 group-hover:text-[#2E82F7]/20 transition-colors"
         />
-        {/* Animated Progress Indicator Circle */}
-        <circle
-          cx="22"
-          cy="22"
-          r={radius}
+        {/* Animated progress square */}
+        <rect
+          x={padding}
+          y={padding}
+          width={innerSize}
+          height={innerSize}
+          rx="9"
           fill="none"
           stroke="currentColor"
-          strokeWidth="2.5"
-          strokeDasharray={circumference}
+          strokeWidth={strokeWidth}
+          strokeDasharray={perimeter}
           strokeDashoffset={strokeDashoffset}
           strokeLinecap="round"
-          className="text-primary group-hover:text-primary-foreground transition-all duration-100 ease-out"
+          className="text-[#2E82F7] group-hover:text-white transition-all duration-100 ease-out"
+          style={{ transformOrigin: "center", transform: "rotate(-90deg)" }}
         />
       </svg>
 
