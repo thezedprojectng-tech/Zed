@@ -11,7 +11,6 @@ import {
   Menu,
   LayoutDashboard,
   Users,
-  FileText,
   ScrollText,
   Share2,
   GraduationCap,
@@ -37,7 +36,6 @@ const navItems = [
   { href: "/admin/skill", label: "Skill content", icon: GraduationCap },
   { href: "/admin/funding", label: "Funding", icon: Share2 },
   { href: "/admin/referrals", label: "Referrals", icon: Share2 },
-  { href: "/admin/reports", label: "Reports", icon: FileText },
   { href: "/admin/audit-log", label: "Audit Log", icon: ScrollText },
 ];
 
@@ -64,7 +62,6 @@ export function AdminTopBar({ adminUser }: AdminTopBarProps) {
     if (pathname.startsWith("/admin/referrals")) return "Referrals Management";
     if (pathname.startsWith("/admin/withdrawals")) return "Withdrawals Queue";
     if (pathname.startsWith("/admin/settings/zed")) return "ZED Token Settings";
-    if (pathname.startsWith("/admin/reports")) return "Centre Reports";
     if (pathname.startsWith("/admin/audit-log")) return "Audit Log";
     return "Console";
   };

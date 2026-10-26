@@ -7,7 +7,6 @@ import { cn } from "@/lib/utils";
 import {
   Home,
   Compass,
-  MapPin,
   BookOpen,
   GraduationCap,
   Fingerprint,
@@ -55,7 +54,6 @@ const sections: NavSection[] = [
       { href: "/home", label: "Dashboard", icon: Home },
       { href: "/nav", label: "Zed Nav", icon: Compass },
       { href: "/skill", label: "Zed Skill", icon: Briefcase },
-      { href: "/nav/passport/centers", label: "Centers Tracker", icon: MapPin },
       { href: "/mining", label: "Zed Mining", icon: Pickaxe },
       { href: "/market", label: "Zed Market", icon: ShoppingBag },
     ],
@@ -87,7 +85,6 @@ const sections: NavSection[] = [
       { href: "/admin", label: "Overview", icon: LayoutDashboard },
       { href: "/admin/users", label: "Users", icon: Users },
       { href: "/admin/funding", label: "Funding", icon: Lightbulb },
-      { href: "/admin/reports", label: "Reports", icon: FileText },
       { href: "/admin/market", label: "Market Moderation", icon: ShoppingBag },
     ],
   },

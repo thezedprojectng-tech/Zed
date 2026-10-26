@@ -13,7 +13,6 @@ import {
   TrendingUp,
   Compass,
   CheckCircle2,
-  Clock,
   ArrowRight,
   UserPlus,
   Pickaxe,
@@ -22,8 +21,6 @@ import { SignupsAreaChart, SignupDataPoint } from "@/components/admin/charts/Sig
 import { FlowsGroupedBarChart, FlowGuideStat } from "@/components/admin/charts/FlowsGroupedBarChart";
 import { VerificationDonutChart } from "@/components/admin/charts/VerificationDonutChart";
 import { CivicLevelBarChart, LevelDataPoint } from "@/components/admin/charts/CivicLevelBarChart";
-import { ReportsPerDayChart, ReportDayData } from "@/components/admin/charts/ReportsPerDayChart";
-import { DeleteReportButton } from "./reports/DeleteReportButton";
 import { getLevelName } from "@/types";
 
 export const metadata: Metadata = {
@@ -41,33 +38,7 @@ interface RecentUser {
   created_at: string;
 }
 
-interface RecentReport {
-  id: string;
-  center_name: string;
-  state: string;
-  wait_minutes: number;
-  reported_at: string;
-  user_id: string;
-  users?: {
-    full_name: string | null;
-    phone_number: string | null;
-  } | null;
-}
 
-function waitBadge(mins: number) {
-  if (mins < 60)
-    return { label: "Quiet", cls: "border-emerald-500/30 bg-emerald-500/10 text-emerald-500" };
-  if (mins <= 180)
-    return { label: "Moderate", cls: "border-amber-500/30 bg-amber-500/10 text-amber-500" };
-  return { label: "Busy", cls: "border-destructive/30 bg-destructive/10 text-destructive" };
-}
-
-function formatMinutes(m: number) {
-  if (m < 60) return `${m}m`;
-  const h = Math.floor(m / 60);
-  const rem = m % 60;
-  return rem > 0 ? `${h}h ${rem}m` : `${h}h`;
-}
 
 function getInitials(name?: string | null) {
   if (!name) return "ZE";
@@ -92,16 +63,12 @@ async function fetchOverviewMetrics() {
     { count: verifiedUsers },
     { count: signupsLast7d },
     { count: signupsPrev7d },
-    { count: reports24h },
-    { count: totalReports },
     { count: miningClaimsToday },
     { data: miningTotalRaw },
     { data: recentUsersRaw },
-    { data: recentReportsRaw },
     { data: signups90dRaw },
     { data: navProgressRaw },
     { data: levelCountsRaw },
-    { data: reports14dRaw },
   ] = await Promise.all([
     admin.from("users").select("*", { count: "exact", head: true }),
     admin.from("users").select("*", { count: "exact", head: true }).eq("is_verified", true),
@@ -111,8 +78,6 @@ async function fetchOverviewMetrics() {
       .select("*", { count: "exact", head: true })
       .gte("created_at", fourteenDaysAgo)
       .lt("created_at", sevenDaysAgo),
-    admin.from("center_reports").select("*", { count: "exact", head: true }).gte("reported_at", twentyFourHoursAgo),
-    admin.from("center_reports").select("*", { count: "exact", head: true }),
     admin.from("mining_logs").select("*", { count: "exact", head: true }).gte("mined_at", twentyFourHoursAgo),
     admin.from("token_wallets").select("total_mined"),
     admin
@@ -121,33 +86,12 @@ async function fetchOverviewMetrics() {
       .order("created_at", { ascending: false })
       .limit(5),
     admin
-      .from("center_reports")
-      .select(`
-        id,
-        center_name,
-        state,
-        wait_minutes,
-        reported_at,
-        user_id,
-        users:user_id (
-          full_name,
-          phone_number
-        )
-      `)
-      .order("reported_at", { ascending: false })
-      .limit(5),
-    admin
       .from("users")
       .select("created_at")
       .gte("created_at", ninetyDaysAgo)
       .order("created_at", { ascending: true }),
     admin.from("nav_progress").select("flow_id, state"),
     admin.from("users").select("level_id"),
-    admin
-      .from("center_reports")
-      .select("center_name, reported_at")
-      .gte("reported_at", fourteenDaysAgo)
-      .order("reported_at", { ascending: true }),
   ]);
 
   // Mining totals
@@ -223,32 +167,6 @@ async function fetchOverviewMetrics() {
     count: levelCounts[lvl] || 0,
   }));
 
-  // Reports 14d & Busiest centre
-  const reports14dMap: Record<string, number> = {};
-  const centreFreq: Record<string, number> = {};
-  for (let i = 13; i >= 0; i--) {
-    const d = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
-    reports14dMap[d.toISOString().slice(0, 10)] = 0;
-  }
-  for (const r of reports14dRaw ?? []) {
-    const day = r.reported_at.slice(0, 10);
-    if (day in reports14dMap) reports14dMap[day]++;
-    if (r.center_name) {
-      centreFreq[r.center_name] = (centreFreq[r.center_name] || 0) + 1;
-    }
-  }
-  const reports14d: ReportDayData[] = Object.entries(reports14dMap).map(([date, count]) => ({
-    date,
-    count,
-  }));
-
-  let busiestCentre: { name: string; count: number } | null = null;
-  for (const [name, count] of Object.entries(centreFreq)) {
-    if (!busiestCentre || count > busiestCentre.count) {
-      busiestCentre = { name, count };
-    }
-  }
-
   // 7-day signups comparison
   const sLast = signupsLast7d ?? 0;
   const sPrev = signupsPrev7d ?? 0;
@@ -266,17 +184,12 @@ async function fetchOverviewMetrics() {
     signupGrowthPct,
     totalFlowsStarted,
     totalFlowsCompleted,
-    reports24h: reports24h ?? 0,
-    totalReports: totalReports ?? 0,
     miningClaimsToday: miningClaimsToday ?? 0,
     totalZedIssued,
     signups90d,
     flowGuideStats,
     levelData,
-    reports14d,
-    busiestCentre,
     recentUsers: (recentUsersRaw as unknown as RecentUser[]) ?? [],
-    recentReports: (recentReportsRaw as unknown as RecentReport[]) ?? [],
   };
 }
 
@@ -407,15 +320,6 @@ async function OverviewContent() {
           accent="border-primary/20 text-primary"
         />
 
-        {/* 6. Reports in Last 24h */}
-        <KPICard
-          label="Reports (24h)"
-          value={data.reports24h.toLocaleString()}
-          subtext={`${data.totalReports} total all-time`}
-          icon={Clock}
-          accent="border-amber-500/20 text-amber-500"
-        />
-
         {/* 7. Mining Claims Today */}
         <KPICard
           label="Mining Claims (24h)"
@@ -441,184 +345,96 @@ async function OverviewContent() {
         <FlowsGroupedBarChart data={data.flowGuideStats} />
       </div>
 
-      {/* Row 2 Charts: Verification Donut, Progression Levels, & Reports per Day */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {/* Row 2 Charts: Verification Donut & Progression Levels */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <VerificationDonutChart
           verified={data.verifiedUsers}
           unverified={Math.max(0, data.totalUsers - data.verifiedUsers)}
         />
         <CivicLevelBarChart data={data.levelData} />
-        <ReportsPerDayChart
-          data={data.reports14d}
-          busiestCentre={data.busiestCentre}
-        />
       </div>
 
-      {/* Bottom Tables: Recent Signups & Recent Reports */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Recent Signups Table */}
-        <Card className="border-border bg-card shadow-xs overflow-hidden">
-          <div className="px-4 py-3 border-b border-border flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <UserPlus className="h-4 w-4 text-primary" />
-              <h3 className="text-xs font-bold uppercase tracking-wider font-mono text-foreground">
-                Recent Signups
-              </h3>
-            </div>
-            <Link
-              href="/admin/users"
-              className="text-xs text-primary hover:underline font-medium inline-flex items-center gap-1"
-            >
-              <span>View all users</span>
-              <ArrowRight className="h-3 w-3" />
-            </Link>
+      {/* Bottom Table: Recent Signups (full width) */}
+      <Card className="border-border bg-card shadow-xs overflow-hidden">
+        <div className="px-4 py-3 border-b border-border flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <UserPlus className="h-4 w-4 text-primary" />
+            <h3 className="text-xs font-bold uppercase tracking-wider font-mono text-foreground">
+              Recent Signups
+            </h3>
           </div>
+          <Link
+            href="/admin/users"
+            className="text-xs text-primary hover:underline font-medium inline-flex items-center gap-1"
+          >
+            <span>View all users</span>
+            <ArrowRight className="h-3 w-3" />
+          </Link>
+        </div>
 
-          {data.recentUsers.length === 0 ? (
-            <div className="p-8 text-center text-xs text-muted-foreground font-mono">
-              No citizens registered yet.
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-xs">
-                <thead>
-                  <tr className="border-b border-border/70 text-muted-foreground text-[10px] font-mono uppercase">
-                    <th className="text-left px-4 py-2.5">Citizen</th>
-                    <th className="text-left px-4 py-2.5">Phone</th>
-                    <th className="text-left px-4 py-2.5">Level</th>
-                    <th className="text-left px-4 py-2.5">Status</th>
-                    <th className="text-right px-4 py-2.5">Joined</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border/50">
-                  {data.recentUsers.map((u) => (
-                    <tr key={u.id} className="hover:bg-secondary/30 transition-colors">
-                      <td className="px-4 py-2.5">
-                        <div className="flex items-center gap-2">
-                          <Avatar className="h-6 w-6 border border-border">
-                            <AvatarImage src={u.avatar_url || ""} />
-                            <AvatarFallback className="text-[9px] font-bold">
-                              {getInitials(u.full_name)}
-                            </AvatarFallback>
-                          </Avatar>
-                          <span className="font-medium text-foreground truncate max-w-[130px]">
-                            {u.full_name || "Citizen"}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-4 py-2.5 font-mono text-muted-foreground text-[11px] whitespace-nowrap">
-                        {maskPhone(u.phone_number)}
-                      </td>
-                      <td className="px-4 py-2.5 font-mono text-muted-foreground text-[11px] whitespace-nowrap">
-                        {getLevelName(u.level_id)}
-                      </td>
-                      <td className="px-4 py-2.5">
-                        <Badge
-                          variant="outline"
-                          className={`text-[9px] font-mono py-0 px-1.5 ${
-                            u.is_verified
-                              ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-500"
-                              : "border-border text-muted-foreground"
-                          }`}
-                        >
-                          {u.is_verified ? "Verified" : "Unverified"}
-                        </Badge>
-                      </td>
-                      <td className="px-4 py-2.5 font-mono text-muted-foreground text-right text-[11px] whitespace-nowrap">
-                        {new Date(u.created_at).toLocaleDateString("en-GB", {
-                          day: "numeric",
-                          month: "short",
-                        })}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </Card>
-
-        {/* Recent Reports List */}
-        <Card className="border-border bg-card shadow-xs overflow-hidden">
-          <div className="px-4 py-3 border-b border-border flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Clock className="h-4 w-4 text-amber-500" />
-              <h3 className="text-xs font-bold uppercase tracking-wider font-mono text-foreground">
-                Recent Wait-Time Reports
-              </h3>
-            </div>
-            <Link
-              href="/admin/reports"
-              className="text-xs text-primary hover:underline font-medium inline-flex items-center gap-1"
-            >
-              <span>View all reports</span>
-              <ArrowRight className="h-3 w-3" />
-            </Link>
+        {data.recentUsers.length === 0 ? (
+          <div className="p-8 text-center text-xs text-muted-foreground font-mono">
+            No citizens registered yet.
           </div>
-
-          {data.recentReports.length === 0 ? (
-            <div className="p-8 text-center text-xs text-muted-foreground font-mono">
-              No reports submitted yet.
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-xs">
-                <thead>
-                  <tr className="border-b border-border/70 text-muted-foreground text-[10px] font-mono uppercase">
-                    <th className="text-left px-4 py-2.5">Centre</th>
-                    <th className="text-left px-4 py-2.5">Wait</th>
-                    <th className="text-left px-4 py-2.5">Status</th>
-                    <th className="text-left px-4 py-2.5">Reporter</th>
-                    <th className="text-right px-4 py-2.5"></th>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs">
+              <thead>
+                <tr className="border-b border-border/70 text-muted-foreground text-[10px] font-mono uppercase">
+                  <th className="text-left px-4 py-2.5">Citizen</th>
+                  <th className="text-left px-4 py-2.5">Phone</th>
+                  <th className="text-left px-4 py-2.5">Level</th>
+                  <th className="text-left px-4 py-2.5">Status</th>
+                  <th className="text-right px-4 py-2.5">Joined</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border/50">
+                {data.recentUsers.map((u) => (
+                  <tr key={u.id} className="hover:bg-secondary/30 transition-colors">
+                    <td className="px-4 py-2.5">
+                      <div className="flex items-center gap-2">
+                        <Avatar className="h-6 w-6 border border-border">
+                          <AvatarImage src={u.avatar_url || ""} />
+                          <AvatarFallback className="text-[9px] font-bold">
+                            {getInitials(u.full_name)}
+                          </AvatarFallback>
+                        </Avatar>
+                        <span className="font-medium text-foreground truncate max-w-[200px]">
+                          {u.full_name || "Citizen"}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-2.5 font-mono text-muted-foreground text-[11px] whitespace-nowrap">
+                      {maskPhone(u.phone_number)}
+                    </td>
+                    <td className="px-4 py-2.5 font-mono text-muted-foreground text-[11px] whitespace-nowrap">
+                      {getLevelName(u.level_id)}
+                    </td>
+                    <td className="px-4 py-2.5">
+                      <Badge
+                        variant="outline"
+                        className={`text-[9px] font-mono py-0 px-1.5 ${
+                          u.is_verified
+                            ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-500"
+                            : "border-border text-muted-foreground"
+                        }`}
+                      >
+                        {u.is_verified ? "Verified" : "Unverified"}
+                      </Badge>
+                    </td>
+                    <td className="px-4 py-2.5 font-mono text-muted-foreground text-right text-[11px] whitespace-nowrap">
+                      {new Date(u.created_at).toLocaleDateString("en-GB", {
+                        day: "numeric",
+                        month: "short",
+                      })}
+                    </td>
                   </tr>
-                </thead>
-                <tbody className="divide-y divide-border/50">
-                  {data.recentReports.map((r) => {
-                    const badge = waitBadge(r.wait_minutes);
-                    const reporterName = r.users?.full_name || "Citizen";
-                    const maskedPhone = maskPhone(r.users?.phone_number);
-
-                    return (
-                      <tr key={r.id} className="hover:bg-secondary/30 transition-colors">
-                        <td className="px-4 py-2.5">
-                          <span className="font-medium text-foreground block truncate max-w-[140px]">
-                            {r.center_name}
-                          </span>
-                          <span className="text-[10px] text-muted-foreground">
-                            {r.state}
-                          </span>
-                        </td>
-                        <td className="px-4 py-2.5 font-mono font-semibold text-foreground whitespace-nowrap">
-                          {formatMinutes(r.wait_minutes)}
-                        </td>
-                        <td className="px-4 py-2.5 whitespace-nowrap">
-                          <Badge
-                            variant="outline"
-                            className={`text-[9px] font-mono py-0 px-1.5 ${badge.cls}`}
-                          >
-                            {badge.label}
-                          </Badge>
-                        </td>
-                        <td className="px-4 py-2.5 truncate max-w-[130px]">
-                          <span className="font-medium text-foreground block truncate">
-                            {reporterName}
-                          </span>
-                          <span className="text-[10px] font-mono text-muted-foreground">
-                            {maskedPhone}
-                          </span>
-                        </td>
-                        <td className="px-4 py-2.5 text-right whitespace-nowrap">
-                          <DeleteReportButton reportId={r.id} centreName={r.center_name} />
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </Card>
-      </div>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </Card>
     </div>
   );
 }

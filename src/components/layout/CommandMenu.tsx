@@ -16,7 +16,6 @@ import {
   Compass,
   Home,
   User,
-  MapPin,
   BookOpen,
   GraduationCap,
   Fingerprint,
@@ -97,23 +96,6 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
               <span className="font-medium text-foreground">Zed Nav</span>
               <span className="text-[11px] text-muted-foreground">
                 Step-by-step civic and administrative navigation playbooks
-              </span>
-            </div>
-            <ArrowRight className="h-3.5 w-3.5 text-muted-foreground opacity-60" />
-          </CommandItem>
-
-          <CommandItem
-            onSelect={() =>
-              handleSelect(() => router.push("/nav/passport/centers"))
-            }
-          >
-            <div className="flex h-7 w-7 items-center justify-center rounded-md border-hairline bg-secondary shrink-0 text-muted-foreground">
-              <MapPin className="h-3.5 w-3.5" />
-            </div>
-            <div className="flex flex-col flex-1 min-w-0">
-              <span className="font-medium text-foreground">Center Wait Times & Crowd Tracker</span>
-              <span className="text-[11px] text-muted-foreground">
-                Real-time queue reports for Ikoyi, Alausa, FESTAC, and Abuja
               </span>
             </div>
             <ArrowRight className="h-3.5 w-3.5 text-muted-foreground opacity-60" />

@@ -96,7 +96,7 @@ export default function PrivacyPolicyPage() {
               <strong>Proof-of-Engagement &amp; Mining Logs:</strong> Daily mining timestamps, current streak counts, level progression status (Levels 1–5), and Cloudflare Turnstile hardware verification hashes used to detect automated bot manipulation.
             </li>
             <li>
-              <strong>Voluntary Support &amp; Community Feedback:</strong> Inquiry logs, center wait-time reports, and PPA salary ratings voluntarily submitted by community members.
+              <strong>Voluntary Support &amp; Community Feedback:</strong> Inquiry logs and PPA salary ratings voluntarily submitted by community members.
             </li>
             <li>
               <strong>Client-Side Local Storage:</strong> Procedural checklists, offline guide caches, and course notes stored locally on your device via IndexedDB and Service Worker caches.

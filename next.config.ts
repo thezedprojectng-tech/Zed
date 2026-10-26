@@ -25,6 +25,20 @@ const baseConfig: NextConfig = {
       },
     },
   },
+  async redirects() {
+    return [
+      {
+        source: "/nav/passport/centers",
+        destination: "/nav/passport",
+        permanent: true,
+      },
+      {
+        source: "/centers",
+        destination: "/nav/passport",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 // Apply Serwist PWA wrapper only in production builds

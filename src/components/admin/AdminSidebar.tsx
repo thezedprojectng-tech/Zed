@@ -7,7 +7,6 @@ import { cn } from "@/lib/utils";
 import {
   LayoutDashboard,
   Users,
-  FileText,
   ScrollText,
   ArrowLeft,
   Banknote,
@@ -39,7 +38,6 @@ const navItems = [
   { href: "/admin/withdrawals", label: "Withdrawals", icon: Banknote, exact: false },
   { href: "/admin/settings/zed", label: "ZED Token", icon: Coins, exact: false },
   { href: "/admin/market", label: "Market Moderation", icon: ShoppingBag, exact: false },
-  { href: "/admin/reports", label: "Reports", icon: FileText, exact: false },
   { href: "/admin/audit-log", label: "Audit Log", icon: ScrollText, exact: false },
 ];
 

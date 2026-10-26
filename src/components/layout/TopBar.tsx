@@ -54,7 +54,6 @@ const routeLabels: Record<string, string> = {
   home: "Dashboard",
   nav: "Zed Nav",
   passport: "Nigerian Passport",
-  centers: "Passport Centers",
   nysc: "NYSC Mobilisation",
   cds: "Community Development",
   ppa: "Place of Primary Assignment",
@@ -64,7 +63,6 @@ const routeLabels: Record<string, string> = {
   "verify-nin": "NIN Verification",
   admin: "Admin",
   users: "Users",
-  reports: "Reports",
 };
 
 export function TopBar({

@@ -3,14 +3,12 @@ import { createAdminClient } from "@/lib/supabase/admin";
 export type AuditAction =
   | "user.delete"
   | "user.role_change"
-  | "users.export_csv"
-  | "report.delete"
-  | "report.bulk_delete";
+  | "users.export_csv";
 
 interface LogAdminActionParams {
   adminId: string;
   action: AuditAction | string;
-  targetType: "user" | "center_report" | "export" | "system";
+  targetType: "user" | "export" | "system";
   targetId?: string | null;
   metadata?: Record<string, unknown>;
 }

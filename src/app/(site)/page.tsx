@@ -74,7 +74,7 @@ const FAQ_ITEMS = [
   {
     question: "Which administrative playbooks are currently live in Zed Nav?",
     answer:
-      "Zed Nav currently provides complete, field-tested playbooks for: Nigerian Standard e-Passport (Fresh & Renewal), NYSC Mobilization & Call-Up, NIMC NIN Registration & BVN Harmonization, and CAC Business Name Incorporation. Each guide includes verified statutory fees, required document audits, and real-time capture center wait times.",
+      "Zed Nav currently provides complete, field-tested playbooks for: Nigerian Standard e-Passport (Fresh & Renewal), NYSC Mobilization & Call-Up, NIMC NIN Registration & BVN Harmonization, and CAC Business Name Incorporation. Each guide includes verified statutory fees and required document audits.",
   },
   {
     question: "How do university students and alumni benefit from Zed?",
@@ -111,7 +111,7 @@ const ENGINEERING_DIRECTIVES = [
     icon: Zap,
     title: "State Machine Engine",
     description:
-      "JSON-structured sequential workflows with crowdsourced wait-time tracking across state capture offices (Ikoyi, Festac, Abuja, Ibadan, Enugu, PH).",
+      "JSON-structured sequential workflows powering verified civic navigation playbooks across passport, NYSC, NIN, and business registration processes.",
   },
 ];
 

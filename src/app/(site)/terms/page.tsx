@@ -103,7 +103,7 @@ export default function TermsPage() {
           </div>
           <p>
             Zed does not issue Nigerian passports, national identity slips, NYSC call-up letters, or CAC business certificates. 
-            Zed provides plain-language educational playbooks, crowdsourced wait-time reports, and document dimension checkers. 
+            Zed provides plain-language educational playbooks and document dimension checkers.
             All official filings and statutory payments must be concluded directly through official government portals.
           </p>
         </div>
