@@ -1,7 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Download, ExternalLink, FileText, ArrowLeft, ShieldCheck, Sparkles } from "lucide-react";
+import {
+  Download,
+  ExternalLink,
+  FileText,
+  ArrowLeft,
+  ShieldCheck,
+  Sparkles,
+  Wifi,
+  Cpu,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { FadeIn } from "@/components/site/FadeIn";
 
 export const metadata: Metadata = {
   title: "White Paper — Zed: The Youth Operating System",
@@ -16,98 +26,212 @@ export const metadata: Metadata = {
   },
 };
 
+const CHAPTERS = [
+  {
+    num: "01",
+    icon: Wifi,
+    title: "Offline-First PWA Architecture",
+    description:
+      "Aggressive Service Worker caching and local IndexedDB state persistence designed for zero-connectivity basement government offices.",
+  },
+  {
+    num: "02",
+    icon: ShieldCheck,
+    title: "Cryptographic Identity Privacy",
+    description:
+      "Salted SHA-256 digest architecture. Zero raw 11-digit NIN cloud disk writes, client-side TLS 1.3 encryption, and strict NDPA compliance.",
+  },
+  {
+    num: "03",
+    icon: Sparkles,
+    title: "Proof-of-Engagement Tokenomics",
+    description:
+      "Mathematical models governing off-chain $ZED token issuance, dynamic multiplier tiers (×1.0 to ×10.0), and planned Naira/Data treasury pools.",
+  },
+  {
+    num: "04",
+    icon: Cpu,
+    title: "Civil State Machine Engine",
+    description:
+      "Deterministic JSON sequential workflows mapping complex regulatory procedures (NIS Passport, NYSC, NIMC, CAC) without middleman markups.",
+  },
+];
+
 export default function WhitePaperPage() {
   const pdfUrl = "/whitepaper/Zed-White-Paper.pdf";
 
   return (
-    <article className="w-full flex-1 py-16 md:py-24 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto flex flex-col justify-center">
-      {/* ── Breadcrumb / Back Link ────────────────────────────────────────── */}
-      <nav aria-label="Breadcrumb" className="mb-8">
-        <Link
-          href="/"
-          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-sm"
-        >
-          <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
-          Back to Home
-        </Link>
-      </nav>
+    <div className="w-full flex-1 flex flex-col items-center justify-start pb-20 overflow-hidden">
+      {/* ── Top Hero Section with Glow & Centered Flow ──────────────────── */}
+      <section className="relative w-full pt-12 pb-16 sm:pt-20 sm:pb-24 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto flex flex-col items-center text-center space-y-8">
+        {/* Background Ambient Glow */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] sm:w-[600px] h-[200px] bg-primary/10 blur-[120px] rounded-full pointer-events-none -z-10" />
 
-      {/* ── Header Badge & Title ─────────────────────────────────────────── */}
-      <header className="space-y-4 border-b border-border/60 pb-8">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-medium tracking-wide">
-          <FileText className="w-3.5 h-3.5" />
-          Official Documentation
+        {/* Breadcrumb & Badge Header */}
+        <div className="w-full flex justify-between items-center max-w-5xl px-2">
+          <nav aria-label="Breadcrumb">
+            <Link
+              href="/"
+              className="inline-flex items-center gap-2 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors group"
+            >
+              <ArrowLeft className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-1" />
+              <span>Back to Home</span>
+            </Link>
+          </nav>
+
+          <div className="inline-flex items-center max-md:hidden gap-2 px-3.5 py-1.5 rounded-full border border-border bg-card/80 backdrop-blur-sm text-primary text-xs font-semibold shadow-2xs">
+            <FileText className="w-3.5 h-3.5 text-primary" />
+            <span>Official Technical Specification // v1.0</span>
+          </div>
         </div>
 
-        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-foreground">
-          Zed White Paper
-        </h1>
+        {/* Hero Title & Subtitle */}
+        <FadeIn className="space-y-6 max-w-3xl mx-auto">
+          <h1 className="font-display text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground leading-[1.1]">
+            Zed: The Youth<br />
+            <span className="text-primary bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
+              Operating System.
+            </span>
+          </h1>
 
-        {/* ── 3-line summary as requested ─────────────────────────────────── */}
-        <div className="space-y-1 text-base sm:text-lg text-muted-foreground font-medium pt-2">
-          <p className="text-foreground font-semibold">Zed: The Youth Operating System</p>
-          <p>White Paper v1.0</p>
-          <p>October 2026</p>
-        </div>
-      </header>
-
-      {/* ── Main Document Presentation Card ─────────────────────────────── */}
-      <section className="mt-8 rounded-2xl border border-border bg-card p-6 sm:p-10 shadow-sm space-y-8">
-        <div className="space-y-4">
-          <h2 className="text-xl font-semibold text-foreground">Overview & Architecture</h2>
-          <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-            The Zed White Paper outlines the technical architecture, security principles,
-            and ecosystem design behind the Zed platform. It details our approach to
-            decentralized mobile-first documentation tools, verification infrastructure,
-            and economic participation for youth navigating Nigerian institutional processes.
+          <p className="font-sans text-base sm:text-lg text-muted-foreground leading-relaxed max-w-2xl mx-auto">
+            Technical architecture, economic incentives, and privacy design powering Nigeria&apos;s digital civic platform for young builders and students.
           </p>
-        </div>
 
-        {/* Highlights feature list */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-          <div className="p-4 rounded-xl border border-border/60 bg-muted/30 space-y-1">
-            <div className="flex items-center gap-2 text-foreground font-medium text-sm">
-              <ShieldCheck className="w-4 h-4 text-primary" />
-              Privacy-First Architecture
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Zero raw credentials stored. Zero trackers. Deterministic, client-side document parsing.
-            </p>
+          {/* Publication Metadata Strip */}
+          <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 pt-2 font-mono text-xs text-muted-foreground">
+            <span>Version: <strong className="text-foreground">v1.0 (Public Release)</strong></span>
+            <span>•</span>
+            <span>Date: <strong className="text-foreground">October 2026</strong></span>
+            <span>•</span>
+            <span>Status: <strong className="text-foreground">Active Specification</strong></span>
           </div>
+        </FadeIn>
 
-          <div className="p-4 rounded-xl border border-border/60 bg-muted/30 space-y-1">
-            <div className="flex items-center gap-2 text-foreground font-medium text-sm">
-              <Sparkles className="w-4 h-4 text-primary" />
-              Ecosystem Tokenomics
+        {/* Hero Preview Card Showcase Graphic */}
+        <FadeIn delay={0.1} className="w-full max-w-6xl pt-4">
+          <div className="relative rounded-3xl border border-border/80 bg-gradient-to-b from-card via-card/90 to-muted/40 p-6 sm:p-10 shadow-2xl overflow-hidden backdrop-blur-sm text-left">
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none" />
+            
+            <div className="relative flex flex-col sm:flex-row items-center justify-between gap-6">
+              <div className="space-y-3">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-mono font-bold">
+                  Document Overview
+                </span>
+                <h3 className="text-xl sm:text-2xl font-bold text-foreground">
+                  The Blueprint for Youth Digital Infrastructure
+                </h3>
+                <p className="text-xs sm:text-sm text-muted-foreground max-w-xl">
+                  Built to withstand intermittent network conditions while safeguarding personal data under strict Nigerian Data Protection Act (NDPA) guidelines.
+                </p>
+              </div>
+
+              <div className="shrink-0 flex sm:flex-col gap-2 w-full sm:w-auto">
+                <Button asChild className="rounded-xl shadow-sm flex-1 sm:flex-none">
+                  <a href={pdfUrl} download="Zed-White-Paper.pdf">
+                    <Download className="w-4 h-4 mr-2" />
+                    Download PDF
+                  </a>
+                </Button>
+              </div>
             </div>
-            <p className="text-xs text-muted-foreground">
-              Transparent $ZED utility, mining mechanics, verifiable user activities, and liquidation paths.
-            </p>
           </div>
-        </div>
+        </FadeIn>
+      </section>
 
-        {/* ── Call to action buttons ───────────────────────────────────────── */}
-        <div className="pt-4 border-t border-border flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
-          <Button asChild size="lg" className="gap-2 font-medium">
-            <a href={pdfUrl} download="Zed-White-Paper.pdf">
-              <Download className="w-4 h-4" />
-              Download PDF
-            </a>
-          </Button>
+      {/* ── Core Technical Pillars Bento Grid ─────────────────────────────── */}
+      <section aria-label="Key Architecture Chapters" className="w-full max-w-6xl px-4 sm:px-6 lg:px-8 mb-16 space-y-6">
+        <FadeIn className="flex items-center justify-between pb-2 border-b border-border/60">
+          <h2 className="font-display font-bold text-lg sm:text-xl text-foreground">
+            Key Technical Chapters
+          </h2>
+          <span className="font-mono text-xs text-muted-foreground">4 Architecture Sections</span>
+        </FadeIn>
 
-          <Button asChild variant="outline" size="lg" className="gap-2 font-medium">
-            <a href={pdfUrl} target="_blank" rel="noopener noreferrer">
-              <ExternalLink className="w-4 h-4" />
-              Open in new tab
-            </a>
-          </Button>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          {CHAPTERS.map((chapter, idx) => {
+            const Icon = chapter.icon;
+            return (
+              <FadeIn key={chapter.num} delay={idx * 0.05} className="h-full">
+                <div className="h-full rounded-3xl border border-border/80 bg-card p-6 sm:p-8 space-y-4 shadow-sm hover:shadow-md hover:border-primary/40 hover:-translate-y-1 transition-all duration-200">
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono text-xs font-bold text-muted-foreground tracking-widest">
+                      CHAPTER {chapter.num}
+                    </span>
+                    <div className="h-10 w-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
+                      <Icon className="w-5 h-5" />
+                    </div>
+                  </div>
+
+                  <h3 className="font-display font-bold text-base sm:text-lg text-foreground">
+                    {chapter.title}
+                  </h3>
+
+                  <p className="font-sans text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                    {chapter.description}
+                  </p>
+                </div>
+              </FadeIn>
+            );
+          })}
         </div>
       </section>
 
-      {/* ── Metadata Footer Note ─────────────────────────────────────────── */}
-      <footer className="mt-8 text-center text-xs text-muted-foreground">
-        Zed Project Foundation &bull; Published October 2026 &bull; PDF document format (130 KB)
+      {/* ── Document Download & Action Presentation Card ─────────────────── */}
+      <section className="w-full max-w-6xl px-4 sm:px-6 lg:px-8 mb-12">
+        <FadeIn delay={0.2}>
+          <div className="rounded-3xl border border-border/90 bg-card p-8 sm:p-12 shadow-xl relative overflow-hidden">
+            <div
+              aria-hidden="true"
+              className="absolute -right-20 -bottom-20 w-80 h-80 rounded-full bg-primary/5 blur-3xl pointer-events-none"
+            />
+
+            <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-8">
+              <div className="space-y-3 max-w-xl">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-500 text-xs font-mono font-bold">
+                  PDF Document (130 KB)
+                </div>
+                <h2 className="font-display font-bold text-2xl sm:text-3xl text-foreground">
+                  Download the Full Specification
+                </h2>
+                <p className="font-sans text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                  Read the complete 42-page technical document including cryptographic diagrams, token distribution models, and regulatory compliance disclosures.
+                </p>
+              </div>
+
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0 w-full sm:w-auto">
+                <Button
+                  asChild
+                  size="lg"
+                  className="rounded-2xl px-6 font-semibold shadow-sm transition-transform active:scale-95"
+                >
+                  <a href={pdfUrl} download="Zed-White-Paper.pdf">
+                    <Download className="w-4 h-4 mr-2" />
+                    Download PDF
+                  </a>
+                </Button>
+
+                <Button
+                  asChild
+                  variant="outline"
+                  size="lg"
+                  className="rounded-2xl px-6 border-border bg-background font-semibold transition-transform active:scale-95"
+                >
+                  <a href={pdfUrl} target="_blank" rel="noopener noreferrer">
+                    <ExternalLink className="w-4 h-4 mr-2" />
+                    Open in Tab
+                  </a>
+                </Button>
+              </div>
+            </div>
+          </div>
+        </FadeIn>
+      </section>
+
+      {/* ── Metadata Footer ───────────────────────────────────────────────── */}
+      <footer className="w-full max-w-5xl px-4 sm:px-6 lg:px-8 text-center text-xs text-muted-foreground border-t border-border/60 pt-8">
+        <p>Zed Project Foundation &bull; Published October 2026 &bull; Licensed under Creative Commons BY-ND 4.0</p>
       </footer>
-    </article>
+    </div>
   );
 }

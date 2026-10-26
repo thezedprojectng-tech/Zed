@@ -1,83 +1,45 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import Image from "next/image";
-import { ArrowLeft, Compass, Home } from "lucide-react";
+import { SiteHeader } from "@/components/site/SiteHeader";
+import { NotFoundHero } from "@/components/site/NotFoundHero";
+import { ClosingCTA } from "@/components/site/ClosingCTA";
+import { SiteFooter } from "@/components/site/SiteFooter";
+import { ScrollToTop } from "@/components/site/ScrollToTop";
+import { CookieBanner } from "@/components/site/CookieBanner";
+import { SmoothScrollProvider } from "@/components/site/SmoothScrollProvider";
 
 export const metadata: Metadata = {
-  title: "404 – Page Not Found | Zed",
-  description: "The requested civic guide or procedural milestone does not exist on this directory.",
+  title: "Page Not Found (404) | Zed",
+  description: "The page you are looking for doesn't exist or has been moved.",
 };
 
 export default function NotFound() {
   return (
-    <main
-      id="main-content"
-      role="main"
-      className="min-h-dvh flex flex-col justify-between bg-[#FAFAF8] dark:bg-[#0B0B0C] text-[#0B0B0C] dark:text-[#FAFAF8] px-4 sm:px-6 lg:px-8 py-12 selection:bg-[#2E82F7] selection:text-[#0a2a5e]"
-    >
-      {/* Top Header Row */}
-      <header className="max-w-site mx-auto w-full flex items-center justify-between border-b border-[#E5E5E0] dark:border-white/10 pb-6">
-        <Link href="/" className="flex items-center gap-1.5 group" aria-label="The Zed Project Home">
-          <Image
-            src="/icons/zed-logo-full-dark.png"
-            alt="The Zed Project"
-            width={120}
-            height={60}
-            className="h-8 w-auto object-contain dark:hidden"
-          />
-          <Image
-            src="/icons/zed-logo-full-light.png"
-            alt="The Zed Project"
-            width={120}
-            height={60}
-            className="h-8 w-auto object-contain hidden dark:block"
-          />
-        </Link>
-        <span className="font-mono text-xs text-[#57575e] dark:text-[#9c9ca4] font-medium uppercase tracking-wider">
-          Error 404 // Unresolved Route
-        </span>
-      </header>
+    <SmoothScrollProvider>
+      <div className="min-h-dvh bg-[#FAFAF8] text-[#0B0B0C] flex flex-col font-sans selection:bg-[#2E82F7] selection:text-[#0a2a5e]">
+        {/* Skip to Content for Keyboard Accessibility */}
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-[#0B0B0C] focus:text-[#FAFAF8] focus:border focus:border-[#2E82F7] focus:font-mono focus:text-xs uppercase tracking-wider rounded-md"
+        >
+          Skip to main content
+        </a>
 
-      {/* Main 404 Content */}
-      <div className="max-w-2xl mx-auto w-full py-16 text-center space-y-6">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#E5E5E0] dark:border-white/10 bg-[#ffffff] dark:bg-[#141416] text-[#57575e] dark:text-[#9c9ca4] font-mono text-xs uppercase tracking-wider font-medium">
-          <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
-          <span>Page not found</span>
-        </div>
+        {/* Global Marketing Site Header */}
+        <SiteHeader />
 
-        <h1 className="font-display text-4xl sm:text-6xl font-bold tracking-tight text-[#0B0B0C] dark:text-[#FAFAF8] leading-tight">
-          This milestone doesn&apos;t exist.
-        </h1>
+        {/* Main Content Viewport */}
+        <main id="main-content" className="flex-1 w-full flex flex-col pt-4">
+          <NotFoundHero />
+          <ClosingCTA />
+        </main>
 
-        <p className="font-sans text-base text-[#57575e] dark:text-[#9c9ca4] max-w-lg mx-auto leading-relaxed">
-          The page, guide chapter, or link you followed cannot be found. It may have been moved or updated.
-        </p>
+        {/* Global Marketing Site Footer */}
+        <SiteFooter />
 
-        {/* Action Cluster */}
-        <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
-          <Link
-            href="/"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-[#2E82F7] hover:bg-[#2567d4] text-[#0a2a5e] font-medium text-sm rounded-lg shadow-sm transition-all"
-          >
-            <Home className="h-4 w-4" />
-            <span>Return to overview</span>
-          </Link>
-
-          <Link
-            href="/#how-it-works"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg border border-[#E5E5E0] dark:border-white/10 bg-[#ffffff] dark:bg-[#141416] hover:bg-[#f4f4f0] dark:hover:bg-white/[0.04] text-[#0B0B0C] dark:text-[#FAFAF8] text-sm font-medium transition-all"
-          >
-            <Compass className="h-4 w-4 text-[#2E82F7]" />
-            <span>Browse Zed Nav</span>
-          </Link>
-        </div>
+        {/* Floating Utilities */}
+        <ScrollToTop />
+        <CookieBanner />
       </div>
-
-      {/* Footer Meta Row */}
-      <footer className="max-w-site mx-auto w-full border-t border-[#E5E5E0] dark:border-white/10 pt-6 flex flex-col sm:flex-row items-center justify-between text-xs font-mono text-[#57575e] dark:text-[#9c9ca4] gap-2">
-        <span>Zed</span>
-        <span>Independent Civic Platform &bull; Lagos, Nigeria</span>
-      </footer>
-    </main>
+    </SmoothScrollProvider>
   );
 }

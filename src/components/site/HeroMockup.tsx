@@ -27,9 +27,9 @@ export function HeroMockup() {
   ];
 
   return (
+    <div aria-hidden="true" className="w-full">
     <div
-      aria-hidden="true"
-      className="w-full max-w-4xl mx-auto rounded-2xl sm:rounded-3xl border border-[#E5E5E0] dark:border-white/10 bg-white/95 dark:bg-[#121214]/95 shadow-[0_24px_70px_-15px_rgba(46,130,247,0.22)] dark:shadow-[0_24px_70px_-15px_rgba(0,0,0,0.6)] backdrop-blur-md overflow-hidden select-none pointer-events-none text-left"
+      className="w-full max-w-5xl mx-auto rounded-2xl sm:rounded-3xl border border-[#E5E5E0] dark:border-white/10 bg-white/95 dark:bg-[#121214]/95 shadow-[0_24px_70px_-15px_rgba(46,130,247,0.22)] dark:shadow-[0_24px_70px_-15px_rgba(0,0,0,0.6)] backdrop-blur-md overflow-hidden select-none pointer-events-none text-left"
     >
       {/* ── Window App Header Bar ────────────────────────────────────────── */}
       <div className="flex items-center justify-between border-b border-[#EAEAE6] dark:border-white/8 px-4 sm:px-6 py-3 bg-[#FAFAF8] dark:bg-[#161619]">
@@ -82,10 +82,10 @@ export function HeroMockup() {
         {/* User Greeting & Status Banner */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#F0F0EC] dark:border-white/5 pb-4">
           <div>
-            <h2 className="font-display text-lg sm:text-xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8] tracking-tight">
+            <h2 className="font-display text-base sm:text-xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8] tracking-tight">
               Good morning, Explorer!
             </h2>
-            <p className="text-xs text-[#707078] dark:text-zinc-400">
+            <p className="hidden sm:block text-xs text-[#707078] dark:text-zinc-400">
               Track your daily mining rewards and civic document progress.
             </p>
           </div>
@@ -96,7 +96,7 @@ export function HeroMockup() {
         </div>
 
         {/* ── Two-Column Feature Grid (Mining + Zed Nav) ─────────────────── */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 sm:gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 sm:gap-5" style={{ gridTemplateRows: 'auto' }}>
           {/* Card 1: Daily Mining Card (7 cols on desktop) */}
           <div className="md:col-span-7 rounded-xl border border-[#EBEBE6] dark:border-white/8 bg-[#FAFAF8] dark:bg-[#17171a] p-4 sm:p-5 space-y-4">
             <div className="flex items-center justify-between">
@@ -146,8 +146,8 @@ export function HeroMockup() {
               <span>Claim Today&apos;s 100 $ZED</span>
             </div>
 
-            {/* Weekly Activity Heatmap Bars */}
-            <div className="pt-1 border-t border-[#EAEAE5] dark:border-white/6">
+            {/* Weekly Activity Heatmap Bars — hidden on mobile */}
+            <div className="hidden sm:block pt-1 border-t border-[#EAEAE5] dark:border-white/6">
               <div className="flex items-center justify-between text-[10px] text-[#707078] dark:text-zinc-400 mb-2">
                 <span>Streak Consistency (Past 7 Days)</span>
                 <span className="font-semibold text-emerald-600 dark:text-emerald-400">
@@ -182,8 +182,8 @@ export function HeroMockup() {
             </div>
           </div>
 
-          {/* Card 2: Active Civil Application (5 cols on desktop) */}
-          <div className="md:col-span-5 rounded-xl border border-[#EBEBE6] dark:border-white/8 bg-[#FAFAF8] dark:bg-[#17171a] p-4 sm:p-5 flex flex-col justify-between space-y-4">
+          {/* Card 2: Active Civil Application (5 cols on desktop, hidden on mobile) */}
+          <div className="hidden md:flex md:col-span-5 rounded-xl border border-[#EBEBE6] dark:border-white/8 bg-[#FAFAF8] dark:bg-[#17171a] p-4 sm:p-5 flex-col justify-between space-y-4">
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <span className="font-mono text-[10px] uppercase tracking-wider text-[#2E82F7] font-semibold">
@@ -249,6 +249,7 @@ export function HeroMockup() {
           </div>
         </div>
       </div>
+    </div>
     </div>
   );
 }

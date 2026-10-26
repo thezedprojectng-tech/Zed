@@ -8,7 +8,6 @@ import { useSiteAuth } from "./useSiteAuth";
 import { SOCIAL_LINKS, XIcon, InstagramIcon, WhatsAppIcon, TikTokIcon } from "@/data/socials";
 
 const PRODUCT_LINKS = [
-  { href: "/", label: "Landing Page" },
   { href: "/#features", label: "Features" },
   { href: "/#zed-nav", label: "Zed Nav" },
   { href: "/mining", label: "$ZED Mining" },
@@ -27,7 +26,6 @@ const COMPANY_LINKS = [
 
 const SUPPORT_LINKS = [
   { href: "/#faq", label: "Frequently Asked Questions" },
-  { href: "/nav/passport", label: "Civic Fee Schedules" },
   { href: "/cookies", label: "Cookie Policy" },
   { href: "mailto:thezedprojectng@gmail.com", label: "Contact Support", external: true },
 ];
@@ -44,7 +42,7 @@ export function SiteFooter() {
 
   return (
     <footer className="w-full bg-[#FAFAF8] dark:bg-[#0B0B0C] text-[#0B0B0C] dark:text-[#FAFAF8] transition-colors border-t border-[#EAEAE6] dark:border-white/10">
-      <div className="max-w-site mx-auto px-4 sm:px-6 lg:px-8 pt-12 sm:pt-16 pb-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 sm:pt-16 pb-12">
         {/* ── Watermark & Copyright Section (Inspired by reference screenshot) ── */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 pb-10 sm:pb-14 border-b border-[#EAEAE6] dark:border-white/10">
           {/* Giant Faint Brand Watermark */}
@@ -237,22 +235,12 @@ export function SiteFooter() {
         </div>
 
         {/* ── Sub-footer disclaimer & Scroll-to-top ──────────────────────── */}
-        <div className="mt-12 sm:mt-16 pt-6 border-t border-[#EAEAE6] dark:border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <p className="font-sans text-[11px] text-[#707078] dark:text-zinc-500 max-w-xl leading-relaxed">
+        <div className="mt-12 sm:mt-16 pt-6 border-t border-[#EAEAE6] dark:border-white/10 flex justify-center gap-4">
+          <p className="font-sans text-[11px] text-[#707078] dark:text-zinc-500 leading-relaxed">
             Zed is an independent platform and is not affiliated with, endorsed by, or representing any Nigerian government agency.
           </p>
 
-          <button
-            type="button"
-            onClick={scrollToTop}
-            aria-label="Back to top"
-            className="inline-flex items-center gap-2 text-xs font-medium text-[#707078] dark:text-zinc-400 hover:text-[#0B0B0C] dark:hover:text-white transition-colors cursor-pointer shrink-0"
-          >
-            <span>Back to top</span>
-            <span className="h-7 w-7 rounded-full border border-[#D8D8D2] dark:border-white/10 flex items-center justify-center">
-              <ArrowUp className="h-3.5 w-3.5" />
-            </span>
-          </button>
+         
         </div>
       </div>
     </footer>

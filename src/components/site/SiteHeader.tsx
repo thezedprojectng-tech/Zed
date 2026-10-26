@@ -71,9 +71,9 @@ export function SiteHeader() {
         isScrolledDown && !isMobileMenuOpen ? "-translate-y-full" : "translate-y-0"
       }`}
     >
-      <div className="max-w-site mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div
-          className={`pointer-events-auto flex items-center justify-between h-14 sm:h-16 px-4 sm:px-6 rounded-full transition-all duration-200 ${
+          className={`pointer-events-auto flex items-center justify-between h-14 sm:h-16 px-4 sm:px-6 rounded- transition-all duration-200 ${
             hasScrolled
               ? "bg-white/95 dark:bg-[#141416]/95 backdrop-blur-md border border-[#E5E5E0] dark:border-white/10 shadow-[0_4px_24px_-4px_rgba(0,0,0,0.1)]"
               : "bg-white/85 dark:bg-[#141416]/85 backdrop-blur-md border border-[#E8E8E4] dark:border-white/10 shadow-xs"
@@ -96,7 +96,7 @@ export function SiteHeader() {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav aria-label="Marketing Navigation" className="hidden md:flex items-center space-x-8">
+          <nav aria-label="Marketing Navigation" className="hidden lg:flex items-center space-x-8">
             {NAV_LINKS.map((link) => (
               <a
                 key={link.href}
@@ -145,7 +145,7 @@ export function SiteHeader() {
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
               aria-expanded={isMobileMenuOpen}
-              className="md:hidden h-9 w-9 rounded-full border border-[#E8E8E4] dark:border-white/10 flex items-center justify-center text-[#0B0B0C] dark:text-white hover:bg-[#f4f4f0] dark:hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2E82F7] cursor-pointer transition-colors"
+              className="lg:hidden h-9 w-9 rounded-full border border-[#E8E8E4] dark:border-white/10 flex items-center justify-center text-[#0B0B0C] dark:text-white hover:bg-[#f4f4f0] dark:hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2E82F7] cursor-pointer transition-colors"
             >
               {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>

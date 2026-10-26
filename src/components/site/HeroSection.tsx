@@ -26,10 +26,10 @@ export function HeroSection() {
           >
             <a
               href="#how-it-works"
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#D8D8D2] dark:border-white/10 bg-white/80 dark:bg-[#141416]/80 text-[#57575e] dark:text-zinc-300 font-sans text-xs sm:text-sm font-medium shadow-xs hover:border-[#2E82F7]/50 hover:text-[#0B0B0C] dark:hover:text-white transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2E82F7]"
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#D8D8D2] dark:border-white/10 bg-white/80 dark:bg-[#141416]/80 text-[#57575e] dark:text-zinc-300 font-sans text-[10px] sm:text-xs font-medium shadow-xs hover:border-[#2E82F7]/50 hover:text-[#0B0B0C] dark:hover:text-white transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2E82F7]"
             >
               <span className="h-1.5 w-1.5 rounded-full bg-[#2E82F7]" />
-              <span>Version 2.0 Live · The Digital OS for Nigerian Youth</span>
+              <span> The Digital OS for Nigerian Youth</span>
               <ArrowUpRight className="h-3.5 w-3.5 text-[#2E82F7]" />
             </a>
           </motion.div>
@@ -108,7 +108,7 @@ export function HeroSection() {
           initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 28 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.38, ease: [0.22, 1, 0.36, 1] }}
-          className="relative mt-12 sm:mt-16 pt-8 pb-4"
+          className="relative mt-12 sm:mt-16 pt-8 pb-4 "
         >
           {/* ── Pure CSS Blue Vertical-Stripe Glow Background ──────────────── */}
           <div
@@ -156,9 +156,10 @@ export function HeroSection() {
           </div>
 
           {/* Real UI HTML/CSS Mockup Component */}
-          <div className="relative z-10 px-2 sm:px-4">
+          <div className=" relative z-10 px-2 sm:px-4">
             <HeroMockup />
           </div>
+          
         </motion.div>
       </div>
     </section>

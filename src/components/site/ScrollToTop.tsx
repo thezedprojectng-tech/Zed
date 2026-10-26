@@ -17,7 +17,7 @@ export function ScrollToTop() {
         setProgress(percent);
       }
 
-      // Appears after 500px as required
+      // Appears after scrolling 500px
       setIsVisible(currentScroll > 500);
     };
 
@@ -38,7 +38,8 @@ export function ScrollToTop() {
     });
   };
 
-  const radius = 17;
+  // Circular progress ring parameters
+  const radius = 18;
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (progress / 100) * circumference;
 
@@ -47,36 +48,43 @@ export function ScrollToTop() {
       type="button"
       onClick={scrollToTop}
       aria-label="Scroll back to top"
-      className={`fixed bottom-6 right-6 z-40 flex items-center justify-center h-11 w-11 rounded-full border border-[#E5E5E0] bg-white text-[#0B0B0C] shadow-md transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2E82F7] cursor-pointer ${
+      className={`fixed bottom-6 right-6 z-50 group flex items-center justify-center h-12 w-12 rounded-full border border-border/80 bg-card/90 backdrop-blur-md text-foreground shadow-xl transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary cursor-pointer ${
         isVisible
           ? "opacity-100 translate-y-0 pointer-events-auto"
-          : "opacity-0 translate-y-3 pointer-events-none"
-      } hover:border-[#2E82F7] hover:shadow-lg active:scale-95`}
+          : "opacity-0 translate-y-4 pointer-events-none"
+      } hover:border-primary hover:bg-primary hover:text-primary-foreground hover:shadow-2xl hover:scale-105 active:scale-95`}
     >
+      {/* SVG Progress Ring */}
       <svg
-        className="absolute inset-0 h-full w-full -rotate-90 pointer-events-none"
+        className="absolute inset-0 h-full w-full -rotate-90 p-1 pointer-events-none"
         viewBox="0 0 44 44"
       >
+        {/* Background Track Circle */}
         <circle
           cx="22"
           cy="22"
           r={radius}
-          className="stroke-[#E5E5E0]"
-          strokeWidth="2"
           fill="none"
+          stroke="currentColor"
+          strokeWidth="2.5"
+          className="text-muted/40 group-hover:text-primary-foreground/20 transition-colors"
         />
+        {/* Animated Progress Indicator Circle */}
         <circle
           cx="22"
           cy="22"
           r={radius}
-          className="stroke-[#2E82F7] transition-[stroke-dashoffset] duration-150 ease-out"
-          strokeWidth="2"
           fill="none"
+          stroke="currentColor"
+          strokeWidth="2.5"
           strokeDasharray={circumference}
           strokeDashoffset={strokeDashoffset}
           strokeLinecap="round"
+          className="text-primary group-hover:text-primary-foreground transition-all duration-100 ease-out"
         />
       </svg>
+
+      {/* Arrow Icon */}
       <ArrowUp className="h-4 w-4 relative z-10 transition-transform duration-200 group-hover:-translate-y-0.5" />
     </button>
   );
