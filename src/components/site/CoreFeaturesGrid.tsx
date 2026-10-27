@@ -2,51 +2,51 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 import {
+  Compass,
+  GraduationCap,
+  Briefcase,
   Users,
-  TrendingUp,
-  Handshake,
-  ShieldCheck,
-  Bell,
-  Cpu,
+  Coins,
+  ShieldAlert,
 } from "lucide-react";
 import { FadeIn } from "./FadeIn";
 
 const FEATURES = [
   {
+    icon: Compass,
+    title: "Zed Nav (Civil Bureaucracy Engine)",
+    description:
+      "Interactive state machines demystifying NIS e-Passports, NYSC green card mobilization, NIN-BVN harmonization, and CAC business registration with client-side document auditing (35×45mm photos, <200KB files).",
+  },
+  {
+    icon: GraduationCap,
+    title: "Zed Skill (Low-Data Tracks)",
+    description:
+      "Text-and-audio-first microcourses in UI/UX design, engineering, video editing, and AI prompt engineering with downloadable PDF summaries engineered for 3G/4G networks (MTN, Airtel, Glo, 9mobile).",
+  },
+  {
+    icon: Briefcase,
+    title: "Zed Market (Escrow-Backed Gigs)",
+    description:
+      "Connects young Nigerian freelancers with domestic and global clients. Funds are secured via Paystack and Flutterwave escrow APIs, with direct payouts to GTB, Kuda, OPay, Moniepoint, Zenith, or USDT.",
+  },
+  {
     icon: Users,
-    title: "Smart procedural branching",
+    title: "Zed Meet & Campus Hubs",
     description:
-      "Bureaucratic rules are scattered across gazettes, blogs, and counter windows. Zed branches your exact requirements with plain-language steps.",
+      "WebRTC 1-on-1 speed networking with Level 1+ NIN verification, Live Audio Rooms (+150 $ZED reward), and dedicated university hubs across UNILAG, OAU, UI, FUTA, ABU Zaria, and Covenant.",
   },
   {
-    icon: TrendingUp,
-    title: "Pre-submission document auditor",
+    icon: Coins,
+    title: "Gamified $ZED Token Matrix",
     description:
-      "Client-side file dimension and size verification. Confirms passport photos match the 35×45mm standard and stay below 200KB thresholds before you apply.",
+      "Off-chain Proof-of-Engagement (PoE) token ecosystem rewarding daily activity from Rookie (100/day) to Zed Legend (1,000/day), convertible to Naira treasury payouts or discounted mobile data bundles.",
   },
   {
-    icon: Handshake,
-    title: "Campus & peer hubs",
+    icon: ShieldAlert,
+    title: "Zed SOS & Creator Asset Lab",
     description:
-      "Share departmental notes, past exams, and verified SIWES/IT listings across UNILAG, OAU, UI, FUTA, ABU, and Covenant.",
-  },
-  {
-    icon: ShieldCheck,
-    title: "Data security & permissions",
-    description:
-      "Protect sensitive data with salted SHA-256 cryptographic hashing. Raw 11-digit NINs are never written to physical disk, keeping your master identity secure.",
-  },
-  {
-    icon: Bell,
-    title: "Real-time alerts & notifications",
-    description:
-      "Stay ahead of every opportunity with instant alerts for new portal openings, statutory fee updates, and NYSC mobilization changes.",
-  },
-  {
-    icon: Cpu,
-    title: "Proof-of-engagement rewards",
-    description:
-      "Earn $ZED token rewards for completing digital courses, verifying community guides, and peer mentoring with dynamic multiplier tiers.",
+      "PostGIS-powered real-time geospatial safety reporting map for road hazards and police checkpoints, paired with free Afrobeat drum kits, video editing overlays, and student merchant QR discounts.",
   },
 ];
 

@@ -8,15 +8,15 @@ import { useSiteAuth } from "./useSiteAuth";
 import { SOCIAL_LINKS, XIcon, InstagramIcon, WhatsAppIcon, TikTokIcon } from "@/data/socials";
 
 const PRODUCT_LINKS = [
-  { href: "/#features", label: "Features" },
-  { href: "/#zed-nav", label: "Zed Nav" },
+  { href: "/features", label: "Features" },
+  { href: "/nav", label: "Zed Nav" },
   { href: "/mining", label: "$ZED Mining" },
   { href: "/skill", label: "Skill Academy" },
   { href: "/market", label: "Zed Market" },
 ];
 
 const COMPANY_LINKS = [
-  { href: "/#how-it-works", label: "About Zed" },
+  { href: "/about", label: "About Zed" },
   { href: "/fund", label: "Fund Your Idea" },
   { href: "/whitepaper", label: "White Paper" },
   { href: "/careers", label: "Careers" },
@@ -25,9 +25,10 @@ const COMPANY_LINKS = [
 ];
 
 const SUPPORT_LINKS = [
+  { href: "/contact", label: "Contact Us" },
   { href: "/#faq", label: "Frequently Asked Questions" },
   { href: "/cookies", label: "Cookie Policy" },
-  { href: "mailto:thezedprojectng@gmail.com", label: "Contact Support", external: true },
+  { href: "mailto:thezedprojectng@gmail.com", label: "Email Support", external: true },
 ];
 
 export function SiteFooter() {

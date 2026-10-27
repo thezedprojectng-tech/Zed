@@ -40,12 +40,12 @@ export default function PrivacyPolicyPage() {
     <LegalPageLayout
       title="Privacy Policy"
       subtitle="Formal documentation of our data governance protocols, technical privacy controls, and adherence to the Nigeria Data Protection Act 2023 (NDPA) and Nigeria Data Protection Regulation (NDPR)."
-      lastUpdated="October 14, 2026"
+      lastUpdated="Oct 30, 2026"
       toc={TOC}
     >
       {/* ── Section 1 ──────────────────────────────────────────────── */}
-      <section id="section-1" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
-        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] ">
+      <section id="section-1" className="space-y-4 scroll-mt-28 pb-2">
+        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
           1. Introduction &amp; Platform Scope
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
@@ -69,8 +69,8 @@ export default function PrivacyPolicyPage() {
       </section>
 
       {/* ── Section 2 ──────────────────────────────────────────────── */}
-      <section id="section-2" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
-        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] ">
+      <section id="section-2" className="space-y-4 scroll-mt-28 pb-2">
+        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
           2. Information We Collect Across Modules
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
@@ -96,7 +96,7 @@ export default function PrivacyPolicyPage() {
               <strong>Proof-of-Engagement &amp; Mining Logs:</strong> Daily mining timestamps, current streak counts, level progression status (Levels 1–5), and Cloudflare Turnstile hardware verification hashes used to detect automated bot manipulation.
             </li>
             <li>
-              <strong>Voluntary Support &amp; Community Feedback:</strong> Inquiry logs and PPA salary ratings voluntarily submitted by community members.
+              <strong>Support &amp; Contact Inquiries:</strong> When contacting us via our website forms, we store your name, email address, optional phone number, subject line, message text, and a salted SHA-256 hash of your network IP to prevent automated abuse. Raw IP addresses are never retained.
             </li>
             <li>
               <strong>Client-Side Local Storage:</strong> Procedural checklists, offline guide caches, and course notes stored locally on your device via IndexedDB and Service Worker caches.
@@ -106,8 +106,8 @@ export default function PrivacyPolicyPage() {
       </section>
 
       {/* ── Section 3 ──────────────────────────────────────────────── */}
-      <section id="section-3" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
-        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] ">
+      <section id="section-3" className="space-y-4 scroll-mt-28 pb-2">
+        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
           3. Strict Prohibition of Raw NIN Storage &amp; Cryptographic Hashing Protocol
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
@@ -136,8 +136,8 @@ export default function PrivacyPolicyPage() {
       </section>
 
       {/* ── Section 4 ──────────────────────────────────────────────── */}
-      <section id="section-4" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
-        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] ">
+      <section id="section-4" className="space-y-4 scroll-mt-28 pb-2">
+        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
           4. Lawful Bases for Processing under NDPA 2023
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
@@ -162,8 +162,8 @@ export default function PrivacyPolicyPage() {
       </section>
 
       {/* ── Section 5 ──────────────────────────────────────────────── */}
-      <section id="section-5" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
-        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] ">
+      <section id="section-5" className="space-y-4 scroll-mt-28 pb-2">
+        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
           5. Purposes of Data Processing
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
@@ -181,8 +181,8 @@ export default function PrivacyPolicyPage() {
       </section>
 
       {/* ── Section 6 ──────────────────────────────────────────────── */}
-      <section id="section-6" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
-        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] ">
+      <section id="section-6" className="space-y-4 scroll-mt-28 pb-2">
+        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
           6. Financial Privacy &amp; Zero-Fintech Compliance Model
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
@@ -199,8 +199,8 @@ export default function PrivacyPolicyPage() {
       </section>
 
       {/* ── Section 7 ──────────────────────────────────────────────── */}
-      <section id="section-7" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
-        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] ">
+      <section id="section-7" className="space-y-4 scroll-mt-28 pb-2">
+        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
           7. Real-Time WebRTC Audio &amp; Safety Buffer Protocol
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
@@ -217,8 +217,8 @@ export default function PrivacyPolicyPage() {
       </section>
 
       {/* ── Section 8 ──────────────────────────────────────────────── */}
-      <section id="section-8" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
-        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] ">
+      <section id="section-8" className="space-y-4 scroll-mt-28 pb-2">
+        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
           8. Geospatial Data &amp; Safety Mapping (Zed SOS)
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
@@ -234,8 +234,8 @@ export default function PrivacyPolicyPage() {
       </section>
 
       {/* ── Section 9 ──────────────────────────────────────────────── */}
-      <section id="section-9" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
-        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] ">
+      <section id="section-9" className="space-y-4 scroll-mt-28 pb-2">
+        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
           9. Data Retention &amp; Automated Deletion Schedules
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
@@ -244,7 +244,7 @@ export default function PrivacyPolicyPage() {
           </p>
           <ul className="list-disc pl-5 space-y-2">
             <li><strong>Session Authentication Tokens:</strong> Invalidated after 30 days of inactivity.</li>
-            <li><strong>Support Inquiries:</strong> Retained for 90 days following ticket resolution, then permanently purged.</li>
+            <li><strong>Support &amp; Contact Messages:</strong> Retained securely in our administrative database until our team reviews and manually deletes them.</li>
             <li><strong>Safety Incident Buffers:</strong> Deleted within 14 days following moderator review, unless preservation is required by a valid Nigerian court order.</li>
             <li><strong>Client-Side Local Storage:</strong> Procedural checklists and course summaries remain on your physical device until manually cleared or until selecting &quot;Reset Local Data&quot; in profile settings.</li>
           </ul>
@@ -252,8 +252,8 @@ export default function PrivacyPolicyPage() {
       </section>
 
       {/* ── Section 10 ─────────────────────────────────────────────── */}
-      <section id="section-10" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
-        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] ">
+      <section id="section-10" className="space-y-4 scroll-mt-28 pb-2">
+        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
           10. Disclosure &amp; Sharing with Third-Party Processors
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
@@ -264,6 +264,7 @@ export default function PrivacyPolicyPage() {
           <ul className="list-disc pl-5 space-y-2">
             <li><strong>Payment &amp; Escrow Gateways:</strong> Paystack, Flutterwave, and Monnify for domestic Nigerian bank transfers and milestone settlements.</li>
             <li><strong>SMS &amp; Telecommunication Aggregators:</strong> Licensed Nigerian telecommunication partners for transactional OTP delivery.</li>
+            <li><strong>Transactional Email Infrastructure:</strong> Resend for secure dispatch of inquiry notices and administrative communications.</li>
             <li><strong>Cloud Infrastructure:</strong> SOC2 and ISO 27001 certified edge cloud hosting providers for encrypted database storage.</li>
             <li><strong>Law Enforcement &amp; Legal Compliance:</strong> Data disclosed only when strictly mandated by a valid subpoena or court order issued by a Nigerian court of competent jurisdiction.</li>
           </ul>
@@ -271,8 +272,8 @@ export default function PrivacyPolicyPage() {
       </section>
 
       {/* ── Section 11 ─────────────────────────────────────────────── */}
-      <section id="section-11" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
-        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] ">
+      <section id="section-11" className="space-y-4 scroll-mt-28 pb-2">
+        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
           11. Cross-Border Data Transfers
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
@@ -285,8 +286,8 @@ export default function PrivacyPolicyPage() {
       </section>
 
       {/* ── Section 12 ─────────────────────────────────────────────── */}
-      <section id="section-12" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
-        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] ">
+      <section id="section-12" className="space-y-4 scroll-mt-28 pb-2">
+        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
           12. Technical &amp; Organizational Security Measures
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
@@ -303,8 +304,8 @@ export default function PrivacyPolicyPage() {
       </section>
 
       {/* ── Section 13 ─────────────────────────────────────────────── */}
-      <section id="section-13" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
-        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] ">
+      <section id="section-13" className="space-y-4 scroll-mt-28 pb-2">
+        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
           13. Your Statutory Rights as a Data Subject
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
@@ -319,8 +320,8 @@ export default function PrivacyPolicyPage() {
       </section>
 
       {/* ── Section 14 ─────────────────────────────────────────────── */}
-      <section id="section-14" className="space-y-4 scroll-mt-28 border-b border-[#E5E5E0] dark:border-white/10 pb-8">
-        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] ">
+      <section id="section-14" className="space-y-4 scroll-mt-28 pb-2">
+        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
           14. Protection of Minors &amp; Student Data
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
@@ -334,7 +335,7 @@ export default function PrivacyPolicyPage() {
 
       {/* ── Section 15 ─────────────────────────────────────────────── */}
       <section id="section-15" className="space-y-4 scroll-mt-28">
-        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] ">
+        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
           15. Regulatory Recourse (NDPC) &amp; Data Protection Officer Contact
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">

@@ -46,10 +46,22 @@ export default async function AdminLayout({
     avatarUrl: profile.avatar_url || (user.user_metadata?.avatar_url as string) || undefined,
   };
 
+  // 3. Fetch unread contact message count (safely fallback to 0)
+  let unreadContactCount = 0;
+  try {
+    const { count } = await admin
+      .from("contact_messages")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "new");
+    unreadContactCount = count ?? 0;
+  } catch {
+    unreadContactCount = 0;
+  }
+
   return (
     <div className="flex min-h-dvh w-full bg-background text-foreground antialiased font-sans selection:bg-amber-500/20 selection:text-amber-500">
       {/* Dedicated Admin Sidebar */}
-      <AdminSidebar adminUser={adminUser} />
+      <AdminSidebar adminUser={adminUser} unreadContactCount={unreadContactCount} />
 
       {/* Main Console Content */}
       <div className="flex flex-1 flex-col overflow-x-hidden min-w-0">

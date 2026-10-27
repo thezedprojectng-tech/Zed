@@ -3,20 +3,22 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { ArrowUpRight, Menu, X } from "lucide-react";
 import { useSiteAuth } from "./useSiteAuth";
 import { SOCIAL_LINKS, XIcon, InstagramIcon, WhatsAppIcon, TikTokIcon } from "@/data/socials";
 
 const NAV_LINKS = [
-  { href: "/#features", label: "Features" },
-  { href: "/#how-it-works", label: "How it works" },
+  { href: "/features", label: "Features" },
+  { href: "/about", label: "About" },
   { href: "/fund", label: "Fund Your Idea" },
   { href: "/whitepaper", label: "White Paper" },
   { href: "/careers", label: "Careers" },
-  { href: "/#faq", label: "FAQ" },
+  { href: "/contact", label: "Contact" },
 ];
 
 export function SiteHeader() {
+  const pathname = usePathname();
   const [hasScrolled, setHasScrolled] = useState(false);
   const [isScrolledDown, setIsScrolledDown] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -97,16 +99,30 @@ export function SiteHeader() {
 
           {/* Desktop Navigation */}
           <nav aria-label="Marketing Navigation" className="hidden lg:flex items-center space-x-8">
-            {NAV_LINKS.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                className="group relative py-1 text-sm font-medium text-[#57575e] dark:text-[#9c9ca4] hover:text-[#0B0B0C] dark:hover:text-[#FAFAF8] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2E82F7] rounded-sm"
-              >
-                <span>{link.label}</span>
-                <span className="absolute inset-x-0 -bottom-0.5 h-[1.5px] bg-[#0B0B0C] dark:bg-[#FAFAF8] scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-200" />
-              </a>
-            ))}
+            {NAV_LINKS.map((link) => {
+              const isActive = pathname === link.href || (link.href !== "/" && pathname?.startsWith(link.href));
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  aria-current={isActive ? "page" : undefined}
+                  className={`group relative py-1 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2E82F7] rounded-sm ${
+                    isActive
+                      ? "text-[#2E82F7] dark:text-[#2E82F7] font-semibold"
+                      : "text-[#57575e] dark:text-[#9c9ca4] hover:text-[#0B0B0C] dark:hover:text-[#FAFAF8]"
+                  }`}
+                >
+                  <span>{link.label}</span>
+                  <span
+                    className={`absolute inset-x-0 -bottom-0.5 h-[2px] transition-transform origin-left duration-200 ${
+                      isActive
+                        ? "bg-[#2E82F7] scale-x-100"
+                        : "bg-[#0B0B0C] dark:bg-[#FAFAF8] scale-x-0 group-hover:scale-x-100"
+                    }`}
+                  />
+                </Link>
+              );
+            })}
           </nav>
 
           {/* Right Action Cluster */}
@@ -162,16 +178,24 @@ export function SiteHeader() {
           className="md:hidden pointer-events-auto bg-white dark:bg-[#141416] border border-[#E8E8E4] dark:border-white/10 px-5 pt-4 pb-6 space-y-5 shadow-xl mt-2 mx-4 rounded-2xl"
         >
           <nav className="flex flex-col space-y-1">
-            {NAV_LINKS.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="py-2.5 text-base font-medium text-[#0B0B0C] dark:text-[#FAFAF8] hover:text-[#2E82F7] dark:hover:text-[#2E82F7] transition-colors"
-              >
-                {link.label}
-              </a>
-            ))}
+            {NAV_LINKS.map((link) => {
+              const isActive = pathname === link.href || (link.href !== "/" && pathname?.startsWith(link.href));
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  aria-current={isActive ? "page" : undefined}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`py-2 px-3 text-base rounded-xl transition-colors ${
+                    isActive
+                      ? "bg-[#2E82F7]/10 text-[#2E82F7] font-semibold"
+                      : "font-medium text-[#0B0B0C] dark:text-[#FAFAF8] hover:text-[#2E82F7] dark:hover:text-[#2E82F7]"
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
           </nav>
 
           <div className="pt-3 border-t border-[#E8E8E4] dark:border-white/10 space-y-2.5">

@@ -16,6 +16,7 @@ import {
   GraduationCap,
   ShoppingBag,
   Briefcase,
+  Mail,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -26,11 +27,13 @@ interface AdminSidebarProps {
     email?: string;
     avatarUrl?: string;
   };
+  unreadContactCount?: number;
 }
 
 const navItems = [
   { href: "/admin", label: "Overview", icon: LayoutDashboard, exact: true },
   { href: "/admin/users", label: "Users", icon: Users, exact: false },
+  { href: "/admin/contact", label: "Contact Inbox", icon: Mail, exact: false, badgeKey: "contact" },
   { href: "/admin/careers", label: "Careers", icon: Briefcase, exact: false },
   { href: "/admin/skill", label: "Skill content", icon: GraduationCap, exact: false },
   { href: "/admin/funding", label: "Funding", icon: Lightbulb, exact: false },
@@ -41,7 +44,7 @@ const navItems = [
   { href: "/admin/audit-log", label: "Audit Log", icon: ScrollText, exact: false },
 ];
 
-export function AdminSidebar({ adminUser }: AdminSidebarProps) {
+export function AdminSidebar({ adminUser, unreadContactCount = 0 }: AdminSidebarProps) {
   const pathname = usePathname();
 
   const getInitials = (name?: string | null) => {
@@ -89,10 +92,12 @@ export function AdminSidebar({ adminUser }: AdminSidebarProps) {
           </p>
 
           <ul className="space-y-0.5" role="list">
-            {navItems.map(({ href, label, icon: Icon, exact }) => {
+            {navItems.map(({ href, label, icon: Icon, exact, badgeKey }) => {
               const isActive = exact
                 ? pathname === href
                 : pathname === href || pathname.startsWith(href + "/");
+
+              const showBadge = badgeKey === "contact" && unreadContactCount > 0;
 
               return (
                 <li key={href}>
@@ -114,7 +119,12 @@ export function AdminSidebar({ adminUser }: AdminSidebarProps) {
                           : "text-muted-foreground group-hover:text-foreground"
                       )}
                     />
-                    <span className="truncate">{label}</span>
+                    <span className="truncate flex-1">{label}</span>
+                    {showBadge && (
+                      <span className="inline-flex items-center justify-center px-1.5 py-0.2 rounded-full text-[10px] font-semibold bg-primary text-primary-foreground">
+                        {unreadContactCount > 99 ? "99+" : unreadContactCount}
+                      </span>
+                    )}
                   </Link>
                 </li>
               );

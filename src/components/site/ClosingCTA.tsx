@@ -70,7 +70,7 @@ export function ClosingCTA() {
                 {isAuthenticated ? (
                   <Link
                     href="/home"
-                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-white hover:bg-zinc-100 text-[#0B0B0C] text-sm sm:text-base font-semibold rounded-full shadow-lg transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-white hover:bg-zinc-100 text-[#0B0B0C] text-sm sm:text-base font-semibold rounded-lg shadow-lg transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
                   >
                     <span>Open your dashboard</span>
                     <ArrowUpRight className="h-4 w-4" />
@@ -78,7 +78,7 @@ export function ClosingCTA() {
                 ) : (
                   <Link
                     href="/signup"
-                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-white hover:bg-zinc-100 text-[#0B0B0C] text-sm sm:text-base font-semibold rounded-full shadow-lg transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-white hover:bg-zinc-100 text-[#0B0B0C] text-sm sm:text-base font-semibold rounded-lg shadow-lg transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
                   >
                     <span>Get started free</span>
                     <ArrowRight className="h-4 w-4" />
