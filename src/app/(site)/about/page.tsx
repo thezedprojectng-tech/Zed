@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { FadeIn } from "@/components/site/FadeIn";
 import { ClosingCTA } from "@/components/site/ClosingCTA";
-import TeamSection7 from "@/components/team-section-7";
+// import TeamSection7 from "@/components/team-section-7";
 
 export const metadata: Metadata = {
   title: "About Us — The Digital OS for Nigerian Gen Z",
@@ -246,9 +246,9 @@ export default function AboutPage() {
       </section>
 
       {/* ── Section 3: Installed Shadcn SolaceUI Team Section 7 ── */}
-      <div className="w-full">
+      {/* <div className="w-full">
         <TeamSection7 />
-      </div>
+      </div> */}
 
       {/* ── Section 4: Closing CTA Banner ── */}
       <ClosingCTA />

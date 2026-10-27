@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { ArrowLeft, Mail, Lightbulb, CheckCircle2, ShieldCheck, Sparkles, ArrowRight, Layers, Cpu, Compass } from "lucide-react";
+import { Mail, Lightbulb, CheckCircle2, ShieldCheck, Sparkles, ArrowRight, Layers, Cpu, Compass } from "lucide-react";
 import { FadeIn } from "@/components/site/FadeIn";
 import { FundIdeaForm } from "./FundIdeaForm";
 
@@ -24,21 +23,6 @@ export default function FundIdeaPage() {
       <section className="relative w-full pt-12 pb-16 sm:pt-20 sm:pb-24 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto flex flex-col items-center text-center space-y-8">
         {/* Background Ambient Glow */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] sm:w-[600px] h-[200px] bg-primary/10 blur-[120px] rounded-full pointer-events-none -z-10" />
-
-        {/* Breadcrumb & Badge Header */}
-        <div className="w-full flex justify-between items-center max-w-5xl px-2">
-          <nav aria-label="Breadcrumb">
-            <Link
-              href="/"
-              className="inline-flex items-center gap-2 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors group"
-            >
-              <ArrowLeft className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-1" />
-              <span>Back to Home</span>
-            </Link>
-          </nav>
-
-          
-        </div>
 
         {/* Hero Title & Subtitle */}
         <FadeIn className="space-y-6 max-w-3xl mx-auto">
