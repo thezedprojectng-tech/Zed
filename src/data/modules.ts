@@ -126,6 +126,16 @@ export const MODULES: ZedModule[] = [
     what: "Zed Market is a services marketplace where Nigerian providers list their skills and clients connect with them directly via WhatsApp. Categories include design, tech, tutoring, writing, photography, fashion services, repairs, errands, events, and business support.",
   },
   {
+    slug: "internship-radar",
+    name: "Internship Radar",
+    tagline: "Curated tracking of internship, SIWES, and industrial training opportunities across Nigeria.",
+    icon: Search,
+    status: "live",
+    phase: "Phase 1",
+    href: "/internships",
+    what: "Internship Radar surfaces entry-level openings, SIWES placements, and graduate trainee programmes submitted by the community and reviewed by admins, filtered by field, work mode, and location.",
+  },
+  {
     slug: "zed-chat",
     name: "Zed Chat",
     tagline: "Peer-to-peer discussion channels and community messaging.",
@@ -189,16 +199,7 @@ export const MODULES: ZedModule[] = [
     phase: "Phase 2",
     what: "Zed SOS will aggregate verified emergency contacts, legal aid resources, and civic safety information into a fast-access layer for users who need urgent help navigating critical situations.",
   },
-  {
-    slug: "internship-radar",
-    name: "Internship Radar",
-    tagline: "Curated tracking of internship, SIWES, and industrial training opportunities across Nigeria.",
-    icon: Search,
-    status: "live",
-    phase: "Phase 1",
-    href: "/internships",
-    what: "Internship Radar surfaces entry-level openings, SIWES placements, and graduate trainee programmes submitted by the community and reviewed by admins, filtered by field, work mode, and location.",
-  },
+  
   {
     slug: "civic-trackers",
     name: "Civic Trackers",

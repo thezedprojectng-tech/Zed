@@ -21,6 +21,7 @@ import {
   Briefcase,
   UserPlus,
   Lightbulb,
+  Search,
   ShoppingBag,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -56,6 +57,7 @@ const sections: NavSection[] = [
       { href: "/skill", label: "Zed Skill", icon: Briefcase },
       { href: "/mining", label: "Zed Mining", icon: Pickaxe },
       { href: "/market", label: "Zed Market", icon: ShoppingBag },
+      { href: "/internships", label: "Internship Radar", icon: Search },
     ],
   },
   {
