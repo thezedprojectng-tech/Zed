@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import { Mail, Sparkles, ArrowRight, MessageSquare } from "lucide-react";
+import { Phone, Mail, MapPin, ArrowRight } from "lucide-react";
 import { FadeIn } from "@/components/site/FadeIn";
 import { Accordion, type AccordionItemData } from "@/components/site/Accordion";
 import { ClosingCTA } from "@/components/site/ClosingCTA";
@@ -55,8 +55,28 @@ export default function ContactPage() {
         aria-labelledby="contact-heading"
         className="w-full pt-10 sm:pt-16 pb-12 sm:pb-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
       >
+        {/* Trustpilot Review Badge */}
+        <FadeIn className="flex flex-col items-center justify-center text-center space-y-1.5 mb-6 sm:mb-8">
+          <div className="flex items-center gap-1.5">
+            <span className="font-sans text-xs font-semibold text-[#0B0B0C] dark:text-[#FAFAF8]">
+              Excellent
+            </span>
+            <div className="flex items-center gap-0.5" aria-label="5 out of 5 stars on Trustpilot">
+              {[...Array(5)].map((_, i) => (
+                <div
+                  key={i}
+                  className="w-4 h-4 bg-[#00b67a] rounded-[2px] flex items-center justify-center text-white text-[10px] leading-none select-none font-bold shadow-2xs"
+                >
+                  ★
+                </div>
+              ))}
+            </div>
+          </div>
+          
+        </FadeIn>
+
         {/* Hero Title & Subtitle */}
-        <FadeIn className="text-center max-w-3xl mx-auto space-y-3 mb-10 sm:mb-14">
+        <FadeIn delay={0.05} className="text-center max-w-3xl mx-auto space-y-3 mb-10 sm:mb-14">
           <h1
             id="contact-heading"
             className="font-display text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-[#0B0B0C] dark:text-[#FAFAF8] leading-[1.12]"
@@ -64,54 +84,87 @@ export default function ContactPage() {
             Get in touch with Zed
           </h1>
           <p className="font-sans text-sm sm:text-base md:text-lg text-[#57575e] dark:text-zinc-400 leading-relaxed max-w-2xl mx-auto">
-            Zed is designed to help businesses of all sizes capture, engage, and grow, all in one powerful platform.
+            The all-in-one platform for Nigerian youth. Master civil administrative
+            processes with step-by-step guides, acquire in-demand digital skills,
+            trade safely, and claim daily $ZED rewards.
           </p>
         </FadeIn>
 
         {/* 2-Column Contact Container */}
-        <FadeIn delay={0.1} className="w-full max-w-5xl mx-auto">
+        <FadeIn delay={0.1} className="w-full max-w-6xl mx-auto">
           <div className="bg-[#f8f8fa] dark:bg-white/[0.02] border border-[#EAEAE6] dark:border-white/10 rounded-3xl p-4 sm:p-8 lg:p-10 shadow-xs">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
-              {/* Left Column: Email Information Card */}
+              {/* Left Column: 3 Contact Info Cards */}
               <div className="lg:col-span-5 flex flex-col space-y-4">
-                <div className="bg-white dark:bg-[#141416] border border-[#EAEAE6] dark:border-white/10 rounded-2xl p-5 sm:p-6 shadow-xs flex items-start gap-4 transition-all hover:border-[#2E82F7]/30 hover:shadow-sm">
-                  <div className="h-11 w-11 rounded-xl bg-zinc-100 dark:bg-white/5 border border-zinc-200/60 dark:border-white/10 flex items-center justify-center shrink-0 text-[#0B0B0C] dark:text-white">
+                {/* 1. Call Information */}
+                <div className="bg-white dark:bg-[#18181B] border border-[#EAEAE6] dark:border-white/10 rounded-2xl p-5 sm:p-6 shadow-xs flex items-start gap-4 transition-all hover:border-[#3B5BFD]/30 hover:shadow-sm">
+                  <div className="h-12 w-12 rounded-2xl bg-[#F4F4F6] dark:bg-white/5 border border-zinc-200/50 dark:border-white/10 flex items-center justify-center shrink-0 text-[#1C1C1E] dark:text-white">
+                    <Phone className="h-5 w-5" />
+                  </div>
+                  <div className="space-y-1">
+                    <h2 className="font-display text-base font-semibold text-[#0B0B0C] dark:text-[#FAFAF8]">
+                      Call information
+                    </h2>
+                    <div className="font-sans text-xs sm:text-[13px] text-[#707078] dark:text-zinc-400 space-y-1">
+                      <p>
+                        Front Desk:{" "}
+                        <a
+                          href="tel:+2348009337765"
+                          className="text-[#0B0B0C] dark:text-zinc-200 hover:text-[#3B5BFD] dark:hover:text-[#3B5BFD] transition-colors"
+                        >
+                          +234 704 609 4344
+                        </a>
+                      </p>
+                      
+                    </div>
+                  </div>
+                </div>
+
+                {/* 2. Email Information */}
+                <div className="bg-white dark:bg-[#18181B] border border-[#EAEAE6] dark:border-white/10 rounded-2xl p-5 sm:p-6 shadow-xs flex items-start gap-4 transition-all hover:border-[#3B5BFD]/30 hover:shadow-sm">
+                  <div className="h-12 w-12 rounded-2xl bg-[#F4F4F6] dark:bg-white/5 border border-zinc-200/50 dark:border-white/10 flex items-center justify-center shrink-0 text-[#1C1C1E] dark:text-white">
                     <Mail className="h-5 w-5" />
                   </div>
                   <div className="space-y-1">
-                    <h2 className="font-display text-sm sm:text-base font-semibold text-[#0B0B0C] dark:text-[#FAFAF8]">
+                    <h2 className="font-display text-base font-semibold text-[#0B0B0C] dark:text-[#FAFAF8]">
                       Email information
                     </h2>
-                    <div className="font-sans text-xs sm:text-sm text-[#57575e] dark:text-zinc-400 space-y-0.5">
-                      <p>
-                        General:{" "}
+                    <div className="font-sans text-xs sm:text-[13px] text-[#707078] dark:text-zinc-400 space-y-1">
+                      {/* <p>
+                        Sales:{" "}
                         <a
                           href="mailto:hello@zedproject.ng"
-                          className="text-[#0B0B0C] dark:text-zinc-200 hover:text-[#2E82F7] dark:hover:text-[#2E82F7] transition-colors"
+                          className="text-[#0B0B0C] dark:text-zinc-200 hover:text-[#3B5BFD] dark:hover:text-[#3B5BFD] transition-colors"
                         >
                           hello@zedproject.ng
                         </a>
-                      </p>
+                      </p> */}
                       <p>
                         Support:{" "}
                         <a
-                          href="mailto:support@zedproject.ng"
-                          className="text-[#0B0B0C] dark:text-zinc-200 hover:text-[#2E82F7] dark:hover:text-[#2E82F7] transition-colors"
+                          href="mailto:thezedprojectng@gmail.com"
+                          className="text-[#0B0B0C] dark:text-zinc-200 hover:text-[#3B5BFD] dark:hover:text-[#3B5BFD] transition-colors"
                         >
-                          support@zedproject.ng
+                          thezedprojectng@gmail.com
                         </a>
                       </p>
                     </div>
                   </div>
                 </div>
 
-                <div className="p-5 rounded-2xl bg-white/60 dark:bg-white/[0.02] border border-[#EAEAE6]/70 dark:border-white/5 text-xs text-[#57575e] dark:text-zinc-400 space-y-2">
-                  <p className="font-semibold text-[#0B0B0C] dark:text-[#FAFAF8]">
-                    Prompt Response Guarantee
-                  </p>
-                  <p className="leading-relaxed">
-                    Our team reviews submissions continuously. Inquiries received through the portal receive direct responses within 1 to 2 business hours.
-                  </p>
+                {/* 3. Office Location / Call information */}
+                <div className="bg-white dark:bg-[#18181B] border border-[#EAEAE6] dark:border-white/10 rounded-2xl p-5 sm:p-6 shadow-xs flex items-start gap-4 transition-all hover:border-[#3B5BFD]/30 hover:shadow-sm">
+                  <div className="h-12 w-12 rounded-2xl bg-[#F4F4F6] dark:bg-white/5 border border-zinc-200/50 dark:border-white/10 flex items-center justify-center shrink-0 text-[#1C1C1E] dark:text-white">
+                    <MapPin className="h-5 w-5" />
+                  </div>
+                  <div className="space-y-1">
+                    <h2 className="font-display text-base font-semibold text-[#0B0B0C] dark:text-[#FAFAF8]">
+                      Call information
+                    </h2>
+                    <address className="not-italic font-sans text-xs sm:text-[13px] text-[#707078] dark:text-zinc-400 leading-relaxed">
+                       Lagos, Nigeria
+                    </address>
+                  </div>
                 </div>
               </div>
 

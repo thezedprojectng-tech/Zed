@@ -35,7 +35,8 @@ export const contactMessageSchema = z.object({
     .or(z.literal("")),
   subject: z
     .string()
-    .transform((val) => stripControlCharacters(val.trim()))
+    .optional()
+    .transform((val) => (val && val.trim().length > 0 ? stripControlCharacters(val.trim()) : "General Inquiry"))
     .pipe(
       z
         .string()

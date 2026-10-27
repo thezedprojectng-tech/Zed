@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Loader2, CheckCircle2, ArrowRight, AlertCircle, ShieldCheck } from "lucide-react";
+import { Loader2, CheckCircle2, ArrowRight, AlertCircle } from "lucide-react";
 import { Turnstile, type TurnstileInstance } from "@marsidev/react-turnstile";
 import { toast } from "sonner";
 import { contactMessageSchema, type ContactSubmissionInput } from "@/lib/contact/schema";
@@ -12,7 +12,7 @@ export function ContactForm() {
     name: "",
     email: "",
     phone: "",
-    subject: "",
+    subject: "General Inquiry",
     message: "",
     hpCompanyField: "",
   });
@@ -48,6 +48,7 @@ export function ContactForm() {
     // Client-side Zod validation
     const candidateData = {
       ...formData,
+      subject: formData.subject || "General Inquiry",
       turnstileToken: turnstileToken || (isProd ? "" : "bypass"),
     };
 
@@ -95,7 +96,7 @@ export function ContactForm() {
 
   if (isSubmitted) {
     return (
-      <div className="bg-white dark:bg-[#141416] border border-[#EAEAE6] dark:border-white/10 rounded-2xl sm:rounded-3xl p-8 sm:p-12 text-center shadow-xs flex flex-col items-center justify-center space-y-4 min-h-[420px]">
+      <div className="bg-white dark:bg-[#18181B] rounded-2xl sm:rounded-3xl p-8 sm:p-12 text-center shadow-xs flex flex-col items-center justify-center space-y-4 min-h-[420px]">
         <div className="h-14 w-14 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-2">
           <CheckCircle2 className="h-8 w-8" />
         </div>
@@ -108,7 +109,7 @@ export function ContactForm() {
             {formData.name}
           </span>
           . One of our team members will review your message and reply via{" "}
-          <span className="font-medium text-[#2E82F7]">{formData.email}</span> shortly.
+          <span className="font-medium text-[#3B5BFD]">{formData.email}</span> shortly.
         </p>
         <button
           type="button"
@@ -118,7 +119,7 @@ export function ContactForm() {
               name: "",
               email: "",
               phone: "",
-              subject: "",
+              subject: "General Inquiry",
               message: "",
               hpCompanyField: "",
             });
@@ -136,13 +137,13 @@ export function ContactForm() {
   }
 
   return (
-    <div className="bg-white dark:bg-[#141416] border border-[#EAEAE6] dark:border-white/10 rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-xs">
+    <div className="bg-white dark:bg-[#18181B] rounded-2xl sm:rounded-3xl p-6 sm:p-9 shadow-xs border border-transparent dark:border-white/5">
       <header className="space-y-1 mb-6">
-        <h2 className="font-display text-xl sm:text-2xl font-bold tracking-tight text-[#0B0B0C] dark:text-[#FAFAF8]">
+        <h2 className="font-display text-2xl sm:text-[28px] font-bold tracking-tight text-[#0B0B0C] dark:text-[#FAFAF8]">
           Send us a message
         </h2>
-        <p className="font-sans text-xs sm:text-sm text-[#57575e] dark:text-zinc-400">
-          Have questions or inquiries? Drop us a note and we will reply promptly.
+        <p className="font-sans text-xs sm:text-sm text-[#707078] dark:text-zinc-400">
+          Fill out the form to reach out.
         </p>
       </header>
 
@@ -157,7 +158,7 @@ export function ContactForm() {
       )}
 
       <form onSubmit={handleSubmit} noValidate className="space-y-4">
-        {/* Anti-spam Honeypot Field (hidden from genuine users) */}
+        {/* Anti-spam Honeypot Field */}
         <div className="sr-only" aria-hidden="true">
           <label htmlFor="contact-hp-field">Leave this empty</label>
           <input
@@ -177,22 +178,22 @@ export function ContactForm() {
               htmlFor="contact-name"
               className="block font-sans text-xs font-semibold text-[#0B0B0C] dark:text-[#FAFAF8]"
             >
-              Full Name <span className="text-red-500">*</span>
+              Full Name
             </label>
             <input
               id="contact-name"
               type="text"
               name="name"
-              placeholder="e.g. Chinedu Okafor"
+              placeholder="Enter your name"
               value={formData.name || ""}
               onChange={(e) => handleChange("name", e.target.value)}
               aria-required="true"
               aria-invalid={!!fieldErrors.name}
               aria-describedby={fieldErrors.name ? "name-error" : undefined}
-              className={`w-full h-11 px-3.5 rounded-xl text-sm bg-[#FBFBFA] dark:bg-white/[0.04] border ${
+              className={`w-full h-11 px-4 rounded-xl text-sm bg-[#F5F5F7] dark:bg-white/[0.05] border ${
                 fieldErrors.name
                   ? "border-red-500 focus:ring-red-500"
-                  : "border-[#E8E8E4] dark:border-white/10 focus:border-[#2E82F7] focus:ring-[#2E82F7]/20"
+                  : "border-transparent focus:border-[#3B5BFD] focus:ring-[#3B5BFD]/20 focus:bg-white dark:focus:bg-[#121214]"
               } text-[#0B0B0C] dark:text-white placeholder:text-[#9c9ca4] dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 transition-all`}
             />
             {fieldErrors.name && (
@@ -207,22 +208,22 @@ export function ContactForm() {
               htmlFor="contact-email"
               className="block font-sans text-xs font-semibold text-[#0B0B0C] dark:text-[#FAFAF8]"
             >
-              Email <span className="text-red-500">*</span>
+              Email
             </label>
             <input
               id="contact-email"
               type="email"
               name="email"
-              placeholder="you@domain.com"
+              placeholder="Enter you email"
               value={formData.email || ""}
               onChange={(e) => handleChange("email", e.target.value)}
               aria-required="true"
               aria-invalid={!!fieldErrors.email}
               aria-describedby={fieldErrors.email ? "email-error" : undefined}
-              className={`w-full h-11 px-3.5 rounded-xl text-sm bg-[#FBFBFA] dark:bg-white/[0.04] border ${
+              className={`w-full h-11 px-4 rounded-xl text-sm bg-[#F5F5F7] dark:bg-white/[0.05] border ${
                 fieldErrors.email
                   ? "border-red-500 focus:ring-red-500"
-                  : "border-[#E8E8E4] dark:border-white/10 focus:border-[#2E82F7] focus:ring-[#2E82F7]/20"
+                  : "border-transparent focus:border-[#3B5BFD] focus:ring-[#3B5BFD]/20 focus:bg-white dark:focus:bg-[#121214]"
               } text-[#0B0B0C] dark:text-white placeholder:text-[#9c9ca4] dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 transition-all`}
             />
             {fieldErrors.email && (
@@ -233,66 +234,34 @@ export function ContactForm() {
           </div>
         </div>
 
-        {/* Row 2: Phone number (Optional) & Subject (Required) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="space-y-1.5">
-            <label
-              htmlFor="contact-phone"
-              className="block font-sans text-xs font-semibold text-[#0B0B0C] dark:text-[#FAFAF8]"
-            >
-              Phone / WhatsApp <span className="text-muted-foreground font-normal">(Optional)</span>
-            </label>
-            <input
-              id="contact-phone"
-              type="tel"
-              name="phone"
-              placeholder="e.g. +234 803 123 4567"
-              value={formData.phone || ""}
-              onChange={(e) => handleChange("phone", e.target.value)}
-              aria-invalid={!!fieldErrors.phone}
-              aria-describedby={fieldErrors.phone ? "phone-error" : undefined}
-              className={`w-full h-11 px-3.5 rounded-xl text-sm bg-[#FBFBFA] dark:bg-white/[0.04] border ${
-                fieldErrors.phone
-                  ? "border-red-500 focus:ring-red-500"
-                  : "border-[#E8E8E4] dark:border-white/10 focus:border-[#2E82F7] focus:ring-[#2E82F7]/20"
-              } text-[#0B0B0C] dark:text-white placeholder:text-[#9c9ca4] dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 transition-all`}
-            />
-            {fieldErrors.phone && (
-              <p id="phone-error" className="text-xs text-red-500 mt-1">
-                {fieldErrors.phone}
-              </p>
-            )}
-          </div>
-
-          <div className="space-y-1.5">
-            <label
-              htmlFor="contact-subject"
-              className="block font-sans text-xs font-semibold text-[#0B0B0C] dark:text-[#FAFAF8]"
-            >
-              Subject <span className="text-red-500">*</span>
-            </label>
-            <input
-              id="contact-subject"
-              type="text"
-              name="subject"
-              placeholder="What is this inquiry regarding?"
-              value={formData.subject || ""}
-              onChange={(e) => handleChange("subject", e.target.value)}
-              aria-required="true"
-              aria-invalid={!!fieldErrors.subject}
-              aria-describedby={fieldErrors.subject ? "subject-error" : undefined}
-              className={`w-full h-11 px-3.5 rounded-xl text-sm bg-[#FBFBFA] dark:bg-white/[0.04] border ${
-                fieldErrors.subject
-                  ? "border-red-500 focus:ring-red-500"
-                  : "border-[#E8E8E4] dark:border-white/10 focus:border-[#2E82F7] focus:ring-[#2E82F7]/20"
-              } text-[#0B0B0C] dark:text-white placeholder:text-[#9c9ca4] dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 transition-all`}
-            />
-            {fieldErrors.subject && (
-              <p id="subject-error" className="text-xs text-red-500 mt-1">
-                {fieldErrors.subject}
-              </p>
-            )}
-          </div>
+        {/* Row 2: Phone number */}
+        <div className="space-y-1.5">
+          <label
+            htmlFor="contact-phone"
+            className="block font-sans text-xs font-semibold text-[#0B0B0C] dark:text-[#FAFAF8]"
+          >
+            Phone number
+          </label>
+          <input
+            id="contact-phone"
+            type="tel"
+            name="phone"
+            placeholder="Enter your number"
+            value={formData.phone || ""}
+            onChange={(e) => handleChange("phone", e.target.value)}
+            aria-invalid={!!fieldErrors.phone}
+            aria-describedby={fieldErrors.phone ? "phone-error" : undefined}
+            className={`w-full h-11 px-4 rounded-xl text-sm bg-[#F5F5F7] dark:bg-white/[0.05] border ${
+              fieldErrors.phone
+                ? "border-red-500 focus:ring-red-500"
+                : "border-transparent focus:border-[#3B5BFD] focus:ring-[#3B5BFD]/20 focus:bg-white dark:focus:bg-[#121214]"
+            } text-[#0B0B0C] dark:text-white placeholder:text-[#9c9ca4] dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 transition-all`}
+          />
+          {fieldErrors.phone && (
+            <p id="phone-error" className="text-xs text-red-500 mt-1">
+              {fieldErrors.phone}
+            </p>
+          )}
         </div>
 
         {/* Row 3: Message */}
@@ -301,22 +270,22 @@ export function ContactForm() {
             htmlFor="contact-message"
             className="block font-sans text-xs font-semibold text-[#0B0B0C] dark:text-[#FAFAF8]"
           >
-            Message <span className="text-red-500">*</span>
+            Message
           </label>
           <textarea
             id="contact-message"
             name="message"
-            rows={4}
-            placeholder="Type your message here (min. 10 characters)..."
+            rows={5}
+            placeholder="Type your message here"
             value={formData.message || ""}
             onChange={(e) => handleChange("message", e.target.value)}
             aria-required="true"
             aria-invalid={!!fieldErrors.message}
             aria-describedby={fieldErrors.message ? "message-error" : undefined}
-            className={`w-full p-3.5 rounded-xl text-sm bg-[#FBFBFA] dark:bg-white/[0.04] border resize-y min-h-[120px] ${
+            className={`w-full p-4 rounded-xl text-sm bg-[#F5F5F7] dark:bg-white/[0.05] border resize-none min-h-[140px] ${
               fieldErrors.message
                 ? "border-red-500 focus:ring-red-500"
-                : "border-[#E8E8E4] dark:border-white/10 focus:border-[#2E82F7] focus:ring-[#2E82F7]/20"
+                : "border-transparent focus:border-[#3B5BFD] focus:ring-[#3B5BFD]/20 focus:bg-white dark:focus:bg-[#121214]"
             } text-[#0B0B0C] dark:text-white placeholder:text-[#9c9ca4] dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 transition-all`}
           />
           {fieldErrors.message && (
@@ -343,20 +312,12 @@ export function ContactForm() {
           </div>
         )}
 
-        {/* Privacy Note */}
-        <div className="flex items-center gap-2 text-[11px] text-[#707078] dark:text-zinc-400">
-          <ShieldCheck className="h-3.5 w-3.5 text-[#2E82F7] shrink-0" />
-          <span>
-            Your data is protected. Network IP is cryptographically hashed with zero raw IP storage.
-          </span>
-        </div>
-
         {/* Submit button */}
         <div className="pt-2">
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full h-12 bg-[#2E82F7] hover:bg-[#256fd8] disabled:bg-[#2E82F7]/70 text-white text-sm font-semibold rounded-xl shadow-xs transition-all active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2E82F7] focus-visible:ring-offset-2"
+            className="w-full h-12 bg-[#3B5BFD] hover:bg-[#2F4EE8] disabled:bg-[#3B5BFD]/70 text-white text-sm font-semibold rounded-xl shadow-xs transition-all active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3B5BFD] focus-visible:ring-offset-2"
           >
             {isSubmitting ? (
               <>
