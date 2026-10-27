@@ -155,9 +155,9 @@ export default function AboutPage() {
                 <div className="font-serif italic text-2xl text-[#0B0B0C] dark:text-zinc-200 font-semibold tracking-wide">
                   The Zed Project Team
                 </div>
-                <div className="font-sans text-xs text-zinc-400 dark:text-zinc-500 font-medium mt-0.5">
+                {/* <div className="font-sans text-xs text-zinc-400 dark:text-zinc-500 font-medium mt-0.5">
                   Lagos &bull; Abuja &bull; Ibadan &bull; Enugu
-                </div>
+                </div> */}
               </div>
             </div>
           </div>
