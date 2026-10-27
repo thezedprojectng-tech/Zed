@@ -7,12 +7,20 @@ import { toast } from "sonner";
 import { contactMessageSchema, type ContactSubmissionInput } from "@/lib/contact/schema";
 import { submitContactMessage } from "@/lib/contact/actions";
 
-export function ContactForm() {
+interface ContactFormProps {
+  initialSubject?: string;
+}
+
+export function ContactForm({ initialSubject }: ContactFormProps = {}) {
+  const cleanSubject = initialSubject
+    ? initialSubject.replace(/[\x00-\x1F\x7F]/g, "").trim().slice(0, 120)
+    : "General Inquiry";
+
   const [formData, setFormData] = useState<Partial<ContactSubmissionInput>>({
     name: "",
     email: "",
     phone: "",
-    subject: "General Inquiry",
+    subject: cleanSubject || "General Inquiry",
     message: "",
     hpCompanyField: "",
   });
@@ -264,7 +272,27 @@ export function ContactForm() {
           )}
         </div>
 
-        {/* Row 3: Message */}
+        {/* Row 3: Subject */}
+        <div className="space-y-1.5">
+          <label
+            htmlFor="contact-subject"
+            className="block font-sans text-xs font-semibold text-[#0B0B0C] dark:text-[#FAFAF8]"
+          >
+            Subject
+          </label>
+          <input
+            id="contact-subject"
+            type="text"
+            name="subject"
+            placeholder="Subject of your message"
+            value={formData.subject || ""}
+            onChange={(e) => handleChange("subject", e.target.value)}
+            maxLength={120}
+            className="w-full h-11 px-4 rounded-xl text-sm bg-[#F5F5F7] dark:bg-white/[0.05] border border-transparent focus:border-[#3B5BFD] focus:ring-[#3B5BFD]/20 focus:bg-white dark:focus:bg-[#121214] text-[#0B0B0C] dark:text-white placeholder:text-[#9c9ca4] dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 transition-all"
+          />
+        </div>
+
+        {/* Row 4: Message */}
         <div className="space-y-1.5">
           <label
             htmlFor="contact-message"

@@ -17,6 +17,7 @@ import {
   ShoppingBag,
   Briefcase,
   Mail,
+  Search,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -28,12 +29,14 @@ interface AdminSidebarProps {
     avatarUrl?: string;
   };
   unreadContactCount?: number;
+  pendingInternshipsCount?: number;
 }
 
 const navItems = [
   { href: "/admin", label: "Overview", icon: LayoutDashboard, exact: true },
   { href: "/admin/users", label: "Users", icon: Users, exact: false },
   { href: "/admin/contact", label: "Contact Inbox", icon: Mail, exact: false, badgeKey: "contact" },
+  { href: "/admin/internships", label: "Internships", icon: Search, exact: false, badgeKey: "internships" },
   { href: "/admin/careers", label: "Careers", icon: Briefcase, exact: false },
   { href: "/admin/skill", label: "Skill content", icon: GraduationCap, exact: false },
   { href: "/admin/funding", label: "Funding", icon: Lightbulb, exact: false },
@@ -44,7 +47,11 @@ const navItems = [
   { href: "/admin/audit-log", label: "Audit Log", icon: ScrollText, exact: false },
 ];
 
-export function AdminSidebar({ adminUser, unreadContactCount = 0 }: AdminSidebarProps) {
+export function AdminSidebar({
+  adminUser,
+  unreadContactCount = 0,
+  pendingInternshipsCount = 0,
+}: AdminSidebarProps) {
   const pathname = usePathname();
 
   const getInitials = (name?: string | null) => {
@@ -97,7 +104,13 @@ export function AdminSidebar({ adminUser, unreadContactCount = 0 }: AdminSidebar
                 ? pathname === href
                 : pathname === href || pathname.startsWith(href + "/");
 
-              const showBadge = badgeKey === "contact" && unreadContactCount > 0;
+              const badgeCount =
+                badgeKey === "contact"
+                  ? unreadContactCount
+                  : badgeKey === "internships"
+                    ? pendingInternshipsCount
+                    : 0;
+              const showBadge = badgeCount > 0;
 
               return (
                 <li key={href}>
@@ -122,7 +135,7 @@ export function AdminSidebar({ adminUser, unreadContactCount = 0 }: AdminSidebar
                     <span className="truncate flex-1">{label}</span>
                     {showBadge && (
                       <span className="inline-flex items-center justify-center px-1.5 py-0.2 rounded-full text-[10px] font-semibold bg-primary text-primary-foreground">
-                        {unreadContactCount > 99 ? "99+" : unreadContactCount}
+                        {badgeCount > 99 ? "99+" : badgeCount}
                       </span>
                     )}
                   </Link>

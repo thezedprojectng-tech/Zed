@@ -47,7 +47,14 @@ const FAQ_ITEMS: AccordionItemData[] = [
   },
 ];
 
-export default function ContactPage() {
+interface ContactPageProps {
+  searchParams?: Promise<{ subject?: string }>;
+}
+
+export default async function ContactPage({ searchParams }: ContactPageProps) {
+  const resolvedParams = searchParams ? await searchParams : undefined;
+  const initialSubject = resolvedParams?.subject;
+
   return (
     <div className="w-full flex-1 flex flex-col items-center justify-start overflow-hidden">
       {/* ── Main Top Section: Hero + Contact Cards & Form ── */}
@@ -170,7 +177,7 @@ export default function ContactPage() {
 
               {/* Right Column: Send Us A Message Form */}
               <div id="contact-form" className="lg:col-span-7">
-                <ContactForm />
+                <ContactForm initialSubject={initialSubject} />
               </div>
             </div>
           </div>

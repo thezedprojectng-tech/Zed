@@ -192,11 +192,12 @@ export const MODULES: ZedModule[] = [
   {
     slug: "internship-radar",
     name: "Internship Radar",
-    tagline: "Curated tracking of verified internship and industrial training opportunities.",
+    tagline: "Curated tracking of internship, SIWES, and industrial training opportunities across Nigeria.",
     icon: Search,
-    status: "soon",
-    phase: "Phase 2",
-    what: "Internship Radar will surface verified entry-level openings, SIWES placements, and graduate trainee programmes, filtered by field and location, so Nigerian youth spend less time searching and more time applying.",
+    status: "live",
+    phase: "Phase 1",
+    href: "/internships",
+    what: "Internship Radar surfaces entry-level openings, SIWES placements, and graduate trainee programmes submitted by the community and reviewed by admins, filtered by field, work mode, and location.",
   },
   {
     slug: "civic-trackers",

@@ -58,10 +58,26 @@ export default async function AdminLayout({
     unreadContactCount = 0;
   }
 
+  // 4. Fetch pending internships count (safely fallback to 0)
+  let pendingInternshipsCount = 0;
+  try {
+    const { count } = await admin
+      .from("internships")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "pending");
+    pendingInternshipsCount = count ?? 0;
+  } catch {
+    pendingInternshipsCount = 0;
+  }
+
   return (
     <div className="flex min-h-dvh w-full bg-background text-foreground antialiased font-sans selection:bg-amber-500/20 selection:text-amber-500">
       {/* Dedicated Admin Sidebar */}
-      <AdminSidebar adminUser={adminUser} unreadContactCount={unreadContactCount} />
+      <AdminSidebar
+        adminUser={adminUser}
+        unreadContactCount={unreadContactCount}
+        pendingInternshipsCount={pendingInternshipsCount}
+      />
 
       {/* Main Console Content */}
       <div className="flex flex-1 flex-col overflow-x-hidden min-w-0">

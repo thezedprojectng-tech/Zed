@@ -99,6 +99,9 @@ export default function PrivacyPolicyPage() {
               <strong>Support &amp; Contact Inquiries:</strong> When contacting us via our website forms, we store your name, email address, optional phone number, subject line, message text, and a salted SHA-256 hash of your network IP to prevent automated abuse. Raw IP addresses are never retained.
             </li>
             <li>
+              <strong>Internship Radar Leads:</strong> When you submit an internship or opportunity lead, we store your account user ID internally so administrators can review the submission. Submitter IDs are private and are never exposed publicly or to other users.
+            </li>
+            <li>
               <strong>Client-Side Local Storage:</strong> Procedural checklists, offline guide caches, and course notes stored locally on your device via IndexedDB and Service Worker caches.
             </li>
           </ul>
