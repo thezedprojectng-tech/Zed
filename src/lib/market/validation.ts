@@ -1,15 +1,21 @@
 import { z } from "zod";
 import type { MarketCategory, MarketCondition, MarketReportReason } from "./types";
 
-export const MARKET_CATEGORIES: MarketCategory[] = [
-  "electronics",
-  "fashion",
-  "books-and-notes",
-  "services",
-  "food",
-  "creative",
-  "other",
-];
+export const SERVICE_CATEGORIES = [
+  "design-and-creative",
+  "tech-and-development",
+  "tutoring-and-lessons",
+  "writing-and-translation",
+  "photography-and-video",
+  "fashion-and-beauty-services",
+  "repairs-and-maintenance",
+  "errands-and-delivery",
+  "events-and-entertainment",
+  "business-and-admin",
+  "other-services",
+] as const;
+
+export const MARKET_CATEGORIES: MarketCategory[] = [...SERVICE_CATEGORIES];
 
 export const MARKET_CONDITIONS: MarketCondition[] = ["new", "used", "na"];
 
@@ -56,16 +62,8 @@ export const createListingSchema = z.object({
     .trim()
     .min(20, "Description must be at least 20 characters")
     .max(2000, "Description cannot exceed 2,000 characters"),
-  category: z.enum([
-    "electronics",
-    "fashion",
-    "books-and-notes",
-    "services",
-    "food",
-    "creative",
-    "other",
-  ] as const, {
-    error: () => ({ message: "Please select a valid category" }),
+  category: z.enum(SERVICE_CATEGORIES, {
+    error: () => ({ message: "Please select a valid service category" }),
   }),
   price_ngn: z
     .union([z.number(), z.string(), z.null(), z.undefined()])
@@ -102,7 +100,7 @@ export const createListingSchema = z.object({
       { message: "Please enter a valid WhatsApp number (e.g. +234 801 234 5678)" }
     ),
   confirm_allowed: z.boolean().refine((val) => val === true, {
-    message: "You must confirm this item is allowed and that you own or are authorized to sell it.",
+    message: "You must confirm this service is allowed and that you are authorized to offer it.",
   }),
 });
 
@@ -117,15 +115,7 @@ export const updateListingSchema = z.object({
     .trim()
     .min(20, "Description must be at least 20 characters")
     .max(2000, "Description cannot exceed 2,000 characters"),
-  category: z.enum([
-    "electronics",
-    "fashion",
-    "books-and-notes",
-    "services",
-    "food",
-    "creative",
-    "other",
-  ] as const),
+  category: z.enum(SERVICE_CATEGORIES),
   price_ngn: z
     .union([z.number(), z.string(), z.null(), z.undefined()])
     .transform((val) => {

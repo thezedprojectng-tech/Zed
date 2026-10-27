@@ -7,11 +7,9 @@ import {
   updateListingSchema,
   reportListingSchema,
   escapeSearchQuery,
+  SERVICE_CATEGORIES,
   MAX_IMAGE_SIZE_BYTES,
   ALLOWED_IMAGE_MIME_TYPES,
-  type CreateListingInput,
-  type UpdateListingInput,
-  type ReportListingInput,
 } from "./validation";
 import { mapMarketError } from "./helpers";
 import type { MarketFilterParams, MarketListing } from "./types";
@@ -40,6 +38,9 @@ export async function getListings(params: MarketFilterParams = {}): Promise<{
     )
     .eq("status", "active")
     .gt("expires_at", new Date().toISOString())
+    // Explicitly limit public feed to service categories only.
+    // This prevents any restored legacy goods listing from ever surfacing.
+    .in("category", SERVICE_CATEGORIES)
     .order("created_at", { ascending: false });
 
   if (params.category && params.category !== "all") {

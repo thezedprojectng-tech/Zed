@@ -1,11 +1,15 @@
 export type MarketCategory =
-  | "electronics"
-  | "fashion"
-  | "books-and-notes"
-  | "services"
-  | "food"
-  | "creative"
-  | "other";
+  | "design-and-creative"
+  | "tech-and-development"
+  | "tutoring-and-lessons"
+  | "writing-and-translation"
+  | "photography-and-video"
+  | "fashion-and-beauty-services"
+  | "repairs-and-maintenance"
+  | "errands-and-delivery"
+  | "events-and-entertainment"
+  | "business-and-admin"
+  | "other-services";
 
 export type MarketCondition = "new" | "used" | "na";
 

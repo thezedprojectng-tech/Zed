@@ -1,7 +1,6 @@
 import { describe, it, expect } from "vitest";
 import {
   createListingSchema,
-  updateListingSchema,
   reportListingSchema,
   adminRemoveListingSchema,
   escapeSearchQuery,
@@ -12,8 +11,6 @@ import {
   buildWhatsAppLink,
   mapMarketError,
   CATEGORY_DEFINITIONS,
-  CONDITION_LABELS,
-  STATUS_LABELS,
   PROHIBITED_ITEMS,
 } from "./helpers";
 
@@ -59,13 +56,13 @@ describe("Zed Market - Image Path Regex Validation", () => {
 
 describe("Zed Market - Create Listing Validation Schema", () => {
   const validBase = {
-    title: "MacBook Pro M1 16GB",
-    description: "In excellent condition, battery health 92%. Comes with original charger and box.",
-    category: "electronics",
-    price_ngn: 750000,
-    condition: "used",
+    title: "Professional Logo Design",
+    description: "I will design a modern logo for your brand with unlimited revisions included in the price.",
+    category: "design-and-creative",
+    price_ngn: 25000,
+    condition: "na",
     location: "Lagos, Yaba",
-    image_paths: ["550e8400-e29b-41d4-a716-446655440000/macbook.jpg"],
+    image_paths: ["550e8400-e29b-41d4-a716-446655440000/portfolio.jpg"],
     contact_whatsapp: "+2348012345678",
     confirm_allowed: true,
   };
@@ -74,8 +71,8 @@ describe("Zed Market - Create Listing Validation Schema", () => {
     const res = createListingSchema.safeParse(validBase);
     expect(res.success).toBe(true);
     if (res.success) {
-      expect(res.data.price_ngn).toBe(750000);
-      expect(res.data.title).toBe("MacBook Pro M1 16GB");
+      expect(res.data.price_ngn).toBe(25000);
+      expect(res.data.title).toBe("Professional Logo Design");
     }
   });
 
@@ -206,16 +203,25 @@ describe("Zed Market - Formatters and Helpers", () => {
     expect(mapMarketError("You have already reported this listing.")).toContain("already reported");
   });
 
-  it("contains all 7 defined categories with labels and descriptions", () => {
+  it("contains all 11 service categories with labels and descriptions", () => {
     const categories = Object.keys(CATEGORY_DEFINITIONS);
-    expect(categories).toHaveLength(7);
-    expect(categories).toContain("electronics");
-    expect(categories).toContain("fashion");
-    expect(categories).toContain("books-and-notes");
-    expect(categories).toContain("services");
-    expect(categories).toContain("food");
-    expect(categories).toContain("creative");
-    expect(categories).toContain("other");
+    expect(categories).toHaveLength(11);
+    expect(categories).toContain("design-and-creative");
+    expect(categories).toContain("tech-and-development");
+    expect(categories).toContain("tutoring-and-lessons");
+    expect(categories).toContain("writing-and-translation");
+    expect(categories).toContain("photography-and-video");
+    expect(categories).toContain("fashion-and-beauty-services");
+    expect(categories).toContain("repairs-and-maintenance");
+    expect(categories).toContain("errands-and-delivery");
+    expect(categories).toContain("events-and-entertainment");
+    expect(categories).toContain("business-and-admin");
+    expect(categories).toContain("other-services");
+    // Legacy goods categories must NOT be present in new service-only market
+    expect(categories).not.toContain("electronics");
+    expect(categories).not.toContain("fashion");
+    expect(categories).not.toContain("food");
+    expect(categories).not.toContain("books-and-notes");
   });
 
   it("includes prohibited items list conforming to safety rules", () => {

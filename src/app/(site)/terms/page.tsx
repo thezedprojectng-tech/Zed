@@ -18,7 +18,7 @@ const TOC = [
   { id: "section-2", title: "Eligibility & Age Requirements" },
   { id: "section-3", title: "Civic Guides & Non-Affiliation Disclaimer" },
   { id: "section-4", title: "User Accounts, Authentication & Anti-Bot Protection" },
-  { id: "section-5", title: "Zed Market: Escrow Mechanics & Freelance Terms" },
+  { id: "section-5", title: "Zed Market: Services Marketplace & Freelance Terms" },
   { id: "section-6", title: "Zed Meet & Live Audio: Trust, Safety & Audio Buffers" },
   { id: "section-7", title: "Campus Hubs & Academic Vault Guidelines" },
   { id: "section-8", title: "$ZED Token Rules & Dynamic Treasury Liquidity" },
@@ -132,17 +132,19 @@ export default function TermsPage() {
       {/* ── Section 5 ──────────────────────────────────────────────── */}
       <section id="section-5" className="space-y-4 scroll-mt-28 pb-2">
         <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
-          5. Zed Market: Escrow Mechanics &amp; Freelance Terms
+          5. Zed Market: Services Marketplace &amp; Freelance Terms
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
           <p>
-            Zed Market connects Nigerian freelance talent with domestic and international buyers under an escrow framework:
+            Zed Market is a platform connecting Nigerian youth offering freelance, creative, technical, and trade services with clients:
           </p>
           <ul className="list-disc pl-5 space-y-2">
-            <li><strong>Milestone Escrow:</strong> Client funds are deposited via CBN-licensed payment gateways (Paystack and Flutterwave) and held securely in escrow until the client reviews and formally approves the agreed project milestone.</li>
-            <li><strong>Direct Payouts:</strong> Approved earnings route directly to verified Nigerian bank accounts (GTB, Kuda, OPay, Moniepoint, Zenith) or designated USDT wallet addresses.</li>
-            <li><strong>Prohibition of Circumvention:</strong> Users agree not to solicit or accept off-platform payments to circumvent marketplace escrow protections or platform fees. Doing so voids all escrow protections and may result in immediate suspension.</li>
-            <li><strong>Tax Responsibility:</strong> Freelancers are independently responsible for declaring income and remitting applicable personal income taxes in accordance with Nigerian revenue laws.</li>
+            <li><strong>Services Only Policy:</strong> Zed Market is strictly dedicated to services (including graphic design, software development, academic tutoring, writing and translation, photography and video, beauty and fashion services, repairs and maintenance, errands and delivery, event coordination, and business administration). The listing or sale of physical goods, packaged consumer items, electronics, or retail merchandise is strictly prohibited.</li>
+            <li><strong>Provider Responsibility:</strong> Service providers warrant that they have the skills, qualifications and lawful authority to deliver the services they list. Verification is optional; accounts may display a Verified or Not verified label.</li>
+            <li><strong>Direct Contact &amp; Terms:</strong> Clients and providers connect directly via WhatsApp. Starting prices are indicators; final deliverables, timelines, and payment structures must be agreed clearly in writing between parties before work commences.</li>
+            <li><strong>Safety &amp; Payment Rules:</strong> Clients are strictly advised never to pay the full agreed amount before seeing completed work or verifiable milestones. Deposits or partial advance payments should be governed by clear written milestones.</li>
+            <li><strong>Prohibited Activities:</strong> Listings or transactions involving academic dishonesty (e.g., impersonation, writing examination papers, cheating services), adult or sexually explicit services, counterfeit work, intellectual property infringement, illicit substances, or any unlawful trade under Nigerian law are strictly prohibited and will result in immediate listing removal and account termination.</li>
+            <li><strong>Tax Responsibility:</strong> Service providers operate as independent contractors and remain solely responsible for reporting income and fulfilling applicable personal income tax or VAT obligations under the Laws of the Federal Republic of Nigeria.</li>
           </ul>
         </div>
       </section>

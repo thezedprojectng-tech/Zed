@@ -94,13 +94,13 @@ export function MyListingsClient({ initialListings }: MyListingsClientProps) {
             </Link>
           </Button>
           <h1 className="text-xl sm:text-2xl font-bold tracking-tight">My Listings</h1>
-          <p className="text-xs text-muted-foreground">Manage your posted marketplace items and sales</p>
+          <p className="text-xs text-muted-foreground">Manage your service listings on Zed Market</p>
         </div>
 
         <Button size="sm" asChild className="h-9 gap-1.5 shadow-sm">
           <Link href="/market/new">
             <Plus className="h-4 w-4" />
-            <span>Post an item</span>
+            <span>Post a service</span>
           </Link>
         </Button>
       </div>
@@ -162,12 +162,12 @@ export function MyListingsClient({ initialListings }: MyListingsClientProps) {
           <h3 className="text-sm font-semibold">No listings in this tab</h3>
           <p className="text-xs text-muted-foreground max-w-sm mx-auto">
             {filterTab === "all"
-              ? "You haven't posted any items on Zed Market yet."
-              : `You have no ${filterTab} items at this time.`}
+              ? "You haven't posted any services on Zed Market yet."
+              : `You have no ${filterTab} services at this time.`}
           </p>
           {filterTab === "all" && (
             <Button size="sm" asChild className="mt-2">
-              <Link href="/market/new">Post an item</Link>
+              <Link href="/market/new">Post a service</Link>
             </Button>
           )}
         </div>

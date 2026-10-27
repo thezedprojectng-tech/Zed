@@ -118,12 +118,12 @@ export const MODULES: ZedModule[] = [
   {
     slug: "zed-market",
     name: "Zed Market",
-    tagline: "Transparent, escrow-secured marketplace connecting youth with vetted providers.",
+    tagline: "Services marketplace connecting Nigerian youth with clients: design, tutoring, tech, photography, repairs, and more.",
     icon: ShoppingBag,
     status: "live",
     phase: "Phase 1",
     href: "/market",
-    what: "Zed Market will be a trust-first services marketplace where buyers and sellers transact through an escrow layer, eliminating fraud risk for freelance work, digital services, and physical goods.",
+    what: "Zed Market is a services marketplace where Nigerian providers list their skills and clients connect with them directly via WhatsApp. Categories include design, tech, tutoring, writing, photography, fashion services, repairs, errands, events, and business support.",
   },
   {
     slug: "zed-chat",

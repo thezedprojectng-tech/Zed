@@ -4,8 +4,8 @@ import { createClient } from "@/lib/supabase/server";
 import { NewListingClient } from "./NewListingClient";
 
 export const metadata: Metadata = {
-  title: "Post an Item | Zed Market",
-  description: "Create a verified peer-to-peer listing on Zed Market.",
+  title: "Post a Service | Zed Market",
+  description: "List your service on Zed Market — design, tutoring, tech, photography, repairs, and more.",
 };
 
 export default async function NewListingPage() {

@@ -26,9 +26,9 @@ const FEATURES = [
   },
   {
     icon: Briefcase,
-    title: "Zed Market (Escrow-Backed Gigs)",
+    title: "Zed Market (Services Marketplace)",
     description:
-      "Connects young Nigerian freelancers with domestic and global clients. Funds are secured via Paystack and Flutterwave escrow APIs, with direct payouts to GTB, Kuda, OPay, Moniepoint, Zenith, or USDT.",
+      "A services marketplace connecting Nigerian youth with clients for design, development, tutoring, repairs, and creative work with direct WhatsApp messaging.",
   },
   {
     icon: Users,

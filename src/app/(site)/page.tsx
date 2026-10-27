@@ -58,9 +58,9 @@ const FAQ_ITEMS = [
       "Planned: coming in Phase 2. The $ZED Token is an upcoming off-chain engagement reward system designed to recognize active learning, course completions, and community reports. Mining rates will scale with your verified tier. In Phase 2, conversions to Naira or discounted mobile data bundles are planned once treasury mechanisms launch.",
   },
   {
-    question: "How does the Zed Market escrow model protect buyers and sellers?",
+    question: "How does Zed Market connect clients with service providers?",
     answer:
-      "Planned for Phase 2: Zed Market is an upcoming trust-first services marketplace. When launched, it is planned to use escrow protection to hold client funds until project milestones are approved before releasing payouts to verified Nigerian accounts.",
+      "Zed Market is a services marketplace where Nigerian youth list their skills (design, tech, tutoring, writing, photography, repairs, etc.) with transparent starting rates. Clients can browse listings and connect directly via WhatsApp.",
   },
   {
     question: "Does Zed work offline on weak mobile networks?",

@@ -1,10 +1,14 @@
 import {
-  Smartphone,
-  Shirt,
-  BookOpen,
+  Pen,
+  Code2,
+  GraduationCap,
+  FileText,
+  Camera,
+  Scissors,
   Wrench,
-  Utensils,
-  Palette,
+  Bike,
+  Music,
+  BarChart3,
   Package,
 } from "lucide-react";
 import type { MarketCategory, MarketCondition, MarketStatus } from "./types";
@@ -17,47 +21,72 @@ export interface CategoryMeta {
 }
 
 export const CATEGORY_DEFINITIONS: Record<MarketCategory, CategoryMeta> = {
-  electronics: {
-    id: "electronics",
-    label: "Electronics & Gadgets",
-    icon: Smartphone,
-    description: "Phones, laptops, accessories, gaming, power banks",
+  "design-and-creative": {
+    id: "design-and-creative",
+    label: "Design & Creative",
+    icon: Pen,
+    description: "Graphic design, branding, illustration, UI/UX, motion graphics",
   },
-  fashion: {
-    id: "fashion",
-    label: "Fashion & Apparel",
-    icon: Shirt,
-    description: "Clothing, shoes, bags, watches, jewelry",
+  "tech-and-development": {
+    id: "tech-and-development",
+    label: "Tech & Development",
+    icon: Code2,
+    description: "Web dev, mobile apps, data, IT support, software solutions",
   },
-  "books-and-notes": {
-    id: "books-and-notes",
-    label: "Books & Study Materials",
-    icon: BookOpen,
-    description: "Textbooks, revision guides, course notes, fiction",
+  "tutoring-and-lessons": {
+    id: "tutoring-and-lessons",
+    label: "Tutoring & Lessons",
+    icon: GraduationCap,
+    description: "Academic coaching, exam prep, language lessons, skill training",
   },
-  services: {
-    id: "services",
-    label: "Skills & Services",
+  "writing-and-translation": {
+    id: "writing-and-translation",
+    label: "Writing & Translation",
+    icon: FileText,
+    description: "Copywriting, content writing, proofreading, transcription, translation",
+  },
+  "photography-and-video": {
+    id: "photography-and-video",
+    label: "Photography & Video",
+    icon: Camera,
+    description: "Portrait, event photography, video production, editing, reels",
+  },
+  "fashion-and-beauty-services": {
+    id: "fashion-and-beauty-services",
+    label: "Fashion & Beauty Services",
+    icon: Scissors,
+    description: "Tailoring, hair styling, make-up, fashion design, nail art",
+  },
+  "repairs-and-maintenance": {
+    id: "repairs-and-maintenance",
+    label: "Repairs & Maintenance",
     icon: Wrench,
-    description: "Graphic design, tutoring, CV writing, repairs, photography",
+    description: "Phone repairs, electrical, plumbing, appliance fixes, AC servicing",
   },
-  food: {
-    id: "food",
-    label: "Food & Confectionery",
-    icon: Utensils,
-    description: "Campus bakes, snacks, meal prep, healthy bites",
+  "errands-and-delivery": {
+    id: "errands-and-delivery",
+    label: "Errands & Delivery",
+    icon: Bike,
+    description: "Pick-up and drop-off, shopping runs, document delivery",
   },
-  creative: {
-    id: "creative",
-    label: "Creative & Crafts",
-    icon: Palette,
-    description: "Custom prints, art, handmade goods, decor",
+  "events-and-entertainment": {
+    id: "events-and-entertainment",
+    label: "Events & Entertainment",
+    icon: Music,
+    description:
+      "Event planning, DJ services, MC/compère, decorations, event catering as a booked service",
   },
-  other: {
-    id: "other",
-    label: "General / Other",
+  "business-and-admin": {
+    id: "business-and-admin",
+    label: "Business & Admin",
+    icon: BarChart3,
+    description: "Virtual assistant, data entry, accounting, business registration, legal support",
+  },
+  "other-services": {
+    id: "other-services",
+    label: "Other Services",
     icon: Package,
-    description: "Household items, hostel essentials, miscellaneous",
+    description: "Any legitimate service that doesn't fit the categories above",
   },
 };
 
@@ -108,21 +137,26 @@ export function formatNgnPrice(price: number | null | undefined): string {
 }
 
 /**
- * Prohibited items list required by Zed safety standards.
+ * Prohibited items list — services marketplace.
+ * Item 9 (upfront payment) is moved to safety wording instead.
  */
 export const PROHIBITED_ITEMS = [
   "Weapons, firearms, ammunition, knives, explosives, or fireworks",
   "Illicit drugs, narcotics, prescription medications, or controlled substances",
-  "Counterfeit goods, unauthorized replicas, pirated software, or stolen media",
-  "Stolen property, hijacked credentials, or items acquired unlawfully",
-  "Adult, sexually explicit, pornographic, or escort services/content",
+  "Counterfeit services, unauthorized use of third-party IP, or pirated software",
+  "Stolen property, hijacked credentials, or services acquired unlawfully",
+  "Adult, sexually explicit, pornographic, or escort services or content",
   "Hazardous chemicals, toxic substances, or dangerous materials",
-  "Academic dishonesty items (e.g. solved exam question leaks or imposter test-taking)",
+  "Academic dishonesty (e.g. writing exam papers, impersonation, or ghost-studying)",
   "Anything strictly prohibited under Nigerian law or federal regulations",
 ];
 
+/**
+ * Safety disclaimer for the services marketplace.
+ * Note: selling packaged food or physical goods is not allowed.
+ */
 export const SAFETY_DISCLAIMER =
-  "Zed does not handle payments or delivery. Meet in a safe public place. Never pay before you see the item. Report anything suspicious.";
+  "Zed Market is for services only — not physical goods. Agree terms clearly before work begins. Never pay the full amount before seeing work. Report anything suspicious.";
 
 /**
  * Format a WhatsApp phone number into an international click-to-chat URL.
@@ -136,7 +170,7 @@ export function buildWhatsAppLink(phone: string, listingTitle?: string): string 
   }
   const text = listingTitle
     ? encodeURIComponent(`Hi, I saw your listing for "${listingTitle}" on Zed Market. Is it still available?`)
-    : encodeURIComponent("Hi, I saw your listing on Zed Market. Is it still available?");
+    : encodeURIComponent("Hi, I saw your service listing on Zed Market. Is it still available?");
   return `https://wa.me/${clean}?text=${text}`;
 }
 
@@ -167,6 +201,9 @@ export function mapMarketError(error: unknown): string {
   }
   if (msg.includes("Not authenticated") || msg.includes("sign in")) {
     return "Please sign in to continue.";
+  }
+  if (msg.includes("only supports services")) {
+    return "Invalid category. Zed Market only supports services — not physical goods.";
   }
   return msg || "An error occurred while processing your request.";
 }

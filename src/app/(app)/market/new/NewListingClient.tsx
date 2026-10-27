@@ -37,7 +37,6 @@ import {
 } from "@/components/ui/dialog";
 import {
   CATEGORY_DEFINITIONS,
-  CONDITION_LABELS,
   PROHIBITED_ITEMS,
   SAFETY_DISCLAIMER,
 } from "@/lib/market/helpers";
@@ -47,7 +46,7 @@ import {
   ALLOWED_IMAGE_MIME_TYPES,
 } from "@/lib/market/validation";
 import { createListing, uploadListingImage } from "@/lib/market/actions";
-import type { MarketCategory, MarketCondition } from "@/lib/market/types";
+import type { MarketCategory } from "@/lib/market/types";
 
 interface NewListingClientProps {
   isVerified: boolean;
@@ -59,8 +58,7 @@ export function NewListingClient({ isVerified, userPhone }: NewListingClientProp
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [category, setCategory] = useState<MarketCategory>("electronics");
-  const [condition, setCondition] = useState<MarketCondition>("used");
+  const [category, setCategory] = useState<MarketCategory>("design-and-creative");
   const [priceNgn, setPriceNgn] = useState("");
   const [location, setLocation] = useState("");
   const [contactWhatsapp, setContactWhatsapp] = useState(userPhone || "");
@@ -137,7 +135,7 @@ export function NewListingClient({ isVerified, userPhone }: NewListingClientProp
       description,
       category,
       price_ngn: priceNgn ? parseFloat(priceNgn.replace(/,/g, "")) : null,
-      condition,
+      condition: "na",
       location,
       image_paths: uploadedPaths,
       contact_whatsapp: contactWhatsapp.trim() || null,
@@ -154,28 +152,6 @@ export function NewListingClient({ isVerified, userPhone }: NewListingClientProp
     router.push(`/market/${res.id}`);
   };
 
-  if (!isVerified) {
-    return (
-      <div className="container mx-auto px-4 py-8 max-w-xl text-center space-y-4">
-        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 mx-auto">
-          <AlertCircle className="h-7 w-7" />
-        </div>
-        <h1 className="text-xl font-bold">Verification Required</h1>
-        <p className="text-sm text-muted-foreground leading-relaxed">
-          To maintain trust and protect our youth community from fraud, only verified Zed users can create marketplace listings.
-        </p>
-        <div className="pt-2 flex justify-center gap-3">
-          <Button variant="outline" size="sm" asChild>
-            <Link href="/market">Back to Market</Link>
-          </Button>
-          <Button size="sm" asChild>
-            <Link href="/profile">Verify Profile on Zed →</Link>
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="container mx-auto px-4 py-6 max-w-2xl space-y-6">
       {/* ── Header ────────────────────────────────────────────────────────── */}
@@ -188,7 +164,7 @@ export function NewListingClient({ isVerified, userPhone }: NewListingClientProp
         </Button>
         <div>
           <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Create Listing</h1>
-          <p className="text-xs text-muted-foreground">Post an item or offer a service on Zed Market</p>
+          <p className="text-xs text-muted-foreground">Offer a service on Zed Market — design, tutoring, tech, photography, and more</p>
         </div>
       </div>
 
@@ -233,50 +209,30 @@ export function NewListingClient({ isVerified, userPhone }: NewListingClientProp
           <span className="text-[10px] text-muted-foreground">{title.length}/120 characters (min 3)</span>
         </div>
 
-        {/* Category & Condition */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="space-y-1.5">
-            <Label className="text-xs font-semibold">
-              Category <span className="text-rose-500">*</span>
-            </Label>
-            <Select value={category} onValueChange={(val) => setCategory(val as MarketCategory)}>
-              <SelectTrigger className="text-sm">
-                <SelectValue placeholder="Select a category" />
-              </SelectTrigger>
-              <SelectContent>
-                {Object.values(CATEGORY_DEFINITIONS).map((c) => (
-                  <SelectItem key={c.id} value={c.id}>
-                    {c.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-1.5">
-            <Label className="text-xs font-semibold">
-              Condition <span className="text-rose-500">*</span>
-            </Label>
-            <Select value={condition} onValueChange={(val) => setCondition(val as MarketCondition)}>
-              <SelectTrigger className="text-sm">
-                <SelectValue placeholder="Select condition" />
-              </SelectTrigger>
-              <SelectContent>
-                {Object.entries(CONDITION_LABELS).map(([key, val]) => (
-                  <SelectItem key={key} value={key}>
-                    {val.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+        {/* Category */}
+        <div className="space-y-1.5">
+          <Label className="text-xs font-semibold">
+            Category <span className="text-rose-500">*</span>
+          </Label>
+          <Select value={category} onValueChange={(val) => setCategory(val as MarketCategory)}>
+            <SelectTrigger className="text-sm">
+              <SelectValue placeholder="Select a service category" />
+            </SelectTrigger>
+            <SelectContent>
+              {Object.values(CATEGORY_DEFINITIONS).map((c) => (
+                <SelectItem key={c.id} value={c.id}>
+                  {c.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Price & Location */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-1.5">
             <Label htmlFor="listing-price" className="text-xs font-semibold">
-              Price (₦ NGN)
+              Starting Price (₦)
             </Label>
             <Input
               id="listing-price"
@@ -288,7 +244,7 @@ export function NewListingClient({ isVerified, userPhone }: NewListingClientProp
               placeholder="Leave blank for 'Contact for price'"
               className="text-sm"
             />
-            <span className="text-[10px] text-muted-foreground">0 = Free, or enter amount</span>
+            <span className="text-[10px] text-muted-foreground">Optional. Leave blank for &apos;Contact for price&apos;.</span>
           </div>
 
           <div className="space-y-1.5">
@@ -314,7 +270,7 @@ export function NewListingClient({ isVerified, userPhone }: NewListingClientProp
             <Label htmlFor="listing-whatsapp" className="text-xs font-semibold">
               WhatsApp Contact Number
             </Label>
-            <span className="text-[10px] text-muted-foreground">Only shown to verified users</span>
+            <span className="text-[10px] text-muted-foreground">Only shown to signed-in users</span>
           </div>
           <Input
             id="listing-whatsapp"
@@ -334,7 +290,7 @@ export function NewListingClient({ isVerified, userPhone }: NewListingClientProp
             id="listing-description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder="Describe the item condition, specs, included accessories, or meetup preferences..."
+            placeholder="Describe your service, deliverables, turnaround time, or requirements..."
             minLength={20}
             maxLength={2000}
             required
@@ -388,6 +344,36 @@ export function NewListingClient({ isVerified, userPhone }: NewListingClientProp
           )}
         </div>
 
+        {/* ── Marketplace Rules Box (Services Only) ────────────────────────── */}
+        <aside
+          aria-label="Marketplace rules"
+          className="rounded-xl border border-primary/20 bg-primary/5 p-4 space-y-3"
+        >
+          <div className="flex items-center gap-2 text-foreground font-semibold text-xs">
+            <ShieldAlert className="h-4 w-4 text-primary shrink-0" />
+            <span>Marketplace Rules — Services Only</span>
+          </div>
+          <p className="text-xs text-foreground/90 leading-relaxed">
+            Zed Market is strictly for listing <strong>services</strong> (such as design, tech, tutoring, writing, repairs, photography, and event support). Selling physical goods, packaged products, food, or electronics is strictly prohibited.
+          </p>
+          <div className="space-y-1.5 pt-1 border-t border-border/60">
+            <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block">
+              Prohibited on Zed Market:
+            </span>
+            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-[11px] text-muted-foreground">
+              {PROHIBITED_ITEMS.map((item, idx) => (
+                <li key={idx} className="flex items-start gap-1.5">
+                  <span className="text-rose-500 font-bold leading-none mt-1">•</span>
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="text-[11px] text-amber-700 dark:text-amber-300 font-medium pt-1.5 border-t border-border/60">
+            Safety rule: Never pay the full amount before seeing work. Agree terms clearly first.
+          </div>
+        </aside>
+
         {/* Confirmation & Prohibited Items */}
         <div className="pt-2 border-t border-border space-y-3">
           <div className="flex items-start space-x-2.5">
@@ -402,10 +388,10 @@ export function NewListingClient({ isVerified, userPhone }: NewListingClientProp
                 htmlFor="confirm-allowed"
                 className="text-xs font-medium leading-none cursor-pointer text-foreground"
               >
-                I confirm this item is allowed and I own or am authorized to sell it.
+                I confirm this service is allowed and I am authorized to offer it.
               </label>
               <div className="text-[11px] text-muted-foreground">
-                I agree not to list weapons, drugs, adult items, counterfeit or stolen goods.{" "}
+                I agree not to offer adult services, counterfeit work, academic dishonesty, or anything prohibited.{" "}
                 <button
                   type="button"
                   onClick={() => setProhibitedModalOpen(true)}
@@ -424,7 +410,7 @@ export function NewListingClient({ isVerified, userPhone }: NewListingClientProp
           disabled={submitting || uploadingImage || !confirmAllowed}
           className="w-full h-10 text-sm font-semibold shadow-sm"
         >
-          {submitting ? "Publishing listing..." : "Publish Listing"}
+          {submitting ? "Publishing service..." : "Publish Service Listing"}
         </Button>
       </form>
 

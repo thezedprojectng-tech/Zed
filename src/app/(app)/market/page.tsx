@@ -4,9 +4,9 @@ import { MarketFeedClient } from "./MarketFeedClient";
 import type { MarketCategory } from "@/lib/market/types";
 
 export const metadata: Metadata = {
-  title: "Zed Market | Peer-to-Peer Classifieds",
+  title: "Zed Market | Services Marketplace",
   description:
-    "Direct peer-to-peer marketplace listings for verified Nigerian youth. Connect with sellers on WhatsApp for phones, books, services, and essentials.",
+    "Find and offer services on Zed Market — design, tutoring, tech, photography, repairs, and more. Connect with Nigerian youth on WhatsApp.",
 };
 
 interface MarketPageProps {

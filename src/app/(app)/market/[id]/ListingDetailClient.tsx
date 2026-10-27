@@ -36,7 +36,6 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   CATEGORY_DEFINITIONS,
-  CONDITION_LABELS,
   STATUS_LABELS,
   formatNgnPrice,
   buildWhatsAppLink,
@@ -90,7 +89,6 @@ export function ListingDetailClient({
 
   const images = listing.image_paths && listing.image_paths.length > 0 ? listing.image_paths : [];
   const categoryMeta = CATEGORY_DEFINITIONS[listing.category];
-  const conditionMeta = CONDITION_LABELS[listing.condition];
   const statusMeta = STATUS_LABELS[currentStatus];
 
   const executeRevealContact = async () => {
@@ -270,15 +268,6 @@ export function ListingDetailClient({
                 <span className="text-xs">No photos uploaded for this listing</span>
               </div>
             )}
-
-            {/* Condition overlay */}
-            <div className="absolute top-3 left-3">
-              <span
-                className={`rounded-md px-2.5 py-1 text-xs font-semibold border backdrop-blur-md ${conditionMeta.badgeClass}`}
-              >
-                {conditionMeta.label}
-              </span>
-            </div>
           </div>
 
           {/* Thumbnail Gallery (if > 1 image) */}
@@ -311,8 +300,8 @@ export function ListingDetailClient({
 
           {/* Description Section */}
           <article className="rounded-xl border border-border bg-card p-5 space-y-3 mt-6">
-            <h2 className="text-sm font-semibold tracking-tight text-foreground uppercase tracking-wider text-[11px] text-muted-foreground">
-              Item Description
+            <h2 className="text-sm font-semibold tracking-tight uppercase tracking-wider text-[11px] text-muted-foreground">
+              Service Description
             </h2>
             <div className="text-sm text-foreground/90 whitespace-pre-line leading-relaxed break-words">
               {listing.description}
@@ -344,9 +333,16 @@ export function ListingDetailClient({
             {/* Price */}
             <div className="py-2 border-y border-border/70 flex items-baseline justify-between">
               <span className="text-2xl sm:text-3xl font-extrabold text-foreground tracking-tight">
-                {formatNgnPrice(listing.price_ngn)}
+                {listing.price_ngn === null || listing.price_ngn === undefined
+                  ? "Contact for price"
+                  : listing.price_ngn === 0
+                  ? "Free"
+                  : `Starting from ₦${Number(listing.price_ngn).toLocaleString("en-NG", {
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 2,
+                    })}`}
               </span>
-              <span className="text-xs text-muted-foreground">Fixed / Negotiable</span>
+              <span className="text-xs text-muted-foreground">Service rate</span>
             </div>
 
             {/* Meta attributes */}
@@ -379,7 +375,7 @@ export function ListingDetailClient({
                     <span>{listing.seller_name_masked}</span>
                     <VerifiedBadge isVerified={sellerVerified} />
                   </div>
-                  <div className="text-[11px] text-muted-foreground">Seller</div>
+                  <div className="text-[11px] text-muted-foreground">Service Provider</div>
                 </div>
               </div>
             </div>
@@ -388,13 +384,13 @@ export function ListingDetailClient({
             <div className="space-y-2.5 pt-2">
               {currentStatus !== "active" ? (
                 <div className="rounded-xl border border-zinc-500/20 bg-zinc-500/10 p-3 text-center text-xs text-muted-foreground">
-                  This listing is no longer active ({currentStatus}). Contacting the seller is disabled.
+                  This listing is no longer active ({currentStatus}). Contacting the provider is disabled.
                 </div>
               ) : contactState.revealed && contactState.hasContact && contactState.whatsapp ? (
                 <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4 space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-semibold text-emerald-800 dark:text-emerald-300">
-                      Seller WhatsApp Contact
+                      Provider WhatsApp Contact
                     </span>
                     <button
                       type="button"
@@ -422,7 +418,7 @@ export function ListingDetailClient({
                 </div>
               ) : contactState.revealed && !contactState.hasContact ? (
                 <div className="rounded-xl border border-border bg-muted/40 p-3.5 text-center text-xs text-muted-foreground">
-                  The seller did not provide a WhatsApp number for this listing.
+                  The provider did not provide a WhatsApp number for this listing.
                 </div>
               ) : (
                 <Button
@@ -431,7 +427,7 @@ export function ListingDetailClient({
                   className="w-full h-11 gap-2 bg-[#25D366] hover:bg-[#1EBE5D] text-white font-semibold text-sm shadow-sm"
                 >
                   <WhatsAppIcon className="h-4 w-4" />
-                  <span>{contactState.loading ? "Connecting..." : "Contact seller on WhatsApp"}</span>
+                  <span>{contactState.loading ? "Connecting..." : "Contact provider on WhatsApp"}</span>
                 </Button>
               )}
 
@@ -465,9 +461,9 @@ export function ListingDetailClient({
               {SAFETY_DISCLAIMER}
             </p>
             <ul className="list-disc pl-4 space-y-1 text-muted-foreground text-[11px]">
-              <li>Never send payments in advance, delivery fees, or deposits.</li>
-              <li>Inspect items thoroughly before handing over cash.</li>
-              <li>Always meet in crowded, well-lit campus spots or public plazas.</li>
+              <li>Never pay the full amount before seeing work. Agree terms clearly first.</li>
+              <li>Agree project milestones, deliverables, and timelines in writing.</li>
+              <li>For in-person services, meet in public, well-lit spaces or campus locations.</li>
             </ul>
           </section>
         </section>
@@ -509,13 +505,13 @@ export function ListingDetailClient({
                   <div className="flex items-center space-x-2 rounded-lg border border-border p-2 text-xs">
                     <RadioGroupItem value="scam" id="reason-scam" />
                     <Label htmlFor="reason-scam" className="cursor-pointer flex-1">
-                      Financial scam or suspicious seller behavior
+                      Financial scam or suspicious provider behavior
                     </Label>
                   </div>
                   <div className="flex items-center space-x-2 rounded-lg border border-border p-2 text-xs">
                     <RadioGroupItem value="prohibited" id="reason-prohibited" />
                     <Label htmlFor="reason-prohibited" className="cursor-pointer flex-1">
-                      Prohibited item (weapons, drugs, adult content, stolen goods)
+                      Prohibited service or physical goods (Zed Market is services only)
                     </Label>
                   </div>
                   <div className="flex items-center space-x-2 rounded-lg border border-border p-2 text-xs">
@@ -577,10 +573,10 @@ export function ListingDetailClient({
             <DialogHeader>
               <DialogTitle className="text-base font-semibold text-foreground flex items-center gap-2">
                 <ShieldAlert className="h-5 w-5 text-amber-500" />
-                <span>Unverified Seller Notice</span>
+                <span>Unverified Provider Notice</span>
               </DialogTitle>
               <DialogDescription className="text-xs text-foreground/80 pt-2 leading-relaxed">
-                This seller is not verified. Deal at your own risk. Never pay before you see the item.
+                This provider is not verified. Deal at your own risk. Never pay the full amount before seeing work. Agree terms clearly first.
               </DialogDescription>
             </DialogHeader>
             <DialogFooter className="pt-3 gap-2 sm:gap-2">

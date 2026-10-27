@@ -53,23 +53,23 @@ const TABS = [
   {
     id: "market",
     icon: ShieldCheck,
-    title: "Zed Market & Escrow Gigs",
+    title: "Zed Market (Services Marketplace)",
     description:
-      "Unify peer trading, freelance micro-gigs, and milestone-locked escrow payments released straight to verified Nigerian bank accounts.",
+      "Connect Nigerian youth offering freelance services, tutoring, tech, and creative skills with clients through transparent starting rates and direct WhatsApp contact.",
     preview: {
-      category: "Escrow Gig",
-      flowName: "Brand Identity Gig",
-      step: "Milestone 2 Paid",
+      category: "Service Gig",
+      flowName: "Brand Identity Design",
+      step: "Direct Contact",
       fee: "₦75,000",
-      feeStatus: "Locked in Escrow",
+      feeStatus: "Starting Rate",
       balance: "3,850",
       level: "Lvl 5 Legend",
-      chartTitle: "Escrow Payouts",
-      chartChange: "100% Safe",
+      chartTitle: "Client Inquiries",
+      chartChange: "100% Vetted",
       chartColor: "#8b5cf6",
       chartPath: "M 0 30 Q 30 35, 60 15 T 100 10",
       donutScore: "100%",
-      subNote: "Zero-Fraud Milestone Release",
+      subNote: "Services Marketplace",
     },
   },
 ];
@@ -179,7 +179,7 @@ export function PowerPackSection() {
                   </div>
 
                   <div className="hidden sm:flex items-center gap-1.5 p-1 rounded-full bg-slate-200/60 dark:bg-white/5 font-medium text-[11px] text-zinc-600 dark:text-zinc-400">
-                    {["Overview", "Playbooks", "Academy", "Escrow"].map((item, idx) => (
+                    {["Overview", "Playbooks", "Academy", "Market"].map((item, idx) => (
                       <span
                         key={item}
                         className={`px-3 py-0.5 rounded-full transition-colors ${

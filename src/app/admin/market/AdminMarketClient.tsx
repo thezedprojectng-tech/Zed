@@ -4,19 +4,13 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import {
-  ShieldAlert,
   Search,
   ExternalLink,
   Trash2,
   RotateCcw,
-  AlertTriangle,
   Flag,
-  UserCheck,
-  MapPin,
-  Clock,
   Package,
   CheckCircle2,
-  FileText,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,9 +26,15 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   CATEGORY_DEFINITIONS,
   STATUS_LABELS,
-  CONDITION_LABELS,
   formatNgnPrice,
 } from "@/lib/market/helpers";
 import {
@@ -42,6 +42,7 @@ import {
   adminRestoreListing,
 } from "@/lib/market/admin-actions";
 import type {
+  MarketCategory,
   MarketListing,
   MarketListingWithReports,
   MarketStatus,
@@ -62,6 +63,7 @@ export function AdminMarketClient({
 
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<MarketStatus | "all">("all");
+  const [categoryFilter, setCategoryFilter] = useState<MarketCategory | "all">("all");
 
   const [removeModalTarget, setRemoveModalTarget] = useState<MarketListing | null>(null);
   const [removeReason, setRemoveReason] = useState("");
@@ -70,6 +72,7 @@ export function AdminMarketClient({
 
   const filteredAll = allListings.filter((l) => {
     if (statusFilter !== "all" && l.status !== statusFilter) return false;
+    if (categoryFilter !== "all" && l.category !== categoryFilter) return false;
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       const matchTitle = l.title.toLowerCase().includes(q);
@@ -151,7 +154,7 @@ export function AdminMarketClient({
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Marketplace Moderation</h1>
           <p className="text-xs text-muted-foreground mt-0.5">
-            Review reported listings, moderate prohibited items, and inspect all marketplace activity.
+            Review reported listings, moderate prohibited services and policy violations, and inspect all marketplace activity.
           </p>
         </div>
 
@@ -266,7 +269,7 @@ export function AdminMarketClient({
                           <div className="text-xs font-semibold text-foreground">
                             {formatNgnPrice(listing.price_ngn)} •{" "}
                             <span className="text-muted-foreground font-normal">
-                              Seller: {listing.seller_name_masked} ({listing.location})
+                              Provider: {listing.seller_name_masked} ({listing.location})
                             </span>
                           </div>
 
@@ -344,34 +347,54 @@ export function AdminMarketClient({
       {/* ── Tab 2: All Listings ───────────────────────────────────────────── */}
       {activeTab === "all" && (
         <div className="space-y-4">
-          {/* Search & Status Filter bar */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          {/* Search & Status/Category Filter bar */}
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
             <div className="relative flex-1 max-w-md">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
               <Input
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search by title, location, or seller..."
+                placeholder="Search by title, location, or provider..."
                 className="pl-8 h-9 text-xs"
               />
             </div>
 
-            <div className="flex items-center gap-1.5 text-xs">
-              <span className="text-muted-foreground">Status:</span>
-              {(["all", "active", "sold", "removed"] as const).map((st) => (
-                <button
-                  key={st}
-                  type="button"
-                  onClick={() => setStatusFilter(st)}
-                  className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors border ${
-                    statusFilter === st
-                      ? "bg-primary text-primary-foreground border-primary"
-                      : "bg-card text-muted-foreground border-border hover:text-foreground"
-                  }`}
+            <div className="flex flex-wrap items-center gap-2.5 text-xs">
+              <div className="w-48">
+                <Select
+                  value={categoryFilter}
+                  onValueChange={(val) => setCategoryFilter(val as MarketCategory | "all")}
                 >
-                  {st.charAt(0).toUpperCase() + st.slice(1)}
-                </button>
-              ))}
+                  <SelectTrigger className="h-8 text-xs">
+                    <SelectValue placeholder="All Categories" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Categories</SelectItem>
+                    {Object.values(CATEGORY_DEFINITIONS).map((c) => (
+                      <SelectItem key={c.id} value={c.id}>
+                        {c.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="flex items-center gap-1">
+                {(["all", "active", "sold", "removed"] as const).map((st) => (
+                  <button
+                    key={st}
+                    type="button"
+                    onClick={() => setStatusFilter(st)}
+                    className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors border ${
+                      statusFilter === st
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "bg-card text-muted-foreground border-border hover:text-foreground"
+                    }`}
+                  >
+                    {st.charAt(0).toUpperCase() + st.slice(1)}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 
@@ -381,10 +404,10 @@ export function AdminMarketClient({
               <table className="w-full text-xs text-left">
                 <thead className="bg-muted/50 border-b border-border text-[11px] text-muted-foreground uppercase font-semibold">
                   <tr>
-                    <th className="p-3">Item Title</th>
+                    <th className="p-3">Service Title</th>
                     <th className="p-3">Category</th>
-                    <th className="p-3">Price</th>
-                    <th className="p-3">Seller</th>
+                    <th className="p-3">Starting Price</th>
+                    <th className="p-3">Provider</th>
                     <th className="p-3">Status</th>
                     <th className="p-3">Reports</th>
                     <th className="p-3 text-right">Actions</th>
@@ -493,7 +516,7 @@ export function AdminMarketClient({
                 id="admin-remove-reason"
                 value={removeReason}
                 onChange={(e) => setRemoveReason(e.target.value)}
-                placeholder="e.g. Prohibited item listed (weapons/counterfeit), confirmed scam..."
+                placeholder="e.g. Prohibited service (academic dishonesty, escort), physical goods listing, confirmed scam..."
                 minLength={3}
                 maxLength={500}
                 required

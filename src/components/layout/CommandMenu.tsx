@@ -125,7 +125,7 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
             <div className="flex flex-col flex-1 min-w-0">
               <span className="font-medium text-foreground">Zed Market</span>
               <span className="text-[11px] text-muted-foreground">
-                Buy and sell with verified users — phones, books, services, and more
+                Find and offer services — design, tutoring, tech, photography, repairs, and more
               </span>
             </div>
             <ArrowRight className="h-3.5 w-3.5 text-muted-foreground opacity-60" />

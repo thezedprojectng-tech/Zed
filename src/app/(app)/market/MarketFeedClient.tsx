@@ -99,7 +99,7 @@ export function MarketFeedClient({
   };
 
   const categoriesList: Array<{ id: MarketCategory | "all"; label: string }> = [
-    { id: "all", label: "All Items" },
+    { id: "all", label: "All Services" },
     ...Object.values(CATEGORY_DEFINITIONS).map((c) => ({ id: c.id, label: c.label })),
   ];
 
@@ -130,11 +130,11 @@ export function MarketFeedClient({
             </div>
             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Zed Market</h1>
             <Badge variant="outline" className="border-primary/30 text-primary text-xs ml-1">
-              v1 Verified
+              v1 Services
             </Badge>
           </div>
           <p className="text-sm text-muted-foreground mt-1">
-            Direct peer-to-peer listings for verified Nigerian youth. Contact sellers on WhatsApp.
+            A services marketplace for Nigerian youth. Find designers, tutors, developers, photographers, and more.
           </p>
         </div>
 
@@ -145,7 +145,7 @@ export function MarketFeedClient({
           <Button size="sm" asChild className="h-9 gap-1.5 shadow-sm">
             <Link href="/market/new">
               <Plus className="h-4 w-4" />
-              <span>Post an item</span>
+              <span>Post a service</span>
             </Link>
           </Button>
         </div>
@@ -158,7 +158,7 @@ export function MarketFeedClient({
           <Input
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search phones, notes, fashion, services, location..."
+            placeholder="Search design, tutoring, tech, repairs, photography..."
             className="pl-9 pr-24 h-11 bg-card/80 border-border text-sm"
           />
           {searchTerm && (
@@ -239,8 +239,8 @@ export function MarketFeedClient({
           <h3 className="text-base font-semibold">No listings found</h3>
           <p className="text-sm text-muted-foreground max-w-sm mt-1 mb-5">
             {currentSearch || selectedCategory !== "all"
-              ? "We couldn't find any items matching your active search filters. Try broadening your terms or category."
-              : "No items have been listed in this marketplace yet. Be the first verified seller to post an item!"}
+              ? "We couldn't find any services matching your active search filters. Try broadening your terms or category."
+              : "No services have been listed yet. Be the first verified provider to post a service!"}
           </p>
           <div className="flex gap-2">
             {(currentSearch || selectedCategory !== "all") && (
@@ -249,7 +249,7 @@ export function MarketFeedClient({
               </Button>
             )}
             <Button size="sm" asChild>
-              <Link href="/market/new">Post an item</Link>
+              <Link href="/market/new">Post a service</Link>
             </Button>
           </div>
         </section>

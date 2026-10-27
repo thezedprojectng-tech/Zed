@@ -10,6 +10,7 @@ import {
   X,
   AlertCircle,
   CheckCircle2,
+  ShieldAlert,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,7 +25,7 @@ import {
 } from "@/components/ui/select";
 import {
   CATEGORY_DEFINITIONS,
-  CONDITION_LABELS,
+  PROHIBITED_ITEMS,
 } from "@/lib/market/helpers";
 import {
   MAX_IMAGES_PER_LISTING,
@@ -32,7 +33,7 @@ import {
   ALLOWED_IMAGE_MIME_TYPES,
 } from "@/lib/market/validation";
 import { updateListing, uploadListingImage } from "@/lib/market/actions";
-import type { MarketCategory, MarketCondition, MarketListing } from "@/lib/market/types";
+import type { MarketCategory, MarketListing } from "@/lib/market/types";
 
 interface EditListingClientProps {
   listing: MarketListing;
@@ -45,7 +46,6 @@ export function EditListingClient({ listing, initialWhatsapp }: EditListingClien
   const [title, setTitle] = useState(listing.title);
   const [description, setDescription] = useState(listing.description);
   const [category, setCategory] = useState<MarketCategory>(listing.category);
-  const [condition, setCondition] = useState<MarketCondition>(listing.condition);
   const [priceNgn, setPriceNgn] = useState(listing.price_ngn !== null ? listing.price_ngn.toString() : "");
   const [location, setLocation] = useState(listing.location);
   const [contactWhatsapp, setContactWhatsapp] = useState(initialWhatsapp || "");
@@ -109,7 +109,7 @@ export function EditListingClient({ listing, initialWhatsapp }: EditListingClien
       description,
       category,
       price_ngn: priceNgn ? parseFloat(priceNgn.replace(/,/g, "")) : null,
-      condition,
+      condition: "na",
       location,
       image_paths: uploadedPaths,
       contact_whatsapp: contactWhatsapp.trim() || null,
@@ -163,43 +163,27 @@ export function EditListingClient({ listing, initialWhatsapp }: EditListingClien
           />
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="space-y-1.5">
-            <Label className="text-xs font-semibold">Category</Label>
-            <Select value={category} onValueChange={(val) => setCategory(val as MarketCategory)}>
-              <SelectTrigger className="text-sm">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {Object.values(CATEGORY_DEFINITIONS).map((c) => (
-                  <SelectItem key={c.id} value={c.id}>
-                    {c.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-1.5">
-            <Label className="text-xs font-semibold">Condition</Label>
-            <Select value={condition} onValueChange={(val) => setCondition(val as MarketCondition)}>
-              <SelectTrigger className="text-sm">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {Object.entries(CONDITION_LABELS).map(([key, val]) => (
-                  <SelectItem key={key} value={key}>
-                    {val.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+        <div className="space-y-1.5">
+          <Label className="text-xs font-semibold">Category</Label>
+          <Select value={category} onValueChange={(val) => setCategory(val as MarketCategory)}>
+            <SelectTrigger className="text-sm">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {Object.values(CATEGORY_DEFINITIONS).map((c) => (
+                <SelectItem key={c.id} value={c.id}>
+                  {c.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-1.5">
-            <Label htmlFor="edit-price" className="text-xs font-semibold">Price (₦ NGN)</Label>
+            <Label htmlFor="edit-price" className="text-xs font-semibold">
+              Starting Price (₦)
+            </Label>
             <Input
               id="edit-price"
               type="number"
@@ -210,6 +194,7 @@ export function EditListingClient({ listing, initialWhatsapp }: EditListingClien
               placeholder="Leave blank for 'Contact for price'"
               className="text-sm"
             />
+            <span className="text-[10px] text-muted-foreground">Optional. Leave blank for &apos;Contact for price&apos;.</span>
           </div>
 
           <div className="space-y-1.5">
@@ -301,6 +286,36 @@ export function EditListingClient({ listing, initialWhatsapp }: EditListingClien
             </label>
           )}
         </div>
+
+        {/* ── Marketplace Rules Box (Services Only) ────────────────────────── */}
+        <aside
+          aria-label="Marketplace rules"
+          className="rounded-xl border border-primary/20 bg-primary/5 p-4 space-y-3"
+        >
+          <div className="flex items-center gap-2 text-foreground font-semibold text-xs">
+            <ShieldAlert className="h-4 w-4 text-primary shrink-0" />
+            <span>Marketplace Rules — Services Only</span>
+          </div>
+          <p className="text-xs text-foreground/90 leading-relaxed">
+            Zed Market is strictly for listing <strong>services</strong> (such as design, tech, tutoring, writing, repairs, photography, and event support). Selling physical goods, packaged products, food, or electronics is strictly prohibited.
+          </p>
+          <div className="space-y-1.5 pt-1 border-t border-border/60">
+            <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block">
+              Prohibited on Zed Market:
+            </span>
+            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-[11px] text-muted-foreground">
+              {PROHIBITED_ITEMS.map((item, idx) => (
+                <li key={idx} className="flex items-start gap-1.5">
+                  <span className="text-rose-500 font-bold leading-none mt-1">•</span>
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="text-[11px] text-amber-700 dark:text-amber-300 font-medium pt-1.5 border-t border-border/60">
+            Safety rule: Never pay the full amount before seeing work. Agree terms clearly first.
+          </div>
+        </aside>
 
         <Button type="submit" disabled={submitting || uploadingImage} className="w-full h-10 text-sm font-semibold">
           {submitting ? "Saving changes..." : "Save Changes"}
