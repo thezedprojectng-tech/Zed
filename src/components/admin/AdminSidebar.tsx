@@ -18,6 +18,7 @@ import {
   Briefcase,
   Mail,
   Search,
+  Award,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -30,12 +31,14 @@ interface AdminSidebarProps {
   };
   unreadContactCount?: number;
   pendingInternshipsCount?: number;
+  newAmbassadorsCount?: number;
 }
 
 const navItems = [
   { href: "/admin", label: "Overview", icon: LayoutDashboard, exact: true },
   { href: "/admin/users", label: "Users", icon: Users, exact: false },
   { href: "/admin/contact", label: "Contact Inbox", icon: Mail, exact: false, badgeKey: "contact" },
+  { href: "/admin/ambassadors", label: "Ambassadors", icon: Award, exact: false, badgeKey: "ambassadors" },
   { href: "/admin/internships", label: "Internships", icon: Search, exact: false, badgeKey: "internships" },
   { href: "/admin/careers", label: "Careers", icon: Briefcase, exact: false },
   { href: "/admin/skill", label: "Skill content", icon: GraduationCap, exact: false },
@@ -51,6 +54,7 @@ export function AdminSidebar({
   adminUser,
   unreadContactCount = 0,
   pendingInternshipsCount = 0,
+  newAmbassadorsCount = 0,
 }: AdminSidebarProps) {
   const pathname = usePathname();
 
@@ -109,7 +113,9 @@ export function AdminSidebar({
                   ? unreadContactCount
                   : badgeKey === "internships"
                     ? pendingInternshipsCount
-                    : 0;
+                    : badgeKey === "ambassadors"
+                      ? newAmbassadorsCount
+                      : 0;
               const showBadge = badgeCount > 0;
 
               return (
