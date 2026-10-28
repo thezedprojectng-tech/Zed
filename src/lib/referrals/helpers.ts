@@ -2,6 +2,25 @@
  * Pure helpers for Zed Referrals ("Invite friends")
  */
 
+export const APP_URL =
+  process.env.NEXT_PUBLIC_APP_URL || "https://zedproject.ng";
+
+/**
+ * Ensures that a referral link is absolute. If link starts with "/" and
+ * window exists, prefixes window.location.origin (or APP_URL if no window).
+ */
+export function ensureAbsoluteLink(link: string): string {
+  if (!link) return link;
+  if (link.startsWith("/")) {
+    const origin =
+      typeof window !== "undefined" && window.location?.origin
+        ? window.location.origin
+        : APP_URL;
+    return `${origin.replace(/\/+$/, "")}${link}`;
+  }
+  return link;
+}
+
 /**
  * Masks a user's name showing only the first name and last initial (e.g. "Babatunde A.").
  * Never exposes full surname, phone numbers, or emails.
@@ -33,7 +52,7 @@ export function formatReferralLink(codeOrOrigin: string, originOrCode?: string):
   if (
     code &&
     (code.startsWith("http://") || code.startsWith("https://")) &&
-    originOrCode &&
+    originOrCode !== undefined &&
     !originOrCode.startsWith("http")
   ) {
     origin = codeOrOrigin;
@@ -64,7 +83,8 @@ export function buildWhatsAppShareUrl(linkOrCode: string, codeOrLink?: string): 
     code = "";
   }
 
-  const message = `Join me on Zed! Use my invite link to create your account and earn bonus ZED points once verified: ${link}`;
+  const absoluteLink = ensureAbsoluteLink(link);
+  const message = `Join me on Zed! Use my invite link to create your account and earn bonus ZED points: ${absoluteLink}`;
   return `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
 }
 

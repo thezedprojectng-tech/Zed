@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import {
+  APP_URL,
   formatReferralLink,
   maskUserName,
   mapReferralError,
@@ -126,7 +127,7 @@ export async function getReferralOverview(): Promise<UserReferralOverview | null
   ).length;
 
   const referralCode = profile.referral_code || "";
-  const referralLink = formatReferralLink(referralCode);
+  const referralLink = formatReferralLink(APP_URL, referralCode);
 
   return {
     referralCode,

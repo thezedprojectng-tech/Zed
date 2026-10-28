@@ -21,7 +21,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { WhatsAppIcon } from "@/data/socials";
-import { buildWhatsAppShareUrl } from "@/lib/referrals/helpers";
+import { buildWhatsAppShareUrl, ensureAbsoluteLink } from "@/lib/referrals/helpers";
 import { applyReferralAction } from "@/lib/referrals/actions";
 import type {
   ReferralStatus,
@@ -47,6 +47,8 @@ export function ReferralsClient({ overview }: ReferralsClientProps) {
     isEligibleToEnterCode,
     referredUsers,
   } = overview;
+
+  const absoluteReferralLink = ensureAbsoluteLink(referralLink);
 
   // Auto-apply referral code from localStorage if available and eligible
   useEffect(() => {
@@ -86,7 +88,7 @@ export function ReferralsClient({ overview }: ReferralsClientProps) {
 
   const handleCopyLink = async () => {
     try {
-      await navigator.clipboard.writeText(referralLink);
+      await navigator.clipboard.writeText(absoluteReferralLink);
       setCopiedLink(true);
       toast.success("Referral link copied!");
       setTimeout(() => setCopiedLink(false), 2000);
@@ -229,7 +231,7 @@ export function ReferralsClient({ overview }: ReferralsClientProps) {
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
             <Input
               readOnly
-              value={referralLink}
+              value={absoluteReferralLink}
               className="font-mono text-xs h-10 select-all bg-secondary/30"
             />
             <div className="flex items-center gap-2 shrink-0">
@@ -258,7 +260,7 @@ export function ReferralsClient({ overview }: ReferralsClientProps) {
                 className="flex-1 sm:flex-none h-10 text-xs gap-1.5 bg-[#25D366] hover:bg-[#1EBE5D] text-white"
               >
                 <a
-                  href={buildWhatsAppShareUrl(referralCode, referralLink)}
+                  href={buildWhatsAppShareUrl(referralCode, absoluteReferralLink)}
                   target="_blank"
                   rel="noopener noreferrer"
                 >

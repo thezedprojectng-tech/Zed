@@ -1,7 +1,9 @@
 import { describe, it, expect } from "vitest";
 import {
+  APP_URL,
   maskUserName,
   formatReferralLink,
+  ensureAbsoluteLink,
   buildWhatsAppShareUrl,
   mapReferralError,
 } from "./helpers";
@@ -13,26 +15,50 @@ import type { ReferralStatus } from "./types";
 
 describe("Referrals — Code Format & Helpers", () => {
   it("formats referral links correctly with /signup?ref=CODE", () => {
-    const origin = "https://zed.ng";
+    const origin = "https://zedproject.ng";
     const code = "7K9M2P4X";
     const link = formatReferralLink(origin, code);
-    expect(link).toBe("https://zed.ng/signup?ref=7K9M2P4X");
+    expect(link).toBe("https://zedproject.ng/signup?ref=7K9M2P4X");
   });
 
   it("handles trailing slashes on origin when formatting link", () => {
-    const origin = "https://zed.ng/";
+    const origin = "https://zedproject.ng/";
     const code = "7K9M2P4X";
     const link = formatReferralLink(origin, code);
-    expect(link).toBe("https://zed.ng/signup?ref=7K9M2P4X");
+    expect(link).toBe("https://zedproject.ng/signup?ref=7K9M2P4X");
+  });
+
+  it("formats referral link with absolute server-style call", () => {
+    const code = "7K9M2P4X";
+    const link = formatReferralLink(APP_URL, code);
+    expect(link).toBe(`${APP_URL}/signup?ref=7K9M2P4X`);
   });
 
   it("builds WhatsApp share URL with the invite link and user wording", () => {
-    const url = buildWhatsAppShareUrl("https://zed.ng/signup?ref=7K9M2P4X", "7K9M2P4X");
+    const url = buildWhatsAppShareUrl("https://zedproject.ng/signup?ref=7K9M2P4X", "7K9M2P4X");
     expect(url).toContain("https://api.whatsapp.com/send?text=");
     expect(url).toContain(encodeURIComponent("7K9M2P4X"));
-    expect(url).toContain(encodeURIComponent("https://zed.ng/signup?ref=7K9M2P4X"));
+    expect(url).toContain(encodeURIComponent("https://zedproject.ng/signup?ref=7K9M2P4X"));
+    expect(url).toContain(
+      encodeURIComponent(
+        "Join me on Zed! Use my invite link to create your account and earn bonus ZED points: https://zedproject.ng/signup?ref=7K9M2P4X"
+      )
+    );
+    expect(decodeURIComponent(url)).not.toContain("once verified");
     // Ensure "citizen" is never included in the share copy
     expect(url.toLowerCase()).not.toContain("citizen");
+  });
+});
+
+describe("Referrals — ensureAbsoluteLink", () => {
+  it("converts relative link to absolute link", () => {
+    const relative = "/signup?ref=7K9M2P4X";
+    expect(ensureAbsoluteLink(relative)).toBe(`${APP_URL}/signup?ref=7K9M2P4X`);
+  });
+
+  it("leaves already absolute link unchanged", () => {
+    const existing = "https://zedproject.ng/signup?ref=7K9M2P4X";
+    expect(ensureAbsoluteLink(existing)).toBe(existing);
   });
 });
 
