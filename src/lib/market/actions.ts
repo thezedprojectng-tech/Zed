@@ -279,7 +279,7 @@ export async function reportListing(rawInput: unknown): Promise<{
 }
 
 /**
- * Reveal the seller's WhatsApp number (verified users only; max 30 reveals / 24h).
+ * Reveal the seller's WhatsApp number (max 30 reveals / 24h).
  */
 export async function getListingContact(listingId: string): Promise<{
   success: boolean;

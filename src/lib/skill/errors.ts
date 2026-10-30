@@ -13,9 +13,6 @@ export function mapSkillRpcError(errorMessage?: string | null): string {
     return "Please sign in again.";
   }
 
-  if (msg.includes("not verified")) {
-    return "Verify your account to earn skill points.";
-  }
 
   if (msg.includes("lesson not found") || msg.includes("not found")) {
     return "This lesson is no longer available.";

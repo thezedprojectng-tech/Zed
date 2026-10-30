@@ -57,17 +57,6 @@ export type {
   FlowDifficulty,
 } from "./nav";
 
-// ── Center Reports ────────────────────────────────────────────────────────────
-
-export interface CenterReport {
-  id: string;
-  user_id: string;
-  center_name: string;
-  state: string;
-  wait_minutes: number;
-  reported_at: string;
-}
-
 // ── API Payloads ──────────────────────────────────────────────────────────────
 
 export interface OtpRequestPayload {

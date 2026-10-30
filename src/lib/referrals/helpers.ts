@@ -108,7 +108,7 @@ export function mapReferralError(errorCode?: string | null): string {
     case "ALREADY_REFERRED":
       return "You have already been referred by someone.";
     case "ALREADY_VERIFIED":
-      return "Referral codes can only be linked before account verification.";
+      return "This account is already verified and can no longer link a referral code.";
     case "ACCOUNT_TOO_OLD":
       return "Referral codes must be applied within 7 days of registration.";
     case "NOT_AUTHENTICATED":
@@ -117,7 +117,7 @@ export function mapReferralError(errorCode?: string | null): string {
       return "User account could not be found.";
     default:
       if (code.includes("SELF")) return "You cannot refer your own account.";
-      if (code.includes("VERIFIED")) return "Referral codes can only be linked before account verification.";
+      if (code.includes("VERIFIED")) return "This account is already verified and can no longer link a referral code.";
       if (code.includes("ALREADY")) return "You have already been referred by someone.";
       return "Could not apply referral code. Please try again.";
   }

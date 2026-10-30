@@ -62,7 +62,7 @@ export function ReferralsClient({ overview }: ReferralsClientProps) {
             const res = await applyReferralAction(parsed.code);
             localStorage.removeItem("zed_ref_code");
             if (res.ok) {
-              toast.success("Referral code linked! Welcome reward will activate once verified.");
+              toast.success("Referral code linked! Your reward is paid when you make your first mining claim.");
               router.refresh();
             }
           });
@@ -110,7 +110,7 @@ export function ReferralsClient({ overview }: ReferralsClientProps) {
         toast.error(res.error);
         return;
       }
-      toast.success("Referral code linked! Your bonus will be credited once you verify your account.");
+      toast.success("Referral code linked! Your reward is paid when you make your first mining claim.");
       setManualCode("");
       router.refresh();
     });
@@ -124,7 +124,7 @@ export function ReferralsClient({ overview }: ReferralsClientProps) {
             variant="outline"
             className="border-amber-500/30 bg-amber-500/10 text-amber-500 font-mono text-[10px] uppercase font-semibold"
           >
-            Pending Verification
+            Pending first claim
           </Badge>
         );
       case "rewarded":
@@ -286,14 +286,14 @@ export function ReferralsClient({ overview }: ReferralsClientProps) {
             {stats.totalInvited}
           </p>
           <p className="font-mono text-[11px] text-muted-foreground mt-0.5">
-            {stats.pendingCount} awaiting verification
+            {stats.pendingCount} awaiting first claim
           </p>
         </Card>
 
         <Card className="p-4 border-border bg-card shadow-xs">
           <div className="flex items-center justify-between">
             <span className="font-mono text-[10px] uppercase text-muted-foreground">
-              Verified & Rewarded
+              Rewarded
             </span>
             <ShieldCheck className="h-4 w-4 text-emerald-500" />
           </div>
@@ -316,7 +316,7 @@ export function ReferralsClient({ overview }: ReferralsClientProps) {
             {stats.totalEarnedZed.toLocaleString()} $ZED
           </p>
           <p className="font-mono text-[11px] text-muted-foreground mt-0.5">
-            +{settings.referrer_reward_zed} ZED per verified user
+            +{settings.referrer_reward_zed} ZED per friend who starts mining
           </p>
         </Card>
       </section>
@@ -331,7 +331,7 @@ export function ReferralsClient({ overview }: ReferralsClientProps) {
                 Were you invited by a friend?
               </h3>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Enter your friend&apos;s referral code before verifying your account to link your bonus. Both you and your referrer will be rewarded once your verification is complete.
+                Enter your friend&apos;s referral code before your first mining claim. You and your referrer will both be rewarded after your first claim.
               </p>
             </div>
           </div>

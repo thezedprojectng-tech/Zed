@@ -181,9 +181,6 @@ export function mapMarketError(error: unknown): string {
   if (!error) return "An unexpected error occurred. Please try again.";
   const msg = typeof error === "string" ? error : (error as { message?: string }).message || "";
 
-  if (msg.includes("Only verified users")) {
-    return "Only verified users can access this feature. Please verify your profile first.";
-  }
   if (msg.includes("maximum of 10 active listings") || msg.includes("limit of 10 active listings")) {
     return "You have reached the maximum limit of 10 active listings. Please mark completed items as sold or delete inactive ones.";
   }

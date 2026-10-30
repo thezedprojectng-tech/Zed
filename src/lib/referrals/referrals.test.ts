@@ -99,7 +99,7 @@ describe("Referrals — Error Code Mapping", () => {
       "You have already been referred by someone."
     );
     expect(mapReferralError("ALREADY_VERIFIED")).toBe(
-      "Referral codes can only be linked before account verification."
+      "This account is already verified and can no longer link a referral code."
     );
     expect(mapReferralError("ACCOUNT_TOO_OLD")).toBe(
       "Referral codes must be applied within 7 days of registration."

@@ -5,7 +5,7 @@ export const LEVELS: Level[] = [
   {
     id: 1,
     name: "Zed Rookie",
-    unlock_criteria: "Default level – complete phone verification",
+    unlock_criteria: "Default level",
   },
   {
     id: 2,

@@ -240,7 +240,7 @@ export function MarketFeedClient({
           <p className="text-sm text-muted-foreground max-w-sm mt-1 mb-5">
             {currentSearch || selectedCategory !== "all"
               ? "We couldn't find any services matching your active search filters. Try broadening your terms or category."
-              : "No services have been listed yet. Be the first verified provider to post a service!"}
+              : "No services have been listed yet. Be the first to post a service!"}
           </p>
           <div className="flex gap-2">
             {(currentSearch || selectedCategory !== "all") && (

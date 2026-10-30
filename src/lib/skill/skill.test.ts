@@ -247,12 +247,6 @@ describe("mapSkillRpcError", () => {
     expect(mapSkillRpcError("Error: user not authenticated")).toBe("Please sign in again.");
   });
 
-  it("maps 'not verified' to 'Verify your account to earn skill points.'", () => {
-    expect(
-      mapSkillRpcError("User is not verified. Account must be verified to complete lessons.")
-    ).toBe("Verify your account to earn skill points.");
-    expect(mapSkillRpcError("Not verified")).toBe("Verify your account to earn skill points.");
-  });
 
   it("maps 'lesson not found' to 'This lesson is no longer available.'", () => {
     expect(mapSkillRpcError("Lesson not found")).toBe("This lesson is no longer available.");

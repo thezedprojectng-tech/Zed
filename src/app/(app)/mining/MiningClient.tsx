@@ -66,7 +66,6 @@ const TURNSTILE_MESSAGES: Record<string, string> = {
 
 const CLAIM_MESSAGES: Record<string, string> = {
   ALREADY_CLAIMED: "You've already claimed today. Come back tomorrow!",
-  NOT_VERIFIED: "Verify your NIN first to start mining.",
   NOT_SIGNED_IN: "Sign in to claim your $ZED.",
   INTERNAL: "Something went wrong. Please try again.",
   ...TURNSTILE_MESSAGES,
@@ -402,7 +401,7 @@ export function MiningClient({
                     )}
                   </div>
                   <p className="type-small text-muted-foreground mt-0.5 truncate">
-                    {isLocked ? lvl.unlockCriteria : "Active – verified account."}
+                    {isLocked ? lvl.unlockCriteria : "Active."}
                   </p>
                 </div>
 

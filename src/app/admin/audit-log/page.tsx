@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 
 interface AuditLogRow {
   id: string;
-  admin_id: string;
+  admin_id: string | null;
   action: string;
   target_type: string;
   target_id: string | null;
@@ -171,7 +171,9 @@ CREATE POLICY "admin_audit_log: insert"
             <tbody className="divide-y divide-border/60">
               {logList.map((entry) => {
                 const badge = getActionBadge(entry.action);
-                const adminName = entry.admin_user?.full_name || "Administrator";
+                const adminName = !entry.admin_id
+                  ? "Deleted admin"
+                  : entry.admin_user?.full_name || "Administrator";
 
                 return (
                   <tr key={entry.id} className="hover:bg-secondary/30 transition-colors">
