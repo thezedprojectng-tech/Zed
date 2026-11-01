@@ -19,6 +19,7 @@ const COMPANY_LINKS = [
   { href: "/about", label: "About Zed" },
   { href: "/fund", label: "Fund Your Idea" },
   { href: "/ambassadors", label: "Campus Ambassadors" },
+  { href: "/mentorship", label: "Mentorship" },
   { href: "/whitepaper", label: "White Paper" },
   { href: "/careers", label: "Careers" },
   { href: "/privacy", label: "Privacy Policy" },

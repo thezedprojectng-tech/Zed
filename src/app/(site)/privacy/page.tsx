@@ -102,6 +102,9 @@ export default function PrivacyPolicyPage() {
               <strong>Campus Ambassador Applications:</strong> When applying to become a Campus Ambassador, we collect your full name, email address, phone/WhatsApp number, educational institution, state, course of study, level/year, optional social media handle, application motivation, and a salted SHA-256 hash of your network IP address to prevent abuse. This information is processed solely for evaluating and administering ambassador appointments.
             </li>
             <li>
+              <strong>Mentorship Applications:</strong> When applying to the Zed Mentorship programme, we collect your full name, email address, phone/WhatsApp number, location (state or city), current status, optional institution name, area of interest, experience level, goals, availability, preferred format, and a salted SHA-256 hash of your network IP address to prevent abuse. This information is processed solely for evaluating and administering mentorship arrangements. Applications are reviewed by authorized Zed team members only; applicant data is never sold or shared publicly.
+            </li>
+            <li>
               <strong>Internship Radar Leads:</strong> When you submit an internship or opportunity lead, we store your account user ID internally so administrators can review the submission. Submitter IDs are private and are never exposed publicly or to other users.
             </li>
             <li>

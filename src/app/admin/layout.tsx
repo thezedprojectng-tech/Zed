@@ -82,6 +82,18 @@ export default async function AdminLayout({
     newAmbassadorsCount = 0;
   }
 
+  // 6. Fetch new mentorship applications count (safely fallback to 0)
+  let newMentorshipCount = 0;
+  try {
+    const { count } = await admin
+      .from("mentorship_applications")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "new");
+    newMentorshipCount = count ?? 0;
+  } catch {
+    newMentorshipCount = 0;
+  }
+
   return (
     <div className="flex min-h-dvh w-full bg-background text-foreground antialiased font-sans selection:bg-amber-500/20 selection:text-amber-500">
       {/* Dedicated Admin Sidebar */}
@@ -90,6 +102,7 @@ export default async function AdminLayout({
         unreadContactCount={unreadContactCount}
         pendingInternshipsCount={pendingInternshipsCount}
         newAmbassadorsCount={newAmbassadorsCount}
+        newMentorshipCount={newMentorshipCount}
       />
 
       {/* Main Console Content */}
