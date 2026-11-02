@@ -66,10 +66,7 @@ export const mentorshipApplicationSchema = z.object({
         .max(120, "Location cannot exceed 120 characters")
     ),
   age: z
-    .number({
-      required_error: "Please enter your age",
-      invalid_type_error: "Age must be a number",
-    })
+    .number({ message: "Please enter your age" })
     .int("Age must be a whole number")
     .min(21, "You must be at least 21 years old to apply")
     .max(100, "Please enter a valid age"),
