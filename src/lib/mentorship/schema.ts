@@ -18,25 +18,6 @@ export const MENTORSHIP_STATUSES = [
 
 export type MentorshipStatus = (typeof MENTORSHIP_STATUSES)[number];
 
-export const CURRENT_STATUS_OPTIONS = [
-  { value: "student", label: "Student" },
-  { value: "graduate", label: "Graduate" },
-  { value: "employed", label: "Employed" },
-  { value: "job_seeker", label: "Job Seeker" },
-  { value: "other", label: "Other" },
-] as const;
-
-export const INTEREST_AREA_OPTIONS = [
-  { value: "frontend", label: "Frontend Development" },
-  { value: "backend", label: "Backend Development" },
-  { value: "mobile", label: "Mobile Development" },
-  { value: "ui_ux", label: "UI/UX Design" },
-  { value: "data", label: "Data & Analytics" },
-  { value: "cybersecurity", label: "Cybersecurity" },
-  { value: "product", label: "Product Management" },
-  { value: "other", label: "Other" },
-] as const;
-
 export const EXPERIENCE_LEVEL_OPTIONS = [
   { value: "beginner", label: "Beginner (no prior experience)" },
   { value: "some", label: "Some experience (learning on my own)" },
@@ -84,23 +65,47 @@ export const mentorshipApplicationSchema = z.object({
         .min(2, "Location must be at least 2 characters")
         .max(120, "Location cannot exceed 120 characters")
     ),
-  currentStatus: z.enum(
-    ["student", "graduate", "employed", "job_seeker", "other"],
-    { message: "Please select your current status" }
-  ),
+  age: z
+    .number({
+      required_error: "Please enter your age",
+      invalid_type_error: "Age must be a number",
+    })
+    .int("Age must be a whole number")
+    .min(21, "You must be at least 21 years old to apply")
+    .max(100, "Please enter a valid age"),
   institution: z
     .string()
     .transform((val) => stripControlCharacters(val.trim()))
-    .pipe(z.string().max(120, "Institution cannot exceed 120 characters"))
-    .optional()
-    .or(z.literal("")),
-  interestArea: z.enum(
-    ["frontend", "backend", "mobile", "ui_ux", "data", "cybersecurity", "product", "other"],
-    { message: "Please select your area of interest" }
-  ),
+    .pipe(
+      z
+        .string()
+        .min(2, "University name must be at least 2 characters")
+        .max(120, "University name cannot exceed 120 characters")
+    ),
+  isStudent: z
+    .boolean()
+    .refine((val) => val === true, "You must confirm you are currently a university student"),
+  interestArea: z
+    .string()
+    .transform((val) => stripControlCharacters(val.trim()))
+    .pipe(
+      z
+        .string()
+        .min(2, "Please describe your area of interest (at least 2 characters)")
+        .max(100, "Area of interest cannot exceed 100 characters")
+    ),
   experienceLevel: z.enum(["beginner", "some", "intermediate"], {
     message: "Please select your experience level",
   }),
+  skills: z
+    .string()
+    .transform((val) => stripControlCharacters(val.trim()))
+    .pipe(
+      z
+        .string()
+        .min(2, "Please list at least one skill you already have")
+        .max(300, "Skills cannot exceed 300 characters")
+    ),
   goals: z
     .string()
     .transform((val) => stripControlCharacters(val.trim()))
@@ -137,10 +142,12 @@ export interface MentorshipApplicationRow {
   email: string;
   phone: string;
   location: string;
+  age: number;
   current_status: string;
-  institution: string | null;
+  institution: string;
   interest_area: string;
   experience_level: string;
+  skills: string;
   goals: string;
   availability: string;
   preferred_format: string;

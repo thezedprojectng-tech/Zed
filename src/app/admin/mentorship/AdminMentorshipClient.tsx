@@ -20,6 +20,8 @@ import {
   Calendar,
   Save,
   MessageSquare,
+  GraduationCap,
+  Wrench,
 } from "lucide-react";
 import {
   type MentorshipApplicationRow,
@@ -186,7 +188,7 @@ export function AdminMentorshipClient({
             <span>Mentorship Applications</span>
           </h1>
           <p className="font-sans text-xs sm:text-sm text-muted-foreground">
-            Review and manage incoming mentorship applications across software, design, data, and product.
+            Review and manage incoming mentorship applications from university students.
           </p>
         </div>
 
@@ -243,7 +245,7 @@ export function AdminMentorshipClient({
         <div className="relative w-full sm:w-64">
           <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
           <Input
-            placeholder="Search applicant or interest..."
+            placeholder="Search applicant, interest or location..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             onKeyDown={(e) => {
@@ -305,7 +307,7 @@ export function AdminMentorshipClient({
                     <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
                       <span className="inline-flex items-center gap-1 font-medium text-foreground">
                         <BookOpen className="h-3.5 w-3.5 text-primary" />
-                        <span className="capitalize">{app.interest_area.replace("_", " ")}</span>
+                        <span>{app.interest_area}</span>
                       </span>
                       <span>•</span>
                       <span className="capitalize">{app.experience_level}</span>
@@ -381,8 +383,8 @@ export function AdminMentorshipClient({
                 <SheetTitle className="text-lg font-bold text-foreground">
                   {selectedApp.full_name}
                 </SheetTitle>
-                <SheetDescription className="text-xs text-muted-foreground capitalize">
-                  {selectedApp.interest_area.replace("_", " ")} — {selectedApp.location}
+                <SheetDescription className="text-xs text-muted-foreground">
+                  {selectedApp.interest_area} — {selectedApp.location}
                 </SheetDescription>
               </SheetHeader>
 
@@ -449,11 +451,9 @@ export function AdminMentorshipClient({
                   <div className="space-y-1">
                     <span className="text-muted-foreground flex items-center gap-1">
                       <Users className="h-3.5 w-3.5" />
-                      Current Status
+                      Age
                     </span>
-                    <p className="font-medium text-foreground capitalize">
-                      {selectedApp.current_status.replace("_", " ")}
-                    </p>
+                    <p className="font-medium text-foreground">{selectedApp.age}</p>
                   </div>
                 </div>
 
@@ -463,9 +463,7 @@ export function AdminMentorshipClient({
                       <BookOpen className="h-3.5 w-3.5" />
                       Area of Interest
                     </span>
-                    <p className="font-medium text-foreground capitalize">
-                      {selectedApp.interest_area.replace("_", " ")}
-                    </p>
+                    <p className="font-medium text-foreground">{selectedApp.interest_area}</p>
                   </div>
 
                   <div className="space-y-1">
@@ -479,10 +477,21 @@ export function AdminMentorshipClient({
                   </div>
                 </div>
 
-                {selectedApp.institution && (
+                <div className="space-y-1">
+                  <span className="text-muted-foreground flex items-center gap-1">
+                    <GraduationCap className="h-3.5 w-3.5" />
+                    University
+                  </span>
+                  <p className="font-medium text-foreground">{selectedApp.institution}</p>
+                </div>
+
+                {selectedApp.skills && (
                   <div className="space-y-1">
-                    <span className="text-muted-foreground">Educational Institution</span>
-                    <p className="font-medium text-foreground">{selectedApp.institution}</p>
+                    <span className="text-muted-foreground flex items-center gap-1">
+                      <Wrench className="h-3.5 w-3.5" />
+                      Skills
+                    </span>
+                    <p className="font-medium text-foreground">{selectedApp.skills}</p>
                   </div>
                 )}
 
@@ -605,4 +614,3 @@ export function AdminMentorshipClient({
     </div>
   );
 }
-

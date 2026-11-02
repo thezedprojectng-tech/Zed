@@ -8,8 +8,6 @@ import { toast } from "sonner";
 import {
   mentorshipApplicationSchema,
   type MentorshipApplicationInput,
-  CURRENT_STATUS_OPTIONS,
-  INTEREST_AREA_OPTIONS,
   EXPERIENCE_LEVEL_OPTIONS,
   PREFERRED_FORMAT_OPTIONS,
 } from "@/lib/mentorship/schema";
@@ -23,15 +21,20 @@ import {
 } from "@/components/ui/select";
 
 export function MentorshipForm() {
-  const [formData, setFormData] = useState<Partial<MentorshipApplicationInput>>({
+  const [formData, setFormData] = useState<
+    Partial<MentorshipApplicationInput> & { ageRaw: string }
+  >({
     fullName: "",
     email: "",
     phone: "",
     location: "",
-    currentStatus: undefined,
+    age: undefined,
+    ageRaw: "",
     institution: "",
-    interestArea: undefined,
+    isStudent: false,
+    interestArea: "",
     experienceLevel: undefined,
+    skills: "",
     goals: "",
     availability: "",
     preferredFormat: undefined,
@@ -52,14 +55,15 @@ export function MentorshipForm() {
   const isProd = process.env.NODE_ENV === "production";
 
   const handleChange = (
-    field: keyof MentorshipApplicationInput,
-    value: string | boolean
+    field: keyof MentorshipApplicationInput | "ageRaw",
+    value: string | boolean | number
   ) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
-    if (fieldErrors[field]) {
+    const schemaKey = field === "ageRaw" ? "age" : field;
+    if (fieldErrors[schemaKey]) {
       setFieldErrors((prev) => {
         const next = { ...prev };
-        delete next[field];
+        delete next[schemaKey];
         return next;
       });
     }
@@ -72,6 +76,7 @@ export function MentorshipForm() {
 
     const candidateData = {
       ...formData,
+      age: formData.ageRaw !== "" ? Number(formData.ageRaw) : undefined,
       turnstileToken: turnstileToken || (isProd ? "" : "bypass"),
     };
 
@@ -145,10 +150,13 @@ export function MentorshipForm() {
                 email: "",
                 phone: "",
                 location: "",
-                currentStatus: undefined,
+                age: undefined,
+                ageRaw: "",
                 institution: "",
-                interestArea: undefined,
+                isStudent: false,
+                interestArea: "",
                 experienceLevel: undefined,
+                skills: "",
                 goals: "",
                 availability: "",
                 preferredFormat: undefined,
@@ -297,66 +305,34 @@ export function MentorshipForm() {
           )}
         </div>
 
-        {/* Current Status — shadcn Select */}
+        {/* Age */}
         <div className="space-y-1.5">
           <label
-            htmlFor="mentorship_current_status"
+            htmlFor="mentorship_age"
             className="block font-sans text-xs font-semibold text-foreground"
           >
-            Current Status <span className="text-destructive">*</span>
-          </label>
-          <Select
-            value={formData.currentStatus || ""}
-            onValueChange={(val) => handleChange("currentStatus", val)}
-          >
-            <SelectTrigger
-              id="mentorship_current_status"
-              className={`w-full rounded-lg border bg-background px-3.5 py-2.5 font-sans text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
-                fieldErrors.currentStatus
-                  ? "border-destructive ring-1 ring-destructive"
-                  : "border-input"
-              }`}
-            >
-              <SelectValue placeholder="Select your current status" />
-            </SelectTrigger>
-            <SelectContent position="popper">
-              {CURRENT_STATUS_OPTIONS.map((opt) => (
-                <SelectItem key={opt.value} value={opt.value}>
-                  {opt.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {fieldErrors.currentStatus && (
-            <p className="font-sans text-xs text-destructive">{fieldErrors.currentStatus}</p>
-          )}
-        </div>
-
-        {/* Institution (Optional) */}
-        <div className="space-y-1.5">
-          <label
-            htmlFor="mentorship_institution"
-            className="block font-sans text-xs font-semibold text-foreground"
-          >
-            Educational Institution{" "}
-            <span className="text-muted-foreground font-normal">(Optional)</span>
+            Age <span className="text-destructive">*</span>
           </label>
           <input
-            id="mentorship_institution"
-            type="text"
-            placeholder="e.g. University of Lagos (if applicable)"
-            value={formData.institution || ""}
-            onChange={(e) => handleChange("institution", e.target.value)}
+            id="mentorship_age"
+            type="number"
+            required
+            min={21}
+            max={100}
+            inputMode="numeric"
+            placeholder="e.g. 22"
+            value={formData.ageRaw || ""}
+            onChange={(e) => handleChange("ageRaw", e.target.value)}
             className={`w-full rounded-lg border bg-background px-3.5 py-2.5 font-sans text-sm text-foreground placeholder:text-muted-foreground/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
-              fieldErrors.institution ? "border-destructive ring-1 ring-destructive" : "border-input"
+              fieldErrors.age ? "border-destructive ring-1 ring-destructive" : "border-input"
             }`}
           />
-          {fieldErrors.institution && (
-            <p className="font-sans text-xs text-destructive">{fieldErrors.institution}</p>
+          {fieldErrors.age && (
+            <p className="font-sans text-xs text-destructive">{fieldErrors.age}</p>
           )}
         </div>
 
-        {/* Area of Interest — shadcn Select */}
+        {/* Area of Interest — free text */}
         <div className="space-y-1.5">
           <label
             htmlFor="mentorship_interest_area"
@@ -364,28 +340,17 @@ export function MentorshipForm() {
           >
             Area of Interest <span className="text-destructive">*</span>
           </label>
-          <Select
+          <input
+            id="mentorship_interest_area"
+            type="text"
+            required
+            placeholder="e.g. web development, data analysis, UI design"
             value={formData.interestArea || ""}
-            onValueChange={(val) => handleChange("interestArea", val)}
-          >
-            <SelectTrigger
-              id="mentorship_interest_area"
-              className={`w-full rounded-lg border bg-background px-3.5 py-2.5 font-sans text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
-                fieldErrors.interestArea
-                  ? "border-destructive ring-1 ring-destructive"
-                  : "border-input"
-              }`}
-            >
-              <SelectValue placeholder="Select primary interest area" />
-            </SelectTrigger>
-            <SelectContent position="popper">
-              {INTEREST_AREA_OPTIONS.map((opt) => (
-                <SelectItem key={opt.value} value={opt.value}>
-                  {opt.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            onChange={(e) => handleChange("interestArea", e.target.value)}
+            className={`w-full rounded-lg border bg-background px-3.5 py-2.5 font-sans text-sm text-foreground placeholder:text-muted-foreground/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
+              fieldErrors.interestArea ? "border-destructive ring-1 ring-destructive" : "border-input"
+            }`}
+          />
           {fieldErrors.interestArea && (
             <p className="font-sans text-xs text-destructive">{fieldErrors.interestArea}</p>
           )}
@@ -451,7 +416,7 @@ export function MentorshipForm() {
         </div>
 
         {/* Preferred Format — shadcn Select */}
-        <div className="space-y-1.5">
+        <div className="space-y-1.5 sm:col-span-2">
           <label
             htmlFor="mentorship_preferred_format"
             className="block font-sans text-xs font-semibold text-foreground"
@@ -486,6 +451,33 @@ export function MentorshipForm() {
         </div>
       </div>
 
+      {/* Your skills */}
+      <div className="space-y-1.5">
+        <label
+          htmlFor="mentorship_skills"
+          className="block font-sans text-xs font-semibold text-foreground"
+        >
+          Your Skills <span className="text-destructive">*</span>
+        </label>
+        <p className="font-sans text-xs text-muted-foreground">
+          List at least one skill you already have.
+        </p>
+        <input
+          id="mentorship_skills"
+          type="text"
+          required
+          placeholder="e.g. HTML, Python basics, Figma, Microsoft Excel"
+          value={formData.skills || ""}
+          onChange={(e) => handleChange("skills", e.target.value)}
+          className={`w-full rounded-lg border bg-background px-3.5 py-2.5 font-sans text-sm text-foreground placeholder:text-muted-foreground/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
+            fieldErrors.skills ? "border-destructive ring-1 ring-destructive" : "border-input"
+          }`}
+        />
+        {fieldErrors.skills && (
+          <p className="font-sans text-xs text-destructive">{fieldErrors.skills}</p>
+        )}
+      </div>
+
       {/* Goals with character counter */}
       <div className="space-y-1.5">
         <div className="flex items-center justify-between">
@@ -512,6 +504,55 @@ export function MentorshipForm() {
         />
         {fieldErrors.goals && (
           <p className="font-sans text-xs text-destructive">{fieldErrors.goals}</p>
+        )}
+      </div>
+
+      {/* University section */}
+      <div className="space-y-4 rounded-lg border border-border bg-secondary/20 p-4">
+        <p className="font-sans text-xs font-semibold text-foreground">
+          University Details <span className="text-destructive">*</span>
+        </p>
+
+        {/* University name */}
+        <div className="space-y-1.5">
+          <label
+            htmlFor="mentorship_institution"
+            className="block font-sans text-xs font-semibold text-foreground"
+          >
+            University <span className="text-destructive">*</span>
+          </label>
+          <input
+            id="mentorship_institution"
+            type="text"
+            required
+            placeholder="e.g. University of Lagos"
+            value={formData.institution || ""}
+            onChange={(e) => handleChange("institution", e.target.value)}
+            className={`w-full rounded-lg border bg-background px-3.5 py-2.5 font-sans text-sm text-foreground placeholder:text-muted-foreground/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
+              fieldErrors.institution ? "border-destructive ring-1 ring-destructive" : "border-input"
+            }`}
+          />
+          {fieldErrors.institution && (
+            <p className="font-sans text-xs text-destructive">{fieldErrors.institution}</p>
+          )}
+        </div>
+
+        {/* Student confirmation checkbox */}
+        <label className="flex items-start gap-3 cursor-pointer select-none">
+          <input
+            type="checkbox"
+            required
+            checked={formData.isStudent || false}
+            onChange={(e) => handleChange("isStudent", e.target.checked)}
+            className="mt-0.5 h-4 w-4 rounded border-input text-primary focus:ring-primary cursor-pointer"
+          />
+          <span className="font-sans text-xs text-foreground leading-normal">
+            I am currently a student at a university{" "}
+            <span className="text-destructive">*</span>
+          </span>
+        </label>
+        {fieldErrors.isStudent && (
+          <p className="font-sans text-xs text-destructive">{fieldErrors.isStudent}</p>
         )}
       </div>
 
@@ -579,4 +620,3 @@ export function MentorshipForm() {
     </form>
   );
 }
-

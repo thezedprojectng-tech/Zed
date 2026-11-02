@@ -11,10 +11,12 @@ describe("Mentorship — Schema Validation", () => {
     email: "chidinma@example.com",
     phone: "+2348098765432",
     location: "Lagos, Nigeria",
-    currentStatus: "student" as const,
+    age: 22,
     institution: "University of Lagos",
-    interestArea: "frontend" as const,
+    isStudent: true,
+    interestArea: "web development",
     experienceLevel: "beginner" as const,
+    skills: "HTML, CSS, basic Python",
     goals:
       "I want to build modern web applications and eventually contribute to open source projects.",
     availability: "Weekends and evenings",
@@ -29,8 +31,11 @@ describe("Mentorship — Schema Validation", () => {
       expect(res.data.fullName).toBe("Chidinma Okafor");
       expect(res.data.email).toBe("chidinma@example.com");
       expect(res.data.consent).toBe(true);
-      expect(res.data.currentStatus).toBe("student");
-      expect(res.data.interestArea).toBe("frontend");
+      expect(res.data.age).toBe(22);
+      expect(res.data.institution).toBe("University of Lagos");
+      expect(res.data.isStudent).toBe(true);
+      expect(res.data.interestArea).toBe("web development");
+      expect(res.data.skills).toBe("HTML, CSS, basic Python");
     }
   });
 
@@ -90,20 +95,133 @@ describe("Mentorship — Schema Validation", () => {
     expect(res.success).toBe(false);
   });
 
-  it("rejects invalid currentStatus enum values", () => {
+  // Age validation
+  it("rejects applicants under 21", () => {
     const res = mentorshipApplicationSchema.safeParse({
       ...validPayload,
-      currentStatus: "freelancer",
+      age: 20,
+    });
+    expect(res.success).toBe(false);
+    if (!res.success) {
+      expect(res.error.issues[0]?.path).toContain("age");
+      expect(res.error.issues[0]?.message).toMatch(/21/);
+    }
+  });
+
+  it("accepts applicants who are exactly 21", () => {
+    const res = mentorshipApplicationSchema.safeParse({
+      ...validPayload,
+      age: 21,
+    });
+    expect(res.success).toBe(true);
+  });
+
+  it("rejects age above 100", () => {
+    const res = mentorshipApplicationSchema.safeParse({
+      ...validPayload,
+      age: 101,
     });
     expect(res.success).toBe(false);
   });
 
-  it("rejects invalid interestArea enum values", () => {
+  it("rejects missing age", () => {
+    const { age: _age, ...rest } = validPayload;
+    const res = mentorshipApplicationSchema.safeParse(rest);
+    expect(res.success).toBe(false);
+  });
+
+  // Skills validation
+  it("rejects empty skills", () => {
     const res = mentorshipApplicationSchema.safeParse({
       ...validPayload,
-      interestArea: "gaming",
+      skills: "",
     });
     expect(res.success).toBe(false);
+    if (!res.success) {
+      expect(res.error.issues.some((i) => i.path.includes("skills"))).toBe(true);
+    }
+  });
+
+  it("rejects whitespace-only skills", () => {
+    const res = mentorshipApplicationSchema.safeParse({
+      ...validPayload,
+      skills: "  ",
+    });
+    expect(res.success).toBe(false);
+  });
+
+  it("rejects skills exceeding 300 characters", () => {
+    const res = mentorshipApplicationSchema.safeParse({
+      ...validPayload,
+      skills: "A".repeat(301),
+    });
+    expect(res.success).toBe(false);
+  });
+
+  // University / isStudent validation
+  it("rejects missing institution", () => {
+    const { institution: _inst, ...rest } = validPayload;
+    const res = mentorshipApplicationSchema.safeParse(rest);
+    expect(res.success).toBe(false);
+  });
+
+  it("rejects institution shorter than 2 characters", () => {
+    const res = mentorshipApplicationSchema.safeParse({
+      ...validPayload,
+      institution: "A",
+    });
+    expect(res.success).toBe(false);
+  });
+
+  it("rejects isStudent = false", () => {
+    const res = mentorshipApplicationSchema.safeParse({
+      ...validPayload,
+      isStudent: false,
+    });
+    expect(res.success).toBe(false);
+    if (!res.success) {
+      expect(res.error.issues.some((i) => i.path.includes("isStudent"))).toBe(true);
+    }
+  });
+
+  it("rejects missing isStudent field", () => {
+    const { isStudent: _is, ...rest } = validPayload;
+    const res = mentorshipApplicationSchema.safeParse(rest);
+    expect(res.success).toBe(false);
+  });
+
+  // Free-text interest area validation
+  it("accepts free-text interest area", () => {
+    const res = mentorshipApplicationSchema.safeParse({
+      ...validPayload,
+      interestArea: "data science and machine learning",
+    });
+    expect(res.success).toBe(true);
+  });
+
+  it("rejects interest area shorter than 2 characters", () => {
+    const res = mentorshipApplicationSchema.safeParse({
+      ...validPayload,
+      interestArea: "x",
+    });
+    expect(res.success).toBe(false);
+  });
+
+  it("rejects interest area longer than 100 characters", () => {
+    const res = mentorshipApplicationSchema.safeParse({
+      ...validPayload,
+      interestArea: "A".repeat(101),
+    });
+    expect(res.success).toBe(false);
+  });
+
+  it("rejects old enum values that are no longer valid (e.g. 'frontend' as literal)", () => {
+    // "frontend" is fine as free text since it is 8 chars and within bounds
+    const res = mentorshipApplicationSchema.safeParse({
+      ...validPayload,
+      interestArea: "frontend",
+    });
+    expect(res.success).toBe(true);
   });
 
   it("rejects invalid experienceLevel enum values", () => {
@@ -134,20 +252,6 @@ describe("Mentorship — Schema Validation", () => {
       consent: undefined,
     });
     expect(res2.success).toBe(false);
-  });
-
-  it("allows institution to be empty or omitted", () => {
-    const res1 = mentorshipApplicationSchema.safeParse({
-      ...validPayload,
-      institution: "",
-    });
-    expect(res1.success).toBe(true);
-
-    const res2 = mentorshipApplicationSchema.safeParse({
-      ...validPayload,
-      institution: undefined,
-    });
-    expect(res2.success).toBe(true);
   });
 
   it("allows honeypot and turnstile tokens in payload", () => {
@@ -206,4 +310,3 @@ describe("Mentorship — Salted IP Hashing", () => {
     expect(hashA).not.toBe(hashB);
   });
 });
-

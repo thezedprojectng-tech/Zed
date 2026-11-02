@@ -154,13 +154,12 @@ export async function submitMentorshipApplication(
       email: data.email.toLowerCase(),
       phone: data.phone,
       location: data.location,
-      current_status: data.currentStatus,
-      institution:
-        data.institution && data.institution.trim().length > 0
-          ? data.institution.trim()
-          : null,
+      age: data.age,
+      current_status: "student",
+      institution: data.institution,
       interest_area: data.interestArea,
       experience_level: data.experienceLevel,
+      skills: data.skills,
       goals: data.goals,
       availability: data.availability,
       preferred_format: data.preferredFormat,
@@ -203,10 +202,11 @@ export async function submitMentorshipApplication(
     email: data.email,
     phone: data.phone,
     location: data.location,
-    currentStatus: data.currentStatus,
-    institution: data.institution || null,
+    age: data.age,
+    institution: data.institution,
     interestArea: data.interestArea,
     experienceLevel: data.experienceLevel,
+    skills: data.skills,
     goals: data.goals,
     availability: data.availability,
     preferredFormat: data.preferredFormat,
@@ -335,4 +335,3 @@ export async function adminDeleteMentorshipApplication(
     return { ok: false, error: "An unexpected error occurred while deleting application" };
   }
 }
-

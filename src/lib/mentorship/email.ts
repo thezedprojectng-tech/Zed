@@ -17,10 +17,11 @@ interface SendMentorshipEmailParams {
   email: string;
   phone: string;
   location: string;
-  currentStatus: string;
-  institution?: string | null;
+  age: number;
+  institution: string;
   interestArea: string;
   experienceLevel: string;
+  skills: string;
   goals: string;
   availability: string;
   preferredFormat: string;
@@ -54,10 +55,11 @@ export async function sendMentorshipEmail(
   const cleanEmail = escapeHtml(params.email);
   const cleanPhone = escapeHtml(params.phone);
   const cleanLocation = escapeHtml(params.location);
-  const cleanStatus = escapeHtml(params.currentStatus);
-  const cleanInstitution = params.institution ? escapeHtml(params.institution) : null;
+  const cleanAge = String(params.age);
+  const cleanInstitution = escapeHtml(params.institution);
   const cleanInterest = escapeHtml(params.interestArea);
   const cleanLevel = escapeHtml(params.experienceLevel);
+  const cleanSkills = escapeHtml(params.skills);
   const cleanGoals = escapeHtml(params.goals).replace(/\n/g, "<br/>");
   const cleanAvailability = escapeHtml(params.availability);
   const cleanFormat = escapeHtml(params.preferredFormat);
@@ -87,24 +89,24 @@ export async function sendMentorshipEmail(
           <td style="padding: 6px 0; color: #0B0B0C;">${cleanLocation}</td>
         </tr>
         <tr>
-          <td style="padding: 6px 0; color: #707078;">Current Status:</td>
-          <td style="padding: 6px 0; color: #0B0B0C;">${cleanStatus}</td>
+          <td style="padding: 6px 0; color: #707078;">Age:</td>
+          <td style="padding: 6px 0; color: #0B0B0C;">${cleanAge}</td>
         </tr>
-        ${
-          cleanInstitution
-            ? `<tr>
-                <td style="padding: 6px 0; color: #707078;">Institution:</td>
-                <td style="padding: 6px 0; color: #0B0B0C;">${cleanInstitution}</td>
-              </tr>`
-            : ""
-        }
         <tr>
-          <td style="padding: 6px 0; color: #707078;">Interest Area:</td>
+          <td style="padding: 6px 0; color: #707078;">University:</td>
+          <td style="padding: 6px 0; color: #0B0B0C;">${cleanInstitution}</td>
+        </tr>
+        <tr>
+          <td style="padding: 6px 0; color: #707078;">Area of Interest:</td>
           <td style="padding: 6px 0; color: #0B0B0C;">${cleanInterest}</td>
         </tr>
         <tr>
           <td style="padding: 6px 0; color: #707078;">Experience Level:</td>
           <td style="padding: 6px 0; color: #0B0B0C;">${cleanLevel}</td>
+        </tr>
+        <tr>
+          <td style="padding: 6px 0; color: #707078;">Skills:</td>
+          <td style="padding: 6px 0; color: #0B0B0C;">${cleanSkills}</td>
         </tr>
         <tr>
           <td style="padding: 6px 0; color: #707078;">Availability:</td>
@@ -117,7 +119,7 @@ export async function sendMentorshipEmail(
       </table>
 
       <div style="margin-top: 16px;">
-        <h3 style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: #707078; margin-bottom: 8px;">Goals & What They Hope to Learn</h3>
+        <h3 style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: #707078; margin-bottom: 8px;">Goals &amp; What They Hope to Learn</h3>
         <div style="background: #F8F8F9; border: 1px solid #EAEAE6; border-radius: 8px; padding: 16px; font-size: 14px; color: #1C1C1E; line-height: 1.6; white-space: pre-wrap;">${cleanGoals}</div>
       </div>
 
@@ -144,4 +146,3 @@ export async function sendMentorshipEmail(
     console.error("[Mentorship Email] Failed to send email via Resend:", error);
   }
 }
-
