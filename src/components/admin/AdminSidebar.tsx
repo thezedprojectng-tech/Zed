@@ -20,6 +20,7 @@ import {
   Search,
   Award,
   HandHeart,
+  Building2,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -43,6 +44,7 @@ const navItems = [
   { href: "/admin/ambassadors", label: "Ambassadors", icon: Award, exact: false, badgeKey: "ambassadors" },
   { href: "/admin/mentorship", label: "Mentorship", icon: HandHeart, exact: false, badgeKey: "mentorship" },
   { href: "/admin/internships", label: "Internships", icon: Search, exact: false, badgeKey: "internships" },
+  { href: "/admin/campus-hubs", label: "Campus Hubs", icon: Building2, exact: false },
   { href: "/admin/careers", label: "Careers", icon: Briefcase, exact: false },
   { href: "/admin/skill", label: "Skill content", icon: GraduationCap, exact: false },
   { href: "/admin/funding", label: "Funding", icon: Lightbulb, exact: false },

@@ -93,8 +93,6 @@ export const MODULES: ZedModule[] = [
   //   href: "/nav/nysc/cds",
   //   what: "CDS Logger lets corps members record Community Development Service sessions, track hours, and export a personal attendance log. It is a personal record — not an official NYSC document.",
   // },
-
-  // -- Coming soon -----------------------------------------------------------
   {
     slug: "zed-mining",
     name: "Zed Mining",
@@ -136,6 +134,18 @@ export const MODULES: ZedModule[] = [
     what: "Internship Radar surfaces entry-level openings, SIWES placements, and graduate trainee programmes submitted by the community and reviewed by admins, filtered by field, work mode, and location.",
   },
   {
+    slug: "campus-hubs",
+    name: "Campus Hubs",
+    tagline: "University-specific clearance checklists, hostel guides, and departmental walkthroughs.",
+    icon: Building2,
+    status: "live",
+    phase: "Phase 1",
+    href: "/campus-hubs",
+    what: "Campus Hubs provides clearance checklists, hostel guides, and departmental walkthroughs for the universities we currently cover. ",
+  },
+
+  // -- Coming soon -----------------------------------------------------------
+  {
     slug: "zed-chat",
     name: "Zed Chat",
     tagline: "Peer-to-peer discussion channels and community messaging.",
@@ -143,16 +153,6 @@ export const MODULES: ZedModule[] = [
     status: "soon",
     phase: "Phase 2",
     what: "Zed Chat will provide persistent community channels and direct messaging so users can share tips, coordinate queue strategies, and support one another across all Zed modules in real time.",
-  },
-  
-  {
-    slug: "campus-hubs",
-    name: "Campus Hubs",
-    tagline: "University-specific mobilization guides and campus community networks.",
-    icon: Building2,
-    status: "soon",
-    phase: "Phase 2",
-    what: "Campus Hubs will bring institution-specific clearance checklists, hostel guides, departmental walkthrough flows, and a peer network tailored to each Nigerian university campus.",
   },
   {
     slug: "alumni-office-hours",
@@ -199,7 +199,6 @@ export const MODULES: ZedModule[] = [
     phase: "Phase 2",
     what: "Zed SOS will aggregate verified emergency contacts, legal aid resources, and civic safety information into a fast-access layer for users who need urgent help navigating critical situations.",
   },
-  
   {
     slug: "civic-trackers",
     name: "Civic Trackers",
