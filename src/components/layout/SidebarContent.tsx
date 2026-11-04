@@ -7,15 +7,10 @@ import { cn } from "@/lib/utils";
 import {
   Home,
   Compass,
-  BookOpen,
-  GraduationCap,
-  Fingerprint,
-  Building2,
   User,
   LayoutDashboard,
   Users,
   FileText,
-  FileSearch,
   LayoutGrid,
   Pickaxe,
   Briefcase,
@@ -58,17 +53,6 @@ const sections: NavSection[] = [
       { href: "/mining", label: "Zed Mining", icon: Pickaxe },
       { href: "/market", label: "Zed Market", icon: ShoppingBag },
       { href: "/internships", label: "Internship Radar", icon: Search },
-    ],
-  },
-  {
-    title: "ZED NAV",
-    items: [
-      { href: "/nav/passport", label: "Nigerian Passport", icon: BookOpen },
-      { href: "/nav/nysc", label: "NYSC Mobilisation", icon: GraduationCap },
-      { href: "/nav/nysc/call-up", label: "Call-up Parser", icon: FileSearch },
-      { href: "/nav/nysc/cds", label: "CDS Logger", icon: FileText },
-      { href: "/nav/nin-bvn", label: "NIN & BVN", icon: Fingerprint },
-      { href: "/nav/cac", label: "CAC Registration", icon: Building2 },
     ],
   },
   {

@@ -1,34 +1,39 @@
-"use client";
-
-import { useState } from "react";
+import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import Link from "next/link";
+import { Suspense, cache } from "react";
 import {
-  BookOpen,
-  GraduationCap,
-  Fingerprint,
-  Building2,
   ArrowRight,
   ShieldAlert,
-  ChevronRight,
+  Pickaxe,
+  Users,
+  GraduationCap,
+  Zap,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
-import { useAuthStore } from "@/store/useAuthStore";
-import { useNavProgressStore } from "@/store/useNavProgressStore";
-import { getLevelName } from "@/types";
-import passportFlow from "@/data/nav/passport.flow.json";
-import nyscFlow from "@/data/nav/nysc.flow.json";
-import ninBvnFlow from "@/data/nav/nin-bvn.flow.json";
-import cacFlow from "@/data/nav/cac.flow.json";
-import type { NavFlow } from "@/types/nav";
+import { createClient } from "@/lib/supabase/server";
 import { MODULES } from "@/data/modules";
+import { MINING_LEVEL_MAP } from "@/data/levels";
+import { getLevelName } from "@/types";
 import { isVerifiedBadgeEnabled } from "@/lib/verification/flags";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
+export const metadata: Metadata = {
+  title: "Home – Zed",
+  description:
+    "Your Zed dashboard. Track your ZED balance, mining streak, referrals, skill progress and active civic guides.",
+};
+
 function getTimeGreeting(): string {
-  const hour = new Date().getHours();
+  const hour = new Date(
+    new Date().toLocaleString("en-US", { timeZone: "Africa/Lagos" })
+  ).getHours();
   if (hour < 12) return "Good morning";
   if (hour < 17) return "Good afternoon";
   return "Good evening";
@@ -40,140 +45,402 @@ function getFormattedDate(): string {
     day: "numeric",
     month: "long",
     year: "numeric",
+    timeZone: "Africa/Lagos",
   }).format(new Date());
 }
 
-interface HomeGuide {
-  id: string;
-  href: string;
-  flow: NavFlow;
-  title: string;
-  code: string;
-  icon: React.ElementType;
-  badge: string;
+// ── Per-request cached profile fetch ─────────────────────────────────────────
+// React.cache() deduplicates calls with the same userId within one render tree.
+// Both HomePage (for the greeting/badges) and OverviewCards (for level/verified)
+// call this; Supabase is only hit once per request.
+const getProfile = cache(async (userId: string) => {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("users")
+    .select("full_name, level_id, is_verified")
+    .eq("id", userId)
+    .single();
+  return data;
+});
+
+// ── Skeleton ──────────────────────────────────────────────────────────────────
+function OverviewSkeleton() {
+  return (
+    <div
+      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4"
+      aria-hidden="true"
+    >
+      {Array.from({ length: 5 }).map((_, i) => (
+        <div
+          key={i}
+          className="rounded-xl border-hairline bg-card/60 p-5 h-32 animate-pulse"
+        />
+      ))}
+    </div>
+  );
 }
 
-const guides: HomeGuide[] = [
-  {
-    id: "passport",
-    href: "/nav/passport",
-    flow: passportFlow as unknown as NavFlow,
-    title: "Nigerian Passport",
-    code: "NIS-01",
-    icon: BookOpen,
-    badge: "High Demand",
-  },
-  {
-    id: "nysc",
-    href: "/nav/nysc",
-    flow: nyscFlow as unknown as NavFlow,
-    title: "NYSC Mobilisation",
-    code: "NYSC-02",
-    icon: GraduationCap,
-    badge: "Batch A Open",
-  },
-  {
-    id: "nin-bvn",
-    href: "/nav/nin-bvn",
-    flow: ninBvnFlow as unknown as NavFlow,
-    title: "NIN & BVN Harmonisation",
-    code: "NIMC-03",
-    icon: Fingerprint,
-    badge: "Essential",
-  },
-  {
-    id: "cac",
-    href: "/nav/cac",
-    flow: cacFlow as unknown as NavFlow,
-    title: "CAC Business Reg.",
-    code: "CAC-04",
-    icon: Building2,
-    badge: "Incorporation",
-  },
-];
+// ── Overview cards ────────────────────────────────────────────────────────────
+// Runs inside <Suspense>. Shares the users row with HomePage via getProfile().
+async function OverviewCards({ userId }: { userId: string }) {
+  const supabase = await createClient();
 
-const civilTips = [
-  {
-    category: "PASSPORT ENROLLMENT",
-    title: "Early Morning Slot Advantage",
-    body: "Arrive at Ikoyi or Alausa centers before 08:30 AM. Processing booths prioritize pre-booked online applicants with verified payment slips.",
-  },
-  {
-    category: "NYSC CLEARANCE",
-    title: "Valid Medical Certificate",
-    body: "Certificates of medical fitness must be issued by a registered General Hospital. Private clinic notes are strictly rejected at camp gates.",
-  },
-  {
-    category: "NATIONAL IDENTITY",
-    title: "NIN QR Code Validation",
-    body: "Commercial banks and immigration officials require the standard NIMC slip with a scannable QR code. Laminated mini cards often fail verification.",
-  },
-];
+  // All five independent data fetches run in one Promise.all.
+  // getProfile() is deduped by React.cache() — no second DB hit.
+  const [
+    profile,
+    walletRes,
+    miningCountRes,
+    referralCountRes,
+    totalLessonsRes,
+    completedLessonsRes,
+  ] = await Promise.all([
+    // 1. users — served from React.cache(); no extra DB round-trip
+    getProfile(userId),
+    // 2. token_wallets: balance, streak, last mined
+    supabase
+      .from("token_wallets")
+      .select("balance_zed, streak_days, last_mined_at")
+      .eq("user_id", userId)
+      .maybeSingle(),
+    // 3. mining_logs: total days claimed (head-only count)
+    supabase
+      .from("mining_logs")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", userId),
+    // 4. referrals: count where I am the referrer (head-only count)
+    supabase
+      .from("referrals")
+      .select("id", { count: "exact", head: true })
+      .eq("referrer_id", userId),
+    // 5. skill_lessons: total lessons in published tracks (head-only count).
+    //    RLS policy "skill_lessons: authenticated select published" already
+    //    restricts rows to lessons whose track has is_published = true,
+    //    so no extra filter is needed here.
+    supabase
+      .from("skill_lessons")
+      .select("id", { count: "exact", head: true }),
+    // 6. skill_progress: completed lessons in published tracks (head-only count).
+    //    Inner-join to skill_lessons ensures only lessons in published tracks
+    //    are counted (RLS on skill_lessons filters out unpublished tracks).
+    //    RLS on skill_progress restricts to auth.uid() so no .eq() needed,
+    //    but we add it explicitly for clarity and defence in depth.
+    supabase
+      .from("skill_progress")
+      .select("lesson_id, skill_lessons!inner(id)", { count: "exact", head: true })
+      .eq("user_id", userId),
+  ]);
 
-export default function HomePage() {
-  const { user, profile } = useAuthStore();
-  const { progressMap } = useNavProgressStore();
-  const [greeting] = useState(() => getTimeGreeting());
-  const [dateString] = useState(() => getFormattedDate());
+  const wallet = walletRes.data;
+  const miningDays = miningCountRes.count ?? 0;
+  const referralCount = referralCountRes.count ?? 0;
+  const totalLessons = totalLessonsRes.count ?? 0;
+  const completedLessons = completedLessonsRes.count ?? 0;
 
-  const fullName = profile?.full_name || (user?.user_metadata?.full_name as string | undefined);
-  const firstName = fullName ? fullName.trim().split(" ")[0] : "there";
-  const isVerified = Boolean(profile?.is_verified);
-  const civicLevel = profile?.level_id || 1;
-  const showGetVerifiedCard = isVerifiedBadgeEnabled() && !isVerified;
-  const [getVerifiedDismissed, setGetVerifiedDismissed] = useState(() => {
-    try {
-      return localStorage.getItem("zed_get_verified_dismissed") === "1";
-    } catch {
-      return false;
-    }
-  });
+  const levelId = (profile?.level_id ?? 1) as 1 | 2 | 3 | 4 | 5;
+  const levelData = MINING_LEVEL_MAP[levelId] ?? MINING_LEVEL_MAP[1];
+  const balanceZed = wallet?.balance_zed ?? 0;
+  const streakDays = wallet?.streak_days ?? 0;
+  const lastMinedAt = wallet?.last_mined_at;
 
-  function dismissGetVerified() {
-    try {
-      localStorage.setItem("zed_get_verified_dismissed", "1");
-    } catch { /* ignore */ }
-    setGetVerifiedDismissed(true);
-  }
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+      {/* ZED Balance */}
+      <Card className="p-5 border-hairline bg-card flex flex-col justify-between gap-4">
+        <div>
+          <div className="flex items-center justify-between mb-3">
+            <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+              ZED Balance
+            </span>
+            <div className="flex h-7 w-7 items-center justify-center rounded-md border-hairline bg-primary/10 text-primary border-primary/20">
+              <Zap className="h-3.5 w-3.5" aria-hidden="true" />
+            </div>
+          </div>
+          <p className="text-3xl font-bold font-mono text-foreground leading-none">
+            {balanceZed.toLocaleString()}
+          </p>
+          <p className="type-small text-muted-foreground mt-1">$ZED</p>
+        </div>
+        <Button
+          asChild
+          size="sm"
+          className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-medium text-xs"
+        >
+          <Link href="/mining">
+            <Pickaxe className="h-3.5 w-3.5 mr-1.5" />
+            Mine today
+          </Link>
+        </Button>
+      </Card>
 
-  const activeFlow = progressMap["passport"] || {
-    flow_id: "passport",
-    current_step: "step-3",
-    completed_steps: ["step-1", "step-2"],
-    updated_at: new Date().toISOString(),
+      {/* Level */}
+      <Card className="p-5 border-hairline bg-card flex flex-col justify-between gap-3">
+        <div>
+          <div className="flex items-center justify-between mb-3">
+            <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+              Level
+            </span>
+            <Badge
+              variant="outline"
+              className="font-mono text-[10px] border-primary/30 bg-primary/5 text-primary px-1.5 py-0"
+            >
+              {levelData.name}
+            </Badge>
+          </div>
+          <p className="text-2xl font-bold font-mono text-foreground leading-none">
+            ×{levelData.multiplier}
+          </p>
+          <p className="type-small text-muted-foreground mt-1">
+            {levelData.dailyCap.toLocaleString()} ZED / day
+          </p>
+        </div>
+        <p className="type-small text-muted-foreground/70 italic">
+          Level requirements are coming soon.
+        </p>
+      </Card>
+
+      {/* Mining */}
+      <Card className="p-5 border-hairline bg-card flex flex-col justify-between gap-3">
+        <div>
+          <div className="flex items-center justify-between mb-3">
+            <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+              Mining
+            </span>
+            <div className="flex h-7 w-7 items-center justify-center rounded-md border-hairline bg-secondary text-muted-foreground">
+              <Pickaxe className="h-3.5 w-3.5" aria-hidden="true" />
+            </div>
+          </div>
+          <p className="text-2xl font-bold font-mono text-foreground leading-none">
+            {streakDays}
+          </p>
+          <p className="type-small text-muted-foreground mt-1">
+            day streak · {miningDays} total claims
+          </p>
+        </div>
+        {lastMinedAt && (
+          <p className="font-mono text-[11px] text-muted-foreground/70">
+            Last:{" "}
+            {new Intl.DateTimeFormat("en-GB", {
+              day: "numeric",
+              month: "short",
+              timeZone: "Africa/Lagos",
+            }).format(new Date(lastMinedAt))}
+          </p>
+        )}
+      </Card>
+
+      {/* Referrals */}
+      <Card className="p-5 border-hairline bg-card flex flex-col justify-between gap-3">
+        <div>
+          <div className="flex items-center justify-between mb-3">
+            <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+              Referrals
+            </span>
+            <div className="flex h-7 w-7 items-center justify-center rounded-md border-hairline bg-secondary text-muted-foreground">
+              <Users className="h-3.5 w-3.5" aria-hidden="true" />
+            </div>
+          </div>
+          <p className="text-2xl font-bold font-mono text-foreground leading-none">
+            {referralCount}
+          </p>
+          <p className="type-small text-muted-foreground mt-1">
+            friend{referralCount !== 1 ? "s" : ""} invited
+          </p>
+        </div>
+        <Link
+          href="/referrals"
+          className="type-small text-primary hover:underline inline-flex items-center gap-1 font-mono"
+        >
+          View referrals <ArrowRight className="h-3 w-3" />
+        </Link>
+      </Card>
+
+      {/* Skill */}
+      <Card className="p-5 border-hairline bg-card flex flex-col justify-between gap-3">
+        <div>
+          <div className="flex items-center justify-between mb-3">
+            <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+              Skill
+            </span>
+            <div className="flex h-7 w-7 items-center justify-center rounded-md border-hairline bg-secondary text-muted-foreground">
+              <GraduationCap className="h-3.5 w-3.5" aria-hidden="true" />
+            </div>
+          </div>
+          <p className="text-2xl font-bold font-mono text-foreground leading-none">
+            {completedLessons}
+            <span className="text-sm font-normal text-muted-foreground">
+              /{totalLessons}
+            </span>
+          </p>
+          <p className="type-small text-muted-foreground mt-1">lessons complete</p>
+        </div>
+        <Link
+          href="/skill"
+          className="type-small text-primary hover:underline inline-flex items-center gap-1 font-mono"
+        >
+          View tracks <ArrowRight className="h-3 w-3" />
+        </Link>
+      </Card>
+    </div>
+  );
+}
+
+// ── Active guide card ─────────────────────────────────────────────────────────
+async function ActiveGuideCard({ userId }: { userId: string }) {
+  const supabase = await createClient();
+
+  const { data: progressRows } = await supabase
+    .from("nav_progress")
+    .select("flow_id, state, updated_at")
+    .eq("user_id", userId)
+    .order("updated_at", { ascending: false });
+
+  const active = (progressRows ?? []).find((row) => !row.state?.completed);
+
+  if (!active) return null;
+
+  const flowId = active.flow_id as string;
+  const state = active.state as {
+    current_step?: string;
+    completed_steps?: string[];
+    completed?: boolean;
+  } | null;
+
+  const completedSteps: string[] = state?.completed_steps ?? [];
+
+  const FLOW_META: Record<string, { href: string; label: string; ref: string }> = {
+    passport: { href: "/nav/passport", label: "Nigerian Passport", ref: "NIS-01" },
+    nysc: { href: "/nav/nysc", label: "NYSC Mobilisation", ref: "NYSC-02" },
+    "nin-bvn": { href: "/nav/nin-bvn", label: "NIN & BVN Harmonisation", ref: "NIMC-03" },
+    cac: { href: "/nav/cac", label: "CAC Business Registration", ref: "CAC-04" },
   };
 
-  const totalSteps = passportFlow.steps.length;
-  const completedCount = activeFlow.completed_steps.length;
-  const progressPercent = Math.round((completedCount / totalSteps) * 100);
+  const meta = FLOW_META[flowId];
+  if (!meta) return null;
+
+  return (
+    <section aria-label="In-progress civil flow">
+      <div className="flex items-center justify-between mb-3">
+        <h2 className="type-caption text-muted-foreground font-semibold">
+          ACTIVE ZED NAV GUIDE
+        </h2>
+        <span className="type-caption text-primary">IN PROGRESS</span>
+      </div>
+
+      <Card className="p-0 border-hairline bg-card hover:border-border transition-colors">
+        <div className="p-5 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-5">
+          <div className="space-y-2 flex-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="type-caption text-muted-foreground">
+                {meta.ref}
+              </span>
+              <Badge
+                variant="outline"
+                className="font-mono text-[10px] border-primary/30 bg-primary/10 text-primary px-1.5 py-0"
+              >
+                IN PROGRESS
+              </Badge>
+            </div>
+
+            <h3 className="type-h2 text-foreground">{meta.label}</h3>
+
+            {completedSteps.length > 0 && (
+              <div className="pt-1 flex flex-col sm:flex-row sm:items-center gap-3">
+                <div className="flex-1 max-w-xs">
+                  <Progress
+                    value={Math.min(completedSteps.length * 10, 100)}
+                    className="h-1.5 bg-secondary"
+                  />
+                </div>
+                <span className="font-mono text-[11px] text-muted-foreground">
+                  {completedSteps.length} step{completedSteps.length !== 1 ? "s" : ""} completed
+                </span>
+              </div>
+            )}
+          </div>
+
+          <div className="shrink-0">
+            <Button
+              asChild
+              variant="outline"
+              className="border-hairline hover:bg-secondary hover:text-foreground text-foreground px-5 font-medium"
+            >
+              <Link href={meta.href}>
+                Resume Guide
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </Card>
+    </section>
+  );
+}
+
+// ── Main page ─────────────────────────────────────────────────────────────────
+export default async function HomePage() {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login");
+  }
+
+  // Fetch the user's profile once. getProfile() is wrapped in React.cache(),
+  // so the identical call inside OverviewCards is served from the same
+  // per-request cache with no second database round-trip.
+  const profile = await getProfile(user.id);
+
+  const fullName =
+    profile?.full_name ||
+    (user.user_metadata?.full_name as string | undefined) ||
+    "";
+  const firstName = fullName.trim().split(" ")[0] || "there";
+  const isVerified = Boolean(profile?.is_verified);
+  const civicLevel = profile?.level_id ?? 1;
+  const greeting = getTimeGreeting();
+  const dateString = getFormattedDate();
+  const showGetVerified = isVerifiedBadgeEnabled() && !isVerified;
 
   return (
     <div className="mx-auto max-w-8xl px-4 md:px-8 py-8 md:py-10 space-y-10">
 
-      {/* ── 1. Header & Time-aware Greeting ───────────────────────────── */}
+      {/* ── 1. Greeting row ──────────────────────────────────────────────── */}
       <section className="space-y-2 border-hairline-b pb-8">
-        <p className="type-caption text-muted-foreground">
-          {dateString || "FEDERAL REPUBLIC OF NIGERIA"}
-        </p>
+        <p className="type-caption text-muted-foreground">{dateString}</p>
         <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-2">
           <h1 className="type-display text-foreground">
             {greeting}, {firstName}.
           </h1>
-          <span className="type-caption text-muted-foreground font-mono">
-            {getLevelName(civicLevel).toUpperCase()} · {isVerified ? "VERIFIED" : "UNVERIFIED"}
-          </span>
+          <div className="flex items-center gap-2 flex-wrap">
+            <Badge
+              variant="outline"
+              className="font-mono text-[10px] border-border text-muted-foreground px-2 py-0.5"
+            >
+              {getLevelName(civicLevel).toUpperCase()}
+            </Badge>
+            {isVerifiedBadgeEnabled() && (
+              <Badge
+                variant="outline"
+                className={cn(
+                  "font-mono text-[10px] px-2 py-0.5",
+                  isVerified
+                    ? "border-primary/30 bg-primary/5 text-primary"
+                    : "border-border text-muted-foreground"
+                )}
+              >
+                {isVerified ? "VERIFIED" : "UNVERIFIED"}
+              </Badge>
+            )}
+          </div>
         </div>
-        <p className="type-body text-muted-foreground max-w-3xl">
-          Track official document progress, bypass center congestion, and navigate{" "}
-          <span className="inline-block">
-            Nigerian civic processes{" "}
-            <span className="type-accent-serif text-foreground">seamlessly</span>.
-          </span>
-        </p>
       </section>
 
-      {/* ── 2. "Get verified" card (dismissible, flag-gated) ────────────── */}
-      {showGetVerifiedCard && !getVerifiedDismissed && (
+      {/* ── 2. Get verified prompt (flag-gated) ──────────────────────────── */}
+      {showGetVerified && (
         <section aria-label="Get verified">
           <Card className="p-0 border-hairline bg-card relative overflow-hidden">
             <div className="absolute inset-x-0 top-0 h-[2px] bg-primary rounded-t-xl" />
@@ -187,11 +454,11 @@ export default function HomePage() {
                 </div>
                 <h2 className="type-h2 text-foreground">Verify your NIN to level up</h2>
                 <p className="type-small text-muted-foreground">
-                  Verify your 11-digit National Identity Number to confirm your identity and unlock your next progression level.
+                  Verify your 11-digit National Identity Number to confirm your identity
+                  and unlock your next progression level.
                 </p>
               </div>
-
-              <div className="flex items-center gap-3 shrink-0">
+              <div className="shrink-0">
                 <Button
                   asChild
                   className="bg-primary text-primary-foreground hover:bg-primary/90 font-medium px-5"
@@ -201,183 +468,31 @@ export default function HomePage() {
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-muted-foreground hover:text-foreground"
-                  onClick={dismissGetVerified}
-                  aria-label="Dismiss verification prompt"
-                >
-                  Dismiss
-                </Button>
               </div>
             </div>
           </Card>
         </section>
       )}
 
-
-      {/* ── 3. Active Civil Application ───────────────────────────────── */}
-      <section aria-label="In-progress civil flow">
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="type-caption text-muted-foreground font-semibold">
-            ACTIVE ZED NAV GUIDE
-          </h2>
-          <span className="type-caption text-primary">IN PROGRESS</span>
+      {/* ── 3. Overview cards ─────────────────────────────────────────────── */}
+      <section aria-label="Account overview">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="type-caption text-muted-foreground font-semibold">OVERVIEW</h2>
         </div>
-
-        <Card className="p-0 border-hairline bg-card hover:border-border transition-colors">
-          <div className="p-5 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-5">
-            <div className="space-y-2 flex-1">
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="type-caption text-muted-foreground">
-                  NIS-01 · NIGERIAN IMMIGRATION SERVICE
-                </span>
-                <Badge
-                  variant="outline"
-                  className="font-mono text-[10px] border-primary/30 bg-primary/10 text-primary px-1.5 py-0"
-                >
-                  RENEWAL (32 PAGES)
-                </Badge>
-              </div>
-
-              <h3 className="type-h2 text-foreground">
-                Standard Passport Application & Renewal
-              </h3>
-
-              <p className="type-small text-muted-foreground">
-                Current Step:{" "}
-                <strong className="text-foreground font-medium">
-                  Biometric Capture Slip Preparation
-                </strong>
-                . Ensure your printed National Identity slip and transaction reference code match your enrollment form.
-              </p>
-
-              <div className="pt-1 flex flex-col sm:flex-row sm:items-center gap-3">
-                <div className="flex-1 max-w-xs">
-                  <Progress value={progressPercent} className="h-1.5 bg-secondary" />
-                </div>
-                <span className="font-mono text-[11px] text-muted-foreground">
-                  {completedCount} of {totalSteps} steps completed ({progressPercent}%)
-                </span>
-              </div>
-            </div>
-
-            <div className="shrink-0">
-              <Button
-                asChild
-                variant="outline"
-                className="border-hairline hover:bg-secondary hover:text-foreground text-foreground px-5 font-medium"
-              >
-                <Link href="/nav/passport">
-                  Resume Guide
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-            </div>
-          </div>
-        </Card>
+        {/* OverviewCards and ActiveGuideCard are both wrapped in Suspense so
+            they stream in independently. Their internal queries run in parallel
+            with each other (React starts both Suspense boundaries together). */}
+        <Suspense fallback={<OverviewSkeleton />}>
+          <OverviewCards userId={user.id} />
+        </Suspense>
       </section>
 
-      {/* ── 4. Civil Process Guides Grid ──────────────────────────────── */}
-      <section aria-label="Official Civil Guides" className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="type-h2 text-foreground">Zed Nav Guides</h2>
-            <p className="type-small text-muted-foreground mt-0.5">
-              End-to-end bureaucratic navigation with official requirements, fees, and traps to avoid.
-            </p>
-          </div>
-          <Link
-            href="/nav"
-            className="hidden sm:inline-flex items-center gap-1 type-caption text-primary hover:underline"
-          >
-            <span>VIEW ALL</span>
-            <ChevronRight className="h-3.5 w-3.5" />
-          </Link>
-        </div>
+      {/* ── 4. Active guide (only if user has one in progress) ───────────── */}
+      <Suspense fallback={null}>
+        <ActiveGuideCard userId={user.id} />
+      </Suspense>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {guides.map((guide) => {
-            const Icon = guide.icon;
-            return (
-              <Link
-                key={guide.id}
-                href={guide.href}
-                className="group block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-xl"
-              >
-                <Card className="p-0 h-full border-hairline bg-card hover:border-border transition-all duration-150">
-                  <div className="p-5 sm:p-6 flex flex-col justify-between h-full gap-4">
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <div className="flex h-9 w-9 items-center justify-center rounded-lg border-hairline bg-secondary text-foreground group-hover:border-primary/40 group-hover:text-primary transition-colors">
-                          <Icon className="h-4 w-4" />
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className="font-mono text-[11px] text-muted-foreground">
-                            {String(guide.flow.steps.length).padStart(2, "0")} STEPS · ~{guide.flow.estimatedMinutes} MINS
-                          </span>
-                          <Badge
-                            variant="outline"
-                            className="font-mono text-[10px] border-border text-muted-foreground px-1.5 py-0"
-                          >
-                            {guide.badge}
-                          </Badge>
-                        </div>
-                      </div>
-
-                      <div>
-                        <h3 className="type-h3 text-foreground group-hover:text-primary transition-colors flex items-center justify-between">
-                          <span>{guide.title}</span>
-                          <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-0.5 transition-all shrink-0" />
-                        </h3>
-                        <p className="type-small text-muted-foreground mt-1.5 leading-relaxed">
-                          {guide.flow.summary}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="border-hairline-t pt-4 flex items-center justify-between font-mono text-[11px] text-muted-foreground">
-                      <span>CODE: {guide.code}</span>
-                      <span className="group-hover:text-foreground transition-colors">
-                        Start walkthrough →
-                      </span>
-                    </div>
-                  </div>
-                </Card>
-              </Link>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* ── 5. Field Intelligence Tips ────────────────────────────────── */}
-      <section aria-label="Field intelligence & tips" className="space-y-3">
-        <h2 className="type-caption text-muted-foreground font-semibold">
-          FIELD INTELLIGENCE & INSIDER TIPS
-        </h2>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {civilTips.map((tip, idx) => (
-            <div
-              key={idx}
-              className="rounded-xl border-hairline bg-card p-5 space-y-2 hover:border-border transition-colors"
-            >
-              <span className="type-caption text-primary font-semibold">
-                {tip.category}
-              </span>
-              <h3 className="text-xs font-semibold text-foreground font-sans">
-                {tip.title}
-              </h3>
-              <p className="type-small text-muted-foreground leading-relaxed">
-                {tip.body}
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ── 6. Platform Modules ───────────────────────────────────────── */}
+      {/* ── 5. Platform Modules ───────────────────────────────────────────── */}
       <section aria-label="Platform modules" className="space-y-4">
         <div className="flex items-center justify-between">
           <div>
@@ -433,7 +548,12 @@ export default function HomePage() {
                   )}
                 </div>
                 <div>
-                  <p className={cn("text-xs font-semibold leading-tight", isLive ? "text-foreground" : "text-muted-foreground")}>
+                  <p
+                    className={cn(
+                      "text-xs font-semibold leading-tight",
+                      isLive ? "text-foreground" : "text-muted-foreground"
+                    )}
+                  >
                     {mod.name}
                   </p>
                   <p className="font-mono text-[10px] text-muted-foreground/60 mt-0.5">
