@@ -2,33 +2,31 @@ import type { Metadata } from "next";
 import { LegalPageLayout } from "@/components/site/LegalPageLayout";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy – Compliance with NDPA 2023 & NDPR",
+  title: "Privacy Policy – Zed",
   description:
-    "Comprehensive Privacy Policy of Zed. Technical details on zero raw NIN storage, salted SHA-256 server-side hashing, escrow financial data protection, WebRTC safety moderation, and NDPC regulatory recourse.",
+    "How Zed collects, uses and protects your personal data under the Nigeria Data Protection Act 2023.",
   openGraph: {
-    title: "Privacy Policy – Compliance with NDPA 2023 & NDPR",
+    title: "Privacy Policy – Zed",
     description:
-      "Understand how Zed protects citizen data across civic guides, marketplace escrow, campus hubs, and safety mapping under the Nigeria Data Protection Act 2023.",
+      "How Zed collects, uses and protects your personal data under the Nigeria Data Protection Act 2023.",
     url: "https://zedproject.ng/privacy",
   },
 };
 
 const TOC = [
-  { id: "section-1", title: "Introduction & Platform Scope" },
-  { id: "section-2", title: "Information We Collect Across Modules" },
-  { id: "section-3", title: "Strict Prohibition of Raw NIN Storage & Salted SHA-256 Protocol" },
-  { id: "section-4", title: "Lawful Bases for Processing under NDPA 2023" },
-  { id: "section-5", title: "Purposes of Data Processing" },
-  { id: "section-6", title: "Financial Privacy & Zero-Fintech Compliance Model" },
-  { id: "section-7", title: "Real-Time WebRTC Audio & Safety Buffer Protocol" },
-  { id: "section-8", title: "Geospatial Data & Safety Mapping (Zed SOS)" },
-  { id: "section-9", title: "Data Retention & Storage Schedules" },
-  { id: "section-10", title: "Disclosure & Sharing with Third-Party Processors" },
-  { id: "section-11", title: "Cross-Border Data Transfers" },
-  { id: "section-12", title: "Technical & Organizational Security Measures" },
-  { id: "section-13", title: "Your Statutory Rights as a Data Subject" },
-  { id: "section-14", title: "Protection of Minors & Student Data" },
-  { id: "section-15", title: "Regulatory Recourse (NDPC) & Data Protection Officer Contact" },
+  { id: "section-1", title: "Who we are" },
+  { id: "section-2", title: "What we collect" },
+  { id: "section-3", title: "Why we use your data" },
+  { id: "section-4", title: "What becomes public" },
+  { id: "section-5", title: "Who we share data with" },
+  { id: "section-6", title: "Transfers outside Nigeria" },
+  { id: "section-7", title: "How long we keep data" },
+  { id: "section-8", title: "Security" },
+  { id: "section-9", title: "Your rights" },
+  { id: "section-10", title: "Children" },
+  { id: "section-11", title: "Cookies and local storage" },
+  { id: "section-12", title: "Changes to this Policy" },
+  { id: "section-13", title: "Contact" },
 ];
 
 /**
@@ -39,31 +37,22 @@ export default function PrivacyPolicyPage() {
   return (
     <LegalPageLayout
       title="Privacy Policy"
-      subtitle="Formal documentation of our data governance protocols, technical privacy controls, and adherence to the Nigeria Data Protection Act 2023 (NDPA) and Nigeria Data Protection Regulation (NDPR)."
-      lastUpdated="Oct 30, 2026"
+      subtitle="How Zed collects, uses and protects your personal data under the Nigeria Data Protection Act 2023."
+      lastUpdated="Nov 4, 2026"
       toc={TOC}
     >
       {/* ── Section 1 ──────────────────────────────────────────────── */}
       <section id="section-1" className="space-y-4 scroll-mt-28 pb-2">
         <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
-          1. Introduction &amp; Platform Scope
+          1. Who we are
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
           <p>
-            Zed (&quot;we&quot;, &quot;us&quot;, or &quot;our&quot;) operates 
-            the Zed digital operating system for Nigerian youth, encompassing the web application, Progressive Web Application (PWA), 
-            and associated sub-systems (collectively, the &quot;Platform&quot;).
-          </p>
-          <p>
-            The Platform provides an integrated ecosystem including: <strong>Zed Nav</strong> (civil administrative state machines and capture center trackers), 
-            <strong>Zed Skill</strong> (data-light learning tracks and verified badging), <strong>Zed Market</strong> (escrow-backed micro-gigs), 
-            <strong>Zed Meet</strong> (real-time WebRTC 1-on-1 networking and live audio spaces), <strong>Campus Hubs &amp; Academic Vault</strong> (university departmental networks and Alumni Office Hours), 
-            <strong>Zed SOS</strong> (geospatial transit safety alerts), and the <strong>$ZED Token Engine</strong> (gamified proof-of-engagement reward system).
-          </p>
-          <p>
-            For the purposes of the <strong>Nigeria Data Protection Act 2023 (&quot;NDPA&quot;)</strong> and the 
-            Nigeria Data Protection Regulation (&quot;NDPR&quot;), Zed acts as the <strong>Data Controller</strong> in 
-            respect of personal data collected through your interaction with the Platform. We are committed to operating in full accordance with the constitutional right to privacy under Section 37 of the Constitution of the Federal Republic of Nigeria 1999 (as amended).
+            Zed operates the Zed web app and Progressive Web App for Nigerian youth (the
+            &ldquo;Platform&rdquo;). We are the data controller for personal data collected through
+            the Platform under the Nigeria Data Protection Act 2023 (&ldquo;NDPA&rdquo;). Some
+            modules shown as &ldquo;coming soon&rdquo; are not built yet and collect no data. We
+            will update this Policy before launching any new feature that handles personal data.
           </p>
         </div>
       </section>
@@ -71,44 +60,40 @@ export default function PrivacyPolicyPage() {
       {/* ── Section 2 ──────────────────────────────────────────────── */}
       <section id="section-2" className="space-y-4 scroll-mt-28 pb-2">
         <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
-          2. Information We Collect Across Modules
+          2. What we collect
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
-          <p>
-            Zed adheres strictly to the principle of <em>Data Minimization</em> under Section 24 of the NDPA 2023. 
-            We collect only the minimum personal data strictly necessary to deliver each modular service:
-          </p>
           <ul className="list-disc pl-5 space-y-2">
             <li>
-              <strong>Account Authentication Data:</strong> Mobile telephone number (utilized for transactional SMS/OTP verification), 
-              full name, and optional avatar URL.
+              <strong>Account:</strong> your phone number (used to send a one-time SMS code to sign
+              in), your name, and an optional profile picture.
             </li>
             <li>
-              <strong>Cryptographically Hashed Identity Data:</strong> When verifying your National Identity Number (NIN), it is processed strictly through a salted SHA-256 one-way cryptographic digest. The raw 11-digit numerical NIN is never written to physical disk or persisted in any database.
+              <strong>Profile:</strong> details you choose to add to your profile, such as your
+              institution or state.
             </li>
             <li>
-              <strong>Campus &amp; University Profiles:</strong> University affiliation (e.g., UNILAG, OAU, UI, FUTA, ABU, Covenant), department name, matriculation/graduation year, and student or alumni verification credentials.
+              <strong>Mining and ZED points:</strong> your daily claim records, point balance, and
+              referral links.
             </li>
             <li>
-              <strong>Marketplace Escrow Telemetry:</strong> Payout destination bank account numbers and account holder names (for disbursements to GTB, Kuda, OPay, Moniepoint, Zenith, etc.) and transaction reference tokens. Zed never collects or stores debit/credit card PANs or security PINs.
+              <strong>Internship Radar submissions:</strong> company name, role, location, stipend,
+              application link, and your display name (all public after approval).
             </li>
             <li>
-              <strong>Proof-of-Engagement &amp; Mining Logs:</strong> Daily mining timestamps, current streak counts, level progression status (Levels 1–5), and Cloudflare Turnstile hardware verification hashes used to detect automated bot manipulation.
+              <strong>Alumni Office Hours applications:</strong> full name, email address,
+              graduation year, institution, field, occupation, short bio, topics, availability, and
+              a contact URL. Email address is kept private; the rest appears publicly after
+              approval.
             </li>
             <li>
-              <strong>Support &amp; Contact Inquiries:</strong> When contacting us via our website forms, we store your name, email address, optional phone number, subject line, message text, and a salted SHA-256 hash of your network IP to prevent automated abuse. Raw IP addresses are never retained.
+              <strong>Mentor applications:</strong> display name, institution, field, bio, and
+              contact details you choose to share, subject to your consent at submission.
             </li>
             <li>
-              <strong>Campus Ambassador Applications:</strong> When applying to become a Campus Ambassador, we collect your full name, email address, phone/WhatsApp number, educational institution, state, course of study, level/year, optional social media handle, application motivation, and a salted SHA-256 hash of your network IP address to prevent abuse. This information is processed solely for evaluating and administering ambassador appointments.
-            </li>
-            <li>
-              <strong>Mentorship Applications:</strong> When applying to the Zed Mentorship programme, we collect your full name, email address, phone/WhatsApp number, location (state or city), current status, optional institution name, area of interest, experience level, goals, availability, preferred format, and a salted SHA-256 hash of your network IP address to prevent abuse. This information is processed solely for evaluating and administering mentorship arrangements. Applications are reviewed by authorized Zed team members only; applicant data is never sold or shared publicly.
-            </li>
-            <li>
-              <strong>Internship Radar Leads:</strong> When you submit an internship or opportunity lead, we store your account user ID internally so administrators can review the submission. Submitter IDs are private and are never exposed publicly or to other users.
-            </li>
-            <li>
-              <strong>Client-Side Local Storage:</strong> Procedural checklists, offline guide caches, and course notes stored locally on your device via IndexedDB and Service Worker caches.
+              <strong>Technical data:</strong> IP address (hashed for rate-limiting, not stored in
+              plain text), browser type, and pages visited, collected automatically when you use
+              the Platform.
             </li>
           </ul>
         </div>
@@ -117,109 +102,140 @@ export default function PrivacyPolicyPage() {
       {/* ── Section 3 ──────────────────────────────────────────────── */}
       <section id="section-3" className="space-y-4 scroll-mt-28 pb-2">
         <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
-          3. Strict Prohibition of Raw NIN Storage &amp; Cryptographic Hashing Protocol
+          3. Why we use your data
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
-          <p>
-            The National Identity Number (NIN) issued by the National Identity Management Commission (NIMC) 
-            is a sensitive sovereign identifier. In recognition of the severe risks associated with centralized identity theft, 
-            Zed enforces an architectural invariant:
-          </p>
-          <div className="p-4 rounded-lg border border-[#E5E5E0] dark:border-white/10 bg-[#ffffff] dark:bg-[#141416] text-xs font-mono text-[#fafaf8]  space-y-2">
-            <span className="font-bold text-[#2E82F7] uppercase block">
-              MANDATORY TECHNICAL PROTOCOL:
-            </span>
-            <p>
-              1. 11-digit format audits occur client-side in the browser before network transmission.<br />
-              2. Transmission to the backend server occurs strictly over an encrypted TLS 1.3 HTTPS connection.<br />
-              3. Verification operates in sandbox demo mode. In volatile RAM, the raw string is combined with a secret cryptographic salt and transformed using SHA-256 into a 64-character hexadecimal digest.<br />
-              4. The raw plaintext NIN is discarded immediately from memory. Only the salted hash token is persisted in the database.<br />
-              5. Under no circumstances is a plaintext NIN written, logged, cached, or backed up on any physical storage media.
-            </p>
-          </div>
-          <p>
-            In the event of an unauthorized infrastructure breach, an adversary cannot reconstruct or extract your raw National 
-            Identity Number from Zed records.
-          </p>
+          <ul className="list-disc pl-5 space-y-2">
+            <li>
+              <strong>To provide the service:</strong> authenticate you, show your points balance,
+              display your approved submissions, and operate the Platform.
+            </li>
+            <li>
+              <strong>To moderate content:</strong> review internship, mentor, and alumni
+              submissions before they go public.
+            </li>
+            <li>
+              <strong>To prevent abuse:</strong> rate-limit form submissions using hashed IP
+              addresses and Cloudflare Turnstile.
+            </li>
+            <li>
+              <strong>To send transactional email:</strong> confirmation emails after you submit an
+              application (sent via Resend; no marketing email without your separate consent).
+            </li>
+            <li>
+              <strong>To comply with law:</strong> retain records as required under Nigerian law and
+              respond to lawful requests from authorities.
+            </li>
+          </ul>
         </div>
       </section>
 
       {/* ── Section 4 ──────────────────────────────────────────────── */}
       <section id="section-4" className="space-y-4 scroll-mt-28 pb-2">
         <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
-          4. Lawful Bases for Processing under NDPA 2023
+          4. What becomes public
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
-          <p>
-            Under Section 25 of the NDPA 2023, every data processing activity conducted by Zed is founded upon an explicit lawful basis:
-          </p>
           <ul className="list-disc pl-5 space-y-2">
             <li>
-              <strong>Consent (Section 25(1)(a)):</strong> You provide specific, informed consent when registering an account, 
-              initiating a speed match in Zed Meet, or enabling optional diagnostics in our Cookie Settings.
+              <strong>Approved internship listings:</strong> all fields you submitted (company,
+              role, location, stipend, link, display name).
             </li>
             <li>
-              <strong>Contractual Necessity (Section 25(1)(b)):</strong> Processing necessary to provide requested services, 
-              such as milestone escrow releases in Zed Market, offline checklist synchronization, and token balance accounting.
+              <strong>Approved alumni profiles:</strong> display name, graduation year,
+              institution, field, occupation, bio, topics, availability, and contact URL. Your
+              email address is never shown publicly.
             </li>
             <li>
-              <strong>Legitimate Interests (Section 25(1)(f)):</strong> Maintaining platform security, executing anti-bot hardware 
-              fingerprinting, and conducting NLP-based moderation to prevent scams and protect student safety.
+              <strong>Approved mentor profiles:</strong> the fields you consented to share at
+              submission.
+            </li>
+            <li>
+              <strong>Your public profile:</strong> your display name and ZED point total, if you
+              choose to make them visible.
             </li>
           </ul>
+          <p>
+            Nothing else is public. Private application data (email addresses, admin notes, IP
+            hashes, status history) is never shown to other users.
+          </p>
         </div>
       </section>
 
       {/* ── Section 5 ──────────────────────────────────────────────── */}
       <section id="section-5" className="space-y-4 scroll-mt-28 pb-2">
         <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
-          5. Purposes of Data Processing
+          5. Who we share data with
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
-          <p>Zed processes personal data strictly for defined and transparent operational purposes:</p>
-          <ol className="list-decimal pl-5 space-y-2">
-            <li>To authenticate users via secure SMS OTP tokens without insecure permanent passwords.</li>
-            <li>To run deterministic, client-side civil checklists for passport renewal, NYSC mobilization, and CAC registration.</li>
-            <li>To manage escrow milestone disbursements for freelance gigs through licensed payment processors.</li>
-            <li>To calculate proof-of-engagement mining multipliers and verify daily claim caps.</li>
-            <li>To verify university student badges and facilitate 15-minute Alumni Office Hours sessions.</li>
-            <li>To render crowd-sourced transit hazard alerts in Zed SOS without continuous personal tracking.</li>
-            <li>To comply with regulatory audit requirements established by the Nigeria Data Protection Commission (NDPC).</li>
-          </ol>
+          <p>
+            We do not sell your personal data. We share it only with the processors listed below,
+            each bound by a data processing agreement:
+          </p>
+          <ul className="list-disc pl-5 space-y-2">
+            <li>
+              <strong>Supabase:</strong> database and authentication hosting (servers in EU West,
+              covered under Section 6 below).
+            </li>
+            <li>
+              <strong>Vercel:</strong> web hosting and edge functions.
+            </li>
+            <li>
+              <strong>Resend:</strong> transactional email delivery.
+            </li>
+            <li>
+              <strong>Cloudflare:</strong> DDoS protection, CDN, and Turnstile bot detection.
+            </li>
+            <li>
+              <strong>Termii:</strong> SMS OTP delivery for phone-number sign-in.
+            </li>
+          </ul>
+          <p>
+            We may also disclose data to law-enforcement or regulatory authorities where required
+            by Nigerian law.
+          </p>
         </div>
       </section>
 
       {/* ── Section 6 ──────────────────────────────────────────────── */}
       <section id="section-6" className="space-y-4 scroll-mt-28 pb-2">
         <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
-          6. Financial Privacy &amp; Zero-Fintech Compliance Model
+          6. Transfers outside Nigeria
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
           <p>
-            Zed operates under a zero-fintech compliance architecture. All $ZED tokens are engagement loyalty points calculated 
-            off-chain. When users withdraw funds earned from marketplace gigs or convert $ZED tokens via monthly platform revenue pools:
+            Some processors (Supabase, Vercel, Resend, Cloudflare) store or process data outside
+            Nigeria. We rely on standard contractual clauses or the processor&apos;s adequacy
+            status under the NDPA to legitimise those transfers. If you would like details of the
+            safeguards in place for a specific transfer, contact us at the address in Section 13.
           </p>
-          <ul className="list-disc pl-5 space-y-2">
-            <li>Transactions route directly through Central Bank of Nigeria (CBN) licensed payment processors (Paystack, Flutterwave, and Monnify).</li>
-            <li>Payment processors hold PCI-DSS Level 1 certification. Zed never captures, processes, or stores debit card PANs, CVVs, expiry dates, or banking PINs.</li>
-            <li>Zed retains only settlement reference tokens and payout account metadata (bank name and account number) strictly necessary to facilitate bank transfers to verified Nigerian accounts.</li>
-          </ul>
         </div>
       </section>
 
       {/* ── Section 7 ──────────────────────────────────────────────── */}
       <section id="section-7" className="space-y-4 scroll-mt-28 pb-2">
         <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
-          7. Real-Time WebRTC Audio &amp; Safety Buffer Protocol
+          7. How long we keep data
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
-          <p>
-            Zed Meet and Live Audio Rooms utilize WebRTC protocols for direct peer-to-peer audio and signaling communication:
-          </p>
           <ul className="list-disc pl-5 space-y-2">
-            <li>Standard audio conversations in Zed Meet are transmitted in real time and are <strong>never recorded, transcribed, or stored</strong> on Zed servers during routine operation.</li>
             <li>
-              <strong>Trust &amp; Safety Moderation Buffer:</strong> To protect young Nigerians from abuse, harassment, scams, and sexual solicitation, our client application maintains a temporary rolling 30-second audio buffer in volatile device memory. If and only if a user activates the <strong>1-Tap Block / Report</strong> trigger, this 30-second buffer is encrypted and transmitted securely to human moderators for incident verification. Unreported buffers are continuously overwritten and never reach our servers.
+              <strong>Active accounts:</strong> for as long as your account exists plus 90 days
+              after deletion to allow for disputes.
+            </li>
+            <li>
+              <strong>Declined or withdrawn applications:</strong> 180 days from the decision date,
+              then deleted.
+            </li>
+            <li>
+              <strong>Approved public profiles:</strong> until you request removal or we
+              depublish them.
+            </li>
+            <li>
+              <strong>IP hashes (rate-limiting):</strong> 30 days.
+            </li>
+            <li>
+              <strong>Admin audit logs:</strong> 2 years for accountability purposes.
             </li>
           </ul>
         </div>
@@ -228,68 +244,81 @@ export default function PrivacyPolicyPage() {
       {/* ── Section 8 ──────────────────────────────────────────────── */}
       <section id="section-8" className="space-y-4 scroll-mt-28 pb-2">
         <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
-          8. Geospatial Data &amp; Safety Mapping (Zed SOS)
+          8. Security
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
           <p>
-            Zed SOS powers a crowd-sourced geospatial map highlighting transit hazards, police checkpoints, and road conditions:
+            We use TLS in transit, encrypted storage at rest, row-level security rules that limit
+            database access to only the data each role needs, hashed IP addresses instead of raw
+            ones, and Cloudflare Turnstile on public submission forms. No security measure is
+            perfect; if you discover a vulnerability, please report it to{" "}
+            <a
+              href="mailto:privacy@zedproject.ng"
+              className="text-[#2E82F7] underline"
+            >
+              privacy@zedproject.ng
+            </a>
+            .
           </p>
-          <ul className="list-disc pl-5 space-y-2">
-            <li>Zed does <strong>not</strong> track, log, or record continuous 24/7 background geolocation data.</li>
-            <li>Location access is requested only when a user explicitly submits a safety report or queries nearby alerts. Coordinates are processed via PostGIS spatial indexing with coarse precision to prevent pinpointing individual domestic dwellings.</li>
-            <li>Hazard alerts automatically expire from the active map layer within 6 hours to preserve timeliness and prevent historical movement profiling.</li>
-          </ul>
         </div>
       </section>
 
       {/* ── Section 9 ──────────────────────────────────────────────── */}
       <section id="section-9" className="space-y-4 scroll-mt-28 pb-2">
         <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
-          9. Data Retention &amp; Automated Deletion Schedules
+          9. Your rights
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
           <p>
-            We retain personal data only for as long as strictly necessary to fulfill the specific purposes defined in this Policy:
+            Under the NDPA 2023 you have the right to access, correct, delete, or port your
+            personal data, and to object to or restrict certain processing. To exercise any of
+            these rights, email{" "}
+            <a
+              href="mailto:privacy@zedproject.ng"
+              className="text-[#2E82F7] underline"
+            >
+              privacy@zedproject.ng
+            </a>
+            . We will respond within 30 days. If you are not satisfied with our response, you may
+            lodge a complaint with the Nigeria Data Protection Commission at{" "}
+            <a
+              href="https://ndpc.gov.ng"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#2E82F7] underline"
+            >
+              ndpc.gov.ng
+            </a>
+            .
           </p>
-          <ul className="list-disc pl-5 space-y-2">
-            <li><strong>Session Authentication Tokens:</strong> Invalidated after 30 days of inactivity.</li>
-            <li><strong>Support &amp; Contact Messages:</strong> Retained securely in our administrative database until our team reviews and manually deletes them.</li>
-            <li><strong>Safety Incident Buffers:</strong> Deleted within 14 days following moderator review, unless preservation is required by a valid Nigerian court order.</li>
-            <li><strong>Client-Side Local Storage:</strong> Procedural checklists and course summaries remain on your physical device until manually cleared or until selecting &quot;Reset Local Data&quot; in profile settings.</li>
-          </ul>
         </div>
       </section>
 
       {/* ── Section 10 ─────────────────────────────────────────────── */}
       <section id="section-10" className="space-y-4 scroll-mt-28 pb-2">
         <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
-          10. Disclosure &amp; Sharing with Third-Party Processors
+          10. Children
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
           <p>
-            Zed does not sell, lease, or trade personal data to advertising networks or data brokers. Data is shared exclusively 
-            with vetted sub-processors bound by formal Data Processing Agreements (DPAs) compliant with NDPA 2023 standards:
+            The Platform is intended for users aged 16 and above. We do not knowingly collect
+            personal data from anyone under 16. If we learn that we have done so, we will delete
+            it promptly.
           </p>
-          <ul className="list-disc pl-5 space-y-2">
-            <li><strong>Payment &amp; Escrow Gateways:</strong> Paystack, Flutterwave, and Monnify for domestic Nigerian bank transfers and milestone settlements.</li>
-            <li><strong>SMS &amp; Telecommunication Aggregators:</strong> Licensed Nigerian telecommunication partners for transactional OTP delivery.</li>
-            <li><strong>Transactional Email Infrastructure:</strong> Resend for secure dispatch of inquiry notices and administrative communications.</li>
-            <li><strong>Cloud Infrastructure:</strong> SOC2 and ISO 27001 certified edge cloud hosting providers for encrypted database storage.</li>
-            <li><strong>Law Enforcement &amp; Legal Compliance:</strong> Data disclosed only when strictly mandated by a valid subpoena or court order issued by a Nigerian court of competent jurisdiction.</li>
-          </ul>
         </div>
       </section>
 
       {/* ── Section 11 ─────────────────────────────────────────────── */}
       <section id="section-11" className="space-y-4 scroll-mt-28 pb-2">
         <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
-          11. Cross-Border Data Transfers
+          11. Cookies and local storage
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
           <p>
-            Where cloud edge infrastructure is hosted in distributed data centers (e.g., AWS Cape Town or edge CDN nodes), 
-            Zed ensures full compliance with <strong>Part VI (Sections 41–43) of the NDPA 2023</strong>. Cross-border transfers 
-            occur exclusively pursuant to standard contractual clauses ensuring equivalent safeguards to Nigerian legal standards.
+            We use a session cookie to keep you signed in and browser local storage to cache your
+            ZED point balance and preferences. We do not use advertising cookies or third-party
+            tracking pixels. Cloudflare may set a short-lived security cookie (__cf_bm) to detect
+            bots; this is a strictly necessary cookie.
           </p>
         </div>
       </section>
@@ -297,75 +326,45 @@ export default function PrivacyPolicyPage() {
       {/* ── Section 12 ─────────────────────────────────────────────── */}
       <section id="section-12" className="space-y-4 scroll-mt-28 pb-2">
         <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
-          12. Technical &amp; Organizational Security Measures
+          12. Changes to this Policy
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
           <p>
-            Zed deploys rigorous technical safeguards engineered to protect citizen data:
+            We will update this Policy when we add features that affect how we handle personal
+            data. The &ldquo;Last updated&rdquo; date at the top of the page will change, and for
+            material changes we will notify signed-in users via an in-app banner. Continued use of
+            the Platform after the effective date of a change constitutes acceptance of the revised
+            Policy.
           </p>
-          <ul className="list-disc pl-5 space-y-2">
-            <li>Enforced TLS 1.3 encryption in transit with HTTP Strict Transport Security (HSTS).</li>
-            <li>Encrypted storage at rest using AES-256 for all persistent database volumes.</li>
-            <li>Cloudflare Turnstile verification and rate-limiting to neutralize credential stuffing and automated mining bots.</li>
-            <li>Principle of Least Privilege (PoLP) governing internal engineering access with hardware multi-factor authentication.</li>
-          </ul>
         </div>
       </section>
 
       {/* ── Section 13 ─────────────────────────────────────────────── */}
-      <section id="section-13" className="space-y-4 scroll-mt-28 pb-2">
+      <section id="section-13" className="space-y-4 scroll-mt-28">
         <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
-          13. Your Statutory Rights as a Data Subject
-        </h2>
-        <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
-          <p>Under Part V of the NDPA 2023, you hold enforceable rights regarding your personal data:</p>
-          <ul className="list-disc pl-5 space-y-2">
-            <li><strong>Right of Access &amp; Portability:</strong> Request a complete machine-readable copy of your profile data.</li>
-            <li><strong>Right to Rectification:</strong> Update inaccurate phone numbers, profile names, or campus affiliations.</li>
-            <li><strong>Right to Erasure (&quot;Right to be Forgotten&quot;):</strong> Request the permanent deletion of your account and hashed identifiers.</li>
-            <li><strong>Right to Object &amp; Withdraw Consent:</strong> Revoke consent for non-essential storage or close your account at any time.</li>
-          </ul>
-        </div>
-      </section>
-
-      {/* ── Section 14 ─────────────────────────────────────────────── */}
-      <section id="section-14" className="space-y-4 scroll-mt-28 pb-2">
-        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
-          14. Protection of Minors &amp; Student Data
+          13. Contact
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
           <p>
-            Zed is designed for Nigerian youth aged 16 and above (including university undergraduates and NYSC corps members). 
-            In compliance with Section 31 of the NDPA 2023, we do not knowingly solicit or process the personal data of children under 13 years of age. 
-            If we discover that personal data of a child under 13 has been collected without verifiable parental consent, it will be deleted immediately.
+            For any privacy question, subject access request, or complaint, contact us at{" "}
+            <a
+              href="mailto:privacy@zedproject.ng"
+              className="text-[#2E82F7] underline"
+            >
+              privacy@zedproject.ng
+            </a>
+            . If we cannot resolve your concern, you may contact the Nigeria Data Protection
+            Commission at{" "}
+            <a
+              href="https://ndpc.gov.ng"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#2E82F7] underline"
+            >
+              ndpc.gov.ng
+            </a>
+            .
           </p>
-        </div>
-      </section>
-
-      {/* ── Section 15 ─────────────────────────────────────────────── */}
-      <section id="section-15" className="space-y-4 scroll-mt-28">
-        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
-          15. Regulatory Recourse (NDPC) &amp; Data Protection Officer Contact
-        </h2>
-        <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
-          <p>
-            If you have questions, subject access requests, or believe your rights have not been respected, contact our Data Protection Officer:
-          </p>
-          <div className="p-4 rounded-lg border border-[#E5E5E0] dark:border-white/10 bg-[#FAFAF8] dark:bg-[#141416] text-xs font-mono space-y-1 text-[#fafaf8] ">
-            <strong>Data Protection &amp; Privacy Desk</strong><br />
-            Zed Project<br />
-            Lagos, Nigeria.<br />
-            Email: <a href="mailto:privacy@zedproject.ng" className="text-[#2E82F7] underline">privacy@zedproject.ng</a>
-          </div>
-          <p className="pt-2">
-            You also have the statutory right to lodge a complaint directly with the primary supervisory authority:
-          </p>
-          <div className="p-4 rounded-lg border border-[#E5E5E0] dark:border-white/10 bg-[#ffffff] dark:bg-[#141416] text-xs font-mono space-y-1 text-[#fafaf8] ">
-            <strong>NIGERIA DATA PROTECTION COMMISSION (NDPC)</strong><br />
-            No. 5, Charles de Gaulle Street, Asokoro, Abuja, Nigeria.<br />
-            Official Portal: <a href="https://ndpc.gov.ng" target="_blank" rel="noopener noreferrer" className="text-[#2E82F7] underline">ndpc.gov.ng</a><br />
-            Email: info@ndpc.gov.ng
-          </div>
         </div>
       </section>
     </LegalPageLayout>
