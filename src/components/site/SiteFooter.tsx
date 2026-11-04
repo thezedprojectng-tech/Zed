@@ -20,6 +20,7 @@ const COMPANY_LINKS = [
   { href: "/fund", label: "Fund Your Idea" },
   { href: "/ambassadors", label: "Campus Ambassadors" },
   { href: "/mentorship", label: "Mentorship" },
+  { href: "/alumni-office-hours", label: "Alumni Office Hours" },
   { href: "/whitepaper", label: "White Paper" },
   { href: "/careers", label: "Careers" },
   { href: "/privacy", label: "Privacy Policy" },

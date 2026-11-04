@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { getPublishedRoles } from "@/lib/careers/queries";
 import { getPublishedInternshipsForSitemap } from "@/lib/internships/queries";
 import { getPublishedCampusHubsForSitemap } from "@/lib/campus-hubs/queries";
+import { getPublishedAlumniForSitemap } from "@/lib/alumni-office-hours/queries";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://zedproject.ng";
@@ -12,6 +13,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/careers",
     "/internships",
     "/campus-hubs",
+    "/alumni-office-hours",
+    "/alumni-office-hours/apply",
     "/ambassadors",
     "/mentorship",
     "/fund",
@@ -27,13 +30,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     changeFrequency:
       route === ""
         ? ("daily" as const)
-        : route === "/careers" || route === "/internships" || route === "/campus-hubs"
+        : route === "/careers" ||
+            route === "/internships" ||
+            route === "/campus-hubs" ||
+            route === "/alumni-office-hours"
           ? ("weekly" as const)
           : ("monthly" as const),
     priority:
       route === ""
         ? 1.0
-        : route === "/careers" || route === "/internships" || route === "/campus-hubs"
+        : route === "/careers" ||
+            route === "/internships" ||
+            route === "/campus-hubs" ||
+            route === "/alumni-office-hours"
           ? 0.8
           : 0.6,
   }));
@@ -77,10 +86,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     campusHubEntries = [];
   }
 
+  let alumniEntries: MetadataRoute.Sitemap = [];
+  try {
+    const alumni = await getPublishedAlumniForSitemap();
+    alumniEntries = alumni.map((item) => ({
+      url: `${baseUrl}/alumni-office-hours/${item.id}`,
+      lastModified: new Date(item.published_at || item.updated_at),
+      changeFrequency: "weekly" as const,
+      priority: 0.7,
+    }));
+  } catch {
+    alumniEntries = [];
+  }
+
   return [
     ...staticEntries,
     ...jobEntries,
     ...internshipEntries,
     ...campusHubEntries,
+    ...alumniEntries,
   ];
 }

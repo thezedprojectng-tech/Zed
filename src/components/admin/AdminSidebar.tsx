@@ -21,6 +21,7 @@ import {
   Award,
   HandHeart,
   Building2,
+  UserCheck,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -35,6 +36,7 @@ interface AdminSidebarProps {
   pendingInternshipsCount?: number;
   newAmbassadorsCount?: number;
   newMentorshipCount?: number;
+  newAlumniCount?: number;
 }
 
 const navItems = [
@@ -43,6 +45,7 @@ const navItems = [
   { href: "/admin/contact", label: "Contact Inbox", icon: Mail, exact: false, badgeKey: "contact" },
   { href: "/admin/ambassadors", label: "Ambassadors", icon: Award, exact: false, badgeKey: "ambassadors" },
   { href: "/admin/mentorship", label: "Mentorship", icon: HandHeart, exact: false, badgeKey: "mentorship" },
+  { href: "/admin/alumni-office-hours", label: "Alumni Office Hours", icon: UserCheck, exact: false, badgeKey: "alumni" },
   { href: "/admin/internships", label: "Internships", icon: Search, exact: false, badgeKey: "internships" },
   { href: "/admin/campus-hubs", label: "Campus Hubs", icon: Building2, exact: false },
   { href: "/admin/careers", label: "Careers", icon: Briefcase, exact: false },
@@ -61,6 +64,7 @@ export function AdminSidebar({
   pendingInternshipsCount = 0,
   newAmbassadorsCount = 0,
   newMentorshipCount = 0,
+  newAlumniCount = 0,
 }: AdminSidebarProps) {
   const pathname = usePathname();
 
@@ -123,7 +127,9 @@ export function AdminSidebar({
                       ? newAmbassadorsCount
                       : badgeKey === "mentorship"
                         ? newMentorshipCount
-                        : 0;
+                        : badgeKey === "alumni"
+                          ? newAlumniCount
+                          : 0;
               const showBadge = badgeCount > 0;
 
               return (

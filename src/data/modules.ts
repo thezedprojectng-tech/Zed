@@ -159,9 +159,10 @@ export const MODULES: ZedModule[] = [
     name: "Alumni Office Hours",
     tagline: "Direct mentorship and career advice from experienced alumni.",
     icon: Users,
-    status: "soon",
+    status: "live",
     phase: "Phase 3",
-    what: "Alumni Office Hours will connect current students and early-career youth with seasoned professionals through structured, time-boxed mentorship sessions hosted on the Zed platform.",
+    href: "/alumni-office-hours",
+    what: "Alumni volunteers share career advice with students. Profiles are reviewed by the Zed team, and students contact them through the link they choose.",
   },
   {
     slug: "creator-lab",
