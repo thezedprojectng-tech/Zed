@@ -22,6 +22,7 @@ import {
   HandHeart,
   Building2,
   UserCheck,
+  Sliders,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -54,6 +55,7 @@ const navItems = [
   { href: "/admin/referrals", label: "Referrals", icon: Share2, exact: false },
   { href: "/admin/withdrawals", label: "Withdrawals", icon: Banknote, exact: false },
   { href: "/admin/settings/zed", label: "ZED Token", icon: Coins, exact: false },
+  { href: "/admin/settings/levels", label: "Level Rules", icon: Sliders, exact: false },
   { href: "/admin/market", label: "Market Moderation", icon: ShoppingBag, exact: false },
   { href: "/admin/audit-log", label: "Audit Log", icon: ScrollText, exact: false },
 ];
