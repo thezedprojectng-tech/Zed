@@ -106,6 +106,18 @@ export default async function AdminLayout({
     newAlumniCount = 0;
   }
 
+  // 8. Fetch pending bank verifications count (safely fallback to 0)
+  let pendingVerificationsCount = 0;
+  try {
+    const { count } = await admin
+      .from("bank_verifications")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "pending");
+    pendingVerificationsCount = count ?? 0;
+  } catch {
+    pendingVerificationsCount = 0;
+  }
+
   return (
     <div className="flex min-h-dvh w-full bg-background text-foreground antialiased font-sans selection:bg-amber-500/20 selection:text-amber-500">
       {/* Dedicated Admin Sidebar */}
@@ -116,6 +128,7 @@ export default async function AdminLayout({
         newAmbassadorsCount={newAmbassadorsCount}
         newMentorshipCount={newMentorshipCount}
         newAlumniCount={newAlumniCount}
+        pendingVerificationsCount={pendingVerificationsCount}
       />
 
       {/* Main Console Content */}

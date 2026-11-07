@@ -23,6 +23,7 @@ import {
   Building2,
   UserCheck,
   Sliders,
+  ShieldCheck,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -38,11 +39,13 @@ interface AdminSidebarProps {
   newAmbassadorsCount?: number;
   newMentorshipCount?: number;
   newAlumniCount?: number;
+  pendingVerificationsCount?: number;
 }
 
 const navItems = [
   { href: "/admin", label: "Overview", icon: LayoutDashboard, exact: true },
   { href: "/admin/users", label: "Users", icon: Users, exact: false },
+  { href: "/admin/verifications", label: "Verifications", icon: ShieldCheck, exact: false, badgeKey: "verifications" },
   { href: "/admin/contact", label: "Contact Inbox", icon: Mail, exact: false, badgeKey: "contact" },
   { href: "/admin/ambassadors", label: "Ambassadors", icon: Award, exact: false, badgeKey: "ambassadors" },
   { href: "/admin/mentorship", label: "Mentorship", icon: HandHeart, exact: false, badgeKey: "mentorship" },
@@ -67,6 +70,7 @@ export function AdminSidebar({
   newAmbassadorsCount = 0,
   newMentorshipCount = 0,
   newAlumniCount = 0,
+  pendingVerificationsCount = 0,
 }: AdminSidebarProps) {
   const pathname = usePathname();
 
@@ -131,7 +135,9 @@ export function AdminSidebar({
                         ? newMentorshipCount
                         : badgeKey === "alumni"
                           ? newAlumniCount
-                          : 0;
+                          : badgeKey === "verifications"
+                            ? pendingVerificationsCount
+                            : 0;
               const showBadge = badgeCount > 0;
 
               return (
