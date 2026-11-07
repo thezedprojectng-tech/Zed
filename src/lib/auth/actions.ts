@@ -33,13 +33,6 @@ export function isValidNigerianPhone(phone: string): boolean {
 }
 
 /**
- * Validates 11-digit NIN format
- */
-export function isValidNIN(nin: string): boolean {
-  return /^\d{11}$/.test(nin.trim());
-}
-
-/**
  * Sign up a new user with email and password.
  * Passes full_name and phone_number into user_metadata.
  * A database trigger on auth.users automatically inserts the public.users profile row.

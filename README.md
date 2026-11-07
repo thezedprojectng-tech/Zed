@@ -2,7 +2,7 @@
 
 The all-in-one digital OS for Nigerian Gen Z: civil guides, skills, freelance work, community, campus life, creator resources and safety, with off-chain $ZED rewards.
 
-This repository is **Phase 1 (Days 1-30, Core Foundation)**: a Next.js PWA, authentication, a NIN verification pipeline and the Zed Nav civil process engine. Other modules are shown as "Coming soon".
+This repository is **Phase 1 (Days 1-30, Core Foundation)**: a Next.js PWA, authentication, a bank account verification pipeline and the Zed Nav civil process engine. Other modules are shown as "Coming soon".
 
 Live: https://zedng.vercel.app
 
@@ -12,7 +12,7 @@ Live: https://zedng.vercel.app
 |---|---|
 | Next.js PWA shell, offline caching | Built |
 | Authentication (email + password, phone saved to profile) | Built |
-| NIN verification pipeline | Built, **demo provider** (mocked) |
+| Bank account verification pipeline | Built, admin review queue |
 | Zed Nav engine (JSON flows, state machine) | Built |
 | Flows: Passport, NYSC, NIN/BVN, CAC | Built |
 | Document checker (client-side) | Built |
@@ -58,7 +58,6 @@ Open http://localhost:3000.
 | `NEXT_PUBLIC_SUPABASE_URL` | Browser and server | Supabase project URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Browser and server | Public anon key |
 | `SUPABASE_SERVICE_ROLE_KEY` | **Server only** | Never expose or commit. Used for admin actions |
-| `NIN_HASH_SALT` | **Server only** | At least 32 characters. Generate with `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"` |
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Browser | Cloudflare Turnstile site key. Omit in dev to use the always-pass test key. |
 | `TURNSTILE_SECRET_KEY` | **Server only** | Cloudflare Turnstile secret key. Required in production. |
 | `FUNDING_IP_SALT` | **Server only** | Salt for client IP SHA-256 hash in /fund submissions (fail-closed if missing). |
@@ -99,8 +98,7 @@ Admin pages are protected server-side. Non-admins receive a 404.
 
 ## Security notes
 
-- The NIN is validated (11 digits) and **only a salted SHA-256 hash is stored**. The raw NIN is never stored or logged.
-- NIN verification currently uses a mock provider and the UI labels it "Demo verification".
+- Verification is performed via manual review of submitted bank account details by Zed administrators.
 - The service role key is used only in server code.
 - Row Level Security is enabled. Users can read and update only their own profile, and column grants limit what can be edited.
 - Admin actions are written to an append-only audit log.
@@ -122,7 +120,7 @@ Flows are JSON files in `src/data/nav/` and are validated against a Zod schema. 
 
 - Email + password sign-in instead of phone OTP (OTP is planned).
 - Supabase (Auth, Postgres, RLS) instead of a separate Fastify or FastAPI service with Redis.
-- NIN provider is mocked. A real provider integration is needed for production.
+- Verification is handled via manual admin review of submitted Nigerian bank accounts.
 - The marketing site and admin console are additions beyond the Phase 1 scope.
 
 ## Roadmap

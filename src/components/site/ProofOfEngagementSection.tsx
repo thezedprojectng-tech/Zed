@@ -9,7 +9,7 @@ const LEVEL_MATRIX = [
   {
     level: 1,
     name: "Rookie",
-    criteria: "Account creation + Phone / NIN verification",
+    criteria: "Account creation + account verification",
     multiplier: "×1.0",
     cap: "100 $ZED/day",
   },

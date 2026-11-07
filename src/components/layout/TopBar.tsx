@@ -60,7 +60,7 @@ const routeLabels: Record<string, string> = {
   "nin-bvn": "NIN & BVN",
   cac: "CAC Registration",
   profile: "Profile",
-  "verify-nin": "NIN Verification",
+  verify: "Bank Verification",
   admin: "Admin",
   users: "Users",
 };
@@ -320,9 +320,9 @@ export function TopBar({
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <Link href="/verify-nin" className="cursor-pointer">
+              <Link href="/verify" className="cursor-pointer">
                 <ShieldCheck className="mr-2 h-4 w-4" />
-                <span>NIN Verification</span>
+                <span>Verify account</span>
               </Link>
             </DropdownMenuItem>
             {profile?.role === "admin" && (

@@ -10,7 +10,7 @@ export const LEVELS: Level[] = [
   {
     id: 2,
     name: "Zed Citizen",
-    unlock_criteria: "Verify your NIN and complete 3 nav guides",
+    unlock_criteria: "Verify your account and complete 3 nav guides",
   },
   {
     id: 3,

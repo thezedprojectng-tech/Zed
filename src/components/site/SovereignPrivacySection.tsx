@@ -7,16 +7,16 @@ import { FadeIn } from "./FadeIn";
 
 const PRIVACY_CARDS = [
   {
-    title: "Salted SHA-256 Digest",
-    desc: "One-way irreversible identity token",
+    title: "Manual Review",
+    desc: "Reviewed manually by the Zed team",
   },
   {
-    title: "Zero Plaintext Cloud Storage",
-    desc: "Raw NIN never written to physical disk",
+    title: "Masked Display",
+    desc: "Only the last four digits shown to you",
   },
   {
     title: "Data Protection First",
-    desc: "Designed with data protection in mind; NIN is hashed, never stored raw",
+    desc: "Designed with data protection in mind",
   },
 ];
 
@@ -43,15 +43,15 @@ export function SovereignPrivacySection() {
                 </motion.div>
 
                 <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-[#0B0B0C] dark:text-[#FAFAF8]">
-                  Your NIN stays yours.
+                  Your details stay yours.
                 </h2>
 
                 <div className="font-sans text-sm sm:text-base text-[#57575e] dark:text-zinc-400 space-y-3.5 leading-relaxed">
                   <p>
-                    Your National Identity Number is the master key to your civil, banking, and travel records. Storing raw identity numbers in cloud databases creates an unacceptable attack surface for identity theft.
+                    Your bank details are used only to confirm you are a real person and for future payouts.
                   </p>
                   <p>
-                    Zed transmits your NIN over an encrypted HTTPS connection and hashes it with a secret salt on our server. Under no circumstances is your raw 11-digit NIN written, logged, or persisted in our databases. Verification operates in demo mode, and only the cryptographic hash is retained.
+                    You submit your bank, account number and account name. The Zed team reviews them manually. Only Zed admins can see the full account number; the app shows you the last four digits.
                   </p>
                 </div>
 

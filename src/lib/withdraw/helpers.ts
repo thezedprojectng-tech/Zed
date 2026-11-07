@@ -111,7 +111,7 @@ export function mapWithdrawalError(rawError?: string | null): string {
   }
 
   if (msg.includes("not verified") || msg.includes("must be verified")) {
-    return "You must verify your NIN before you can withdraw ZED.";
+    return "You must verify your account before you can withdraw ZED.";
   }
 
   if (msg.includes("withdrawals are currently disabled")) {

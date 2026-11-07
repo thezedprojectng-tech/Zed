@@ -16,7 +16,7 @@ async function UsersContent() {
   const currentAdminId = await requireAdmin();
   const admin = createAdminClient();
 
-  // 1. Fetch public.users (never query or select nin_hash)
+  // 1. Fetch public.users (never query or select sensitive columns)
   const { data: usersRaw, error: usersErr } = await admin
     .from("users")
     .select("id, full_name, avatar_url, phone_number, level_id, is_verified, role, created_at, updated_at")

@@ -463,8 +463,8 @@ export function EditProfileSection() {
 
           <p className="text-[10px] text-muted-foreground">
             {isVerified
-              ? "Your full name is verified via NIN and locked to protect your account integrity and trust."
-              : "Will be locked permanently once you complete your official NIN verification."}
+              ? "Your full name is locked because your account is verified."
+              : "Will be locked once your account is verified."}
           </p>
         </div>
 

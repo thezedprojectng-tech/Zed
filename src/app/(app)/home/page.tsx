@@ -519,10 +519,9 @@ export default async function HomePage() {
                   </div>
                   <span className="type-caption text-primary">IDENTITY VERIFICATION</span>
                 </div>
-                <h2 className="type-h2 text-foreground">Verify your NIN to level up</h2>
+                <h2 className="type-h2 text-foreground">Verify your account</h2>
                 <p className="type-small text-muted-foreground">
-                  Verify your 11-digit National Identity Number to confirm your identity
-                  and unlock your next progression level.
+                  Submit your bank account for a manual review by the Zed team.
                 </p>
               </div>
               <div className="shrink-0">
@@ -530,8 +529,8 @@ export default async function HomePage() {
                   asChild
                   className="bg-primary text-primary-foreground hover:bg-primary/90 font-medium px-5"
                 >
-                  <Link href="/verify-nin">
-                    Verify National Identity
+                  <Link href="/verify">
+                    Verify account
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>

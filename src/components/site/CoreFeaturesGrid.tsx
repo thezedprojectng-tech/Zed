@@ -34,7 +34,7 @@ const FEATURES = [
     icon: Users,
     title: "Zed Meet & Campus Hubs",
     description:
-      "WebRTC 1-on-1 speed networking with Level 1+ NIN verification, Live Audio Rooms (+150 $ZED reward), and dedicated university hubs across UNILAG, OAU, UI, FUTA, ABU Zaria, and Covenant.",
+      "WebRTC 1-on-1 speed networking with Level 1+ account verification, Live Audio Rooms (+150 $ZED reward), and dedicated university hubs across UNILAG, OAU, UI, FUTA, ABU Zaria, and Covenant.",
   },
   {
     icon: Coins,

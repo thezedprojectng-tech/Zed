@@ -7,8 +7,8 @@ import { createClient } from "@supabase/supabase-js";
  * CRITICAL SECURITY RULES:
  *  1. NEVER import this file into Client Components.
  *  2. NEVER expose SUPABASE_SERVICE_ROLE_KEY to the browser.
- *  3. Use strictly for backend operations that must bypass RLS (e.g. updating nin_hash,
- *     is_verified, or level_id in /api/nin/verify).
+ *  3. Use strictly for backend operations that must bypass RLS (e.g. managing sensitive rows,
+ *     verifications, or administrative queries).
  */
 export function createAdminClient() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;

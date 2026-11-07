@@ -65,7 +65,7 @@ export function VerificationDonutChart({
           </Badge>
         </div>
         <CardDescription className="text-xs text-muted-foreground">
-          NIN-verified vs pending verification status
+          Verified vs pending verification status
         </CardDescription>
       </CardHeader>
 

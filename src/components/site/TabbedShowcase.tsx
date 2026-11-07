@@ -94,7 +94,7 @@ const TABS: FlowTab[] = [
         { label: "Enrolment Center", status: "Mapped", detail: "Designated NIMC center appointment scheduled" },
         { label: "Bank Notification Slip", status: "Prepared", detail: "NIMC update slip generated for commercial bank submission" },
       ],
-      footerNote: "Cryptographic hash security: your NIN is never stored in plaintext",
+      footerNote: "Bank details are reviewed by the Zed team only",
     },
   },
   {

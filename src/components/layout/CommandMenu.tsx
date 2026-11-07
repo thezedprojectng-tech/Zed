@@ -208,15 +208,15 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
 
         <CommandGroup heading="Actions & System">
           <CommandItem
-            onSelect={() => handleSelect(() => router.push("/verify-nin"))}
+            onSelect={() => handleSelect(() => router.push("/verify"))}
           >
             <div className="flex h-7 w-7 items-center justify-center rounded-md border-hairline bg-secondary shrink-0 text-muted-foreground">
               <ShieldCheck className="h-3.5 w-3.5" />
             </div>
             <div className="flex flex-col flex-1 min-w-0">
-              <span className="font-medium text-foreground">Verify National Identity (NIN)</span>
+              <span className="font-medium text-foreground">Verify account</span>
               <span className="text-[11px] text-muted-foreground">
-                Verify your account and unlock Rookie (Level 1)
+                Confirm your bank account details
               </span>
             </div>
           </CommandItem>

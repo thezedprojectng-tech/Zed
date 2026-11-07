@@ -110,7 +110,7 @@ export function WithdrawClient({ overview }: WithdrawClientProps) {
     }
 
     if (!isVerified) {
-      toast.error("Please verify your NIN before requesting a withdrawal.");
+      toast.error("Please verify your account before requesting a withdrawal.");
       return;
     }
 
@@ -306,11 +306,11 @@ export function WithdrawClient({ overview }: WithdrawClientProps) {
               <div className="text-xs space-y-1">
                 {isVerifiedBadgeEnabled() ? (
                   <>
-                    <p className="font-semibold text-foreground">NIN verification required</p>
+                    <p className="font-semibold text-foreground">Account verification required</p>
                     <p className="text-muted-foreground">
                       You must verify your identity before you can make bank withdrawals.{" "}
-                      <Link href="/nin" className="text-primary underline font-medium">
-                        Verify NIN now
+                      <Link href="/verify" className="text-primary underline font-medium">
+                        Verify account now
                       </Link>
                     </p>
                   </>
@@ -494,7 +494,7 @@ export function WithdrawClient({ overview }: WithdrawClientProps) {
                       <Input
                         id="account-name"
                         type="text"
-                        placeholder="Must match your verified NIN name"
+                        placeholder="Must match your verified account name"
                         value={accountName}
                         onChange={(e) => setAccountName(e.target.value)}
                         disabled={hasPending || !isVerified || !isLevelEligible || isPending}

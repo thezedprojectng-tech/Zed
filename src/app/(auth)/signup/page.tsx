@@ -212,7 +212,7 @@ function SignupForm() {
       {/* Full Name */}
       <div className="space-y-1.5">
         <label className="text-xs font-mono uppercase tracking-wider text-muted-foreground block">
-          Full Legal Name (as on NIN)
+          Full name (as on your bank account)
         </label>
         <div
           className={`flex h-14 items-center gap-3 rounded-xl border bg-secondary/30 px-4 transition-all focus-within:border-primary focus-within:ring-1 focus-within:ring-primary ${

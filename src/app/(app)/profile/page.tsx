@@ -100,8 +100,8 @@ export default function ProfilePage() {
               </div>
               <p className="text-xs text-muted-foreground leading-relaxed">
                 {isVerified
-                  ? `Your 11-digit NIN has been verified in demo mode. Your account status is verified at level ${getLevelName(civicLevel)}.`
-                  : "Your account is unverified. Verify your National Identity Number (NIN) in demo mode to verify your account and unlock your next level."}
+                  ? `Your account is verified at level ${getLevelName(civicLevel)}.`
+                  : "Your account is not verified yet. Submit your bank account details so the Zed team can review them."}
               </p>
             </div>
           </div>
@@ -109,8 +109,8 @@ export default function ProfilePage() {
           {!isVerified && isVerifiedBadgeEnabled() && (
             <div className="pt-2">
               <Button asChild size="sm" className="w-full gap-2">
-                <Link href="/verify-nin">
-                  <span>Verify NIN now</span>
+                <Link href="/verify">
+                  <span>Verify account now</span>
                   <ArrowRight className="h-4 w-4" />
                 </Link>
               </Button>

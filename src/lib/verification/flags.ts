@@ -5,7 +5,7 @@
  * - VerifiedBadge and "Not verified" tags are hidden across the entire application.
  * - Unverified seller caution dialogs are bypassed on contact reveal.
  * - Dismissible "Get verified" prompt cards are hidden on the dashboard and profile.
- * - Withdrawal pages show "Withdrawals are not open yet" instead of prompting for NIN verification.
+ * - Withdrawal pages show "Withdrawals are not open yet" instead of prompting for account verification.
  */
 export function isVerifiedBadgeEnabled(): boolean {
   return process.env.NEXT_PUBLIC_SHOW_VERIFIED_BADGE === "true";

@@ -5,7 +5,6 @@
 export interface ZedUser {
   id: string;
   phone_number: string;
-  nin_hash?: string | null;
   full_name: string;
   display_name?: string | null;
   username?: string | null;
@@ -66,14 +65,4 @@ export interface OtpRequestPayload {
 export interface OtpVerifyPayload {
   phone_number: string;
   token: string;
-}
-
-export interface NinVerifyPayload {
-  nin: string;
-}
-
-export interface NinVerifyResponse {
-  success: boolean;
-  message: string;
-  is_verified?: boolean;
 }

@@ -86,7 +86,7 @@ describe("Zed Withdrawals - Error Mapping", () => {
   it("maps verification requirement errors", () => {
     expect(
       mapWithdrawalError("User must be verified to request a withdrawal")
-    ).toBe("You must verify your NIN before you can withdraw ZED.");
+    ).toBe("You must verify your account before you can withdraw ZED.");
   });
 
   it("maps disabled withdrawals error", () => {
@@ -239,7 +239,7 @@ describe("Zed Withdrawals - Zod Schemas Validation", () => {
 
     const rejectWithReason = {
       decision: "rejected",
-      reject_reason: "Account name mismatch with NIN registration",
+      reject_reason: "Account name mismatch with bank record",
     };
     expect(adminReviewSchema.safeParse(rejectWithReason).success).toBe(true);
   });

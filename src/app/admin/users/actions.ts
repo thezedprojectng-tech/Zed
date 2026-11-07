@@ -182,7 +182,7 @@ export async function changeUserRoleAction(
 }
 
 /**
- * Server action: Export users CSV (masked phone, no NIN data).
+ * Server action: Export users CSV (masked phone, no sensitive columns).
  * Logs export to audit log and returns CSV string.
  */
 export async function exportUsersCsvAction(): Promise<{
@@ -194,7 +194,7 @@ export async function exportUsersCsvAction(): Promise<{
     const currentAdminId = await requireAdmin();
     const admin = createAdminClient();
 
-    // Fetch users (never select nin_hash)
+    // Fetch users (never select sensitive columns)
     const { data: users, error } = await admin
       .from("users")
       .select("id, full_name, phone_number, level_id, is_verified, role, created_at")

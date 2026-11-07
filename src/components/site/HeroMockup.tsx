@@ -221,7 +221,7 @@ export function HeroMockup() {
                 <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400">
                   <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
                   <span className="text-[#0B0B0C] dark:text-zinc-200 text-[11px]">
-                    NIN record match verified
+                    Bank account confirmed
                   </span>
                 </div>
                 <div className="flex items-center gap-2 text-[#2E82F7]">

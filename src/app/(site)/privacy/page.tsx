@@ -16,17 +16,18 @@ export const metadata: Metadata = {
 const TOC = [
   { id: "section-1", title: "Who we are" },
   { id: "section-2", title: "What we collect" },
-  { id: "section-3", title: "Why we use your data" },
-  { id: "section-4", title: "What becomes public" },
-  { id: "section-5", title: "Who we share data with" },
-  { id: "section-6", title: "Transfers outside Nigeria" },
-  { id: "section-7", title: "How long we keep data" },
-  { id: "section-8", title: "Security" },
-  { id: "section-9", title: "Your rights" },
-  { id: "section-10", title: "Children" },
-  { id: "section-11", title: "Cookies and local storage" },
-  { id: "section-12", title: "Changes to this Policy" },
-  { id: "section-13", title: "Contact" },
+  { id: "section-3", title: "Bank account details" },
+  { id: "section-4", title: "Why we use your data" },
+  { id: "section-5", title: "What becomes public" },
+  { id: "section-6", title: "Who we share data with" },
+  { id: "section-7", title: "Transfers outside Nigeria" },
+  { id: "section-8", title: "How long we keep data" },
+  { id: "section-9", title: "Security" },
+  { id: "section-10", title: "Your rights" },
+  { id: "section-11", title: "Children" },
+  { id: "section-12", title: "Cookies and local storage" },
+  { id: "section-13", title: "Changes to this Policy" },
+  { id: "section-14", title: "Contact" },
 ];
 
 /**
@@ -93,6 +94,10 @@ export default function PrivacyPolicyPage() {
               contact details you choose to share, subject to your consent at submission.
             </li>
             <li>
+              <strong>Bank account details:</strong> your bank name, account number, and account
+              name if you submit your account for verification.
+            </li>
+            <li>
               <strong>Technical data:</strong> IP address (hashed for rate-limiting, not stored in
               plain text), browser type, and pages visited, collected automatically when you use
               the Platform.
@@ -104,7 +109,30 @@ export default function PrivacyPolicyPage() {
       {/* ── Section 3 ──────────────────────────────────────────────── */}
       <section id="section-3" className="space-y-4 scroll-mt-28 pb-2">
         <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
-          3. Why we use your data
+          3. Bank account details
+        </h2>
+        <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
+          <ul className="list-disc pl-5 space-y-2">
+            <li>
+              <strong>What we collect:</strong> your bank name, account number, and account name.
+            </li>
+            <li>
+              <strong>Why we collect it:</strong> to confirm you are a real person and for future payouts.
+            </li>
+            <li>
+              <strong>Who can see it:</strong> Zed admins review your submission manually. In the app, you see only the last four digits of your account number.
+            </li>
+            <li>
+              <strong>Retention:</strong> kept while your account exists, and deleted with the account.
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      {/* ── Section 4 ──────────────────────────────────────────────── */}
+      <section id="section-4" className="space-y-4 scroll-mt-28 pb-2">
+        <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
+          4. Why we use your data
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
           <ul className="list-disc pl-5 space-y-2">
@@ -136,10 +164,10 @@ export default function PrivacyPolicyPage() {
         </div>
       </section>
 
-      {/* ── Section 4 ──────────────────────────────────────────────── */}
-      <section id="section-4" className="space-y-4 scroll-mt-28 pb-2">
+      {/* ── Section 5 ──────────────────────────────────────────────── */}
+      <section id="section-5" className="space-y-4 scroll-mt-28 pb-2">
         <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
-          4. What becomes public
+          5. What becomes public
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
           <ul className="list-disc pl-5 space-y-2">
@@ -168,10 +196,10 @@ export default function PrivacyPolicyPage() {
         </div>
       </section>
 
-      {/* ── Section 5 ──────────────────────────────────────────────── */}
-      <section id="section-5" className="space-y-4 scroll-mt-28 pb-2">
+      {/* ── Section 6 ──────────────────────────────────────────────── */}
+      <section id="section-6" className="space-y-4 scroll-mt-28 pb-2">
         <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
-          5. Who we share data with
+          6. Who we share data with
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
           <p>
@@ -181,7 +209,7 @@ export default function PrivacyPolicyPage() {
           <ul className="list-disc pl-5 space-y-2">
             <li>
               <strong>Supabase:</strong> database and authentication hosting (servers in EU West,
-              covered under Section 6 below).
+              covered under Section 7 below).
             </li>
             <li>
               <strong>Vercel:</strong> web hosting and edge functions.
@@ -200,25 +228,25 @@ export default function PrivacyPolicyPage() {
         </div>
       </section>
 
-      {/* ── Section 6 ──────────────────────────────────────────────── */}
-      <section id="section-6" className="space-y-4 scroll-mt-28 pb-2">
+      {/* ── Section 7 ──────────────────────────────────────────────── */}
+      <section id="section-7" className="space-y-4 scroll-mt-28 pb-2">
         <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
-          6. Transfers outside Nigeria
+          7. Transfers outside Nigeria
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
           <p>
             Some processors (Supabase, Vercel, Resend, Cloudflare) store or process data outside
             Nigeria. We rely on standard contractual clauses or the processor&apos;s adequacy
             status under the NDPA to legitimise those transfers. If you would like details of the
-            safeguards in place for a specific transfer, contact us at the address in Section 13.
+            safeguards in place for a specific transfer, contact us at the address in Section 14.
           </p>
         </div>
       </section>
 
-      {/* ── Section 7 ──────────────────────────────────────────────── */}
-      <section id="section-7" className="space-y-4 scroll-mt-28 pb-2">
+      {/* ── Section 8 ──────────────────────────────────────────────── */}
+      <section id="section-8" className="space-y-4 scroll-mt-28 pb-2">
         <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
-          7. How long we keep data
+          8. How long we keep data
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
           <ul className="list-disc pl-5 space-y-2">
@@ -244,10 +272,10 @@ export default function PrivacyPolicyPage() {
         </div>
       </section>
 
-      {/* ── Section 8 ──────────────────────────────────────────────── */}
-      <section id="section-8" className="space-y-4 scroll-mt-28 pb-2">
+      {/* ── Section 9 ──────────────────────────────────────────────── */}
+      <section id="section-9" className="space-y-4 scroll-mt-28 pb-2">
         <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
-          8. Security
+          9. Security
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
           <p>
@@ -266,10 +294,10 @@ export default function PrivacyPolicyPage() {
         </div>
       </section>
 
-      {/* ── Section 9 ──────────────────────────────────────────────── */}
-      <section id="section-9" className="space-y-4 scroll-mt-28 pb-2">
+      {/* ── Section 10 ─────────────────────────────────────────────── */}
+      <section id="section-10" className="space-y-4 scroll-mt-28 pb-2">
         <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
-          9. Your rights
+          10. Your rights
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
           <p>
@@ -297,10 +325,10 @@ export default function PrivacyPolicyPage() {
         </div>
       </section>
 
-      {/* ── Section 10 ─────────────────────────────────────────────── */}
-      <section id="section-10" className="space-y-4 scroll-mt-28 pb-2">
+      {/* ── Section 11 ─────────────────────────────────────────────── */}
+      <section id="section-11" className="space-y-4 scroll-mt-28 pb-2">
         <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
-          10. Children
+          11. Children
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
           <p>
@@ -312,10 +340,10 @@ export default function PrivacyPolicyPage() {
         </div>
       </section>
 
-      {/* ── Section 11 ─────────────────────────────────────────────── */}
-      <section id="section-11" className="space-y-4 scroll-mt-28 pb-2">
+      {/* ── Section 12 ─────────────────────────────────────────────── */}
+      <section id="section-12" className="space-y-4 scroll-mt-28 pb-2">
         <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
-          11. Cookies and local storage
+          12. Cookies and local storage
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
           <p>
@@ -327,10 +355,10 @@ export default function PrivacyPolicyPage() {
         </div>
       </section>
 
-      {/* ── Section 12 ─────────────────────────────────────────────── */}
-      <section id="section-12" className="space-y-4 scroll-mt-28 pb-2">
+      {/* ── Section 13 ─────────────────────────────────────────────── */}
+      <section id="section-13" className="space-y-4 scroll-mt-28 pb-2">
         <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
-          12. Changes to this Policy
+          13. Changes to this Policy
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
           <p>
@@ -343,10 +371,10 @@ export default function PrivacyPolicyPage() {
         </div>
       </section>
 
-      {/* ── Section 13 ─────────────────────────────────────────────── */}
-      <section id="section-13" className="space-y-4 scroll-mt-28">
+      {/* ── Section 14 ─────────────────────────────────────────────── */}
+      <section id="section-14" className="space-y-4 scroll-mt-28">
         <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0B0B0C] dark:text-[#FAFAF8]">
-          13. Contact
+          14. Contact
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
           <p>

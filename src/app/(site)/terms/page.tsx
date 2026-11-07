@@ -160,7 +160,7 @@ export default function TermsPage() {
           </p>
           <ul className="list-disc pl-5 space-y-2">
             <li>Zero tolerance for hate speech, harassment, cyber-stalking, financial fraud (&quot;419&quot; scams), phone number farming, or explicit adult content.</li>
-            <li>Users must hold Level 1+ verified status (phone/NIN verification) to initiate randomized matching.</li>
+            <li>Users must hold Level 1+ verified status (account verification) to initiate randomized matching.</li>
             <li>
               <strong>Consent to Moderation Buffering:</strong> You acknowledge and expressly consent that during Zed Meet sessions, 
               the client software maintains a temporary 30-second rolling audio buffer in volatile device memory. If a counterparty triggers 

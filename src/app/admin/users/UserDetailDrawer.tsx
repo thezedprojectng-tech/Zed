@@ -272,12 +272,6 @@ export function UserDetailDrawer({
                     </span>
                   </div>
                 )}
-                <div className="flex items-center justify-between border-t border-border/50 pt-2 text-[11px]">
-                  <span className="text-muted-foreground">Identity Privacy</span>
-                  <span className="font-mono text-emerald-500">
-                    Salted SHA-256 (Raw NIN never stored)
-                  </span>
-                </div>
               </div>
             </div>
 

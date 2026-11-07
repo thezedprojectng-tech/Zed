@@ -68,9 +68,9 @@ const FAQ_ITEMS = [
       "Yes. Zed is built lightweight for weak networks with aggressive Service Worker caching. Core procedural playbooks, requirement checklists, and statutory fee schedules are cached locally on your device via IndexedDB, enabling access in government basement offices with zero cellular signal.",
   },
   {
-    question: "What happens to my NIN and personal data?",
+    question: "What do you collect when I verify my account?",
     answer:
-      "Zed never stores your raw 11-digit NIN or sensitive banking credentials. In our verification pipeline, your NIN is transmitted over an encrypted HTTPS connection and processed with a salted SHA-256 cryptographic digest on our servers. Designed with data protection in mind; NIN is hashed, never stored raw.",
+      "To verify your account you submit a Nigerian bank account (bank, account number and account name). The Zed team reviews it manually. The app shows you only the last four digits; Zed admins can see the full number. See the Privacy Policy for details.",
   },
   {
     question: "Which administrative playbooks are currently live in Zed Nav?",
@@ -93,7 +93,7 @@ const LEVEL_MATRIX = [
   {
     level: 1,
     name: "Rookie",
-    criteria: "Account creation + Phone / NIN verification",
+    criteria: "Account creation + account verification",
     multiplier: "×1.0",
     cap: "100 $ZED/day",
   },

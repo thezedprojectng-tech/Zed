@@ -36,7 +36,7 @@ const CHAPTERS = [
     icon: ShieldCheck,
     title: "Cryptographic Identity Privacy",
     description:
-      "Salted SHA-256 digest architecture. Zero raw 11-digit NIN cloud disk writes, client-side TLS 1.3 encryption, and strict NDPA compliance.",
+      "Account verification uses a manually reviewed bank account. Bank details are visible only to Zed admins. Zed is designed with the Nigeria Data Protection Act 2023 in mind.",
   },
   {
     num: "03",

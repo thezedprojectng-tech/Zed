@@ -601,7 +601,7 @@ export function WithdrawalsQueueClient({
             </Label>
             <Input
               id="reject-reason"
-              placeholder="e.g. Account name mismatch with NIN, invalid account number"
+              placeholder="e.g. Account name mismatch with bank record, invalid account number"
               value={rejectReason}
               onChange={(e) => setRejectReason(e.target.value)}
               className="text-xs"
