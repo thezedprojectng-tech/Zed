@@ -38,7 +38,7 @@ export default function PrivacyPolicyPage() {
     <LegalPageLayout
       title="Privacy Policy"
       subtitle="How Zed collects, uses and protects your personal data under the Nigeria Data Protection Act 2023."
-      lastUpdated="Nov 4, 2026"
+      lastUpdated="Nov 7, 2026"
       toc={TOC}
     >
       {/* ── Section 1 ──────────────────────────────────────────────── */}
@@ -65,8 +65,10 @@ export default function PrivacyPolicyPage() {
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
           <ul className="list-disc pl-5 space-y-2">
             <li>
-              <strong>Account:</strong> your phone number (used to send a one-time SMS code to sign
-              in), your name, and an optional profile picture.
+              <strong>Account:</strong> your email address, password (stored hashed by our auth
+              provider, never readable by us), name, phone number, date of birth, and an optional
+              profile picture. Your date of birth is used only to check our minimum age requirement
+              and is not shown to other users.
             </li>
             <li>
               <strong>Profile:</strong> details you choose to add to your profile, such as your
@@ -106,6 +108,10 @@ export default function PrivacyPolicyPage() {
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
           <ul className="list-disc pl-5 space-y-2">
+            <li>
+              <strong>To verify age eligibility:</strong> ensure you meet our minimum age requirement
+              of 16 years to register and use the Platform.
+            </li>
             <li>
               <strong>To provide the service:</strong> authenticate you, show your points balance,
               display your approved submissions, and operate the Platform.
@@ -185,9 +191,6 @@ export default function PrivacyPolicyPage() {
             </li>
             <li>
               <strong>Cloudflare:</strong> DDoS protection, CDN, and Turnstile bot detection.
-            </li>
-            <li>
-              <strong>Termii:</strong> SMS OTP delivery for phone-number sign-in.
             </li>
           </ul>
           <p>
@@ -301,7 +304,8 @@ export default function PrivacyPolicyPage() {
         </h2>
         <div className="font-sans text-sm text-[#57575e] dark:text-[#9c9ca4] leading-relaxed space-y-3">
           <p>
-            The Platform is intended for users aged 16 and above. We do not knowingly collect
+            The Platform is intended for users aged 16 and above. We collect your date of birth at
+            registration to enforce this 16+ minimum age requirement. We do not knowingly collect
             personal data from anyone under 16. If we learn that we have done so, we will delete
             it promptly.
           </p>

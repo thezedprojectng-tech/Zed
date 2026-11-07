@@ -8,10 +8,10 @@
  *
  * Rules:
  *  1 Rookie     : x1.0,  claim 100,  cap 100  (account + verified)
- *  2 Explorer   : x2.0,  claim 200,  cap 200  (complete 1 Skill course OR refer 3 verified friends)
- *  3 Builder    : x3.5,  claim 350,  cap 350  (complete 3 courses + post 2 active community threads)
- *  4 Pro        : x5.0,  claim 500,  cap 500  (complete 1 freelance gig OR buy Zed Pass)
- *  5 Zed Legend : x10.0, claim 1000, cap 1000 (top 1% monthly active user / vetted community mentor)
+ *  2 Explorer   : x2.0,  claim 200,  cap 200  (requirements admin-configurable)
+ *  3 Builder    : x3.5,  claim 350,  cap 350  (requirements admin-configurable)
+ *  4 Pro        : x5.0,  claim 500,  cap 500  (requirements admin-configurable)
+ *  5 Zed Legend : x10.0, claim 1000, cap 1000 (requirements admin-configurable)
  *
  * Daily claim = 100 * multiplier.
  * Levels 2-5 stay locked in this phase (no way to self-promote).
@@ -47,7 +47,7 @@ export const MINING_LEVELS: readonly MiningLevel[] = [
     name: "Explorer",
     multiplier: 2.0,
     dailyCap: 200,
-    unlockCriteria: "Complete 1 Skill course OR refer 3 verified friends",
+    unlockCriteria: "Requirements are set by Zed and shown in your dashboard",
     locked: true,
   },
   {
@@ -55,7 +55,7 @@ export const MINING_LEVELS: readonly MiningLevel[] = [
     name: "Builder",
     multiplier: 3.5,
     dailyCap: 350,
-    unlockCriteria: "Complete 3 courses + post 2 active community threads",
+    unlockCriteria: "Requirements are set by Zed and shown in your dashboard",
     locked: true,
   },
   {
@@ -63,7 +63,7 @@ export const MINING_LEVELS: readonly MiningLevel[] = [
     name: "Pro",
     multiplier: 5.0,
     dailyCap: 500,
-    unlockCriteria: "Complete 1 freelance gig OR buy Zed Pass",
+    unlockCriteria: "Requirements are set by Zed and shown in your dashboard",
     locked: true,
   },
   {
@@ -71,7 +71,7 @@ export const MINING_LEVELS: readonly MiningLevel[] = [
     name: "Zed Legend",
     multiplier: 10.0,
     dailyCap: 1000,
-    unlockCriteria: "Top 1% monthly active user / vetted community mentor",
+    unlockCriteria: "Requirements are set by Zed and shown in your dashboard",
     locked: true,
   },
 ] as const;

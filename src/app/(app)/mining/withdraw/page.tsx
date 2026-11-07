@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
 import { getWithdrawalOverview } from "@/lib/withdraw/actions";
 import { WithdrawClient } from "./WithdrawClient";
 
@@ -13,6 +14,25 @@ export const metadata: Metadata = {
 };
 
 export default async function WithdrawPage() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login?redirect=/mining/withdraw");
+  }
+
+  const { data: profile } = await supabase
+    .from("users")
+    .select("date_of_birth")
+    .eq("id", user.id)
+    .single();
+
+  if (!profile?.date_of_birth) {
+    redirect("/home");
+  }
+
   const overview = await getWithdrawalOverview();
 
   if (!overview) {

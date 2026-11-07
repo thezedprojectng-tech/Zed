@@ -30,6 +30,27 @@ export const metadata: Metadata = {
     "Your Zed dashboard. Track your ZED balance, mining streak, referrals, skill progress and active civic guides.",
 };
 
+const REQUIREMENT_UNITS: Record<string, { label: string; unit: string }> = {
+  total_mined: { label: "Total mined", unit: "ZED" },
+  mining_days: { label: "Mining days", unit: "days" },
+  verified_referrals: { label: "Verified referrals", unit: "friends" },
+  completed_courses: { label: "Skill courses", unit: "courses" },
+};
+
+interface LevelProgressRequirement {
+  type: string;
+  threshold: number;
+  current: number;
+  met: boolean;
+}
+
+interface LevelProgressData {
+  current_level: number;
+  next_level: number | null;
+  next_open: boolean;
+  requirements: LevelProgressRequirement[];
+}
+
 function getTimeGreeting(): string {
   const hour = new Date(
     new Date().toLocaleString("en-US", { timeZone: "Africa/Lagos" })
@@ -94,6 +115,7 @@ async function OverviewCards({ userId }: { userId: string }) {
     referralCountRes,
     totalLessonsRes,
     completedLessonsRes,
+    levelProgressRes,
   ] = await Promise.all([
     // 1. users — served from React.cache(); no extra DB round-trip
     getProfile(userId),
@@ -129,6 +151,8 @@ async function OverviewCards({ userId }: { userId: string }) {
       .from("skill_progress")
       .select("lesson_id, skill_lessons!inner(id)", { count: "exact", head: true })
       .eq("user_id", userId),
+    // 7. level progress: computed via get_my_level_progress RPC (safe fallback if error)
+    supabase.rpc("get_my_level_progress"),
   ]);
 
   const wallet = walletRes.data;
@@ -136,6 +160,11 @@ async function OverviewCards({ userId }: { userId: string }) {
   const referralCount = referralCountRes.count ?? 0;
   const totalLessons = totalLessonsRes.count ?? 0;
   const completedLessons = completedLessonsRes.count ?? 0;
+
+  let levelProgress: LevelProgressData | null = null;
+  if (levelProgressRes && !levelProgressRes.error && levelProgressRes.data) {
+    levelProgress = levelProgressRes.data as unknown as LevelProgressData;
+  }
 
   const levelId = (profile?.level_id ?? 1) as 1 | 2 | 3 | 4 | 5;
   const levelData = MINING_LEVEL_MAP[levelId] ?? MINING_LEVEL_MAP[1];
@@ -184,7 +213,7 @@ async function OverviewCards({ userId }: { userId: string }) {
               variant="outline"
               className="font-mono text-[10px] border-primary/30 bg-primary/5 text-primary px-1.5 py-0"
             >
-              {levelData.name}
+              Level {levelId} · {levelData.name}
             </Badge>
           </div>
           <p className="text-2xl font-bold font-mono text-foreground leading-none">
@@ -194,9 +223,47 @@ async function OverviewCards({ userId }: { userId: string }) {
             {levelData.dailyCap.toLocaleString()} ZED / day
           </p>
         </div>
-        <p className="type-small text-muted-foreground/70 italic">
-          Level requirements are coming soon.
-        </p>
+        {/* Level progress footer */}
+        {levelId >= 5 ? (
+          <p className="type-small text-muted-foreground/70 font-mono">Top level</p>
+        ) : levelProgress?.next_open && levelProgress.requirements.length > 0 ? (
+          <div className="space-y-2 pt-1">
+            <p className="font-mono text-[10px] text-muted-foreground">
+              Next: Level {levelProgress.next_level} ·{" "}
+              {MINING_LEVEL_MAP[levelProgress.next_level as 1 | 2 | 3 | 4 | 5]?.name}
+            </p>
+            <div className="space-y-1.5">
+              {levelProgress.requirements.map((req) => {
+                const meta = REQUIREMENT_UNITS[req.type];
+                const pct =
+                  req.threshold > 0
+                    ? Math.min(Math.round((req.current / req.threshold) * 100), 100)
+                    : 0;
+                const unitLabel = meta?.unit ? ` ${meta.unit}` : "";
+                return (
+                  <div key={req.type} className="space-y-0.5">
+                    <div className="flex items-center justify-between font-mono text-[10px] text-muted-foreground">
+                      <span className="truncate">{meta?.label ?? req.type}</span>
+                      <span className="shrink-0 ml-2">
+                        {req.current} / {req.threshold}
+                        {unitLabel}
+                      </span>
+                    </div>
+                    <Progress
+                      value={pct}
+                      className="h-1 bg-secondary"
+                      aria-label={`${meta?.label ?? req.type} progress: ${req.current} of ${req.threshold}`}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ) : (
+          <p className="type-small text-muted-foreground/70 font-mono">
+            Next level opens soon
+          </p>
+        )}
       </Card>
 
       {/* Mining */}

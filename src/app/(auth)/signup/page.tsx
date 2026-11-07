@@ -22,29 +22,93 @@ import {
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { Button } from "@/components/ui/button";
 import { signUp, isValidNigerianPhone } from "@/lib/auth/actions";
+import { MIN_AGE, buildDob, validateDob } from "@/lib/auth/age";
 import { applyReferralAction } from "@/lib/referrals/actions";
 
-const signupSchema = z.object({
-  fullName: z
-    .string()
-    .min(2, "Full name must be at least 2 characters")
-    .max(80, "Full name is too long"),
-  phone: z
-    .string()
-    .min(1, "Phone number is required")
-    .refine(
-      (val) => isValidNigerianPhone(val),
-      "Please enter a valid Nigerian phone number (e.g. 0801 234 5678 or +234...)"
-    ),
-  email: z.string().min(1, "Email is required").email("Invalid email address"),
-  password: z
-    .string()
-    .min(8, "Password must be at least 8 characters")
-    .max(72, "Password is too long"),
-  terms: z.boolean().refine((val) => val === true, {
-    message: "You must accept the Terms and Privacy Policy to register",
-  }),
-});
+const CURRENT_YEAR = new Date().getFullYear();
+const YEARS = Array.from({ length: CURRENT_YEAR - 1900 + 1 }, (_, i) => CURRENT_YEAR - i);
+const MONTHS = [
+  { value: "1", label: "January" },
+  { value: "2", label: "February" },
+  { value: "3", label: "March" },
+  { value: "4", label: "April" },
+  { value: "5", label: "May" },
+  { value: "6", label: "June" },
+  { value: "7", label: "July" },
+  { value: "8", label: "August" },
+  { value: "9", label: "September" },
+  { value: "10", label: "October" },
+  { value: "11", label: "November" },
+  { value: "12", label: "December" },
+];
+const DAYS = Array.from({ length: 31 }, (_, i) => String(i + 1));
+
+const signupSchema = z
+  .object({
+    fullName: z
+      .string()
+      .min(2, "Full name must be at least 2 characters")
+      .max(80, "Full name is too long"),
+    phone: z
+      .string()
+      .min(1, "Phone number is required")
+      .refine(
+        (val) => isValidNigerianPhone(val),
+        "Please enter a valid Nigerian phone number (e.g. 0801 234 5678 or +234...)"
+      ),
+    email: z.string().min(1, "Email is required").email("Invalid email address"),
+    dobDay: z.string().min(1, "Day is required"),
+    dobMonth: z.string().min(1, "Month is required"),
+    dobYear: z.string().min(1, "Year is required"),
+    password: z
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .max(72, "Password is too long"),
+    terms: z.boolean().refine((val) => val === true, {
+      message: "You must accept the Terms and Privacy Policy to register",
+    }),
+  })
+  .superRefine((data, ctx) => {
+    const day = parseInt(data.dobDay, 10);
+    const month = parseInt(data.dobMonth, 10);
+    const year = parseInt(data.dobYear, 10);
+
+    if (!day || !month || !year) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Date of birth is required",
+        path: ["dobYear"],
+      });
+      return;
+    }
+
+    const dob = buildDob(year, month, day);
+    if (!dob) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Please enter a valid date of birth.",
+        path: ["dobYear"],
+      });
+      return;
+    }
+
+    const check = validateDob(dob);
+    if (!check.ok) {
+      if (check.reason === "underage") {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `You must be at least ${MIN_AGE} to create a Zed account.`,
+          path: ["dobYear"],
+        });
+      } else {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Please enter a valid date of birth.",
+          path: ["dobYear"],
+        });
+      }
+    }
+  });
 
 type SignupFormData = z.infer<typeof signupSchema>;
 
@@ -82,6 +146,9 @@ function SignupForm() {
       fullName: "",
       phone: "",
       email: "",
+      dobDay: "",
+      dobMonth: "",
+      dobYear: "",
       password: "",
       terms: undefined,
     },
@@ -92,11 +159,21 @@ function SignupForm() {
   const onSubmit = async (data: SignupFormData) => {
     setIsLoading(true);
     try {
+      const day = parseInt(data.dobDay, 10);
+      const month = parseInt(data.dobMonth, 10);
+      const year = parseInt(data.dobYear, 10);
+      const dob = buildDob(year, month, day);
+      if (!dob) {
+        toast.error("Please enter a valid date of birth.");
+        return;
+      }
+
       const res = await signUp({
         email: data.email,
         password: data.password,
         fullName: data.fullName,
         phoneNumber: data.phone,
+        dateOfBirth: dob,
       });
 
       toast.success(res.message);
@@ -211,6 +288,93 @@ function SignupForm() {
         {errors.email && (
           <p className="text-xs font-medium text-destructive mt-1">
             {errors.email.message}
+          </p>
+        )}
+      </div>
+
+      {/* Date of Birth */}
+      <div className="space-y-1.5">
+        <label className="text-xs font-mono uppercase tracking-wider text-muted-foreground block">
+          {`Date of Birth (Must be at least ${MIN_AGE})`}
+        </label>
+        <div className="grid grid-cols-3 gap-2">
+          {/* Day */}
+          <div
+            className={`flex h-14 items-center rounded-xl border bg-secondary/30 px-3 transition-all focus-within:border-primary focus-within:ring-1 focus-within:ring-primary ${
+              errors.dobDay || errors.dobYear
+                ? "border-destructive bg-destructive/5"
+                : "border-hairline"
+            }`}
+          >
+            <select
+              disabled={isLoading}
+              className="h-full w-full bg-transparent text-sm sm:text-base text-foreground outline-none font-sans disabled:opacity-50 cursor-pointer"
+              {...register("dobDay")}
+            >
+              <option value="" disabled className="bg-popover text-muted-foreground">
+                Day
+              </option>
+              {DAYS.map((d) => (
+                <option key={d} value={d} className="bg-popover text-foreground">
+                  {d}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Month */}
+          <div
+            className={`flex h-14 items-center rounded-xl border bg-secondary/30 px-3 transition-all focus-within:border-primary focus-within:ring-1 focus-within:ring-primary ${
+              errors.dobMonth || errors.dobYear
+                ? "border-destructive bg-destructive/5"
+                : "border-hairline"
+            }`}
+          >
+            <select
+              disabled={isLoading}
+              className="h-full w-full bg-transparent text-sm sm:text-base text-foreground outline-none font-sans disabled:opacity-50 cursor-pointer"
+              {...register("dobMonth")}
+            >
+              <option value="" disabled className="bg-popover text-muted-foreground">
+                Month
+              </option>
+              {MONTHS.map((m) => (
+                <option key={m.value} value={m.value} className="bg-popover text-foreground">
+                  {m.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Year */}
+          <div
+            className={`flex h-14 items-center rounded-xl border bg-secondary/30 px-3 transition-all focus-within:border-primary focus-within:ring-1 focus-within:ring-primary ${
+              errors.dobYear
+                ? "border-destructive bg-destructive/5"
+                : "border-hairline"
+            }`}
+          >
+            <select
+              disabled={isLoading}
+              className="h-full w-full bg-transparent text-sm sm:text-base text-foreground outline-none font-sans disabled:opacity-50 cursor-pointer"
+              {...register("dobYear")}
+            >
+              <option value="" disabled className="bg-popover text-muted-foreground">
+                Year
+              </option>
+              {YEARS.map((y) => (
+                <option key={y} value={String(y)} className="bg-popover text-foreground">
+                  {y}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+        {(errors.dobYear || errors.dobDay || errors.dobMonth) && (
+          <p className="text-xs font-medium text-destructive mt-1">
+            {errors.dobYear?.message ||
+              errors.dobDay?.message ||
+              errors.dobMonth?.message}
           </p>
         )}
       </div>

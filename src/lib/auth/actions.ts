@@ -49,6 +49,7 @@ export async function signUp(params: {
   password: string;
   fullName: string;
   phoneNumber: string;
+  dateOfBirth: string;
 }): Promise<{ success: boolean; message: string; hasSession: boolean }> {
   const supabase = createClient();
 
@@ -61,6 +62,7 @@ export async function signUp(params: {
       data: {
         full_name: params.fullName.trim(),
         phone_number: normalizedPhone,
+        date_of_birth: params.dateOfBirth,
       },
     },
   });

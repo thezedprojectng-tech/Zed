@@ -46,19 +46,12 @@ describe("MINING_LEVELS matrix", () => {
     expect(MINING_LEVEL_MAP[5].dailyCap).toBe(1000);
   });
 
-  it("has the exact unlock criteria for levels 2-5", () => {
-    expect(MINING_LEVEL_MAP[2].unlockCriteria).toBe(
-      "Complete 1 Skill course OR refer 3 verified friends"
-    );
-    expect(MINING_LEVEL_MAP[3].unlockCriteria).toBe(
-      "Complete 3 courses + post 2 active community threads"
-    );
-    expect(MINING_LEVEL_MAP[4].unlockCriteria).toBe(
-      "Complete 1 freelance gig OR buy Zed Pass"
-    );
-    expect(MINING_LEVEL_MAP[5].unlockCriteria).toBe(
-      "Top 1% monthly active user / vetted community mentor"
-    );
+  it("has generic unlock criteria for levels 2-5", () => {
+    const GENERIC = "Requirements are set by Zed and shown in your dashboard";
+    expect(MINING_LEVEL_MAP[2].unlockCriteria).toBe(GENERIC);
+    expect(MINING_LEVEL_MAP[3].unlockCriteria).toBe(GENERIC);
+    expect(MINING_LEVEL_MAP[4].unlockCriteria).toBe(GENERIC);
+    expect(MINING_LEVEL_MAP[5].unlockCriteria).toBe(GENERIC);
   });
 
   it("daily_claim = 100 * multiplier for each level", () => {

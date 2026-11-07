@@ -10,7 +10,6 @@ import { createClient } from "@/lib/supabase/client";
 export interface UserProfile {
   id: string;
   phone_number: string;
-  nin_hash: string | null;
   full_name: string;
   display_name: string | null;
   username: string | null;
@@ -22,6 +21,7 @@ export interface UserProfile {
   username_changed_at: string | null;
   created_at: string;
   updated_at: string;
+  date_of_birth: string | null;
 }
 
 interface AuthState {
@@ -66,7 +66,9 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
       const supabase = createClient();
       const { data, error } = await supabase
         .from("users")
-        .select("*")
+        .select(
+          "id, phone_number, full_name, display_name, username, avatar_path, avatar_url, level_id, is_verified, role, username_changed_at, created_at, updated_at, date_of_birth"
+        )
         .eq("id", user.id)
         .maybeSingle();
 

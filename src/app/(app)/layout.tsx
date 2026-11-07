@@ -6,6 +6,7 @@ import { TopBar } from "@/components/layout/TopBar";
 import { CommandMenu } from "@/components/layout/CommandMenu";
 import { ScrollToTop } from "@/components/layout/ScrollToTop";
 import { PageTransition } from "@/components/layout/PageTransition";
+import { DobGateDialog } from "@/components/auth/DobGateDialog";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const [commandOpen, setCommandOpen] = useState(false);
@@ -40,6 +41,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
       {/* Floating Scroll-to-Top Button with circular progress ring */}
       <ScrollToTop />
+
+      {/* Mandatory Date of Birth gate dialog for existing users */}
+      <DobGateDialog />
     </div>
   );
 }

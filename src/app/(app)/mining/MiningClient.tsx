@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { MINING_LEVELS, MINING_LEVEL_MAP } from "@/data/levels";
+import { formatRequirement } from "@/lib/levels/format";
+import type { RequirementType } from "@/lib/levels/validation";
 import { msUntilNextLagosMidnight, formatCountdown } from "@/lib/mining/helpers";
 import { claimDailyMining } from "@/lib/mining/actions";
 import { cn } from "@/lib/utils";
@@ -28,6 +30,12 @@ interface LogEntry {
   mined_at: string;
 }
 
+interface LevelRequirement {
+  level_id: number;
+  requirement_type: string;
+  threshold: number;
+}
+
 interface MiningClientProps {
   wallet: WalletData | null;
   logs: LogEntry[];
@@ -35,6 +43,7 @@ interface MiningClientProps {
   isVerified: boolean;
   alreadyClaimed: boolean;
   withdrawalsEnabled?: boolean;
+  levelRequirements?: LevelRequirement[];
 }
 
 /**
@@ -81,6 +90,7 @@ export function MiningClient({
   isVerified,
   alreadyClaimed: initialAlreadyClaimed,
   withdrawalsEnabled = false,
+  levelRequirements = [],
 }: MiningClientProps) {
   const level = MINING_LEVEL_MAP[levelId as 1 | 2 | 3 | 4 | 5] ?? MINING_LEVEL_MAP[1];
 
@@ -401,7 +411,15 @@ export function MiningClient({
                     )}
                   </div>
                   <p className="type-small text-muted-foreground mt-0.5 truncate">
-                    {isLocked ? lvl.unlockCriteria : "Active."}
+                    {isLocked
+                      ? (() => {
+                          const reqs = levelRequirements.filter((r) => r.level_id === lvl.id);
+                          if (reqs.length === 0) return "Not open yet";
+                          return reqs
+                            .map((r) => formatRequirement(r.requirement_type as RequirementType, r.threshold))
+                            .join(" · ");
+                        })()
+                      : "Active."}
                   </p>
                 </div>
 

@@ -59,7 +59,7 @@ export async function getWithdrawalOverview(): Promise<UserWithdrawalOverview | 
         .maybeSingle(),
       supabase
         .from("users")
-        .select("is_verified, level_id")
+        .select("is_verified, level_id, date_of_birth")
         .eq("id", user.id)
         .maybeSingle(),
       supabase

@@ -28,9 +28,13 @@ export default async function MiningPage() {
   // Fetch user profile
   const { data: profile } = await supabase
     .from("users")
-    .select("level_id, is_verified")
+    .select("level_id, is_verified, date_of_birth")
     .eq("id", user.id)
     .single();
+
+  if (!profile?.date_of_birth) {
+    redirect("/home");
+  }
 
   const levelId: number = profile?.level_id ?? 1;
   const isVerified: boolean = Boolean(profile?.is_verified);
@@ -53,6 +57,13 @@ export default async function MiningPage() {
 
   const withdrawalsEnabled = Boolean(zedSettings?.withdrawals_enabled);
 
+  // Fetch level requirements
+  const { data: levelRequirements } = await supabase
+    .from("level_requirements")
+    .select("level_id, requirement_type, threshold")
+    .order("level_id")
+    .order("requirement_type");
+
   return (
     <MiningClient
       wallet={wallet}
@@ -61,6 +72,7 @@ export default async function MiningPage() {
       isVerified={isVerified}
       alreadyClaimed={alreadyClaimed}
       withdrawalsEnabled={withdrawalsEnabled}
+      levelRequirements={levelRequirements ?? []}
     />
   );
 }
