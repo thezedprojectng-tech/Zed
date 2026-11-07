@@ -151,7 +151,7 @@ export function HowItWorksSection() {
                     Official NIS Booklet Receipt
                   </div>
                   <div className="pt-2 border-t border-slate-100 dark:border-white/5 flex items-center justify-between text-[11px]">
-                    <span className="text-zinc-600 dark:text-zinc-400 font-medium">Salted SHA-256 Token</span>
+                    <span className="text-zinc-600 dark:text-zinc-400 font-medium">Manual review</span>
                     <Lock className="h-3 w-3 text-emerald-600" />
                   </div>
                 </div>

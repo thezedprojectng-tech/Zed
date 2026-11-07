@@ -233,7 +233,7 @@ export default function TermsPage() {
           <ul className="list-disc pl-5 space-y-2">
             <li>Harvesting personal phone numbers or identity data from community boards or Zed Meet sessions.</li>
             <li>Deploying bots, spiders, or automated scrapers against Zed API endpoints or PWA caches.</li>
-            <li>Attempting to reverse-engineer, decompile, or compromise the integrity of our salted hashing architecture.</li>
+            <li>Attempting to reverse-engineer, decompile, or compromise the integrity of our systems.</li>
             <li>Using the Platform for money laundering, terrorism financing, or fraudulent financial schemes.</li>
           </ul>
         </div>

@@ -39,7 +39,7 @@ export const MINING_LEVELS: readonly MiningLevel[] = [
     name: "Rookie",
     multiplier: 1.0,
     dailyCap: 100,
-    unlockCriteria: "Create an account",
+    unlockCriteria: "Account creation",
     locked: false,
   },
   {

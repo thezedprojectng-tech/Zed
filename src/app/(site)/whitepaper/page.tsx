@@ -34,7 +34,7 @@ const CHAPTERS = [
   {
     num: "02",
     icon: ShieldCheck,
-    title: "Cryptographic Identity Privacy",
+    title: "Account Verification and Privacy",
     description:
       "Account verification uses a manually reviewed bank account. Bank details are visible only to Zed admins. Zed is designed with the Nigeria Data Protection Act 2023 in mind.",
   },
