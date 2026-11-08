@@ -4,7 +4,6 @@ import Link from "next/link";
 import { Suspense, cache } from "react";
 import {
   ArrowRight,
-  ShieldAlert,
   Pickaxe,
   Users,
   GraduationCap,
@@ -20,6 +19,7 @@ import { MODULES } from "@/data/modules";
 import { MINING_LEVEL_MAP } from "@/data/levels";
 import { getLevelName } from "@/types";
 import { isVerifiedBadgeEnabled } from "@/lib/verification/flags";
+import { VerifyAccountBanner } from "@/components/verification/VerifyAccountBanner";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -470,7 +470,21 @@ export default async function HomePage() {
   const civicLevel = profile?.level_id ?? 1;
   const greeting = getTimeGreeting();
   const dateString = getFormattedDate();
-  const showGetVerified = isVerifiedBadgeEnabled() && !isVerified;
+
+  let bannerStatus: "none" | "pending" | "rejected" | null = null;
+  if (!isVerified && isVerifiedBadgeEnabled()) {
+    const { data: bankVerif } = await supabase
+      .from("bank_verifications")
+      .select("status")
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    if (!bankVerif) {
+      bannerStatus = "none";
+    } else if (bankVerif.status === "pending" || bankVerif.status === "rejected") {
+      bannerStatus = bankVerif.status;
+    }
+  }
 
   return (
     <div className="mx-auto max-w-8xl px-4 md:px-8 py-8 md:py-10 space-y-10">
@@ -506,38 +520,9 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── 2. Get verified prompt (flag-gated) ──────────────────────────── */}
-      {showGetVerified && (
-        <section aria-label="Get verified">
-          <Card className="p-0 border-hairline bg-card relative overflow-hidden">
-            <div className="absolute inset-x-0 top-0 h-[2px] bg-primary rounded-t-xl" />
-            <div className="p-5 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-5">
-              <div className="space-y-3 max-w-xl">
-                <div className="flex items-center gap-2">
-                  <div className="flex h-6 w-6 items-center justify-center rounded-md bg-primary/10 text-primary border border-primary/20">
-                    <ShieldAlert className="h-3.5 w-3.5" />
-                  </div>
-                  <span className="type-caption text-primary">IDENTITY VERIFICATION</span>
-                </div>
-                <h2 className="type-h2 text-foreground">Verify your account</h2>
-                <p className="type-small text-muted-foreground">
-                  Submit your bank account for a manual review by the Zed team.
-                </p>
-              </div>
-              <div className="shrink-0">
-                <Button
-                  asChild
-                  className="bg-primary text-primary-foreground hover:bg-primary/90 font-medium px-5"
-                >
-                  <Link href="/verify">
-                    Verify account
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Link>
-                </Button>
-              </div>
-            </div>
-          </Card>
-        </section>
+      {/* ── 2. Verify account banner ────────────────────────────────────────── */}
+      {bannerStatus && (
+        <VerifyAccountBanner status={bannerStatus} />
       )}
 
       {/* ── 3. Overview cards ─────────────────────────────────────────────── */}
