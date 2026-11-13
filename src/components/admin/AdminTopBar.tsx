@@ -1,26 +1,36 @@
 "use client";
 
-import { useState } from "react";
+import * as React from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
 import {
   Sun,
   Moon,
+  Laptop,
   ArrowLeft,
   Menu,
-  LayoutDashboard,
-  Users,
-  ScrollText,
-  Share2,
-  GraduationCap,
-  ShieldCheck,
+  PanelLeft,
+  PanelLeftClose,
+  Check,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useIsMounted } from "@/lib/hooks";
+import { useAdminSidebar } from "./AdminSidebarContext";
+import { WelcomeGreeting } from "./WelcomeGreeting";
+import {
+  AdminMenuContent,
+  AdminMenuItem,
+} from "./AdminDropdownMenu";
 
 interface AdminTopBarProps {
   adminUser: {
@@ -31,23 +41,10 @@ interface AdminTopBarProps {
   };
 }
 
-const navItems = [
-  { href: "/admin", label: "Overview", icon: LayoutDashboard },
-  { href: "/admin/users", label: "Users", icon: Users },
-  { href: "/admin/verifications", label: "Verifications", icon: ShieldCheck },
-  { href: "/admin/skill", label: "Skill content", icon: GraduationCap },
-  { href: "/admin/funding", label: "Funding", icon: Share2 },
-  { href: "/admin/referrals", label: "Referrals", icon: Share2 },
-  { href: "/admin/audit-log", label: "Audit Log", icon: ScrollText },
-];
-
 export function AdminTopBar({ adminUser }: AdminTopBarProps) {
-  const pathname = usePathname();
-  const { theme, setTheme, resolvedTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
   const mounted = useIsMounted();
-  const [mobileOpen, setMobileOpen] = useState(false);
-
-  const currentTheme = resolvedTheme || theme || "dark";
+  const { isCollapsed, toggleCollapse, toggleMobile } = useAdminSidebar();
 
   const getInitials = (name?: string | null) => {
     if (!name) return "AD";
@@ -56,129 +53,152 @@ export function AdminTopBar({ adminUser }: AdminTopBarProps) {
     return parts[0].slice(0, 2).toUpperCase();
   };
 
-  const getSectionTitle = () => {
-    if (pathname === "/admin") return "Overview";
-    if (pathname.startsWith("/admin/users")) return "Users Directory";
-    if (pathname.startsWith("/admin/verifications")) return "Bank Verifications Queue";
-    if (pathname.startsWith("/admin/skill")) return "Skill Content";
-    if (pathname.startsWith("/admin/funding")) return "Funding Submissions";
-    if (pathname.startsWith("/admin/referrals")) return "Referrals Management";
-    if (pathname.startsWith("/admin/withdrawals")) return "Withdrawals Queue";
-    if (pathname.startsWith("/admin/settings/zed")) return "ZED Token Settings";
-    if (pathname.startsWith("/admin/audit-log")) return "Audit Log";
-    return "Console";
-  };
-
   return (
-    <header className="sticky top-0 z-20 flex h-13 w-full items-center justify-between border-b border-border bg-background/90 px-3 sm:px-6 backdrop-blur-md">
-      {/* Left: Mobile Menu + Title + Admin badge */}
-      <div className="flex items-center gap-3">
-        {/* Mobile Hamburger Drawer */}
-        <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-          <SheetTrigger asChild>
+    <header className="sticky top-0 z-20 flex h-14 w-full items-center justify-between border-b border-border bg-background px-3 sm:px-6 select-none">
+      {/* Left: Sidebar toggle (mobile menu / desktop collapse) + Rotating Welcome Greeting */}
+      <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+        {/* Mobile menu trigger (< 768px) */}
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          onClick={toggleMobile}
+          className="md:hidden h-8 w-8 text-muted-foreground hover:text-foreground"
+          aria-label="Open navigation menu"
+        >
+          <Menu className="h-4 w-4" strokeWidth={1.75} />
+        </Button>
+
+        {/* Desktop collapse trigger (>= 768px) */}
+        <Tooltip>
+          <TooltipTrigger asChild>
             <Button
               variant="ghost"
               size="icon-sm"
-              className="md:hidden text-muted-foreground hover:text-foreground"
-              aria-label="Open admin menu"
+              onClick={toggleCollapse}
+              className="hidden md:inline-flex h-8 w-8 text-muted-foreground hover:text-foreground"
+              aria-label={isCollapsed ? "Expand sidebar (Ctrl+B)" : "Collapse sidebar (Ctrl+B)"}
             >
-              <Menu className="h-4 w-4" />
+              {isCollapsed ? (
+                <PanelLeft className="h-4 w-4" strokeWidth={1.75} />
+              ) : (
+                <PanelLeftClose className="h-4 w-4" strokeWidth={1.75} />
+              )}
             </Button>
-          </SheetTrigger>
-          <SheetContent side="left" className="w-64 p-0 bg-card border-border">
-            <SheetHeader className="p-4 border-b border-border text-left">
-              <SheetTitle className="flex items-center gap-2 text-base font-bold text-foreground">
-                Zed Admin Console
-              </SheetTitle>
-            </SheetHeader>
-            <div className="py-4 px-3 space-y-1">
-              {navItems.map(({ href, label, icon: Icon }) => {
-                const isActive = href === "/admin" ? pathname === "/admin" : pathname.startsWith(href);
-                return (
-                  <Link
-                    key={href}
-                    href={href}
-                    onClick={() => setMobileOpen(false)}
-                    className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium transition-colors ${
-                      isActive
-                        ? "bg-secondary text-foreground font-semibold"
-                        : "text-muted-foreground hover:bg-secondary/60 hover:text-foreground"
-                    }`}
-                  >
-                    <Icon className="h-4 w-4" />
-                    <span>{label}</span>
-                  </Link>
-                );
-              })}
-              <div className="pt-4 border-t border-border mt-4">
-                <Link
-                  href="/home"
-                  className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs text-muted-foreground hover:bg-secondary/60 hover:text-foreground"
-                >
-                  <ArrowLeft className="h-4 w-4" />
-                  <span>Back to citizen app</span>
-                </Link>
-              </div>
-            </div>
-          </SheetContent>
-        </Sheet>
+          </TooltipTrigger>
+          <TooltipContent side="bottom" align="start">
+            <span className="font-sans text-xs">
+              {isCollapsed ? "Expand sidebar (Ctrl+B)" : "Collapse sidebar (Ctrl+B)"}
+            </span>
+          </TooltipContent>
+        </Tooltip>
 
-        <div className="flex items-center gap-2">
-          <span className="font-semibold text-xs tracking-tight text-foreground font-mono uppercase">
-            {getSectionTitle()}
-          </span>
-          <Badge
-            variant="outline"
-            className="border-amber-500/30 bg-amber-500/10 text-amber-500 text-[10px] font-mono uppercase font-bold py-0 px-1.5"
-          >
-            ADMIN
-          </Badge>
-        </div>
+        <div className="h-4 w-px bg-border/60 hidden sm:block" />
+
+        {/* Rotating Greeting */}
+        <WelcomeGreeting />
       </div>
 
-      {/* Right Tools & Admin Identity */}
-      <div className="flex items-center gap-2 sm:gap-3">
-        {/* "Back to app" shortcut */}
-        <Link
-          href="/home"
-          className="hidden sm:inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-md border border-border hover:bg-secondary/60"
+      {/* Right: "Back to app", Theme toggle, Admin user chip */}
+      <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+        {/* "Back to app" as a ghost button */}
+        <Button
+          variant="ghost"
+          size="sm"
+          asChild
+          className="h-8 px-2.5 text-xs text-muted-foreground hover:text-foreground hover:bg-secondary/60 gap-1.5"
         >
-          <ArrowLeft className="h-3 w-3" />
-          <span>Back to app</span>
-        </Link>
+          <Link href="/home">
+            <ArrowLeft className="h-3.5 w-3.5" strokeWidth={1.75} />
+            <span className="hidden sm:inline">Back to app</span>
+          </Link>
+        </Button>
 
-        {/* Theme Toggle */}
+        {/* Theme toggle dropdown */}
         {mounted && (
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            onClick={() => setTheme(currentTheme === "light" ? "dark" : "light")}
-            className="text-muted-foreground hover:text-foreground h-8 w-8"
-            aria-label="Toggle theme"
-          >
-            {currentTheme === "light" ? (
-              <Moon className="h-3.5 w-3.5 text-foreground" />
-            ) : (
-              <Sun className="h-3.5 w-3.5 text-foreground" />
-            )}
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-secondary/60"
+                aria-label="Toggle theme"
+              >
+                <Sun className="h-3.5 w-3.5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" strokeWidth={1.75} />
+                <Moon className="absolute h-3.5 w-3.5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" strokeWidth={1.75} />
+                <span className="sr-only">Toggle theme</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <AdminMenuContent
+              align="end"
+              side="bottom"
+              sideOffset={8}
+              className="w-44 min-w-[160px]"
+            >
+              <AdminMenuItem
+                onClick={() => setTheme("light")}
+                className="justify-between"
+              >
+                <div className="flex items-center gap-2">
+                  <Sun className="h-4 w-4" strokeWidth={1.75} />
+                  <span>Light</span>
+                </div>
+                {theme === "light" && (
+                  <Check className="h-3.5 w-3.5 text-primary" strokeWidth={2} />
+                )}
+              </AdminMenuItem>
+              <AdminMenuItem
+                onClick={() => setTheme("dark")}
+                className="justify-between"
+              >
+                <div className="flex items-center gap-2">
+                  <Moon className="h-4 w-4" strokeWidth={1.75} />
+                  <span>Dark</span>
+                </div>
+                {theme === "dark" && (
+                  <Check className="h-3.5 w-3.5 text-primary" strokeWidth={2} />
+                )}
+              </AdminMenuItem>
+              <AdminMenuItem
+                onClick={() => setTheme("system")}
+                className="justify-between"
+              >
+                <div className="flex items-center gap-2">
+                  <Laptop className="h-4 w-4" strokeWidth={1.75} />
+                  <span>System</span>
+                </div>
+                {theme === "system" && (
+                  <Check className="h-3.5 w-3.5 text-primary" strokeWidth={2} />
+                )}
+              </AdminMenuItem>
+            </AdminMenuContent>
+          </DropdownMenu>
         )}
 
-        {/* Admin User Chip */}
-        <div className="flex items-center gap-2 pl-2 border-l border-border">
-          <Avatar className="h-7 w-7 border border-border">
-            <AvatarImage src={adminUser.avatarUrl || ""} />
-            <AvatarFallback className="bg-secondary font-mono text-[10px] font-bold text-foreground">
+        <div className="h-4 w-px bg-border/60" />
+
+        {/* Admin Avatar + Tooltip Email (email hidden under 768px, font-sans not monospace) */}
+        <div className="flex items-center gap-2.5 pl-0.5">
+          <Avatar className="h-7 w-7 border border-border shrink-0">
+            <AvatarImage src={adminUser.avatarUrl || ""} alt={adminUser.fullName} />
+            <AvatarFallback className="bg-secondary text-foreground text-[10px] font-bold">
               {getInitials(adminUser.fullName)}
             </AvatarFallback>
           </Avatar>
-          <div className="hidden sm:flex flex-col text-left">
-            <span className="text-xs font-semibold leading-tight text-foreground truncate max-w-[120px]">
+
+          <div className="hidden md:flex flex-col text-left leading-tight">
+            <span className="text-xs font-semibold text-foreground truncate max-w-[120px] font-sans">
               {adminUser.fullName}
             </span>
-            <span className="text-[10px] text-muted-foreground font-mono leading-none">
-              {adminUser.email || "admin@zed.gov.ng"}
-            </span>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="text-[11px] text-muted-foreground truncate max-w-[150px] font-sans cursor-default">
+                  {adminUser.email || "admin@zed.gov.ng"}
+                </span>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" align="end" className="text-xs font-sans">
+                {adminUser.email || "admin@zed.gov.ng"}
+              </TooltipContent>
+            </Tooltip>
           </div>
         </div>
       </div>

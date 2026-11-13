@@ -37,7 +37,7 @@ export const AdminCard = React.forwardRef<HTMLDivElement, AdminCardProps>(
       <div
         ref={ref}
         className={cn(
-          "rounded-xl overflow-hidden text-card-foreground",
+          "rounded-lg overflow-hidden text-card-foreground",
           variantStyles,
           paddingStyles,
           className

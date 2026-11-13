@@ -92,11 +92,13 @@ export function StatCard({
   const iconChipStyles = {
     overview: "text-primary bg-primary/10 border-primary/20",
     people: "text-admin-accent-people bg-admin-accent-people-subtle border-admin-accent-people-border",
+    programs: "text-admin-accent-content bg-admin-accent-content-subtle border-admin-accent-content-border",
     content: "text-admin-accent-content bg-admin-accent-content-subtle border-admin-accent-content-border",
     money: "text-admin-accent-money bg-admin-accent-money-subtle border-admin-accent-money-border",
+    marketplace: "text-admin-accent-inbox bg-admin-accent-inbox-subtle border-admin-accent-inbox-border",
     inbox: "text-admin-accent-inbox bg-admin-accent-inbox-subtle border-admin-accent-inbox-border",
     system: "text-muted-foreground bg-secondary/60 border-border",
-  }[section];
+  }[section as string] || "text-primary bg-primary/10 border-primary/20";
 
   return (
     <div
@@ -115,7 +117,7 @@ export function StatCard({
       }
       aria-label={finalAriaLabel}
       className={cn(
-        "rounded-xl border bg-card p-4 sm:p-5 flex flex-col justify-between transition-all duration-200 select-none",
+        "rounded-lg border bg-card p-4 sm:p-5 flex flex-col justify-between transition-all duration-200 select-none",
         active
           ? "border-primary shadow-xs ring-1 ring-primary/20"
           : "border-border/70 shadow-xs hover:border-border hover:-translate-y-0.5 hover:shadow-sm",

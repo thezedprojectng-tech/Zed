@@ -25,11 +25,13 @@ export function AdminPageHeader({
   const iconChipStyles = {
     overview: "text-primary bg-primary/10 border-primary/20",
     people: "text-admin-accent-people bg-admin-accent-people-subtle border-admin-accent-people-border",
+    programs: "text-admin-accent-content bg-admin-accent-content-subtle border-admin-accent-content-border",
     content: "text-admin-accent-content bg-admin-accent-content-subtle border-admin-accent-content-border",
     money: "text-admin-accent-money bg-admin-accent-money-subtle border-admin-accent-money-border",
+    marketplace: "text-admin-accent-inbox bg-admin-accent-inbox-subtle border-admin-accent-inbox-border",
     inbox: "text-admin-accent-inbox bg-admin-accent-inbox-subtle border-admin-accent-inbox-border",
     system: "text-muted-foreground bg-secondary/60 border-border",
-  }[section];
+  }[section as string] || "text-primary bg-primary/10 border-primary/20";
 
   return (
     <header
@@ -41,7 +43,7 @@ export function AdminPageHeader({
       <div className="flex items-start gap-3.5">
         <div
           className={cn(
-            "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border shadow-2xs mt-0.5 sm:mt-0",
+            "flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border shadow-2xs mt-0.5 sm:mt-0",
             iconChipStyles
           )}
         >

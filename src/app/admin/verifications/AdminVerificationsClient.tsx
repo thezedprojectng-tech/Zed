@@ -11,15 +11,12 @@ import {
   Building2,
   Copy,
   Search,
-  Filter,
   AlertCircle,
   Loader2,
   User,
-  ArrowRightLeft,
   Check,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -36,6 +33,8 @@ import {
   adminReviewBankVerificationAction,
   type AdminVerificationRow,
 } from "./actions";
+import { StatusPill } from "@/components/admin/people/StatusPill";
+import { AgePill } from "@/components/admin/people/AgePill";
 
 interface AdminVerificationsClientProps {
   initialRequests: AdminVerificationRow[];
@@ -188,14 +187,14 @@ export function AdminVerificationsClient({
 
   return (
     <div className="space-y-6 p-4 sm:p-6 max-w-7xl mx-auto">
-      {/* ── Header & KPI Cards ────────────────────────────────────────── */}
+      {/* ── Header ────────────────────────────────────────── */}
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground flex items-center gap-2">
-            <ShieldCheck className="h-6 w-6 text-primary" />
-            Bank Verifications Queue
+          <h1 className="text-xl font-semibold tracking-tight text-foreground flex items-center gap-2">
+            <ShieldCheck className="h-5 w-5" style={{ color: "var(--data-verified)" }} />
+            Bank verifications queue
           </h1>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-xs text-muted-foreground mt-0.5">
             Review submitted citizen bank accounts and approve them for identity verification and payouts.
           </p>
         </div>
@@ -213,84 +212,76 @@ export function AdminVerificationsClient({
 
       {/* KPI Stats */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <Card
+        <div
           onClick={() => setStatusFilter("pending")}
-          className={`p-4 cursor-pointer transition-colors border ${
-            statusFilter === "pending" ? "border-amber-500/50 bg-amber-500/5" : "hover:border-border"
+          className={`bg-card border border-border/80 rounded-lg p-4 cursor-pointer transition-colors ${
+            statusFilter === "pending"
+              ? "border-[color:var(--data-flows-border)] bg-[color:var(--data-flows-subtle)]"
+              : "hover:border-border"
           }`}
         >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-muted-foreground">Pending Review</span>
-            <Clock className="h-4 w-4 text-amber-500" />
+            <span className="text-xs font-medium text-muted-foreground">Pending review</span>
+            <Clock className="h-4 w-4" style={{ color: "var(--data-flows)" }} />
           </div>
           <p className="text-2xl font-bold text-foreground mt-2">{pendingCount}</p>
           <p className="text-[11px] text-muted-foreground mt-0.5">Oldest requests prioritized first</p>
-        </Card>
+        </div>
 
-        <Card
+        <div
           onClick={() => setStatusFilter("approved")}
-          className={`p-4 cursor-pointer transition-colors border ${
-            statusFilter === "approved" ? "border-emerald-500/50 bg-emerald-500/5" : "hover:border-border"
+          className={`bg-card border border-border/80 rounded-lg p-4 cursor-pointer transition-colors ${
+            statusFilter === "approved"
+              ? "border-[color:var(--data-verified-border)] bg-[color:var(--data-verified-subtle)]"
+              : "hover:border-border"
           }`}
         >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-muted-foreground">Approved Accounts</span>
-            <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+            <span className="text-xs font-medium text-muted-foreground">Approved accounts</span>
+            <CheckCircle2 className="h-4 w-4" style={{ color: "var(--data-verified)" }} />
           </div>
           <p className="text-2xl font-bold text-foreground mt-2">{approvedCount}</p>
           <p className="text-[11px] text-muted-foreground mt-0.5">Granted verified citizen badge</p>
-        </Card>
+        </div>
 
-        <Card
+        <div
           onClick={() => setStatusFilter("rejected")}
-          className={`p-4 cursor-pointer transition-colors border ${
-            statusFilter === "rejected" ? "border-destructive/50 bg-destructive/5" : "hover:border-border"
+          className={`bg-card border border-border/80 rounded-lg p-4 cursor-pointer transition-colors ${
+            statusFilter === "rejected"
+              ? "border-[color:var(--data-negative-border)] bg-[color:var(--data-negative-subtle)]"
+              : "hover:border-border"
           }`}
         >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-muted-foreground">Rejected Requests</span>
-            <XCircle className="h-4 w-4 text-destructive" />
+            <span className="text-xs font-medium text-muted-foreground">Rejected requests</span>
+            <XCircle className="h-4 w-4" style={{ color: "var(--data-negative)" }} />
           </div>
           <p className="text-2xl font-bold text-foreground mt-2">{rejectedCount}</p>
           <p className="text-[11px] text-muted-foreground mt-0.5">Awaiting user resubmission</p>
-        </Card>
+        </div>
       </div>
 
       {/* ── Filters & Search ─────────────────────────────────────────── */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-1.5 p-1 rounded-lg bg-muted/60 border border-border w-fit">
-          <Button
-            size="sm"
-            variant={statusFilter === "pending" ? "default" : "ghost"}
-            onClick={() => setStatusFilter("pending")}
-            className="text-xs h-8 px-3"
-          >
-            Pending ({pendingCount})
-          </Button>
-          <Button
-            size="sm"
-            variant={statusFilter === "approved" ? "default" : "ghost"}
-            onClick={() => setStatusFilter("approved")}
-            className="text-xs h-8 px-3"
-          >
-            Approved ({approvedCount})
-          </Button>
-          <Button
-            size="sm"
-            variant={statusFilter === "rejected" ? "default" : "ghost"}
-            onClick={() => setStatusFilter("rejected")}
-            className="text-xs h-8 px-3"
-          >
-            Rejected ({rejectedCount})
-          </Button>
-          <Button
-            size="sm"
-            variant={statusFilter === "all" ? "default" : "ghost"}
-            onClick={() => setStatusFilter("all")}
-            className="text-xs h-8 px-3"
-          >
-            All ({requests.length})
-          </Button>
+        {/* Status tab group */}
+        <div className="flex items-center gap-1 p-1 rounded-md bg-secondary/60 border border-border w-fit">
+          {(["pending", "approved", "rejected", "all"] as const).map((status) => (
+            <button
+              key={status}
+              type="button"
+              onClick={() => setStatusFilter(status)}
+              className={`px-3 py-1.5 rounded-sm text-xs font-medium transition-all capitalize ${
+                statusFilter === status
+                  ? "bg-background text-foreground shadow-xs"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {status === "pending" && `Pending (${pendingCount})`}
+              {status === "approved" && `Approved (${approvedCount})`}
+              {status === "rejected" && `Rejected (${rejectedCount})`}
+              {status === "all" && `All (${requests.length})`}
+            </button>
+          ))}
         </div>
 
         <div className="relative w-full sm:w-72">
@@ -306,21 +297,29 @@ export function AdminVerificationsClient({
 
       {/* ── Verifications List ───────────────────────────────────────── */}
       {filteredRequests.length === 0 ? (
-        <Card className="p-12 text-center space-y-3">
-          <div className="flex h-12 w-12 mx-auto items-center justify-center rounded-full bg-muted text-muted-foreground">
-            <CheckCircle2 className="h-6 w-6" />
+        <div className="rounded-lg border border-border/80 bg-card p-10 text-center space-y-3">
+          <div className="flex h-10 w-10 mx-auto items-center justify-center rounded-lg bg-secondary/80 border border-border/60 text-muted-foreground">
+            <CheckCircle2 className="h-5 w-5" />
           </div>
-          <h2 className="text-base font-semibold text-foreground">
-            {statusFilter === "pending"
-              ? "All caught up! No pending bank verifications."
-              : "No verification records found."}
-          </h2>
-          <p className="text-xs text-muted-foreground max-w-sm mx-auto">
-            {searchQuery
-              ? "No records matched your search query. Try clearing the filter."
-              : "When users submit bank accounts, they will appear here oldest first for review."}
-          </p>
-        </Card>
+          <div className="space-y-1">
+            <h2 className="text-sm font-semibold text-foreground">
+              {statusFilter === "pending"
+                ? "Nothing waiting for review"
+                : statusFilter === "approved"
+                ? "No approved verifications yet"
+                : statusFilter === "rejected"
+                ? "No rejected verifications yet"
+                : "No verification records found"}
+            </h2>
+            <p className="text-xs text-muted-foreground max-w-sm mx-auto">
+              {searchQuery
+                ? "No records matched your search query. Try clearing the search."
+                : statusFilter === "pending"
+                ? "All submitted bank accounts have been reviewed"
+                : "When users submit bank accounts, they will appear here"}
+            </p>
+          </div>
+        </div>
       ) : (
         <div className="space-y-3">
           {filteredRequests.map((req) => {
@@ -328,16 +327,16 @@ export function AdminVerificationsClient({
             return (
               <Card
                 key={req.id}
-                className="p-5 transition-shadow hover:shadow-sm border border-border space-y-4"
+                className="p-5 transition-shadow hover:shadow-sm border border-border bg-card space-y-4"
               >
                 <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                   {/* Left: Side-by-Side Name Comparison */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1">
                     {/* Profile Name */}
-                    <div className="rounded-lg bg-muted/40 p-3 border border-border/60 space-y-1">
-                      <div className="flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
+                    <div className="rounded-lg bg-secondary/40 p-3 border border-border/60 space-y-1">
+                      <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
                         <User className="h-3.5 w-3.5" />
-                        <span>Profile Name</span>
+                        <span>Profile name</span>
                       </div>
                       <p className="text-sm font-semibold text-foreground">
                         {req.profile_full_name || "—"}
@@ -348,20 +347,16 @@ export function AdminVerificationsClient({
                     </div>
 
                     {/* Bank Account Name */}
-                    <div className="rounded-lg bg-muted/40 p-3 border border-border/60 space-y-1">
+                    <div className="rounded-lg bg-secondary/40 p-3 border border-border/60 space-y-1">
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
+                        <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
                           <Building2 className="h-3.5 w-3.5" />
-                          <span>Bank Account Name</span>
+                          <span>Bank account name</span>
                         </div>
                         {match ? (
-                          <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-emerald-500/40 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-                            Names similar
-                          </Badge>
+                          <StatusPill variant="verified" label="Names match" size="sm" />
                         ) : (
-                          <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-amber-500/40 bg-amber-500/10 text-amber-600 dark:text-amber-400">
-                            Check Name
-                          </Badge>
+                          <StatusPill variant="pending" label="Check name" size="sm" />
                         )}
                       </div>
                       <p className="text-sm font-semibold text-foreground">
@@ -373,60 +368,60 @@ export function AdminVerificationsClient({
                     </div>
                   </div>
 
-                  {/* Right: Bank Details & Full Account Number */}
+                  {/* Right: Bank Details & Masked Account Number */}
                   <div className="flex flex-col sm:flex-row lg:flex-col items-start lg:items-end justify-between gap-2 min-w-[220px]">
                     <div className="text-left lg:text-right space-y-1">
                       <p className="text-xs font-medium text-foreground">
-                        {req.bank_name} <span className="text-muted-foreground">({req.bank_code})</span>
+                        {req.bank_name}{" "}
+                        <span className="text-muted-foreground">({req.bank_code})</span>
                       </p>
                       <div className="flex items-center gap-1.5">
                         <span className="font-mono text-sm font-bold tracking-wider text-foreground">
-                          {req.account_number}
+                          {/* Privacy: show only last 4 digits */}
+                          {"•••• " + req.account_number.slice(-4)}
                         </span>
                         <Button
                           variant="ghost"
                           size="icon"
                           onClick={() => copyToClipboard(req.account_number, req.id)}
                           className="h-6 w-6 text-muted-foreground hover:text-foreground"
-                          title="Copy account number"
+                          title="Copy full account number"
                         >
                           {copiedId === req.id ? (
-                            <Check className="h-3.5 w-3.5 text-emerald-500" />
+                            <Check className="h-3.5 w-3.5" style={{ color: "var(--data-verified)" }} />
                           ) : (
                             <Copy className="h-3.5 w-3.5" />
                           )}
                         </Button>
                       </div>
-                      <p className="text-[11px] text-muted-foreground">
-                        Submitted: {new Date(req.created_at).toLocaleString()}
-                      </p>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <p className="text-[11px] text-muted-foreground">
+                          Submitted:
+                        </p>
+                        <AgePill submittedAt={req.created_at} />
+                      </div>
                     </div>
 
-                    {/* Status Badge */}
+                    {/* Status Pill */}
                     <div className="pt-1">
-                      {req.status === "pending" && (
-                        <Badge variant="outline" className="border-amber-500/40 bg-amber-500/10 text-amber-600 dark:text-amber-400">
-                          Pending
-                        </Badge>
-                      )}
-                      {req.status === "approved" && (
-                        <Badge variant="outline" className="border-emerald-500/40 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-                          Approved
-                        </Badge>
-                      )}
-                      {req.status === "rejected" && (
-                        <Badge variant="outline" className="border-destructive/40 bg-destructive/10 text-destructive">
-                          Rejected
-                        </Badge>
-                      )}
+                      {req.status === "pending" && <StatusPill variant="pending" />}
+                      {req.status === "approved" && <StatusPill variant="approved" />}
+                      {req.status === "rejected" && <StatusPill variant="rejected" />}
                     </div>
                   </div>
                 </div>
 
                 {/* Rejection reason display if rejected */}
                 {req.status === "rejected" && req.reject_reason && (
-                  <div className="rounded-md bg-destructive/10 border border-destructive/20 p-2.5 text-xs text-destructive">
-                    <strong>Rejection Reason:</strong> {req.reject_reason}
+                  <div
+                    className="rounded-md p-2.5 text-xs"
+                    style={{
+                      background: "var(--data-negative-subtle)",
+                      color: "var(--data-negative-ink)",
+                      border: "1px solid var(--data-negative-border)",
+                    }}
+                  >
+                    <strong>Rejection reason:</strong> {req.reject_reason}
                   </div>
                 )}
 
@@ -438,7 +433,18 @@ export function AdminVerificationsClient({
                       size="sm"
                       onClick={() => openRejectDialog(req)}
                       disabled={isPending}
-                      className="text-xs border-destructive/30 text-destructive hover:bg-destructive/10"
+                      className="text-xs"
+                      style={{
+                        borderColor: "var(--data-negative-border)",
+                        color: "var(--data-negative-ink)",
+                      }}
+                      onMouseEnter={(e) => {
+                        (e.currentTarget as HTMLButtonElement).style.background =
+                          "var(--data-negative-subtle)";
+                      }}
+                      onMouseLeave={(e) => {
+                        (e.currentTarget as HTMLButtonElement).style.background = "";
+                      }}
                     >
                       <XCircle className="h-3.5 w-3.5 mr-1" />
                       Reject
@@ -448,14 +454,21 @@ export function AdminVerificationsClient({
                       size="sm"
                       onClick={() => handleApprove(req)}
                       disabled={isPending}
-                      className="text-xs bg-emerald-600 hover:bg-emerald-700 text-white"
+                      className="text-xs text-white"
+                      style={{ background: "var(--data-verified)" }}
+                      onMouseEnter={(e) => {
+                        (e.currentTarget as HTMLButtonElement).style.opacity = "0.9";
+                      }}
+                      onMouseLeave={(e) => {
+                        (e.currentTarget as HTMLButtonElement).style.opacity = "1";
+                      }}
                     >
                       {isPending ? (
                         <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" />
                       ) : (
                         <CheckCircle2 className="h-3.5 w-3.5 mr-1" />
                       )}
-                      Approve & Verify
+                      Approve &amp; verify
                     </Button>
                   </div>
                 )}
@@ -470,11 +483,14 @@ export function AdminVerificationsClient({
         open={Boolean(rejectDialogTarget)}
         onOpenChange={(open) => !open && setRejectDialogTarget(null)}
       >
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md border-border/80 shadow-lg rounded-lg">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-destructive">
+            <DialogTitle
+              className="flex items-center gap-2"
+              style={{ color: "var(--data-negative-ink)" }}
+            >
               <XCircle className="h-5 w-5" />
-              Reject Bank Verification
+              Reject bank verification
             </DialogTitle>
             <DialogDescription className="text-xs">
               Provide a clear reason for rejecting this verification. This reason will be shown
@@ -484,25 +500,28 @@ export function AdminVerificationsClient({
 
           {rejectDialogTarget && (
             <div className="space-y-4 py-2">
-              <div className="rounded-md bg-muted/60 p-3 text-xs space-y-1">
+              <div className="rounded-md bg-secondary/60 p-3 text-xs space-y-1">
                 <div>
                   <span className="text-muted-foreground">User: </span>
                   <span className="font-semibold">{rejectDialogTarget.profile_full_name || "—"}</span>
                 </div>
                 <div>
-                  <span className="text-muted-foreground">Account Name: </span>
+                  <span className="text-muted-foreground">Account name: </span>
                   <span className="font-semibold">{rejectDialogTarget.account_name}</span>
                 </div>
                 <div>
-                  <span className="text-muted-foreground">Bank & Account: </span>
-                  <span>{rejectDialogTarget.bank_name} ({rejectDialogTarget.account_number})</span>
+                  <span className="text-muted-foreground">Bank &amp; account: </span>
+                  <span>
+                    {rejectDialogTarget.bank_name} (••••{" "}
+                    {rejectDialogTarget.account_number.slice(-4)})
+                  </span>
                 </div>
               </div>
 
               {/* Quick suggestions */}
               <div className="space-y-1.5">
                 <span className="text-[11px] font-medium text-muted-foreground">
-                  Quick Reason Presets:
+                  Quick reason presets:
                 </span>
                 <div className="flex flex-wrap gap-1.5">
                   {[
@@ -518,7 +537,7 @@ export function AdminVerificationsClient({
                         setRejectReason(preset);
                         setRejectError(null);
                       }}
-                      className="rounded bg-muted px-2 py-1 text-[11px] text-muted-foreground hover:bg-muted/80 hover:text-foreground transition-colors"
+                      className="rounded bg-secondary px-2 py-1 text-[11px] text-muted-foreground hover:bg-secondary/80 hover:text-foreground transition-colors"
                     >
                       {preset}
                     </button>
@@ -529,7 +548,7 @@ export function AdminVerificationsClient({
               <div className="space-y-1.5">
                 <div className="flex justify-between items-center">
                   <Label htmlFor="rejectReasonInput" className="text-xs font-medium">
-                    Rejection Reason (Required)
+                    Rejection reason (required)
                   </Label>
                   <span className="text-[10px] text-muted-foreground">
                     {rejectReason.trim().length}/200
@@ -549,7 +568,7 @@ export function AdminVerificationsClient({
               </div>
 
               {rejectError && (
-                <div className="flex items-center gap-1.5 text-xs text-destructive">
+                <div className="flex items-center gap-1.5 text-xs" style={{ color: "var(--data-negative-ink)" }}>
                   <AlertCircle className="h-4 w-4 shrink-0" />
                   <span>{rejectError}</span>
                 </div>
@@ -580,7 +599,7 @@ export function AdminVerificationsClient({
                   Rejecting...
                 </>
               ) : (
-                "Confirm Rejection"
+                "Confirm rejection"
               )}
             </Button>
           </DialogFooter>
@@ -589,4 +608,3 @@ export function AdminVerificationsClient({
     </div>
   );
 }
-

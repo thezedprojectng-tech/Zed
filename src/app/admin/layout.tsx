@@ -3,6 +3,8 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { AdminTopBar } from "@/components/admin/AdminTopBar";
+import { AdminSidebarProvider } from "@/components/admin/AdminSidebarContext";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 /**
  * Server layout for all /admin routes.
@@ -119,25 +121,29 @@ export default async function AdminLayout({
   }
 
   return (
-    <div className="flex min-h-dvh w-full bg-background text-foreground antialiased font-sans selection:bg-amber-500/20 selection:text-amber-500">
-      {/* Dedicated Admin Sidebar */}
-      <AdminSidebar
-        adminUser={adminUser}
-        unreadContactCount={unreadContactCount}
-        pendingInternshipsCount={pendingInternshipsCount}
-        newAmbassadorsCount={newAmbassadorsCount}
-        newMentorshipCount={newMentorshipCount}
-        newAlumniCount={newAlumniCount}
-        pendingVerificationsCount={pendingVerificationsCount}
-      />
+    <AdminSidebarProvider>
+      <TooltipProvider delayDuration={150}>
+        <div className="flex min-h-dvh w-full bg-background text-foreground antialiased font-sans selection:bg-amber-500/20 selection:text-amber-500">
+          {/* Dedicated Admin Sidebar */}
+          <AdminSidebar
+            adminUser={adminUser}
+            unreadContactCount={unreadContactCount}
+            pendingInternshipsCount={pendingInternshipsCount}
+            newAmbassadorsCount={newAmbassadorsCount}
+            newMentorshipCount={newMentorshipCount}
+            newAlumniCount={newAlumniCount}
+            pendingVerificationsCount={pendingVerificationsCount}
+          />
 
-      {/* Main Console Content */}
-      <div className="flex flex-1 flex-col overflow-x-hidden min-w-0">
-        <AdminTopBar adminUser={adminUser} />
-        <main className="flex-1 bg-secondary/15 p-3.5 sm:p-6 lg:p-8">
-          {children}
-        </main>
-      </div>
-    </div>
+          {/* Main Console Content */}
+          <div className="flex flex-1 flex-col overflow-x-hidden min-w-0">
+            <AdminTopBar adminUser={adminUser} />
+            <main className="flex-1 bg-secondary/15 p-3.5 sm:p-6 lg:p-8">
+              {children}
+            </main>
+          </div>
+        </div>
+      </TooltipProvider>
+    </AdminSidebarProvider>
   );
 }

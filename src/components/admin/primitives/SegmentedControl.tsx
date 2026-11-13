@@ -33,7 +33,7 @@ export function SegmentedControl<T extends string>({
       role="tablist"
       aria-label={ariaLabel}
       className={cn(
-        "inline-flex items-center gap-1 p-1 rounded-xl bg-secondary/50 border border-border/70 overflow-x-auto max-w-full select-none",
+        "inline-flex items-center gap-1 p-1 rounded-lg bg-secondary/50 border border-border/70 overflow-x-auto max-w-full select-none",
         className
       )}
     >

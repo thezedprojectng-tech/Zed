@@ -2,8 +2,6 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { requireAdmin, maskPhone } from "@/lib/auth/admin-guard";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { Card } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
 import { UsersTableClient } from "./UsersTableClient";
 import { UserDetail } from "./UserDetailDrawer";
 
@@ -102,16 +100,29 @@ async function UsersContent() {
     guidesProgress: progressMap[u.id] || {},
   }));
 
-  return <UsersTableClient users={users} currentAdminId={currentAdminId} />;
+  // 5. Compute summary stats from the fetched array — no extra queries
+  const totalUsers = users.length;
+  const verifiedUsers = users.filter((u) => u.is_verified).length;
+  const adminCount = users.filter((u) => u.role === "admin").length;
+
+  return (
+    <UsersTableClient
+      users={users}
+      currentAdminId={currentAdminId}
+      totalUsers={totalUsers}
+      verifiedUsers={verifiedUsers}
+      adminCount={adminCount}
+    />
+  );
 }
 
 export default function AdminUsersPage() {
   return (
     <div className="space-y-4 max-w-[1400px] mx-auto">
       <div>
-        <h2 className="text-base font-bold tracking-tight text-foreground">
+        <h1 className="text-xl font-semibold tracking-tight text-foreground">
           Citizens Directory
-        </h2>
+        </h1>
         <p className="text-xs text-muted-foreground mt-0.5">
           View registered citizens, track civic progress, and manage administrative roles.
         </p>
@@ -119,11 +130,13 @@ export default function AdminUsersPage() {
 
       <Suspense
         fallback={
-          <Card className="p-6 border-border bg-card space-y-3">
+          <div className="space-y-4 max-w-[1400px] mx-auto animate-pulse">
+            <div className="h-4 w-72 rounded bg-muted" />
+            <div className="h-12 rounded-lg bg-card border border-border" />
             {[...Array(6)].map((_, i) => (
-              <Skeleton key={i} className="h-10 w-full" />
+              <div key={i} className="h-14 rounded-lg bg-card border border-border" />
             ))}
-          </Card>
+          </div>
         }
       >
         <UsersContent />

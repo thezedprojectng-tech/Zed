@@ -39,15 +39,17 @@ export interface AdminNavItem {
 export type AdminNavSectionKey =
   | "overview"
   | "people"
-  | "content"
+  | "programs"
   | "money"
-  | "inbox"
+  | "marketplace"
   | "system";
 
 export interface AdminNavSection {
   key: AdminNavSectionKey;
   label: string;
   accentClass: string;
+  accentToken: string;
+  barColor: string;
   dotColor: string;
   items: AdminNavItem[];
 }
@@ -88,8 +90,10 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
   {
     key: "overview",
     label: "Overview",
-    accentClass: "text-primary",
-    dotColor: "bg-primary",
+    accentClass: "text-data-users",
+    accentToken: "var(--data-users)",
+    barColor: "bg-data-users",
+    dotColor: "bg-data-users",
     items: [
       {
         href: "/admin",
@@ -102,8 +106,10 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
   {
     key: "people",
     label: "People",
-    accentClass: "text-admin-accent-people",
-    dotColor: "bg-admin-accent-people",
+    accentClass: "text-data-users",
+    accentToken: "var(--data-users)",
+    barColor: "bg-data-users",
+    dotColor: "bg-data-users",
     items: [
       {
         href: "/admin/users",
@@ -116,6 +122,22 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
         icon: ShieldCheck,
         badgeKey: "verifications",
       },
+      {
+        href: "/admin/contact",
+        label: "Contact inbox",
+        icon: Mail,
+        badgeKey: "contact",
+      },
+    ],
+  },
+  {
+    key: "programs",
+    label: "Programs",
+    accentClass: "text-data-signups",
+    accentToken: "var(--data-signups)",
+    barColor: "bg-data-signups",
+    dotColor: "bg-data-signups",
+    items: [
       {
         href: "/admin/ambassadors",
         label: "Ambassadors",
@@ -130,32 +152,9 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
       },
       {
         href: "/admin/alumni-office-hours",
-        label: "Alumni Office Hours",
+        label: "Alumni office hours",
         icon: UserCheck,
         badgeKey: "alumni",
-      },
-    ],
-  },
-  {
-    key: "content",
-    label: "Content",
-    accentClass: "text-admin-accent-content",
-    dotColor: "bg-admin-accent-content",
-    items: [
-      {
-        href: "/admin/skill",
-        label: "Skill content",
-        icon: GraduationCap,
-      },
-      {
-        href: "/admin/campus-hubs",
-        label: "Campus Hubs",
-        icon: Building2,
-      },
-      {
-        href: "/admin/careers",
-        label: "Careers",
-        icon: Briefcase,
       },
       {
         href: "/admin/internships",
@@ -164,17 +163,29 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
         badgeKey: "internships",
       },
       {
-        href: "/admin/market",
-        label: "Marketplace",
-        icon: ShoppingBag,
+        href: "/admin/campus-hubs",
+        label: "Campus hubs",
+        icon: Building2,
+      },
+      {
+        href: "/admin/careers",
+        label: "Careers",
+        icon: Briefcase,
+      },
+      {
+        href: "/admin/skill",
+        label: "Skill content",
+        icon: GraduationCap,
       },
     ],
   },
   {
     key: "money",
     label: "Money",
-    accentClass: "text-admin-accent-money",
-    dotColor: "bg-admin-accent-money",
+    accentClass: "text-data-mining",
+    accentToken: "var(--data-mining)",
+    barColor: "bg-data-mining",
+    dotColor: "bg-data-mining",
     items: [
       {
         href: "/admin/funding",
@@ -193,27 +204,28 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
       },
       {
         href: "/admin/settings/zed",
-        label: "ZED Token",
+        label: "ZED token",
         icon: Coins,
       },
       {
         href: "/admin/settings/levels",
-        label: "Level Rules",
+        label: "Level rules",
         icon: Sliders,
       },
     ],
   },
   {
-    key: "inbox",
-    label: "Inbox",
-    accentClass: "text-admin-accent-inbox",
-    dotColor: "bg-admin-accent-inbox",
+    key: "marketplace",
+    label: "Marketplace",
+    accentClass: "text-data-flows",
+    accentToken: "var(--data-flows)",
+    barColor: "bg-data-flows",
+    dotColor: "bg-data-flows",
     items: [
       {
-        href: "/admin/contact",
-        label: "Contact Inbox",
-        icon: Mail,
-        badgeKey: "contact",
+        href: "/admin/market",
+        label: "Market",
+        icon: ShoppingBag,
       },
     ],
   },
@@ -221,14 +233,15 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
     key: "system",
     label: "System",
     accentClass: "text-muted-foreground",
+    accentToken: "var(--muted-foreground)",
+    barColor: "bg-muted-foreground",
     dotColor: "bg-muted-foreground",
     items: [
       {
         href: "/admin/audit-log",
-        label: "Audit Log",
+        label: "Audit log",
         icon: ScrollText,
       },
     ],
   },
 ];
-
