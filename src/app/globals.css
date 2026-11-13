@@ -39,6 +39,10 @@
     --radius-lg: 0.75rem;
 
     --sidebar-background: #0d0d0e;
+    --sidebar: var(--sidebar-background);
+    --sidebar-ring: var(--ring);
+    --sidebar-accent-foreground: var(--sidebar-foreground);
+    --sidebar-primary-foreground: var(--primary-foreground);
     --sidebar-foreground: #ededed;
     --sidebar-border: rgba(255, 255, 255, 0.07);
     --sidebar-primary: #2E82F7;
@@ -74,7 +78,78 @@
     --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, sans-serif;
     --font-mono: var(--font-geist-mono), ui-monospace, "Cascadia Code", monospace;
     --font-serif: var(--font-instrument), "Instrument Serif", Georgia, serif;
-  }
+
+    /* ── Admin Console Tokens (Dark Theme) ───────────────────────────── */
+    --admin-success: #10b981;
+    --admin-success-subtle: rgba(16, 185, 129, 0.12);
+    --admin-success-border: rgba(16, 185, 129, 0.3);
+    --admin-success-ink: #6ee7b7;
+
+    --admin-warning: #f59e0b;
+    --admin-warning-subtle: rgba(245, 158, 11, 0.12);
+    --admin-warning-border: rgba(245, 158, 11, 0.3);
+    --admin-warning-ink: #fde047;
+
+    --admin-danger: #f43f5e;
+    --admin-danger-subtle: rgba(244, 63, 94, 0.12);
+    --admin-danger-border: rgba(244, 63, 94, 0.3);
+    --admin-danger-ink: #fda4af;
+
+    --admin-info: #38bdf8;
+    --admin-info-subtle: rgba(56, 189, 248, 0.12);
+    --admin-info-border: rgba(56, 189, 248, 0.3);
+    --admin-info-ink: #7dd3fc;
+
+    --admin-accent-people: #3b82f6;
+    --admin-accent-people-subtle: rgba(59, 130, 246, 0.12);
+    --admin-accent-people-border: rgba(59, 130, 246, 0.3);
+    --admin-accent-people-ink: #93c5fd;
+
+    --admin-accent-content: #8b5cf6;
+    --admin-accent-content-subtle: rgba(139, 92, 246, 0.12);
+    --admin-accent-content-border: rgba(139, 92, 246, 0.3);
+    --admin-accent-content-ink: #c4b5fd;
+
+    --admin-accent-money: #10b981;
+    --admin-accent-money-subtle: rgba(16, 185, 129, 0.12);
+    --admin-accent-money-border: rgba(16, 185, 129, 0.3);
+    --admin-accent-money-ink: #6ee7b7;
+
+    --admin-accent-inbox: #f59e0b;
+    --admin-accent-inbox-subtle: rgba(245, 158, 11, 0.12);
+    --admin-accent-inbox-border: rgba(245, 158, 11, 0.3);
+    --admin-accent-inbox-ink: #fde047;
+
+    /* ── Overview Data Palette (Dark Theme) ────────────────────────── */
+    --data-users: #3b82f6;
+    --data-users-subtle: rgba(59, 130, 246, 0.12);
+    --data-users-border: rgba(59, 130, 246, 0.25);
+    --data-users-ink: #93c5fd;
+
+    --data-verified: #10b981;
+    --data-verified-subtle: rgba(16, 185, 129, 0.12);
+    --data-verified-border: rgba(16, 185, 129, 0.25);
+    --data-verified-ink: #6ee7b7;
+
+    --data-signups: #8b5cf6;
+    --data-signups-subtle: rgba(139, 92, 246, 0.12);
+    --data-signups-border: rgba(139, 92, 246, 0.25);
+    --data-signups-ink: #c4b5fd;
+
+    --data-flows: #f59e0b;
+    --data-flows-subtle: rgba(245, 158, 11, 0.12);
+    --data-flows-border: rgba(245, 158, 11, 0.25);
+    --data-flows-ink: #fcd34d;
+
+    --data-mining: #14b8a6;
+    --data-mining-subtle: rgba(20, 184, 166, 0.12);
+    --data-mining-border: rgba(20, 184, 166, 0.25);
+    --data-mining-ink: #5eead4;
+
+    --data-negative: #f43f5e;
+    --data-negative-subtle: rgba(244, 63, 94, 0.12);
+    --data-negative-border: rgba(244, 63, 94, 0.25);
+    --data-negative-ink: #fda4af;  }
 
   .light {
     /* ── Light Theme Tokens ──────────────────────────────────────────── */
@@ -107,6 +182,10 @@
     --ring: #2E82F7;
 
     --sidebar-background: #ffffff;
+    --sidebar: var(--sidebar-background);
+    --sidebar-ring: var(--ring);
+    --sidebar-accent-foreground: var(--sidebar-foreground);
+    --sidebar-primary-foreground: var(--primary-foreground);
     --sidebar-foreground: #09090b;
     --sidebar-border: #e2e8f0;
     --sidebar-primary: #2E82F7;
@@ -136,7 +215,78 @@
     --site-vermilion-hover: #2E82F7;
     --site-vermilion-subtle: rgba(62, 207, 142, 0.12);
     --site-grid-line: rgba(11, 11, 12, 0.03);
-  }
+
+    /* ── Admin Console Tokens (Light Theme) ──────────────────────────── */
+    --admin-success: #059669;
+    --admin-success-subtle: #ecfdf5;
+    --admin-success-border: #a7f3d0;
+    --admin-success-ink: #065f46;
+
+    --admin-warning: #d97706;
+    --admin-warning-subtle: #fefce8;
+    --admin-warning-border: #fef08a;
+    --admin-warning-ink: #854d0e;
+
+    --admin-danger: #e11d48;
+    --admin-danger-subtle: #fff1f2;
+    --admin-danger-border: #fecdd3;
+    --admin-danger-ink: #9f1239;
+
+    --admin-info: #0284c7;
+    --admin-info-subtle: #f0f9ff;
+    --admin-info-border: #bae6fd;
+    --admin-info-ink: #075985;
+
+    --admin-accent-people: #2563eb;
+    --admin-accent-people-subtle: #eff6ff;
+    --admin-accent-people-border: #bfdbfe;
+    --admin-accent-people-ink: #1e40af;
+
+    --admin-accent-content: #7c3aed;
+    --admin-accent-content-subtle: #f5f3ff;
+    --admin-accent-content-border: #ddd6fe;
+    --admin-accent-content-ink: #5b21b6;
+
+    --admin-accent-money: #059669;
+    --admin-accent-money-subtle: #ecfdf5;
+    --admin-accent-money-border: #a7f3d0;
+    --admin-accent-money-ink: #065f46;
+
+    --admin-accent-inbox: #d97706;
+    --admin-accent-inbox-subtle: #fefce8;
+    --admin-accent-inbox-border: #fef08a;
+    --admin-accent-inbox-ink: #854d0e;
+
+    /* ── Overview Data Palette (Light Theme) ───────────────────────── */
+    --data-users: #2563eb;
+    --data-users-subtle: #eff6ff;
+    --data-users-border: #bfdbfe;
+    --data-users-ink: #1e40af;
+
+    --data-verified: #059669;
+    --data-verified-subtle: #ecfdf5;
+    --data-verified-border: #a7f3d0;
+    --data-verified-ink: #065f46;
+
+    --data-signups: #7c3aed;
+    --data-signups-subtle: #f5f3ff;
+    --data-signups-border: #ddd6fe;
+    --data-signups-ink: #5b21b6;
+
+    --data-flows: #d97706;
+    --data-flows-subtle: #fffbeb;
+    --data-flows-border: #fde68a;
+    --data-flows-ink: #92400e;
+
+    --data-mining: #0d9488;
+    --data-mining-subtle: #f0fdfa;
+    --data-mining-border: #99f6e4;
+    --data-mining-ink: #115e59;
+
+    --data-negative: #e11d48;
+    --data-negative-subtle: #fff1f2;
+    --data-negative-border: #fecdd3;
+    --data-negative-ink: #9f1239;  }
 
   html {
     font-size: 16px;
@@ -209,10 +359,104 @@
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, "Cascadia Code", monospace;
   --font-serif: var(--font-instrument), "Instrument Serif", Georgia, serif;
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+
+  /* ── Admin Console Token Inlining ── */
+  --color-admin-success: var(--admin-success);
+  --color-admin-success-subtle: var(--admin-success-subtle);
+  --color-admin-success-border: var(--admin-success-border);
+  --color-admin-success-ink: var(--admin-success-ink);
+
+  --color-admin-warning: var(--admin-warning);
+  --color-admin-warning-subtle: var(--admin-warning-subtle);
+  --color-admin-warning-border: var(--admin-warning-border);
+  --color-admin-warning-ink: var(--admin-warning-ink);
+
+  --color-admin-danger: var(--admin-danger);
+  --color-admin-danger-subtle: var(--admin-danger-subtle);
+  --color-admin-danger-border: var(--admin-danger-border);
+  --color-admin-danger-ink: var(--admin-danger-ink);
+
+  --color-admin-info: var(--admin-info);
+  --color-admin-info-subtle: var(--admin-info-subtle);
+  --color-admin-info-border: var(--admin-info-border);
+  --color-admin-info-ink: var(--admin-info-ink);
+
+  --color-admin-accent-people: var(--admin-accent-people);
+  --color-admin-accent-people-subtle: var(--admin-accent-people-subtle);
+  --color-admin-accent-people-border: var(--admin-accent-people-border);
+  --color-admin-accent-people-ink: var(--admin-accent-people-ink);
+
+  --color-admin-accent-content: var(--admin-accent-content);
+  --color-admin-accent-content-subtle: var(--admin-accent-content-subtle);
+  --color-admin-accent-content-border: var(--admin-accent-content-border);
+  --color-admin-accent-content-ink: var(--admin-accent-content-ink);
+
+  --color-admin-accent-money: var(--admin-accent-money);
+  --color-admin-accent-money-subtle: var(--admin-accent-money-subtle);
+  --color-admin-accent-money-border: var(--admin-accent-money-border);
+  --color-admin-accent-money-ink: var(--admin-accent-money-ink);
+
+  --color-admin-accent-inbox: var(--admin-accent-inbox);
+  --color-admin-accent-inbox-subtle: var(--admin-accent-inbox-subtle);
+  --color-admin-accent-inbox-border: var(--admin-accent-inbox-border);
+  --color-admin-accent-inbox-ink: var(--admin-accent-inbox-ink);
+
+  /* ── Overview Data Palette Inlining ── */
+  --color-data-users: var(--data-users);
+  --color-data-users-subtle: var(--data-users-subtle);
+  --color-data-users-border: var(--data-users-border);
+  --color-data-users-ink: var(--data-users-ink);
+
+  --color-data-verified: var(--data-verified);
+  --color-data-verified-subtle: var(--data-verified-subtle);
+  --color-data-verified-border: var(--data-verified-border);
+  --color-data-verified-ink: var(--data-verified-ink);
+
+  --color-data-signups: var(--data-signups);
+  --color-data-signups-subtle: var(--data-signups-subtle);
+  --color-data-signups-border: var(--data-signups-border);
+  --color-data-signups-ink: var(--data-signups-ink);
+
+  --color-data-flows: var(--data-flows);
+  --color-data-flows-subtle: var(--data-flows-subtle);
+  --color-data-flows-border: var(--data-flows-border);
+  --color-data-flows-ink: var(--data-flows-ink);
+
+  --color-data-mining: var(--data-mining);
+  --color-data-mining-subtle: var(--data-mining-subtle);
+  --color-data-mining-border: var(--data-mining-border);
+  --color-data-mining-ink: var(--data-mining-ink);
+
+  --color-data-negative: var(--data-negative);
+  --color-data-negative-subtle: var(--data-negative-subtle);
+  --color-data-negative-border: var(--data-negative-border);
+  --color-data-negative-ink: var(--data-negative-ink);
 }
 
 /* ── Typography Scale ────────────────────────────────────────────────── */
 @layer utilities {
+  /* ── Admin Console Scrollbar ─────────────────────────────────────── */
+  .admin-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+  .admin-scrollbar::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+  .admin-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .admin-scrollbar::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 9999px;
+  }
+  .admin-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: var(--muted-foreground);
+  }
   .max-w-site {
     max-width: 1160px;
   }
