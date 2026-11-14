@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useTransition, useMemo } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useTransition, useMemo, useCallback } from "react";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   Building2,
@@ -20,6 +20,8 @@ import {
   FileCheck2,
   Home,
   GraduationCap,
+  Globe,
+  Save,
 } from "lucide-react";
 import { toast } from "sonner";
 import type { CampusHub, CampusHubStatus } from "@/lib/campus-hubs/types";
@@ -32,8 +34,8 @@ import {
   adminDeleteCampusHub,
 } from "@/lib/campus-hubs/actions";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
@@ -42,13 +44,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetDescription,
-} from "@/components/ui/sheet";
-import {
   Dialog,
   DialogContent,
   DialogHeader,
@@ -56,33 +51,46 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { AdminPageHeader } from "@/components/admin/primitives/AdminPageHeader";
+import { AdminDrawer } from "@/components/admin/primitives/AdminDrawer";
+import { SegmentedControl } from "@/components/admin/primitives/SegmentedControl";
+import { EmptyState } from "@/components/admin/primitives/EmptyState";
+import { StatusPill } from "@/components/admin/people/StatusPill";
 
 interface AdminCampusHubsClientProps {
   initialHubs: CampusHub[];
+  initialStatus: string;
+  initialState: string;
+  initialSearch: string;
   loadError?: string | null;
 }
 
-const STATUS_CONFIG: Record<
-  CampusHubStatus,
-  { label: string; variant: "default" | "secondary" | "outline"; icon: React.ElementType }
-> = {
-  published: { label: "Published", variant: "default", icon: CheckCircle2 },
-  draft: { label: "Draft", variant: "secondary", icon: Clock },
-  archived: { label: "Archived", variant: "outline", icon: Archive },
-};
+const TAB_OPTIONS = [
+  { id: "all", label: "All Hubs" },
+  { id: "published", label: "Published" },
+  { id: "draft", label: "Draft" },
+  { id: "archived", label: "Archived" },
+];
 
 export function AdminCampusHubsClient({
   initialHubs,
+  initialStatus,
+  initialState,
+  initialSearch,
   loadError,
 }: AdminCampusHubsClientProps) {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
   const [hubs, setHubs] = useState<CampusHub[]>(initialHubs);
-  const [activeTab, setActiveTab] = useState<string>("all");
-  const [search, setSearch] = useState("");
+  const [activeTab, setActiveTab] = useState<string>(initialStatus);
+  const [selectedState, setSelectedState] = useState<string>(initialState);
+  const [search, setSearch] = useState(initialSearch);
   const [isPending, startTransition] = useTransition();
 
-  // Create / Edit Sheet state
-  const [sheetOpen, setSheetOpen] = useState(false);
+  // Create / Edit Drawer state
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [editingHubId, setEditingHubId] = useState<string | null>(null);
   const [hasManuallyEditedSlug, setHasManuallyEditedSlug] = useState(false);
 
@@ -107,10 +115,60 @@ export function AdminCampusHubsClient({
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
   // Delete modal state
-  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [deletingHub, setDeletingHub] = useState<CampusHub | null>(null);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
 
-  const openCreateSheet = () => {
+  const updateUrl = useCallback(
+    (newParams: { status?: string; state?: string; search?: string }) => {
+      const current = new URLSearchParams(searchParams.toString());
+      if (newParams.status !== undefined) current.set("status", newParams.status);
+      if (newParams.state !== undefined) current.set("state", newParams.state);
+      if (newParams.search !== undefined) {
+        if (newParams.search) current.set("search", newParams.search);
+        else current.delete("search");
+      }
+      router.push(`${pathname}?${current.toString()}`);
+    },
+    [pathname, router, searchParams]
+  );
+
+  const refreshHubs = useCallback(
+    (targetStatus: string, targetState: string, targetSearch: string) => {
+      startTransition(async () => {
+        const res = await adminGetCampusHubs({
+          status: targetStatus,
+          state: targetState,
+          search: targetSearch,
+        });
+        if (res.ok && res.data) {
+          setHubs(res.data);
+        } else {
+          toast.error(res.error || "Failed to load campus hubs");
+        }
+      });
+    },
+    []
+  );
+
+  const handleTabChange = (val: string) => {
+    setActiveTab(val);
+    updateUrl({ status: val, state: selectedState, search });
+    refreshHubs(val, selectedState, search);
+  };
+
+  const handleStateChange = (val: string) => {
+    setSelectedState(val);
+    updateUrl({ status: activeTab, state: val, search });
+    refreshHubs(activeTab, val, search);
+  };
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    updateUrl({ status: activeTab, state: selectedState, search });
+    refreshHubs(activeTab, selectedState, search);
+  };
+
+  const openCreateDrawer = () => {
     setEditingHubId(null);
     setHasManuallyEditedSlug(false);
     setFormData({
@@ -123,10 +181,10 @@ export function AdminCampusHubsClient({
       departments_guide: "",
     });
     setFormErrors({});
-    setSheetOpen(true);
+    setDrawerOpen(true);
   };
 
-  const openEditSheet = (hub: CampusHub) => {
+  const openEditDrawer = (hub: CampusHub) => {
     setEditingHubId(hub.id);
     setHasManuallyEditedSlug(true);
     setFormData({
@@ -139,7 +197,7 @@ export function AdminCampusHubsClient({
       departments_guide: hub.departments_guide || "",
     });
     setFormErrors({});
-    setSheetOpen(true);
+    setDrawerOpen(true);
   };
 
   const handleNameChange = (newName: string) => {
@@ -195,13 +253,8 @@ export function AdminCampusHubsClient({
       }
 
       toast.success(editingHubId ? "Campus hub updated" : "Campus hub created");
-      setSheetOpen(false);
-
-      // Refresh list
-      const fresh = await adminGetCampusHubs({ status: "all" });
-      if (fresh.ok && fresh.data) {
-        setHubs(fresh.data);
-      }
+      setDrawerOpen(false);
+      refreshHubs(activeTab, selectedState, search);
       router.refresh();
     });
   };
@@ -214,7 +267,7 @@ export function AdminCampusHubsClient({
         return;
       }
 
-      toast.success(`Hub status updated to ${STATUS_CONFIG[newStatus].label}`);
+      toast.success(`Hub status updated to ${newStatus}`);
       setHubs((prev) =>
         prev.map((h) => (h.id === hubId ? { ...h, status: newStatus } : h))
       );
@@ -244,515 +297,524 @@ export function AdminCampusHubsClient({
       if (activeTab !== "all" && hub.status !== activeTab) {
         return false;
       }
+      if (selectedState !== "all" && hub.state !== selectedState) {
+        return false;
+      }
       if (search.trim().length > 0) {
         const q = search.trim().toLowerCase();
         const matchName = hub.name.toLowerCase().includes(q);
         const matchSlug = hub.slug.toLowerCase().includes(q);
         const matchState = hub.state.toLowerCase().includes(q);
-        if (!matchName && !matchSlug && !matchState) {
-          return false;
-        }
+        return matchName || matchSlug || matchState;
       }
       return true;
     });
-  }, [hubs, activeTab, search]);
+  }, [hubs, activeTab, selectedState, search]);
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="font-display text-xl sm:text-2xl font-bold tracking-tight text-foreground flex items-center gap-2">
-            <Building2 className="h-6 w-6 text-primary" />
-            <span>Campus Hubs</span>
-          </h1>
-          <p className="font-sans text-xs sm:text-sm text-muted-foreground">
-            Manage university student clearance, hostel accommodation, and departmental guides.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <Badge variant="outline" className="font-mono text-xs px-2.5 py-1">
-            Total: {hubs.length}
-          </Badge>
-          <Button
-            size="sm"
-            onClick={openCreateSheet}
-            className="h-8 gap-1.5 text-xs font-semibold"
-          >
-            <Plus className="h-4 w-4" />
-            <span>Add Campus Hub</span>
-          </Button>
-        </div>
-      </div>
+      <AdminPageHeader
+        title="Campus Hubs Moderation"
+        description="Curate verified university walkthroughs, clearance procedures, and hostel accommodation guides."
+        icon={Building2}
+        section="programs"
+        actions={
+          <div className="flex items-center gap-2">
+            <Button asChild variant="outline" size="sm" className="gap-1.5 rounded-lg border-border h-8 text-xs">
+              <Link href="/campus-hubs" target="_blank">
+                <Globe className="h-3.5 w-3.5" />
+                <span>Public Directory</span>
+              </Link>
+            </Button>
+            <Button
+              onClick={openCreateDrawer}
+              size="sm"
+              variant="default"
+              className="gap-1.5 rounded-lg h-8 text-xs"
+            >
+              <Plus className="h-3.5 w-3.5" />
+              <span>New campus hub</span>
+            </Button>
+          </div>
+        }
+      />
 
       {loadError && (
-        <div className="rounded-lg border border-destructive/20 bg-destructive/10 p-4 text-xs font-medium text-destructive">
+        <div className="rounded-lg border border-[color:var(--data-negative-border)] bg-[color:var(--data-negative-subtle)] p-4 text-xs font-medium text-[color:var(--data-negative-ink)]">
           {loadError}
         </div>
       )}
 
-      {/* Tabs and Search Bar */}
+      {/* Toolbar: Segmented tabs + State filter + Search */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="flex items-center gap-1 overflow-x-auto pb-1 sm:pb-0">
-          <Button
-            size="sm"
-            variant={activeTab === "all" ? "default" : "outline"}
-            onClick={() => setActiveTab("all")}
-            className="text-xs h-8 px-3"
-          >
-            All ({hubs.length})
-          </Button>
-          {(["published", "draft", "archived"] as const).map((status) => {
-            const config = STATUS_CONFIG[status];
-            const Icon = config.icon;
-            const count = hubs.filter((h) => h.status === status).length;
-            return (
-              <Button
-                key={status}
-                size="sm"
-                variant={activeTab === status ? "default" : "outline"}
-                onClick={() => setActiveTab(status)}
-                className="text-xs h-8 px-3 gap-1.5"
-              >
-                <Icon className="h-3 w-3" />
-                <span>
-                  {config.label} ({count})
-                </span>
-              </Button>
-            );
-          })}
-        </div>
+        <SegmentedControl
+          options={TAB_OPTIONS}
+          value={activeTab}
+          onChange={handleTabChange}
+          ariaLabel="Campus hub status filter"
+        />
 
-        <div className="relative w-full sm:w-64">
-          <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
-          <Input
-            placeholder="Search hub name or slug..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="h-8 pl-8 text-xs bg-background"
-          />
+        <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+          {/* Nigerian State select filter */}
+          <div className="w-40 shrink-0">
+            <Select value={selectedState} onValueChange={handleStateChange}>
+              <SelectTrigger className="h-9 text-xs rounded-lg bg-card border-border">
+                <SelectValue placeholder="All States" />
+              </SelectTrigger>
+              <SelectContent className="max-h-60 rounded-lg">
+                <SelectItem value="all">All States</SelectItem>
+                {NIGERIAN_STATES.map((st) => (
+                  <SelectItem key={st} value={st}>
+                    {st}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Search */}
+          <form onSubmit={handleSearchSubmit} className="relative w-full sm:w-60">
+            <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search hub name or slug..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="h-9 pl-9 text-xs rounded-lg bg-card border-border"
+            />
+          </form>
         </div>
       </div>
 
-      {/* Hubs List */}
-      <div className="rounded-xl border border-border bg-card shadow-xs overflow-hidden">
-        {filteredHubs.length === 0 ? (
-          <div className="p-12 text-center text-muted-foreground space-y-2">
-            <Building2 className="h-10 w-10 mx-auto text-muted-foreground/40" />
-            <p className="font-sans text-sm font-medium text-foreground">
-              No campus hubs found
-            </p>
-            <p className="font-sans text-xs text-muted-foreground">
-              {hubs.length === 0
-                ? "No campus hubs exist yet. Click \"Add Campus Hub\" to create the first one."
-                : `No campus hubs match the selected filter "${activeTab}".`}
-            </p>
+      {/* Campus Hubs Table */}
+      <div className="rounded-lg border border-border bg-card shadow-xs overflow-hidden">
+        {isPending ? (
+          <div className="p-12 text-center text-muted-foreground flex items-center justify-center gap-2 text-xs">
+            <Loader2 className="h-4 w-4 animate-spin text-primary" />
+            <span>Loading campus hubs...</span>
           </div>
+        ) : filteredHubs.length === 0 ? (
+          <EmptyState
+            icon={Building2}
+            title="No campus hubs found"
+            description={
+              search || selectedState !== "all"
+                ? "No campus hubs match your active filter criteria."
+                : "No campus guides have been created yet."
+            }
+            action={
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={openCreateDrawer}
+                className="gap-1.5 rounded-lg border-border h-8 text-xs"
+              >
+                <Plus className="h-3.5 w-3.5" />
+                <span>Create first campus hub</span>
+              </Button>
+            }
+          />
         ) : (
-          <div className="divide-y divide-border">
-            {filteredHubs.map((hub) => {
-              const statusCfg = STATUS_CONFIG[hub.status];
-              const StatusIcon = statusCfg.icon;
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr className="border-b border-border bg-muted/40 font-mono text-[11px] text-muted-foreground uppercase tracking-wider">
+                  <th className="py-3 px-4 font-semibold">Campus Hub & Slug</th>
+                  <th className="py-3 px-4 font-semibold">State</th>
+                  <th className="py-3 px-4 font-semibold">Guides Included</th>
+                  <th className="py-3 px-4 font-semibold">Status</th>
+                  <th className="py-3 px-4 font-semibold">Last Reviewed</th>
+                  <th className="py-3 px-4 font-semibold text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border/60">
+                {filteredHubs.map((hub) => {
+                  const hasClearance = Boolean(hub.clearance_guide);
+                  const hasHostel = Boolean(hub.hostel_guide);
+                  const hasDepts = Boolean(hub.departments_guide);
 
-              return (
-                <div
-                  key={hub.id}
-                  className="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-secondary/20 transition-colors"
-                >
-                  <div className="space-y-1.5 min-w-0 flex-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <h2 className="font-sans text-sm font-bold text-foreground">
-                        {hub.name}
-                      </h2>
-                      <Badge
-                        variant={statusCfg.variant}
-                        className="text-[10px] font-mono uppercase font-semibold gap-1 px-1.5 py-0"
-                      >
-                        <StatusIcon className="h-2.5 w-2.5" />
-                        <span>{statusCfg.label}</span>
-                      </Badge>
-                      <span className="font-mono text-xs text-muted-foreground">
-                        /{hub.slug}
-                      </span>
-                    </div>
+                  return (
+                    <tr
+                      key={hub.id}
+                      onClick={() => openEditDrawer(hub)}
+                      className="hover:bg-secondary/40 transition-colors cursor-pointer group"
+                    >
+                      {/* Name & Slug */}
+                      <td className="py-3 px-4">
+                        <div className="min-w-0">
+                          <div className="font-semibold text-foreground truncate max-w-[220px] sm:max-w-none">
+                            {hub.name}
+                          </div>
+                          <div className="font-mono text-muted-foreground text-[11px] truncate max-w-[220px]">
+                            /{hub.slug}
+                          </div>
+                        </div>
+                      </td>
 
-                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
-                      <span className="inline-flex items-center gap-1 font-medium text-foreground">
-                        <MapPin className="h-3 w-3 text-primary" />
-                        <span>{hub.state} State</span>
-                      </span>
-                      <span>•</span>
-                      <span>
-                        Clearance: {hub.clearance_guide ? "Provided" : "Empty"}
-                      </span>
-                      <span>•</span>
-                      <span>Hostel: {hub.hostel_guide ? "Provided" : "Empty"}</span>
-                      <span>•</span>
-                      <span>
-                        Depts: {hub.departments_guide ? "Provided" : "Empty"}
-                      </span>
-                    </div>
+                      {/* State */}
+                      <td className="py-3 px-4 font-medium text-foreground">
+                        {hub.state}
+                      </td>
 
-                    {hub.summary && (
-                      <p className="font-sans text-xs text-muted-foreground line-clamp-1">
-                        {hub.summary}
-                      </p>
-                    )}
-                  </div>
+                      {/* Guides Included */}
+                      <td className="py-3 px-4">
+                        <div className="flex items-center gap-1.5">
+                          <span
+                            title="Clearance Guide"
+                            className={`h-5 px-1.5 rounded-md font-mono text-[10px] flex items-center gap-1 border ${
+                              hasClearance
+                                ? "bg-[color:var(--data-verified-subtle)] text-[color:var(--data-verified-ink)] border-[color:var(--data-verified-border)]"
+                                : "bg-muted/40 text-muted-foreground/50 border-border/40"
+                            }`}
+                          >
+                            <FileCheck2 className="h-3 w-3" />
+                            Clearance
+                          </span>
+                          <span
+                            title="Hostel Guide"
+                            className={`h-5 px-1.5 rounded-md font-mono text-[10px] flex items-center gap-1 border ${
+                              hasHostel
+                                ? "bg-[color:var(--data-verified-subtle)] text-[color:var(--data-verified-ink)] border-[color:var(--data-verified-border)]"
+                                : "bg-muted/40 text-muted-foreground/50 border-border/40"
+                            }`}
+                          >
+                            <Home className="h-3 w-3" />
+                            Hostel
+                          </span>
+                          <span
+                            title="Departments Guide"
+                            className={`h-5 px-1.5 rounded-md font-mono text-[10px] flex items-center gap-1 border ${
+                              hasDepts
+                                ? "bg-[color:var(--data-verified-subtle)] text-[color:var(--data-verified-ink)] border-[color:var(--data-verified-border)]"
+                                : "bg-muted/40 text-muted-foreground/50 border-border/40"
+                            }`}
+                          >
+                            <GraduationCap className="h-3 w-3" />
+                            Depts
+                          </span>
+                        </div>
+                      </td>
 
-                  {/* Actions */}
-                  <div className="flex items-center gap-2 shrink-0">
-                    {hub.status === "published" && (
-                      <Button
-                        asChild
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 px-2 text-xs text-muted-foreground hover:text-foreground gap-1"
-                      >
-                        <Link
-                          href={`/campus-hubs/${hub.slug}`}
-                          target="_blank"
-                          rel="noreferrer"
+                      {/* Status */}
+                      <td className="py-3 px-4">
+                        <StatusPill variant={hub.status as any} />
+                      </td>
+
+                      {/* Last Reviewed / Published */}
+                      <td className="py-3 px-4 font-mono text-[11px] text-muted-foreground whitespace-nowrap">
+                        {hub.last_reviewed_at || hub.published_at
+                          ? new Date(hub.last_reviewed_at || hub.published_at || "").toLocaleDateString("en-NG", {
+                              month: "short",
+                              day: "numeric",
+                              year: "numeric",
+                            })
+                          : "Never"}
+                      </td>
+
+                      {/* Actions */}
+                      <td className="py-3 px-4 text-right">
+                        <div
+                          className="flex items-center justify-end gap-1.5"
+                          onClick={(e) => e.stopPropagation()}
                         >
-                          <ExternalLink className="h-3.5 w-3.5" />
-                          <span className="hidden sm:inline">View</span>
-                        </Link>
-                      </Button>
-                    )}
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => openEditDrawer(hub)}
+                            className="h-7 px-2 text-xs rounded-lg border-border"
+                          >
+                            <Edit className="h-3 w-3 mr-1" />
+                            Edit
+                          </Button>
 
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => openEditSheet(hub)}
-                      className="h-8 px-2.5 text-xs gap-1"
-                    >
-                      <Edit className="h-3.5 w-3.5" />
-                      <span>Edit</span>
-                    </Button>
+                          {hub.status === "published" ? (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => handleStatusChange(hub.id, "draft")}
+                              disabled={isPending}
+                              className="h-7 px-2 text-xs text-muted-foreground hover:text-foreground"
+                            >
+                              Draft
+                            </Button>
+                          ) : (
+                            <Button
+                              size="sm"
+                              variant="default"
+                              onClick={() => handleStatusChange(hub.id, "published")}
+                              disabled={isPending}
+                              className="h-7 px-2 text-xs rounded-lg"
+                            >
+                              Publish
+                            </Button>
+                          )}
 
-                    {hub.status !== "published" && (
-                      <Button
-                        variant="default"
-                        size="sm"
-                        disabled={isPending}
-                        onClick={() => handleStatusChange(hub.id, "published")}
-                        className="h-8 px-2.5 text-xs gap-1"
-                      >
-                        <CheckCircle2 className="h-3.5 w-3.5" />
-                        <span>Publish</span>
-                      </Button>
-                    )}
+                          {hub.status === "published" && (
+                            <Button asChild variant="ghost" size="sm" className="h-7 px-2 text-xs">
+                              <Link href={`/campus-hubs/${hub.slug}`} target="_blank">
+                                <ExternalLink className="h-3.5 w-3.5" />
+                              </Link>
+                            </Button>
+                          )}
 
-                    {hub.status === "published" && (
-                      <Button
-                        variant="secondary"
-                        size="sm"
-                        disabled={isPending}
-                        onClick={() => handleStatusChange(hub.id, "draft")}
-                        className="h-8 px-2.5 text-xs gap-1"
-                      >
-                        <Clock className="h-3.5 w-3.5" />
-                        <span>Draft</span>
-                      </Button>
-                    )}
-
-                    {hub.status !== "archived" && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        disabled={isPending}
-                        onClick={() => handleStatusChange(hub.id, "archived")}
-                        className="h-8 px-2 text-xs text-muted-foreground"
-                      >
-                        Archive
-                      </Button>
-                    )}
-
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => {
-                        setDeletingHub(hub);
-                        setDeleteConfirmOpen(true);
-                      }}
-                      className="h-8 px-2 text-destructive hover:bg-destructive/10"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </Button>
-                  </div>
-                </div>
-              );
-            })}
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => {
+                              setDeletingHub(hub);
+                              setDeleteConfirmOpen(true);
+                            }}
+                            disabled={isPending}
+                            className="h-7 w-7 p-0 text-muted-foreground hover:text-[color:var(--data-negative-ink)]"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
         )}
       </div>
 
-      {/* Create / Edit Sheet */}
-      <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
-        <SheetContent className="sm:max-w-2xl overflow-y-auto space-y-6">
-          <SheetHeader className="space-y-1">
-            <SheetTitle className="text-lg font-bold text-foreground">
-              {editingHubId ? "Edit Campus Hub" : "Create Campus Hub"}
-            </SheetTitle>
-            <SheetDescription className="text-xs text-muted-foreground">
-              Provide accurate clearance checklists, hostel procedures, and departmental notes.
-            </SheetDescription>
-          </SheetHeader>
-
-          <div className="space-y-5 text-xs">
-            {/* Name */}
-            <div className="space-y-1.5">
-              <label className="font-semibold text-foreground">
-                Institution Name <span className="text-destructive">*</span>
-              </label>
-              <Input
-                placeholder="e.g. University of Lagos"
-                value={formData.name}
-                onChange={(e) => handleNameChange(e.target.value)}
-                className={`text-xs ${formErrors.name ? "border-destructive" : ""}`}
-              />
-              {formErrors.name && (
-                <p className="text-destructive text-[11px]">{formErrors.name}</p>
-              )}
-            </div>
-
-            {/* Slug & State row */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <label className="font-semibold text-foreground">
-                    URL Slug <span className="text-destructive">*</span>
-                  </label>
-                  {!editingHubId && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setHasManuallyEditedSlug(false);
-                        setFormData((prev) => ({
-                          ...prev,
-                          slug: generateSlug(prev.name),
-                        }));
-                      }}
-                      className="text-[10px] text-primary hover:underline"
-                    >
-                      Reset to auto
-                    </button>
-                  )}
-                </div>
-                <Input
-                  placeholder="e.g. university-of-lagos"
-                  value={formData.slug}
-                  onChange={(e) => handleSlugChange(e.target.value)}
-                  className={`text-xs font-mono ${
-                    formErrors.slug ? "border-destructive" : ""
-                  }`}
-                />
-                <p className="text-[10px] text-muted-foreground">
-                  URL: /campus-hubs/{formData.slug || "..."}
-                </p>
-                {formErrors.slug && (
-                  <p className="text-destructive text-[11px]">{formErrors.slug}</p>
-                )}
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="font-semibold text-foreground">
-                  State <span className="text-destructive">*</span>
-                </label>
-                <Select
-                  value={formData.state}
-                  onValueChange={(val) =>
-                    setFormData((prev) => ({ ...prev, state: val }))
-                  }
-                >
-                  <SelectTrigger className="w-full text-xs h-9">
-                    <SelectValue placeholder="Select state" />
-                  </SelectTrigger>
-                  <SelectContent position="popper">
-                    {NIGERIAN_STATES.map((st) => (
-                      <SelectItem key={st} value={st}>
-                        {st}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {formErrors.state && (
-                  <p className="text-destructive text-[11px]">{formErrors.state}</p>
-                )}
-              </div>
-            </div>
-
-            {/* Summary */}
-            <div className="space-y-1.5">
-              <div className="flex items-center justify-between">
-                <label className="font-semibold text-foreground">
-                  Overview Summary
-                </label>
-                <span className="font-mono text-[10px] text-muted-foreground">
-                  {formData.summary.length} / 300
-                </span>
-              </div>
-              <textarea
-                rows={2}
-                placeholder="A concise 1-2 sentence overview of this university campus..."
-                value={formData.summary}
-                onChange={(e) =>
-                  setFormData((prev) => ({ ...prev, summary: e.target.value }))
-                }
-                className="w-full rounded-lg border border-input bg-background p-2.5 font-sans text-xs text-foreground placeholder:text-muted-foreground/60 leading-relaxed resize-y focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-              />
-              {formErrors.summary && (
-                <p className="text-destructive text-[11px]">
-                  {formErrors.summary}
-                </p>
-              )}
-            </div>
-
-            {/* Section 1: Clearance Guide */}
-            <div className="space-y-1.5 pt-2 border-t border-border">
-              <div className="flex items-center justify-between">
-                <label className="font-semibold text-foreground flex items-center gap-1.5">
-                  <FileCheck2 className="h-3.5 w-3.5 text-emerald-600" />
-                  <span>Clearance Guide (plain text)</span>
-                </label>
-                <span className="font-mono text-[10px] text-muted-foreground">
-                  {formData.clearance_guide.length} / 8,000
-                </span>
-              </div>
-              <p className="text-[11px] text-muted-foreground">
-                Document checklists, administrative offices to visit, step-by-step clearance sequence.
-              </p>
-              <textarea
-                rows={5}
-                placeholder="Document Requirements:&#10;1. JAMB admission letter&#10;2. O'Level statement of result&#10;3. Birth certificate / Age declaration&#10;&#10;Procedure:&#10;Visit the faculty office for document vetting..."
-                value={formData.clearance_guide}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    clearance_guide: e.target.value,
-                  }))
-                }
-                className="w-full rounded-lg border border-input bg-background p-2.5 font-sans text-xs text-foreground placeholder:text-muted-foreground/60 leading-relaxed resize-y focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-              />
-              {formErrors.clearance_guide && (
-                <p className="text-destructive text-[11px]">
-                  {formErrors.clearance_guide}
-                </p>
-              )}
-            </div>
-
-            {/* Section 2: Hostel Guide */}
-            <div className="space-y-1.5 pt-2 border-t border-border">
-              <div className="flex items-center justify-between">
-                <label className="font-semibold text-foreground flex items-center gap-1.5">
-                  <Home className="h-3.5 w-3.5 text-blue-600" />
-                  <span>Hostel &amp; Accommodation Guide (plain text)</span>
-                </label>
-                <span className="font-mono text-[10px] text-muted-foreground">
-                  {formData.hostel_guide.length} / 8,000
-                </span>
-              </div>
-              <p className="text-[11px] text-muted-foreground">
-                On-campus hostel allocation procedures, payment portal, and off-campus housing guidelines.
-              </p>
-              <textarea
-                rows={5}
-                placeholder="On-Campus Hostels:&#10;Hostel portal opens 2 weeks before session resumption.&#10;&#10;Off-Campus Accommodation:&#10;Common student hubs near campus gates..."
-                value={formData.hostel_guide}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    hostel_guide: e.target.value,
-                  }))
-                }
-                className="w-full rounded-lg border border-input bg-background p-2.5 font-sans text-xs text-foreground placeholder:text-muted-foreground/60 leading-relaxed resize-y focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-              />
-              {formErrors.hostel_guide && (
-                <p className="text-destructive text-[11px]">
-                  {formErrors.hostel_guide}
-                </p>
-              )}
-            </div>
-
-            {/* Section 3: Departments Guide */}
-            <div className="space-y-1.5 pt-2 border-t border-border">
-              <div className="flex items-center justify-between">
-                <label className="font-semibold text-foreground flex items-center gap-1.5">
-                  <GraduationCap className="h-3.5 w-3.5 text-purple-600" />
-                  <span>Departments &amp; Faculty Guide (plain text)</span>
-                </label>
-                <span className="font-mono text-[10px] text-muted-foreground">
-                  {formData.departments_guide.length} / 8,000
-                </span>
-              </div>
-              <p className="text-[11px] text-muted-foreground">
-                Faculty breakdown, department locations, course registration requirements.
-              </p>
-              <textarea
-                rows={5}
-                placeholder="Faculty of Engineering:&#10;Civil, Electrical, Mechanical, and Systems Engineering.&#10;&#10;Course Registration:&#10;Ensure HOD signs your green file before exams..."
-                value={formData.departments_guide}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    departments_guide: e.target.value,
-                  }))
-                }
-                className="w-full rounded-lg border border-input bg-background p-2.5 font-sans text-xs text-foreground placeholder:text-muted-foreground/60 leading-relaxed resize-y focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-              />
-              {formErrors.departments_guide && (
-                <p className="text-destructive text-[11px]">
-                  {formErrors.departments_guide}
-                </p>
-              )}
-            </div>
-
-            {/* Actions */}
-            <div className="pt-4 border-t border-border flex items-center justify-end gap-2">
+      {/* Create / Edit Drawer */}
+      <AdminDrawer
+        open={drawerOpen}
+        onOpenChange={setDrawerOpen}
+        widthClassName="sm:max-w-xl md:max-w-2xl"
+        title={editingHubId ? "Edit Campus Hub" : "Create New Campus Hub"}
+        subtitle="Manage official school walkthroughs and student relocation guides."
+        badge={
+          editingHubId && (
+            <span className="font-mono text-[11px] text-muted-foreground">
+              /{formData.slug}
+            </span>
+          )
+        }
+        footer={
+          <div className="flex items-center justify-between w-full gap-2">
+            {editingHubId ? (
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setSheetOpen(false)}
+                onClick={() => {
+                  const target = hubs.find((h) => h.id === editingHubId);
+                  if (target) {
+                    setDeletingHub(target);
+                    setDeleteConfirmOpen(true);
+                  }
+                }}
+                className="text-xs text-[color:var(--data-negative-ink)] border-[color:var(--data-negative-border)] hover:bg-[color:var(--data-negative-subtle)] gap-1.5 h-8 rounded-lg"
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+                <span>Delete</span>
+              </Button>
+            ) : (
+              <div />
+            )}
+
+            <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setDrawerOpen(false)}
                 disabled={isPending}
-                className="text-xs"
+                className="text-xs h-8 rounded-lg border-border"
               >
                 Cancel
               </Button>
               <Button
+                type="button"
+                variant="default"
                 size="sm"
-                onClick={handleSave}
                 disabled={isPending}
-                className="text-xs font-semibold gap-1.5"
+                onClick={handleSave}
+                className="text-xs h-8 rounded-lg gap-1.5"
               >
-                {isPending && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-                <span>{editingHubId ? "Save Changes" : "Create Hub"}</span>
+                {isPending ? (
+                  <>
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    <span>Saving...</span>
+                  </>
+                ) : (
+                  <>
+                    <Save className="h-3.5 w-3.5" />
+                    <span>{editingHubId ? "Update Hub" : "Create Hub"}</span>
+                  </>
+                )}
               </Button>
             </div>
           </div>
-        </SheetContent>
-      </Sheet>
+        }
+      >
+        <div className="space-y-5 text-xs p-5">
+          {/* Institution Name */}
+          <div className="space-y-1.5">
+            <label className="font-semibold text-foreground block">
+              Institution Name *
+            </label>
+            <Input
+              value={formData.name}
+              onChange={(e) => handleNameChange(e.target.value)}
+              placeholder="e.g. University of Lagos (UNILAG)"
+              className="h-8 text-xs rounded-lg bg-background border-border"
+            />
+            <p className="text-[11px] text-muted-foreground">
+              Official university name with acronym.
+            </p>
+            {formErrors.name && (
+              <p className="text-[11px] font-medium text-[color:var(--data-negative-ink)]">
+                {formErrors.name}
+              </p>
+            )}
+          </div>
+
+          {/* URL Slug & Nigerian State */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <label className="font-semibold text-foreground block">URL Slug *</label>
+              <div className="flex items-center rounded-lg border border-border bg-background px-2.5 h-8 focus-within:ring-1 focus-within:ring-primary">
+                <span className="font-mono text-muted-foreground text-[11px] select-none">
+                  /campus-hubs/
+                </span>
+                <input
+                  type="text"
+                  value={formData.slug}
+                  onChange={(e) => handleSlugChange(e.target.value)}
+                  placeholder="unilag"
+                  className="w-full bg-transparent font-mono text-xs text-foreground focus:outline-none pl-0.5"
+                />
+              </div>
+              <p className="text-[11px] text-muted-foreground">
+                Lowercase letters, numbers, and hyphens.
+              </p>
+              {formErrors.slug && (
+                <p className="text-[11px] font-medium text-[color:var(--data-negative-ink)]">
+                  {formErrors.slug}
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="font-semibold text-foreground block">State *</label>
+              <Select
+                value={formData.state}
+                onValueChange={(val) => setFormData((p) => ({ ...p, state: val }))}
+              >
+                <SelectTrigger className="h-8 text-xs rounded-lg bg-background border-border">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="max-h-60 rounded-lg">
+                  {NIGERIAN_STATES.map((st) => (
+                    <SelectItem key={st} value={st}>
+                      {st}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-[11px] text-muted-foreground">Nigerian state location.</p>
+              {formErrors.state && (
+                <p className="text-[11px] font-medium text-[color:var(--data-negative-ink)]">
+                  {formErrors.state}
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Summary */}
+          <div className="space-y-1.5">
+            <label className="font-semibold text-foreground block">Short Summary</label>
+            <Textarea
+              rows={2}
+              value={formData.summary}
+              onChange={(e) => setFormData((p) => ({ ...p, summary: e.target.value }))}
+              placeholder="Brief overview of the institution, location, and student life..."
+              className="text-xs rounded-lg bg-background border-border leading-relaxed"
+            />
+            <p className="text-[11px] text-muted-foreground">Max 300 characters.</p>
+            {formErrors.summary && (
+              <p className="text-[11px] font-medium text-[color:var(--data-negative-ink)]">
+                {formErrors.summary}
+              </p>
+            )}
+          </div>
+
+          {/* Clearance Guide */}
+          <div className="space-y-1.5">
+            <label className="font-semibold text-foreground flex items-center gap-1.5">
+              <FileCheck2 className="h-3.5 w-3.5 text-primary" />
+              <span>Freshers Clearance Guide (Markdown)</span>
+            </label>
+            <Textarea
+              rows={5}
+              value={formData.clearance_guide}
+              onChange={(e) => setFormData((p) => ({ ...p, clearance_guide: e.target.value }))}
+              placeholder="Step-by-step checklist of screening requirements, medical tests, and faculty verification..."
+              className="font-mono text-xs rounded-lg bg-background border-border leading-relaxed"
+            />
+            <p className="text-[11px] text-muted-foreground">Markdown supported. Up to 8,000 characters.</p>
+          </div>
+
+          {/* Hostel Guide */}
+          <div className="space-y-1.5">
+            <label className="font-semibold text-foreground flex items-center gap-1.5">
+              <Home className="h-3.5 w-3.5 text-primary" />
+              <span>Hostel &amp; Accommodation Guide (Markdown)</span>
+            </label>
+            <Textarea
+              rows={5}
+              value={formData.hostel_guide}
+              onChange={(e) => setFormData((p) => ({ ...p, hostel_guide: e.target.value }))}
+              placeholder="Hall allocations, private off-campus lodge prices, and safety recommendations..."
+              className="font-mono text-xs rounded-lg bg-background border-border leading-relaxed"
+            />
+            <p className="text-[11px] text-muted-foreground">Markdown supported. Up to 8,000 characters.</p>
+          </div>
+
+          {/* Departments Guide */}
+          <div className="space-y-1.5">
+            <label className="font-semibold text-foreground flex items-center gap-1.5">
+              <GraduationCap className="h-3.5 w-3.5 text-primary" />
+              <span>Faculties &amp; Departments Walkthrough (Markdown)</span>
+            </label>
+            <Textarea
+              rows={5}
+              value={formData.departments_guide}
+              onChange={(e) => setFormData((p) => ({ ...p, departments_guide: e.target.value }))}
+              placeholder="List of faculties, common course codes, department buildings, and key faculty contacts..."
+              className="font-mono text-xs rounded-lg bg-background border-border leading-relaxed"
+            />
+            <p className="text-[11px] text-muted-foreground">Markdown supported. Up to 8,000 characters.</p>
+          </div>
+        </div>
+      </AdminDrawer>
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md rounded-lg">
           <DialogHeader>
             <DialogTitle className="text-base font-bold text-foreground">
               Delete Campus Hub
             </DialogTitle>
             <DialogDescription className="text-xs text-muted-foreground">
-              Are you sure you want to permanently delete{" "}
-              <strong>{deletingHub?.name}</strong>? This will remove all associated
-              guides and cannot be undone.
+              Are you sure you want to permanently delete the campus hub for{" "}
+              <strong>{deletingHub?.name}</strong>? All guides associated with this hub will be
+              removed.
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter className="gap-2 sm:gap-0">
+          <DialogFooter className="gap-2 sm:gap-0 pt-2 border-t border-border">
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setDeleteConfirmOpen(false)}
+              onClick={() => {
+                setDeleteConfirmOpen(false);
+                setDeletingHub(null);
+              }}
               disabled={isPending}
-              className="text-xs h-8"
+              className="text-xs h-8 rounded-lg border-border"
             >
               Cancel
             </Button>
@@ -761,7 +823,7 @@ export function AdminCampusHubsClient({
               size="sm"
               disabled={isPending}
               onClick={handleDelete}
-              className="text-xs h-8 gap-1.5"
+              className="text-xs h-8 rounded-lg gap-1.5"
             >
               {isPending ? (
                 <>
@@ -781,4 +843,3 @@ export function AdminCampusHubsClient({
     </div>
   );
 }
-

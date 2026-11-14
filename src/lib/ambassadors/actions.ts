@@ -267,7 +267,9 @@ export async function adminGetAmbassadorApplications(options?: {
       );
     }
 
-    query = query.order("created_at", { ascending: false }).range(from, to);
+    // Action-needed review queues sort oldest-first (FIFO); history tabs sort newest-first
+    const isQueue = options?.status === "new" || options?.status === "reviewing";
+    query = query.order("created_at", { ascending: isQueue }).range(from, to);
 
     const { data, count, error } = await query;
     if (error) {

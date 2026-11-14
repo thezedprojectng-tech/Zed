@@ -1,32 +1,29 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useTransition, useCallback } from "react";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import {
   Search,
   Users,
-  Clock,
-  CheckCircle2,
-  XCircle,
   Trash2,
   ChevronLeft,
   ChevronRight,
   Loader2,
-  BookOpen,
   Mail,
   Phone,
   MapPin,
+  GraduationCap,
   Layers,
   Calendar,
   Save,
   MessageSquare,
-  GraduationCap,
   Wrench,
+  CheckCircle2,
+  XCircle,
 } from "lucide-react";
 import {
   type MentorshipApplicationRow,
   type MentorshipStatus,
-  MENTORSHIP_STATUSES,
 } from "@/lib/mentorship/schema";
 import {
   adminGetMentorshipApplications,
@@ -35,14 +32,6 @@ import {
 } from "@/lib/mentorship/actions";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetDescription,
-} from "@/components/ui/sheet";
 import {
   Dialog,
   DialogContent,
@@ -52,39 +41,57 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { AdminPageHeader } from "@/components/admin/primitives/AdminPageHeader";
+import { AdminDrawer } from "@/components/admin/primitives/AdminDrawer";
+import { SegmentedControl } from "@/components/admin/primitives/SegmentedControl";
+import { EmptyState } from "@/components/admin/primitives/EmptyState";
+import { StatusPill } from "@/components/admin/people/StatusPill";
+import { AgePill } from "@/components/admin/people/AgePill";
 
 interface AdminMentorshipClientProps {
   initialApplications: MentorshipApplicationRow[];
   initialTotal: number;
   initialPage: number;
   initialPageSize: number;
+  initialStatus: string;
+  initialSearch: string;
   loadError?: string | null;
 }
 
-const STATUS_CONFIG: Record<
-  MentorshipStatus,
-  { label: string; variant: "default" | "secondary" | "outline" | "destructive"; icon: React.ElementType }
-> = {
-  new: { label: "New", variant: "default", icon: Users },
-  reviewing: { label: "Reviewing", variant: "secondary", icon: Clock },
-  accepted: { label: "Accepted", variant: "outline", icon: CheckCircle2 },
-  waitlisted: { label: "Waitlisted", variant: "secondary", icon: Clock },
-  declined: { label: "Declined", variant: "destructive", icon: XCircle },
-};
+const TAB_OPTIONS = [
+  { id: "new", label: "New" },
+  { id: "reviewing", label: "Reviewing" },
+  { id: "accepted", label: "Accepted" },
+  { id: "waitlisted", label: "Waitlisted" },
+  { id: "declined", label: "Declined" },
+  { id: "all", label: "All" },
+];
+
+function getInitials(name: string): string {
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 0 || !parts[0]) return "??";
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
 
 export function AdminMentorshipClient({
   initialApplications,
   initialTotal,
   initialPage,
   initialPageSize,
+  initialStatus,
+  initialSearch,
   loadError,
 }: AdminMentorshipClientProps) {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
   const [applications, setApplications] = useState<MentorshipApplicationRow[]>(initialApplications);
   const [total, setTotal] = useState(initialTotal);
   const [page, setPage] = useState(initialPage);
-  const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState<string>(initialStatus);
+  const [search, setSearch] = useState<string>(initialSearch);
   const [selectedApp, setSelectedApp] = useState<MentorshipApplicationRow | null>(null);
   const [adminNotesInput, setAdminNotesInput] = useState<string>("");
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
@@ -92,39 +99,86 @@ export function AdminMentorshipClient({
 
   const totalPages = Math.max(1, Math.ceil(total / initialPageSize));
 
-  const refreshApplications = (
-    targetPage: number = page,
-    targetFilter: string = statusFilter,
-    targetSearch: string = search
-  ) => {
-    startTransition(async () => {
-      const res = await adminGetMentorshipApplications({
-        page: targetPage,
-        pageSize: initialPageSize,
-        status: targetFilter,
-        search: targetSearch,
-      });
-
-      if (res.ok && res.data) {
-        setApplications(res.data);
-        setTotal(res.total ?? 0);
-        setPage(res.page ?? targetPage);
-      } else {
-        toast.error(res.error || "Failed to refresh applications");
+  const updateUrl = useCallback(
+    (newParams: { page?: number; status?: string; search?: string }) => {
+      const current = new URLSearchParams(searchParams.toString());
+      if (newParams.page !== undefined) current.set("page", String(newParams.page));
+      if (newParams.status !== undefined) current.set("status", newParams.status);
+      if (newParams.search !== undefined) {
+        if (newParams.search) current.set("search", newParams.search);
+        else current.delete("search");
       }
-    });
+      current.set("pageSize", String(initialPageSize));
+      router.push(`${pathname}?${current.toString()}`);
+    },
+    [pathname, router, searchParams, initialPageSize]
+  );
+
+  const fetchApplications = useCallback(
+    (targetPage: number, targetStatus: string, targetSearch: string) => {
+      startTransition(async () => {
+        const res = await adminGetMentorshipApplications({
+          page: targetPage,
+          pageSize: initialPageSize,
+          status: targetStatus,
+          search: targetSearch,
+        });
+
+        if (res.ok && res.data) {
+          setApplications(res.data);
+          setTotal(res.total ?? 0);
+          setPage(res.page ?? targetPage);
+          setStatusFilter(targetStatus);
+        } else {
+          toast.error(res.error || "Failed to load mentorship applications");
+        }
+      });
+    },
+    [initialPageSize]
+  );
+
+  const handleTabChange = (newStatus: string) => {
+    setStatusFilter(newStatus);
+    setPage(1);
+    updateUrl({ page: 1, status: newStatus, search });
+    fetchApplications(1, newStatus, search);
   };
 
-  const openDetailSheet = (app: MentorshipApplicationRow) => {
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setPage(1);
+    updateUrl({ page: 1, status: statusFilter, search });
+    fetchApplications(1, statusFilter, search);
+  };
+
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+    updateUrl({ page: newPage, status: statusFilter, search });
+    fetchApplications(newPage, statusFilter, search);
+  };
+
+  const openDetail = (app: MentorshipApplicationRow) => {
     setSelectedApp(app);
     setAdminNotesInput(app.admin_notes || "");
+  };
+
+  // Find next pending/actionable application for auto-advance
+  const advanceToNext = (currentId: string) => {
+    const currentIndex = applications.findIndex((a) => a.id === currentId);
+    if (currentIndex !== -1 && currentIndex + 1 < applications.length) {
+      const next = applications[currentIndex + 1];
+      setSelectedApp(next);
+      setAdminNotesInput(next.admin_notes || "");
+    } else {
+      setSelectedApp(null);
+    }
   };
 
   const handleStatusChange = (appId: string, newStatus: MentorshipStatus) => {
     startTransition(async () => {
       const res = await adminSetMentorshipStatus(appId, newStatus, adminNotesInput);
       if (res.ok) {
-        toast.success(`Application marked as ${STATUS_CONFIG[newStatus].label}`);
+        toast.success(`Application marked as ${newStatus}`);
         setApplications((prev) =>
           prev.map((app) =>
             app.id === appId
@@ -132,11 +186,7 @@ export function AdminMentorshipClient({
               : app
           )
         );
-        if (selectedApp?.id === appId) {
-          setSelectedApp((prev) =>
-            prev ? { ...prev, status: newStatus, admin_notes: adminNotesInput || prev.admin_notes } : null
-          );
-        }
+        advanceToNext(appId);
         router.refresh();
       } else {
         toast.error(res.error || "Failed to update status");
@@ -158,7 +208,7 @@ export function AdminMentorshipClient({
         setSelectedApp((prev) => (prev ? { ...prev, admin_notes: adminNotesInput } : null));
         router.refresh();
       } else {
-        toast.error(res.error || "Failed to save notes");
+        toast.error(res.error || "Failed to save admin notes");
       }
     });
   };
@@ -169,8 +219,10 @@ export function AdminMentorshipClient({
       if (res.ok) {
         toast.success("Application deleted");
         setDeleteConfirmOpen(false);
-        setSelectedApp(null);
-        refreshApplications();
+        const nextTarget = applications.find((a) => a.id !== appId);
+        setSelectedApp(nextTarget || null);
+        if (nextTarget) setAdminNotesInput(nextTarget.admin_notes || "");
+        fetchApplications(page, statusFilter, search);
         router.refresh();
       } else {
         toast.error(res.error || "Failed to delete application");
@@ -180,173 +232,170 @@ export function AdminMentorshipClient({
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="font-display text-xl sm:text-2xl font-bold tracking-tight text-foreground flex items-center gap-2">
-            <Users className="h-6 w-6 text-primary" />
-            <span>Mentorship Applications</span>
-          </h1>
-          <p className="font-sans text-xs sm:text-sm text-muted-foreground">
-            Review and manage incoming mentorship applications from university students.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <Badge variant="outline" className="font-mono text-xs px-2.5 py-1">
-            Total: {total}
-          </Badge>
-        </div>
-      </div>
+      <AdminPageHeader
+        title="Mentorship Applications"
+        description="Review youth tech mentorship candidates, assign review notes, and curate cohort placements."
+        icon={Users}
+        section="programs"
+        badge={
+          <span className="font-mono text-xs font-semibold px-2 py-0.5 rounded-full bg-[color:var(--data-signups-subtle)] text-[color:var(--data-signups-ink)] border border-[color:var(--data-signups-border)]">
+            {total} total
+          </span>
+        }
+      />
 
       {loadError && (
-        <div className="rounded-lg border border-destructive/20 bg-destructive/10 p-4 text-xs font-medium text-destructive">
+        <div className="rounded-lg border border-[color:var(--data-negative-border)] bg-[color:var(--data-negative-subtle)] p-4 text-xs font-medium text-[color:var(--data-negative-ink)]">
           {loadError}
         </div>
       )}
 
-      {/* Filter and Search Bar */}
+      {/* Toolbar: Segmented status tabs + search */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        {/* Status Filter Tabs */}
-        <div className="flex items-center gap-1 overflow-x-auto pb-1 sm:pb-0">
-          <Button
-            size="sm"
-            variant={statusFilter === "all" ? "default" : "outline"}
-            onClick={() => {
-              setStatusFilter("all");
-              refreshApplications(1, "all", search);
-            }}
-            className="text-xs h-8 px-3"
-          >
-            All
-          </Button>
-          {MENTORSHIP_STATUSES.map((status) => {
-            const config = STATUS_CONFIG[status];
-            const Icon = config.icon;
-            return (
-              <Button
-                key={status}
-                size="sm"
-                variant={statusFilter === status ? "default" : "outline"}
-                onClick={() => {
-                  setStatusFilter(status);
-                  refreshApplications(1, status, search);
-                }}
-                className="text-xs h-8 px-3 gap-1.5"
-              >
-                <Icon className="h-3 w-3" />
-                <span>{config.label}</span>
-              </Button>
-            );
-          })}
-        </div>
+        <SegmentedControl
+          options={TAB_OPTIONS}
+          value={statusFilter}
+          onChange={handleTabChange}
+          ariaLabel="Mentorship application status filter"
+        />
 
-        {/* Search */}
-        <div className="relative w-full sm:w-64">
-          <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
+        <form onSubmit={handleSearchSubmit} className="relative w-full sm:w-72">
+          <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search applicant, interest or location..."
+            placeholder="Search name, location, track..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                refreshApplications(1, statusFilter, search);
-              }
-            }}
-            className="h-8 pl-8 text-xs bg-background"
+            className="h-9 pl-9 text-xs rounded-lg bg-card border-border"
           />
-        </div>
+        </form>
       </div>
 
-      {/* Applications List */}
-      <div className="rounded-xl border border-border bg-card shadow-xs overflow-hidden">
-        {isPending && (
-          <div className="p-8 text-center text-muted-foreground flex items-center justify-center gap-2 text-xs">
+      {/* Applications Table */}
+      <div className="rounded-lg border border-border bg-card shadow-xs overflow-hidden">
+        {isPending ? (
+          <div className="p-12 text-center text-muted-foreground flex items-center justify-center gap-2 text-xs">
             <Loader2 className="h-4 w-4 animate-spin text-primary" />
             <span>Loading applications...</span>
           </div>
-        )}
+        ) : applications.length === 0 ? (
+          <EmptyState
+            icon={Users}
+            title="No applications found"
+            description={
+              statusFilter !== "all"
+                ? `No mentorship applications currently in "${statusFilter}".`
+                : "No mentorship applications have been submitted yet."
+            }
+          />
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr className="border-b border-border bg-muted/40 font-mono text-[11px] text-muted-foreground uppercase tracking-wider">
+                  <th className="py-3 px-4 font-semibold">Applicant</th>
+                  <th className="py-3 px-4 font-semibold">Track & Experience</th>
+                  <th className="py-3 px-4 font-semibold">Location & Age</th>
+                  <th className="py-3 px-4 font-semibold">Status</th>
+                  <th className="py-3 px-4 font-semibold">Submitted</th>
+                  <th className="py-3 px-4 font-semibold text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border/60">
+                {applications.map((app) => {
+                  const initials = getInitials(app.full_name);
+                  return (
+                    <tr
+                      key={app.id}
+                      onClick={() => openDetail(app)}
+                      className="hover:bg-secondary/40 transition-colors cursor-pointer group"
+                    >
+                      {/* Applicant */}
+                      <td className="py-3 px-4">
+                        <div className="flex items-center gap-3">
+                          <div className="h-8 w-8 rounded-full bg-[color:var(--data-signups-subtle)] border border-[color:var(--data-signups-border)] text-[color:var(--data-signups-ink)] flex items-center justify-center font-mono font-bold text-[11px] shrink-0">
+                            {initials}
+                          </div>
+                          <div className="min-w-0">
+                            <div className="font-semibold text-foreground truncate max-w-[180px] sm:max-w-none">
+                              {app.full_name}
+                            </div>
+                            <div className="text-muted-foreground truncate max-w-[180px] sm:max-w-none">
+                              {app.email}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
 
-        {!isPending && applications.length === 0 && (
-          <div className="p-12 text-center text-muted-foreground space-y-2">
-            <Users className="h-10 w-10 mx-auto text-muted-foreground/40" />
-            <p className="font-sans text-sm font-medium text-foreground">No applications found</p>
-            <p className="font-sans text-xs text-muted-foreground">
-              {statusFilter !== "all"
-                ? `No applications with status "${statusFilter}".`
-                : "No mentorship applications have been submitted yet."}
-            </p>
-          </div>
-        )}
+                      {/* Track & Experience */}
+                      <td className="py-3 px-4">
+                        <div className="text-foreground font-medium truncate max-w-[180px]">
+                          {app.interest_area}
+                        </div>
+                        <div className="text-muted-foreground capitalize text-[11px]">
+                          {app.experience_level}
+                        </div>
+                      </td>
 
-        {!isPending && applications.length > 0 && (
-          <div className="divide-y divide-border">
-            {applications.map((app) => {
-              const config = STATUS_CONFIG[app.status] || STATUS_CONFIG.new;
-              const StatusIcon = config.icon;
-              return (
-                <div
-                  key={app.id}
-                  onClick={() => openDetailSheet(app)}
-                  className="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-secondary/40 transition-colors cursor-pointer"
-                >
-                  <div className="space-y-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span className="font-sans text-sm font-bold text-foreground truncate">
-                        {app.full_name}
-                      </span>
-                      <Badge
-                        variant={config.variant}
-                        className="text-[10px] font-mono uppercase font-semibold gap-1 px-1.5 py-0"
-                      >
-                        <StatusIcon className="h-2.5 w-2.5" />
-                        <span>{config.label}</span>
-                      </Badge>
-                    </div>
+                      {/* Location & Age */}
+                      <td className="py-3 px-4">
+                        <div className="text-foreground truncate max-w-[180px]">
+                          {app.location}
+                        </div>
+                        <div className="text-muted-foreground font-mono text-[11px]">
+                          Age: {app.age}
+                        </div>
+                      </td>
 
-                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
-                      <span className="inline-flex items-center gap-1 font-medium text-foreground">
-                        <BookOpen className="h-3.5 w-3.5 text-primary" />
-                        <span>{app.interest_area}</span>
-                      </span>
-                      <span>•</span>
-                      <span className="capitalize">{app.experience_level}</span>
-                      <span>•</span>
-                      <span className="font-mono">{app.location}</span>
-                    </div>
+                      {/* Status */}
+                      <td className="py-3 px-4">
+                        <StatusPill variant={app.status as any} />
+                      </td>
 
-                    <p className="font-sans text-xs text-muted-foreground line-clamp-1 pt-1">
-                      {app.goals}
-                    </p>
-                  </div>
+                      {/* Submitted Date / Age */}
+                      <td className="py-3 px-4 whitespace-nowrap text-muted-foreground text-xs">
+                        {app.status === "new" || app.status === "reviewing" ? (
+                          <AgePill submittedAt={app.created_at} />
+                        ) : (
+                          new Date(app.created_at).toLocaleDateString()
+                        )}
+                      </td>
 
-                  <div className="sm:text-right shrink-0 font-mono text-[11px] text-muted-foreground">
-                    {new Date(app.created_at).toLocaleDateString("en-NG", {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
-                    })}
-                  </div>
-                </div>
-              );
-            })}
+                      {/* Actions */}
+                      <td className="py-3 px-4 text-right">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openDetail(app);
+                          }}
+                          className="h-7 px-2.5 text-xs text-muted-foreground group-hover:text-foreground"
+                        >
+                          Review
+                        </Button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
         )}
       </div>
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between text-xs text-muted-foreground pt-2">
+        <div className="flex items-center justify-between text-xs text-muted-foreground pt-1">
           <span>
-            Page {page} of {totalPages}
+            Page {page} of {totalPages} ({total} applications)
           </span>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1.5">
             <Button
               size="sm"
               variant="outline"
               disabled={page <= 1 || isPending}
-              onClick={() => refreshApplications(page - 1, statusFilter, search)}
-              className="h-8 px-2.5"
+              onClick={() => handlePageChange(page - 1)}
+              className="h-8 px-2.5 rounded-lg border-border"
             >
               <ChevronLeft className="h-3.5 w-3.5" />
             </Button>
@@ -354,8 +403,8 @@ export function AdminMentorshipClient({
               size="sm"
               variant="outline"
               disabled={page >= totalPages || isPending}
-              onClick={() => refreshApplications(page + 1, statusFilter, search)}
-              className="h-8 px-2.5"
+              onClick={() => handlePageChange(page + 1)}
+              className="h-8 px-2.5 rounded-lg border-border"
             >
               <ChevronRight className="h-3.5 w-3.5" />
             </Button>
@@ -363,213 +412,229 @@ export function AdminMentorshipClient({
         </div>
       )}
 
-      {/* Application Detail Sheet */}
-      <Sheet open={!!selectedApp} onOpenChange={(open) => !open && setSelectedApp(null)}>
-        <SheetContent className="sm:max-w-xl overflow-y-auto space-y-6">
-          {selectedApp && (
-            <>
-              <SheetHeader className="space-y-1">
-                <div className="flex items-center justify-between gap-2">
-                  <Badge
-                    variant={STATUS_CONFIG[selectedApp.status]?.variant || "default"}
-                    className="text-[10px] font-mono uppercase"
-                  >
-                    {STATUS_CONFIG[selectedApp.status]?.label || selectedApp.status}
-                  </Badge>
-                  <span className="font-mono text-xs text-muted-foreground">
-                    {new Date(selectedApp.created_at).toLocaleString("en-NG")}
-                  </span>
-                </div>
-                <SheetTitle className="text-lg font-bold text-foreground">
-                  {selectedApp.full_name}
-                </SheetTitle>
-                <SheetDescription className="text-xs text-muted-foreground">
-                  {selectedApp.interest_area} — {selectedApp.location}
-                </SheetDescription>
-              </SheetHeader>
+      {/* Application Detail Drawer */}
+      <AdminDrawer
+        open={!!selectedApp}
+        onOpenChange={(open) => !open && setSelectedApp(null)}
+        title={selectedApp?.full_name || "Applicant Detail"}
+        subtitle={
+          selectedApp
+            ? `${selectedApp.interest_area} • ${selectedApp.location}`
+            : undefined
+        }
+        badge={
+          selectedApp && (
+            <StatusPill variant={selectedApp.status as any} />
+          )
+        }
+        timestamp={
+          selectedApp && (
+            <span className="font-mono text-[11px] text-muted-foreground">
+              {new Date(selectedApp.created_at).toLocaleDateString("en-NG", {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+              })}
+            </span>
+          )
+        }
+        footer={
+          selectedApp && (
+            <div className="flex items-center justify-between w-full gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setDeleteConfirmOpen(true)}
+                className="text-xs text-[color:var(--data-negative-ink)] border-[color:var(--data-negative-border)] hover:bg-[color:var(--data-negative-subtle)] gap-1.5 h-8 rounded-lg"
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+                <span>Delete</span>
+              </Button>
 
-              {/* Status Update Actions */}
-              <div className="space-y-1.5 border-y border-border py-4">
-                <label className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground font-semibold">
-                  Update Application Status
-                </label>
-                <div className="flex flex-wrap gap-2 pt-1">
-                  {MENTORSHIP_STATUSES.map((status) => (
-                    <Button
-                      key={status}
-                      size="sm"
-                      variant={selectedApp.status === status ? "default" : "outline"}
-                      disabled={isPending || selectedApp.status === status}
-                      onClick={() => handleStatusChange(selectedApp.id, status)}
-                      className="text-xs h-8"
-                    >
-                      {STATUS_CONFIG[status].label}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Applicant Details */}
-              <div className="space-y-4 text-xs">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1">
-                    <span className="text-muted-foreground flex items-center gap-1">
-                      <Mail className="h-3.5 w-3.5" />
-                      Email Address
-                    </span>
-                    <a
-                      href={`mailto:${selectedApp.email}`}
-                      className="font-medium text-primary hover:underline block"
-                    >
-                      {selectedApp.email}
-                    </a>
-                  </div>
-
-                  <div className="space-y-1">
-                    <span className="text-muted-foreground flex items-center gap-1">
-                      <Phone className="h-3.5 w-3.5" />
-                      Phone / WhatsApp
-                    </span>
-                    <a
-                      href={`tel:${selectedApp.phone}`}
-                      className="font-medium text-foreground block"
-                    >
-                      {selectedApp.phone}
-                    </a>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1">
-                    <span className="text-muted-foreground flex items-center gap-1">
-                      <MapPin className="h-3.5 w-3.5" />
-                      Location
-                    </span>
-                    <p className="font-medium text-foreground">{selectedApp.location}</p>
-                  </div>
-
-                  <div className="space-y-1">
-                    <span className="text-muted-foreground flex items-center gap-1">
-                      <Users className="h-3.5 w-3.5" />
-                      Age
-                    </span>
-                    <p className="font-medium text-foreground">{selectedApp.age}</p>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1">
-                    <span className="text-muted-foreground flex items-center gap-1">
-                      <BookOpen className="h-3.5 w-3.5" />
-                      Area of Interest
-                    </span>
-                    <p className="font-medium text-foreground">{selectedApp.interest_area}</p>
-                  </div>
-
-                  <div className="space-y-1">
-                    <span className="text-muted-foreground flex items-center gap-1">
-                      <Layers className="h-3.5 w-3.5" />
-                      Experience Level
-                    </span>
-                    <p className="font-medium text-foreground capitalize">
-                      {selectedApp.experience_level}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="space-y-1">
-                  <span className="text-muted-foreground flex items-center gap-1">
-                    <GraduationCap className="h-3.5 w-3.5" />
-                    University
-                  </span>
-                  <p className="font-medium text-foreground">{selectedApp.institution}</p>
-                </div>
-
-                {selectedApp.skills && (
-                  <div className="space-y-1">
-                    <span className="text-muted-foreground flex items-center gap-1">
-                      <Wrench className="h-3.5 w-3.5" />
-                      Skills
-                    </span>
-                    <p className="font-medium text-foreground">{selectedApp.skills}</p>
-                  </div>
-                )}
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1">
-                    <span className="text-muted-foreground flex items-center gap-1">
-                      <Calendar className="h-3.5 w-3.5" />
-                      Availability
-                    </span>
-                    <p className="font-medium text-foreground">{selectedApp.availability}</p>
-                  </div>
-
-                  <div className="space-y-1">
-                    <span className="text-muted-foreground">Preferred Format</span>
-                    <p className="font-medium text-foreground capitalize">
-                      {selectedApp.preferred_format.replace("_", " ")}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Goals */}
-                <div className="space-y-2 pt-2 border-t border-border">
-                  <span className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground font-semibold">
-                    Goals &amp; What They Hope to Learn
-                  </span>
-                  <div className="rounded-lg bg-secondary/30 p-3.5 border border-border text-foreground leading-relaxed whitespace-pre-wrap font-sans">
-                    {selectedApp.goals}
-                  </div>
-                </div>
-
-                {/* Admin Notes */}
-                <div className="space-y-2 pt-2 border-t border-border">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground font-semibold flex items-center gap-1">
-                      <MessageSquare className="h-3.5 w-3.5" />
-                      Admin Notes
-                    </span>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      disabled={isPending}
-                      onClick={() => handleSaveNotes(selectedApp.id)}
-                      className="text-[11px] h-7 px-2 gap-1"
-                    >
-                      <Save className="h-3 w-3" />
-                      <span>Save Notes</span>
-                    </Button>
-                  </div>
-                  <textarea
-                    rows={3}
-                    placeholder="Add private internal notes about this applicant..."
-                    value={adminNotesInput}
-                    onChange={(e) => setAdminNotesInput(e.target.value)}
-                    className="w-full rounded-lg border border-input bg-background p-3 font-sans text-xs text-foreground placeholder:text-muted-foreground/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary leading-relaxed resize-y"
-                  />
-                </div>
-              </div>
-
-              {/* Danger Zone: Delete */}
-              <div className="pt-4 border-t border-border">
+              <div className="flex items-center gap-2">
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => setDeleteConfirmOpen(true)}
-                  className="w-full text-xs text-destructive border-destructive/30 hover:bg-destructive/10 gap-1.5 h-9"
+                  disabled={isPending || selectedApp.status === "declined"}
+                  onClick={() => handleStatusChange(selectedApp.id, "declined")}
+                  className="text-xs h-8 rounded-lg text-[color:var(--data-negative-ink)] hover:bg-[color:var(--data-negative-subtle)] border-border"
                 >
-                  <Trash2 className="h-3.5 w-3.5" />
-                  <span>Delete Application</span>
+                  <XCircle className="h-3.5 w-3.5 mr-1" />
+                  Decline
+                </Button>
+                <Button
+                  variant="default"
+                  size="sm"
+                  disabled={isPending || selectedApp.status === "accepted"}
+                  onClick={() => handleStatusChange(selectedApp.id, "accepted")}
+                  className="text-xs h-8 rounded-lg gap-1"
+                >
+                  <CheckCircle2 className="h-3.5 w-3.5" />
+                  Accept & Advance
                 </Button>
               </div>
-            </>
-          )}
-        </SheetContent>
-      </Sheet>
+            </div>
+          )
+        }
+      >
+        {selectedApp && (
+          <div className="space-y-5 text-xs p-5">
+            {/* Quick Status Bar */}
+            <div className="p-3 rounded-lg border border-border bg-secondary/30 space-y-2">
+              <div className="text-[11px] font-mono text-muted-foreground uppercase font-semibold">
+                Set Status
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {(["new", "reviewing", "accepted", "waitlisted", "declined"] as MentorshipStatus[]).map(
+                  (st) => (
+                    <Button
+                      key={st}
+                      size="sm"
+                      variant={selectedApp.status === st ? "default" : "outline"}
+                      disabled={isPending || selectedApp.status === st}
+                      onClick={() => handleStatusChange(selectedApp.id, st)}
+                      className="text-xs h-7 px-2.5 rounded-lg border-border capitalize"
+                    >
+                      {st}
+                    </Button>
+                  )
+                )}
+              </div>
+            </div>
+
+            {/* Contact details */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="p-3 rounded-lg border border-border bg-card space-y-1">
+                <span className="text-muted-foreground flex items-center gap-1.5 font-medium">
+                  <Mail className="h-3.5 w-3.5" />
+                  Email
+                </span>
+                <a
+                  href={`mailto:${selectedApp.email}`}
+                  className="font-medium text-primary hover:underline block truncate"
+                >
+                  {selectedApp.email}
+                </a>
+              </div>
+
+              <div className="p-3 rounded-lg border border-border bg-card space-y-1">
+                <span className="text-muted-foreground flex items-center gap-1.5 font-medium">
+                  <Phone className="h-3.5 w-3.5" />
+                  Phone / WhatsApp
+                </span>
+                <a
+                  href={`tel:${selectedApp.phone}`}
+                  className="font-medium text-foreground hover:underline block truncate"
+                >
+                  {selectedApp.phone}
+                </a>
+              </div>
+            </div>
+
+            {/* Track, Location, Age */}
+            <div className="p-3 rounded-lg border border-border bg-card space-y-2.5">
+              <div className="text-[11px] font-mono uppercase text-muted-foreground font-semibold">
+                Candidate Profile
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <span className="text-muted-foreground block text-[11px]">Interest Area</span>
+                  <p className="font-semibold text-foreground">{selectedApp.interest_area}</p>
+                </div>
+                <div>
+                  <span className="text-muted-foreground block text-[11px]">Experience Level</span>
+                  <p className="font-medium text-foreground capitalize">
+                    {selectedApp.experience_level}
+                  </p>
+                </div>
+                <div>
+                  <span className="text-muted-foreground block text-[11px]">Location</span>
+                  <p className="font-medium text-foreground">{selectedApp.location}</p>
+                </div>
+                <div>
+                  <span className="text-muted-foreground block text-[11px]">Age</span>
+                  <p className="font-medium text-foreground">{selectedApp.age}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* University & Format */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="p-3 rounded-lg border border-border bg-card space-y-1">
+                <span className="text-muted-foreground flex items-center gap-1 text-[11px]">
+                  <GraduationCap className="h-3 w-3" />
+                  Institution
+                </span>
+                <p className="font-medium text-foreground truncate">
+                  {selectedApp.institution || "Not specified"}
+                </p>
+              </div>
+
+              <div className="p-3 rounded-lg border border-border bg-card space-y-1">
+                <span className="text-muted-foreground flex items-center gap-1 text-[11px]">
+                  <Calendar className="h-3 w-3" />
+                  Format & Availability
+                </span>
+                <p className="font-medium text-foreground truncate capitalize">
+                  {selectedApp.preferred_format.replace("_", " ")} ({selectedApp.availability})
+                </p>
+              </div>
+            </div>
+
+            {/* Skills */}
+            {selectedApp.skills && (
+              <div className="p-3 rounded-lg border border-border bg-card space-y-1">
+                <span className="text-muted-foreground flex items-center gap-1 text-[11px]">
+                  <Wrench className="h-3 w-3" />
+                  Current Skills
+                </span>
+                <p className="font-medium text-foreground">{selectedApp.skills}</p>
+              </div>
+            )}
+
+            {/* Goals */}
+            <div className="p-3.5 rounded-lg border border-border bg-card space-y-2">
+              <div className="text-[11px] font-mono uppercase text-muted-foreground font-semibold">
+                Goals &amp; Expectations
+              </div>
+              <p className="text-foreground leading-relaxed whitespace-pre-wrap font-sans">
+                {selectedApp.goals}
+              </p>
+            </div>
+
+            {/* Admin Review Notes (Preserved) */}
+            <div className="p-3.5 rounded-lg border border-border bg-card space-y-2.5">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-mono uppercase text-muted-foreground font-semibold flex items-center gap-1.5">
+                  <MessageSquare className="h-3.5 w-3.5" />
+                  Admin Review Notes
+                </span>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  disabled={isPending}
+                  onClick={() => handleSaveNotes(selectedApp.id)}
+                  className="text-[11px] h-7 px-2 gap-1 rounded-lg border-border"
+                >
+                  <Save className="h-3 w-3" />
+                  <span>Save Notes</span>
+                </Button>
+              </div>
+              <textarea
+                rows={3}
+                placeholder="Add private internal notes about this applicant..."
+                value={adminNotesInput}
+                onChange={(e) => setAdminNotesInput(e.target.value)}
+                className="w-full rounded-lg border border-border bg-background p-3 font-sans text-xs text-foreground placeholder:text-muted-foreground/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary leading-relaxed resize-y"
+              />
+            </div>
+          </div>
+        )}
+      </AdminDrawer>
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md rounded-lg">
           <DialogHeader>
             <DialogTitle className="text-base font-bold text-foreground">
               Delete Mentorship Application
@@ -579,13 +644,13 @@ export function AdminMentorshipClient({
               <strong>{selectedApp?.full_name}</strong>? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter className="gap-2 sm:gap-0">
+          <DialogFooter className="gap-2 sm:gap-0 pt-2">
             <Button
               variant="outline"
               size="sm"
               onClick={() => setDeleteConfirmOpen(false)}
               disabled={isPending}
-              className="text-xs h-8"
+              className="text-xs h-8 rounded-lg border-border"
             >
               Cancel
             </Button>
@@ -594,7 +659,7 @@ export function AdminMentorshipClient({
               size="sm"
               disabled={isPending}
               onClick={() => selectedApp && handleDelete(selectedApp.id)}
-              className="text-xs h-8 gap-1.5"
+              className="text-xs h-8 rounded-lg gap-1.5"
             >
               {isPending ? (
                 <>

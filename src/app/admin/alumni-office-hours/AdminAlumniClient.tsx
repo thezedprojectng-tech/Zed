@@ -1,38 +1,34 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useCallback } from "react";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   Search,
   Users,
-  Clock,
-  CheckCircle2,
-  XCircle,
   Trash2,
   ChevronLeft,
   ChevronRight,
   Loader2,
   Mail,
   ExternalLink,
-  Building2,
-  Briefcase,
   GraduationCap,
-  ShieldAlert,
-  Sparkles,
-  Eye,
-  EyeOff,
-  Edit,
+  Globe,
   Save,
   MessageSquare,
-  Globe,
+  CheckCircle2,
+  XCircle,
+  Eye,
+  EyeOff,
+  Building2,
+  Briefcase,
+  Layers,
 } from "lucide-react";
 import type {
   AlumniApplicationRow,
   AlumniProfileRow,
 } from "@/lib/alumni-office-hours/types";
 import {
-  ALUMNI_APPLICATION_STATUSES,
-  ALUMNI_PROFILE_STATUSES,
   type AlumniApplicationStatus,
   type AlumniProfileStatus,
 } from "@/lib/alumni-office-hours/constants";
@@ -47,20 +43,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import {
-  Tabs,
-  TabsList,
-  TabsTrigger,
-  TabsContent,
-} from "@/components/ui/tabs";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetDescription,
-} from "@/components/ui/sheet";
 import {
   Dialog,
   DialogContent,
@@ -70,49 +52,87 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { AdminPageHeader } from "@/components/admin/primitives/AdminPageHeader";
+import { AdminDrawer } from "@/components/admin/primitives/AdminDrawer";
+import { SegmentedControl } from "@/components/admin/primitives/SegmentedControl";
+import { EmptyState } from "@/components/admin/primitives/EmptyState";
+import { StatusPill } from "@/components/admin/people/StatusPill";
+import { AgePill } from "@/components/admin/people/AgePill";
 
 interface AdminAlumniClientProps {
   initialApplications: AlumniApplicationRow[];
   initialAppsTotal: number;
   initialProfiles: AlumniProfileRow[];
   initialProfilesTotal: number;
+  initialTab: "applications" | "profiles";
+  initialAppStatus: string;
+  initialProfileStatus: string;
+  initialSearch: string;
+  initialPage: number;
+  initialPageSize: number;
   loadError?: string | null;
 }
 
-const APP_STATUS_CONFIG: Record<
-  AlumniApplicationStatus,
-  { label: string; variant: "default" | "secondary" | "outline" | "destructive" }
-> = {
-  new: { label: "New", variant: "default" },
-  reviewing: { label: "Reviewing", variant: "secondary" },
-  approved: { label: "Approved", variant: "outline" },
-  declined: { label: "Declined", variant: "destructive" },
-};
+const TOP_TABS = [
+  { id: "applications", label: "Applications" },
+  { id: "profiles", label: "Directory Profiles" },
+];
+
+const APP_STATUS_OPTIONS = [
+  { id: "new", label: "New" },
+  { id: "reviewing", label: "Reviewing" },
+  { id: "approved", label: "Approved" },
+  { id: "declined", label: "Declined" },
+  { id: "all", label: "All" },
+];
+
+const PROFILE_STATUS_OPTIONS = [
+  { id: "all", label: "All Profiles" },
+  { id: "published", label: "Published" },
+  { id: "unpublished", label: "Unpublished" },
+];
+
+function getInitials(name: string): string {
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 0 || !parts[0]) return "??";
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
 
 export function AdminAlumniClient({
   initialApplications,
   initialAppsTotal,
   initialProfiles,
   initialProfilesTotal,
+  initialTab,
+  initialAppStatus,
+  initialProfileStatus,
+  initialSearch,
+  initialPage,
+  initialPageSize,
   loadError,
 }: AdminAlumniClientProps) {
-  const [activeTab, setActiveTab] = useState<"applications" | "profiles">("applications");
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const [activeTab, setActiveTab] = useState<"applications" | "profiles">(initialTab);
 
   // Applications state
   const [applications, setApplications] = useState<AlumniApplicationRow[]>(initialApplications);
   const [appsTotal, setAppsTotal] = useState(initialAppsTotal);
-  const [appsPage, setAppsPage] = useState(1);
-  const [appsSearch, setAppsSearch] = useState("");
-  const [appsFilter, setAppsFilter] = useState("all");
+  const [appsPage, setAppsPage] = useState(initialTab === "applications" ? initialPage : 1);
+  const [appsSearch, setAppsSearch] = useState(initialTab === "applications" ? initialSearch : "");
+  const [appsFilter, setAppsFilter] = useState(initialAppStatus);
   const [selectedApp, setSelectedApp] = useState<AlumniApplicationRow | null>(null);
   const [adminNotesInput, setAdminNotesInput] = useState("");
 
   // Profiles state
   const [profiles, setProfiles] = useState<AlumniProfileRow[]>(initialProfiles);
   const [profilesTotal, setProfilesTotal] = useState(initialProfilesTotal);
-  const [profilesPage, setProfilesPage] = useState(1);
-  const [profilesSearch, setProfilesSearch] = useState("");
-  const [profilesFilter, setProfilesFilter] = useState("all");
+  const [profilesPage, setProfilesPage] = useState(initialTab === "profiles" ? initialPage : 1);
+  const [profilesSearch, setProfilesSearch] = useState(initialTab === "profiles" ? initialSearch : "");
+  const [profilesFilter, setProfilesFilter] = useState(initialProfileStatus);
 
   // Modals state
   const [publishDialogOpen, setPublishDialogOpen] = useState(false);
@@ -131,57 +151,103 @@ export function AdminAlumniClient({
   const [deleteConfirmAppId, setDeleteConfirmAppId] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
-  const pageSize = 20;
-  const appsTotalPages = Math.max(1, Math.ceil(appsTotal / pageSize));
-  const profilesTotalPages = Math.max(1, Math.ceil(profilesTotal / pageSize));
+  const appsTotalPages = Math.max(1, Math.ceil(appsTotal / initialPageSize));
+  const profilesTotalPages = Math.max(1, Math.ceil(profilesTotal / initialPageSize));
 
-  // Refresh applications query
-  const refreshApplications = (
-    page: number = appsPage,
-    status: string = appsFilter,
-    search: string = appsSearch
-  ) => {
-    startTransition(async () => {
-      const res = await adminGetAlumniApplications({
-        page,
-        pageSize,
-        status,
-        search,
-      });
-      if (res.ok && res.data) {
-        setApplications(res.data);
-        setAppsTotal(res.total ?? 0);
-        setAppsPage(res.page ?? 1);
-      } else {
-        toast.error(res.error || "Failed to reload applications");
+  const updateUrl = useCallback(
+    (newParams: {
+      tab?: string;
+      appStatus?: string;
+      profileStatus?: string;
+      search?: string;
+      page?: number;
+    }) => {
+      const current = new URLSearchParams(searchParams.toString());
+      if (newParams.tab !== undefined) current.set("tab", newParams.tab);
+      if (newParams.appStatus !== undefined) current.set("appStatus", newParams.appStatus);
+      if (newParams.profileStatus !== undefined) current.set("profileStatus", newParams.profileStatus);
+      if (newParams.search !== undefined) {
+        if (newParams.search) current.set("search", newParams.search);
+        else current.delete("search");
       }
+      if (newParams.page !== undefined) current.set("page", String(newParams.page));
+      current.set("pageSize", String(initialPageSize));
+      router.push(`${pathname}?${current.toString()}`);
+    },
+    [pathname, router, searchParams, initialPageSize]
+  );
+
+  const fetchApplications = useCallback(
+    (targetPage: number, targetStatus: string, targetSearch: string) => {
+      startTransition(async () => {
+        const res = await adminGetAlumniApplications({
+          page: targetPage,
+          pageSize: initialPageSize,
+          status: targetStatus,
+          search: targetSearch,
+        });
+        if (res.ok && res.data) {
+          setApplications(res.data);
+          setAppsTotal(res.total ?? 0);
+          setAppsPage(res.page ?? targetPage);
+          setAppsFilter(targetStatus);
+        } else {
+          toast.error(res.error || "Failed to reload applications");
+        }
+      });
+    },
+    [initialPageSize]
+  );
+
+  const fetchProfiles = useCallback(
+    (targetPage: number, targetStatus: string, targetSearch: string) => {
+      startTransition(async () => {
+        const res = await adminGetAlumniProfiles({
+          page: targetPage,
+          pageSize: initialPageSize,
+          status: targetStatus,
+          search: targetSearch,
+        });
+        if (res.ok && res.data) {
+          setProfiles(res.data);
+          setProfilesTotal(res.total ?? 0);
+          setProfilesPage(res.page ?? targetPage);
+          setProfilesFilter(targetStatus);
+        } else {
+          toast.error(res.error || "Failed to reload profiles");
+        }
+      });
+    },
+    [initialPageSize]
+  );
+
+  const handleTopTabChange = (val: string) => {
+    const nextTab = val as "applications" | "profiles";
+    setActiveTab(nextTab);
+    updateUrl({
+      tab: nextTab,
+      search: nextTab === "applications" ? appsSearch : profilesSearch,
+      page: nextTab === "applications" ? appsPage : profilesPage,
     });
   };
 
-  // Refresh profiles query
-  const refreshProfiles = (
-    page: number = profilesPage,
-    status: string = profilesFilter,
-    search: string = profilesSearch
-  ) => {
-    startTransition(async () => {
-      const res = await adminGetAlumniProfiles({
-        page,
-        pageSize,
-        status,
-        search,
-      });
-      if (res.ok && res.data) {
-        setProfiles(res.data);
-        setProfilesTotal(res.total ?? 0);
-        setProfilesPage(res.page ?? 1);
-      } else {
-        toast.error(res.error || "Failed to reload profiles");
-      }
-    });
+  const openAppDetail = (app: AlumniApplicationRow) => {
+    setSelectedApp(app);
+    setAdminNotesInput(app.admin_notes || "");
   };
 
-  // Handle application status update
+  const advanceToNextApp = (currentId: string) => {
+    const currentIndex = applications.findIndex((a) => a.id === currentId);
+    if (currentIndex !== -1 && currentIndex + 1 < applications.length) {
+      const next = applications[currentIndex + 1];
+      setSelectedApp(next);
+      setAdminNotesInput(next.admin_notes || "");
+    } else {
+      setSelectedApp(null);
+    }
+  };
+
+  // Status changes
   const handleSetAppStatus = (status: AlumniApplicationStatus) => {
     if (!selectedApp) return;
     startTransition(async () => {
@@ -192,15 +258,21 @@ export function AdminAlumniClient({
       );
       if (res.ok) {
         toast.success(`Application marked as ${status}`);
-        setSelectedApp((prev) => (prev ? { ...prev, status, admin_notes: adminNotesInput } : null));
-        refreshApplications();
+        setApplications((prev) =>
+          prev.map((app) =>
+            app.id === selectedApp.id
+              ? { ...app, status, admin_notes: adminNotesInput || app.admin_notes }
+              : app
+          )
+        );
+        advanceToNextApp(selectedApp.id);
+        router.refresh();
       } else {
         toast.error(res.error || "Failed to update status");
       }
     });
   };
 
-  // Save notes only
   const handleSaveNotes = () => {
     if (!selectedApp) return;
     startTransition(async () => {
@@ -212,7 +284,12 @@ export function AdminAlumniClient({
       if (res.ok) {
         toast.success("Admin notes saved");
         setSelectedApp((prev) => (prev ? { ...prev, admin_notes: adminNotesInput } : null));
-        refreshApplications();
+        setApplications((prev) =>
+          prev.map((app) =>
+            app.id === selectedApp.id ? { ...app, admin_notes: adminNotesInput } : app
+          )
+        );
+        router.refresh();
       } else {
         toast.error(res.error || "Failed to save notes");
       }
@@ -245,10 +322,11 @@ export function AdminAlumniClient({
         toast.success("Alumni profile published successfully!");
         setPublishDialogOpen(false);
         if (selectedApp) {
-          setSelectedApp((prev) => (prev ? { ...prev, status: "approved" } : null));
+          advanceToNextApp(selectedApp.id);
         }
-        refreshApplications();
-        refreshProfiles();
+        fetchApplications(appsPage, appsFilter, appsSearch);
+        fetchProfiles(profilesPage, profilesFilter, profilesSearch);
+        router.refresh();
       } else {
         toast.error(res.error || "Failed to publish alumni profile");
       }
@@ -263,7 +341,10 @@ export function AdminAlumniClient({
       const res = await adminSetAlumniProfileStatusAction(profile.id, nextStatus);
       if (res.ok) {
         toast.success(`Profile ${nextStatus === "published" ? "published" : "unpublished"}`);
-        refreshProfiles();
+        setProfiles((prev) =>
+          prev.map((p) => (p.id === profile.id ? { ...p, status: nextStatus } : p))
+        );
+        router.refresh();
       } else {
         toast.error(res.error || "Failed to update profile status");
       }
@@ -277,12 +358,13 @@ export function AdminAlumniClient({
       const res = await adminDeleteAlumniApplicationAction(deleteConfirmAppId);
       if (res.ok) {
         toast.success("Application and any linked profile removed");
+        const nextTarget = applications.find((a) => a.id !== deleteConfirmAppId);
+        setSelectedApp(nextTarget || null);
+        if (nextTarget) setAdminNotesInput(nextTarget.admin_notes || "");
         setDeleteConfirmAppId(null);
-        if (selectedApp?.id === deleteConfirmAppId) {
-          setSelectedApp(null);
-        }
-        refreshApplications();
-        refreshProfiles();
+        fetchApplications(appsPage, appsFilter, appsSearch);
+        fetchProfiles(profilesPage, profilesFilter, profilesSearch);
+        router.refresh();
       } else {
         toast.error(res.error || "Failed to delete application");
       }
@@ -291,714 +373,817 @@ export function AdminAlumniClient({
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground font-display">
-            Alumni Office Hours
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            Review alumni volunteer applications and manage published directory profiles.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <Button asChild variant="outline" size="sm" className="gap-1.5">
+      <AdminPageHeader
+        title="Alumni Office Hours"
+        description="Review volunteer alumni mentor applications and manage published directory listings."
+        icon={GraduationCap}
+        section="programs"
+        actions={
+          <Button asChild variant="outline" size="sm" className="gap-1.5 rounded-lg border-border h-8 text-xs">
             <Link href="/alumni-office-hours" target="_blank">
-              <Globe className="w-3.5 h-3.5" />
+              <Globe className="h-3.5 w-3.5" />
               <span>Public Directory</span>
             </Link>
           </Button>
-        </div>
-      </div>
+        }
+      />
 
       {loadError && (
-        <div className="rounded-lg border border-destructive/20 bg-destructive/10 p-4 text-sm text-destructive">
+        <div className="rounded-lg border border-[color:var(--data-negative-border)] bg-[color:var(--data-negative-subtle)] p-4 text-xs font-medium text-[color:var(--data-negative-ink)]">
           {loadError}
         </div>
       )}
 
-      {/* Tabs */}
-      <Tabs
-        value={activeTab}
-        onValueChange={(val) => setActiveTab(val as "applications" | "profiles")}
-        className="space-y-6"
-      >
-        <TabsList className="bg-muted p-1">
-          <TabsTrigger value="applications" className="gap-2">
-            <Users className="w-4 h-4" />
-            <span>Applications</span>
-            <Badge variant="secondary" className="ml-1 text-[10px] px-1.5 py-0">
-              {appsTotal}
-            </Badge>
-          </TabsTrigger>
-          <TabsTrigger value="profiles" className="gap-2">
-            <GraduationCap className="w-4 h-4" />
-            <span>Published Profiles</span>
-            <Badge variant="secondary" className="ml-1 text-[10px] px-1.5 py-0">
-              {profilesTotal}
-            </Badge>
-          </TabsTrigger>
-        </TabsList>
+      {/* Dual top tabs */}
+      <div className="border-b border-border">
+        <SegmentedControl
+          options={TOP_TABS}
+          value={activeTab}
+          onChange={handleTopTabChange}
+          ariaLabel="Alumni sections"
+        />
+      </div>
 
-        {/* ── Applications Tab ── */}
-        <TabsContent value="applications" className="space-y-4">
-          {/* Filters & Search */}
-          <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
-            <div className="flex flex-wrap gap-1.5">
-              {["all", ...ALUMNI_APPLICATION_STATUSES].map((st) => (
-                <Button
-                  key={st}
-                  variant={appsFilter === st ? "default" : "outline"}
-                  size="sm"
-                  className="h-8 text-xs capitalize"
-                  onClick={() => {
-                    setAppsFilter(st);
-                    refreshApplications(1, st, appsSearch);
-                  }}
-                >
-                  {st}
-                </Button>
-              ))}
-            </div>
+      {/* TAB 1: APPLICATIONS */}
+      {activeTab === "applications" && (
+        <div className="space-y-5">
+          {/* Sub Toolbar */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <SegmentedControl
+              options={APP_STATUS_OPTIONS}
+              value={appsFilter}
+              onChange={(val) => {
+                setAppsFilter(val);
+                setAppsPage(1);
+                updateUrl({ appStatus: val, page: 1, search: appsSearch });
+                fetchApplications(1, val, appsSearch);
+              }}
+              ariaLabel="Alumni applications status filter"
+            />
 
-            <div className="relative w-full sm:w-72">
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                setAppsPage(1);
+                updateUrl({ appStatus: appsFilter, page: 1, search: appsSearch });
+                fetchApplications(1, appsFilter, appsSearch);
+              }}
+              className="relative w-full sm:w-72"
+            >
+              <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search applicant name, email, university..."
+                placeholder="Search candidate, role, company..."
                 value={appsSearch}
-                onChange={(e) => {
-                  setAppsSearch(e.target.value);
-                  refreshApplications(1, appsFilter, e.target.value);
-                }}
-                className="pl-9 h-8 text-xs bg-card"
+                onChange={(e) => setAppsSearch(e.target.value)}
+                className="h-9 pl-9 text-xs rounded-lg bg-card border-border"
               />
-            </div>
+            </form>
           </div>
 
-          {/* Table / List */}
-          {applications.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-border p-12 text-center text-sm text-muted-foreground">
-              No alumni applications found matching the selected criteria.
-            </div>
-          ) : (
-            <div className="rounded-xl border border-border bg-card overflow-hidden shadow-xs">
+          {/* Applications Table */}
+          <div className="rounded-lg border border-border bg-card shadow-xs overflow-hidden">
+            {isPending ? (
+              <div className="p-12 text-center text-muted-foreground flex items-center justify-center gap-2 text-xs">
+                <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                <span>Loading alumni applications...</span>
+              </div>
+            ) : applications.length === 0 ? (
+              <EmptyState
+                icon={Users}
+                title="No alumni applications found"
+                description={
+                  appsFilter !== "all"
+                    ? `No applications currently in status "${appsFilter}".`
+                    : "No alumni applications have been submitted yet."
+                }
+              />
+            ) : (
               <div className="overflow-x-auto">
-                <table className="w-full text-xs text-left">
-                  <thead className="bg-muted/50 border-b border-border text-muted-foreground uppercase font-mono text-[10px]">
-                    <tr>
-                      <th className="p-3">Applicant</th>
-                      <th className="p-3">Academic</th>
-                      <th className="p-3">Current Role &amp; Field</th>
-                      <th className="p-3">Status</th>
-                      <th className="p-3">Date</th>
-                      <th className="p-3 text-right">Actions</th>
+                <table className="w-full text-left border-collapse text-xs">
+                  <thead>
+                    <tr className="border-b border-border bg-muted/40 font-mono text-[11px] text-muted-foreground uppercase tracking-wider">
+                      <th className="py-3 px-4 font-semibold">Candidate</th>
+                      <th className="py-3 px-4 font-semibold">Field & Role</th>
+                      <th className="py-3 px-4 font-semibold">Grad Year & School</th>
+                      <th className="py-3 px-4 font-semibold">Status</th>
+                      <th className="py-3 px-4 font-semibold">Submitted</th>
+                      <th className="py-3 px-4 font-semibold text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-border">
-                    {applications.map((app) => (
-                      <tr
-                        key={app.id}
-                        className="hover:bg-muted/30 transition-colors cursor-pointer"
-                        onClick={() => {
-                          setSelectedApp(app);
-                          setAdminNotesInput(app.admin_notes || "");
-                        }}
-                      >
-                        <td className="p-3">
-                          <div className="font-semibold text-foreground">{app.full_name}</div>
-                          <div className="text-[11px] text-muted-foreground font-mono">{app.email}</div>
-                        </td>
-                        <td className="p-3">
-                          <div>{app.institution}</div>
-                          <div className="text-muted-foreground">Class of {app.graduation_year}</div>
-                        </td>
-                        <td className="p-3">
-                          <div className="font-medium text-foreground">{app.occupation}</div>
-                          <div className="text-muted-foreground">{app.field}</div>
-                        </td>
-                        <td className="p-3">
-                          <Badge variant={APP_STATUS_CONFIG[app.status]?.variant || "outline"}>
-                            {APP_STATUS_CONFIG[app.status]?.label || app.status}
-                          </Badge>
-                        </td>
-                        <td className="p-3 text-muted-foreground">
-                          {new Date(app.created_at).toLocaleDateString()}
-                        </td>
-                        <td className="p-3 text-right" onClick={(e) => e.stopPropagation()}>
-                          <div className="flex items-center justify-end gap-1.5">
+                  <tbody className="divide-y divide-border/60">
+                    {applications.map((app) => {
+                      const initials = getInitials(app.full_name);
+                      return (
+                        <tr
+                          key={app.id}
+                          onClick={() => openAppDetail(app)}
+                          className="hover:bg-secondary/40 transition-colors cursor-pointer group"
+                        >
+                          {/* Candidate */}
+                          <td className="py-3 px-4">
+                            <div className="flex items-center gap-3">
+                              <div className="h-8 w-8 rounded-full bg-[color:var(--data-signups-subtle)] border border-[color:var(--data-signups-border)] text-[color:var(--data-signups-ink)] flex items-center justify-center font-mono font-bold text-[11px] shrink-0">
+                                {initials}
+                              </div>
+                              <div className="min-w-0">
+                                <div className="font-semibold text-foreground truncate max-w-[180px] sm:max-w-none">
+                                  {app.full_name}
+                                </div>
+                                <div className="text-muted-foreground truncate max-w-[180px] sm:max-w-none">
+                                  {app.email}
+                                </div>
+                              </div>
+                            </div>
+                          </td>
+
+                          {/* Field & Role */}
+                          <td className="py-3 px-4">
+                            <div className="text-foreground font-medium truncate max-w-[180px]">
+                              {app.field}
+                            </div>
+                            <div className="text-muted-foreground truncate max-w-[180px] text-[11px]">
+                              {app.occupation}
+                            </div>
+                          </td>
+
+                          {/* Grad Year & School */}
+                          <td className="py-3 px-4">
+                            <div className="text-foreground font-mono text-[11px]">
+                              Class of {app.graduation_year}
+                            </div>
+                            <div className="text-muted-foreground truncate max-w-[180px] text-[11px]">
+                              {app.institution}
+                            </div>
+                          </td>
+
+                          {/* Status */}
+                          <td className="py-3 px-4">
+                            <StatusPill variant={app.status as any} />
+                          </td>
+
+                          {/* Submitted Date / Age */}
+                          <td className="py-3 px-4 whitespace-nowrap text-muted-foreground text-xs">
+                            {app.status === "new" || app.status === "reviewing" ? (
+                              <AgePill submittedAt={app.created_at} />
+                            ) : (
+                              new Date(app.created_at).toLocaleDateString()
+                            )}
+                          </td>
+
+                          {/* Actions */}
+                          <td className="py-3 px-4 text-right">
                             <Button
-                              variant="outline"
+                              variant="ghost"
                               size="sm"
-                              className="h-7 text-xs"
-                              onClick={() => {
-                                setSelectedApp(app);
-                                setAdminNotesInput(app.admin_notes || "");
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openAppDetail(app);
                               }}
+                              className="h-7 px-2.5 text-xs text-muted-foreground group-hover:text-foreground"
                             >
                               Review
                             </Button>
-                            <Button
-                              variant="default"
-                              size="sm"
-                              className="h-7 text-xs"
-                              onClick={() => handleOpenPublishDialog(app)}
-                            >
-                              Publish
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
+            )}
+          </div>
 
-              {/* Pagination */}
-              <div className="p-3 border-t border-border flex items-center justify-between text-xs text-muted-foreground">
-                <span>
-                  Showing page {appsPage} of {appsTotalPages} ({appsTotal} total applications)
-                </span>
-                <div className="flex items-center gap-1">
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="h-7 w-7"
-                    disabled={appsPage <= 1 || isPending}
-                    onClick={() => refreshApplications(appsPage - 1)}
-                  >
-                    <ChevronLeft className="h-3.5 w-3.5" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="h-7 w-7"
-                    disabled={appsPage >= appsTotalPages || isPending}
-                    onClick={() => refreshApplications(appsPage + 1)}
-                  >
-                    <ChevronRight className="h-3.5 w-3.5" />
-                  </Button>
-                </div>
+          {/* Pagination */}
+          {appsTotalPages > 1 && (
+            <div className="flex items-center justify-between text-xs text-muted-foreground pt-1">
+              <span>
+                Page {appsPage} of {appsTotalPages} ({appsTotal} applications)
+              </span>
+              <div className="flex items-center gap-1.5">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  disabled={appsPage <= 1 || isPending}
+                  onClick={() => {
+                    const p = appsPage - 1;
+                    setAppsPage(p);
+                    updateUrl({ appStatus: appsFilter, page: p, search: appsSearch });
+                    fetchApplications(p, appsFilter, appsSearch);
+                  }}
+                  className="h-8 px-2.5 rounded-lg border-border"
+                >
+                  <ChevronLeft className="h-3.5 w-3.5" />
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  disabled={appsPage >= appsTotalPages || isPending}
+                  onClick={() => {
+                    const p = appsPage + 1;
+                    setAppsPage(p);
+                    updateUrl({ appStatus: appsFilter, page: p, search: appsSearch });
+                    fetchApplications(p, appsFilter, appsSearch);
+                  }}
+                  className="h-8 px-2.5 rounded-lg border-border"
+                >
+                  <ChevronRight className="h-3.5 w-3.5" />
+                </Button>
               </div>
             </div>
           )}
-        </TabsContent>
+        </div>
+      )}
 
-        {/* ── Profiles Tab ── */}
-        <TabsContent value="profiles" className="space-y-4">
-          {/* Profiles Filters & Search */}
-          <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
-            <div className="flex flex-wrap gap-1.5">
-              {["all", ...ALUMNI_PROFILE_STATUSES].map((st) => (
+      {/* TAB 2: DIRECTORY PROFILES */}
+      {activeTab === "profiles" && (
+        <div className="space-y-5">
+          {/* Sub Toolbar */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <SegmentedControl
+              options={PROFILE_STATUS_OPTIONS}
+              value={profilesFilter}
+              onChange={(val) => {
+                setProfilesFilter(val);
+                setProfilesPage(1);
+                updateUrl({ profileStatus: val, page: 1, search: profilesSearch });
+                fetchProfiles(1, val, profilesSearch);
+              }}
+              ariaLabel="Alumni profile status filter"
+            />
+
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                setProfilesPage(1);
+                updateUrl({ profileStatus: profilesFilter, page: 1, search: profilesSearch });
+                fetchProfiles(1, profilesFilter, profilesSearch);
+              }}
+              className="relative w-full sm:w-72"
+            >
+              <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search alumni name, role, field..."
+                value={profilesSearch}
+                onChange={(e) => setProfilesSearch(e.target.value)}
+                className="h-9 pl-9 text-xs rounded-lg bg-card border-border"
+              />
+            </form>
+          </div>
+
+          {/* Profiles Table */}
+          <div className="rounded-lg border border-border bg-card shadow-xs overflow-hidden">
+            {isPending ? (
+              <div className="p-12 text-center text-muted-foreground flex items-center justify-center gap-2 text-xs">
+                <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                <span>Loading directory profiles...</span>
+              </div>
+            ) : profiles.length === 0 ? (
+              <EmptyState
+                icon={Users}
+                title="No directory profiles found"
+                description={
+                  profilesFilter !== "all"
+                    ? `No profiles with status "${profilesFilter}".`
+                    : "No alumni profiles published yet."
+                }
+              />
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse text-xs">
+                  <thead>
+                    <tr className="border-b border-border bg-muted/40 font-mono text-[11px] text-muted-foreground uppercase tracking-wider">
+                      <th className="py-3 px-4 font-semibold">Alumni</th>
+                      <th className="py-3 px-4 font-semibold">Field & Institution</th>
+                      <th className="py-3 px-4 font-semibold">Role & Occupation</th>
+                      <th className="py-3 px-4 font-semibold">Status</th>
+                      <th className="py-3 px-4 font-semibold">Published</th>
+                      <th className="py-3 px-4 font-semibold text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border/60">
+                    {profiles.map((profile) => {
+                      const initials = getInitials(profile.display_name);
+                      return (
+                        <tr
+                          key={profile.id}
+                          className="hover:bg-secondary/40 transition-colors"
+                        >
+                          {/* Alumni */}
+                          <td className="py-3 px-4">
+                            <div className="flex items-center gap-3">
+                              <div className="h-8 w-8 rounded-full bg-[color:var(--data-verified-subtle)] border border-[color:var(--data-verified-border)] text-[color:var(--data-verified-ink)] flex items-center justify-center font-mono font-bold text-[11px] shrink-0">
+                                {initials}
+                              </div>
+                              <div className="min-w-0">
+                                <div className="font-semibold text-foreground truncate max-w-[180px] sm:max-w-none">
+                                  {profile.display_name}
+                                </div>
+                                <div className="text-muted-foreground font-mono text-[11px]">
+                                  Class of {profile.graduation_year}
+                                </div>
+                              </div>
+                            </div>
+                          </td>
+
+                          {/* Field & Institution */}
+                          <td className="py-3 px-4">
+                            <div className="text-foreground font-medium truncate max-w-[180px]">
+                              {profile.field}
+                            </div>
+                            <div className="text-muted-foreground truncate max-w-[180px] text-[11px]">
+                              {profile.institution}
+                            </div>
+                          </td>
+
+                          {/* Role */}
+                          <td className="py-3 px-4">
+                            <div className="text-foreground truncate max-w-[200px]">
+                              {profile.occupation}
+                            </div>
+                          </td>
+
+                          {/* Status */}
+                          <td className="py-3 px-4">
+                            <StatusPill variant={profile.status as any} />
+                          </td>
+
+                          {/* Published Date */}
+                          <td className="py-3 px-4 font-mono text-[11px] text-muted-foreground whitespace-nowrap">
+                            {profile.published_at
+                              ? new Date(profile.published_at).toLocaleDateString("en-NG", {
+                                  month: "short",
+                                  day: "numeric",
+                                  year: "numeric",
+                                })
+                              : "—"}
+                          </td>
+
+                          {/* Actions */}
+                          <td className="py-3 px-4 text-right">
+                            <div className="flex items-center justify-end gap-1.5">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleToggleProfileStatus(profile)}
+                                disabled={isPending}
+                                className="h-7 px-2 text-xs rounded-lg border-border"
+                              >
+                                {profile.status === "published" ? (
+                                  <>
+                                    <EyeOff className="h-3 w-3 mr-1" />
+                                    Unpublish
+                                  </>
+                                ) : (
+                                  <>
+                                    <Eye className="h-3 w-3 mr-1" />
+                                    Publish
+                                  </>
+                                )}
+                              </Button>
+                              <Button asChild variant="ghost" size="sm" className="h-7 px-2 text-xs">
+                                <Link
+                                  href={`/alumni-office-hours/${profile.id}`}
+                                  target="_blank"
+                                >
+                                  <ExternalLink className="h-3.5 w-3.5" />
+                                </Link>
+                              </Button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+
+          {/* Pagination */}
+          {profilesTotalPages > 1 && (
+            <div className="flex items-center justify-between text-xs text-muted-foreground pt-1">
+              <span>
+                Page {profilesPage} of {profilesTotalPages} ({profilesTotal} profiles)
+              </span>
+              <div className="flex items-center gap-1.5">
                 <Button
-                  key={st}
-                  variant={profilesFilter === st ? "default" : "outline"}
                   size="sm"
-                  className="h-8 text-xs capitalize"
+                  variant="outline"
+                  disabled={profilesPage <= 1 || isPending}
                   onClick={() => {
-                    setProfilesFilter(st);
-                    refreshProfiles(1, st, profilesSearch);
+                    const p = profilesPage - 1;
+                    setProfilesPage(p);
+                    updateUrl({ profileStatus: profilesFilter, page: p, search: profilesSearch });
+                    fetchProfiles(p, profilesFilter, profilesSearch);
                   }}
+                  className="h-8 px-2.5 rounded-lg border-border"
                 >
-                  {st}
+                  <ChevronLeft className="h-3.5 w-3.5" />
                 </Button>
-              ))}
+                <Button
+                  size="sm"
+                  variant="outline"
+                  disabled={profilesPage >= profilesTotalPages || isPending}
+                  onClick={() => {
+                    const p = profilesPage + 1;
+                    setProfilesPage(p);
+                    updateUrl({ profileStatus: profilesFilter, page: p, search: profilesSearch });
+                    fetchProfiles(p, profilesFilter, profilesSearch);
+                  }}
+                  className="h-8 px-2.5 rounded-lg border-border"
+                >
+                  <ChevronRight className="h-3.5 w-3.5" />
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Application Detail Drawer */}
+      <AdminDrawer
+        open={!!selectedApp}
+        onOpenChange={(open) => !open && setSelectedApp(null)}
+        title={selectedApp?.full_name || "Candidate Details"}
+        subtitle={
+          selectedApp
+            ? `${selectedApp.occupation} • ${selectedApp.institution}`
+            : undefined
+        }
+        badge={
+          selectedApp && (
+            <StatusPill variant={selectedApp.status as any} />
+          )
+        }
+        timestamp={
+          selectedApp && (
+            <span className="font-mono text-[11px] text-muted-foreground">
+              {new Date(selectedApp.created_at).toLocaleDateString("en-NG", {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+              })}
+            </span>
+          )
+        }
+        footer={
+          selectedApp && (
+            <div className="flex items-center justify-between w-full gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setDeleteConfirmAppId(selectedApp.id)}
+                className="text-xs text-[color:var(--data-negative-ink)] border-[color:var(--data-negative-border)] hover:bg-[color:var(--data-negative-subtle)] gap-1.5 h-8 rounded-lg"
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+                <span>Delete</span>
+              </Button>
+
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={isPending || selectedApp.status === "declined"}
+                  onClick={() => handleSetAppStatus("declined")}
+                  className="text-xs h-8 rounded-lg text-[color:var(--data-negative-ink)] hover:bg-[color:var(--data-negative-subtle)] border-border"
+                >
+                  <XCircle className="h-3.5 w-3.5 mr-1" />
+                  Decline
+                </Button>
+                <Button
+                  variant="default"
+                  size="sm"
+                  disabled={isPending}
+                  onClick={() => handleOpenPublishDialog(selectedApp)}
+                  className="text-xs h-8 rounded-lg gap-1.5"
+                >
+                  <Globe className="h-3.5 w-3.5" />
+                  Publish to Directory
+                </Button>
+              </div>
+            </div>
+          )
+        }
+      >
+        {selectedApp && (
+          <div className="space-y-5 text-xs p-5">
+            {/* Quick Status Bar */}
+            <div className="p-3 rounded-lg border border-border bg-secondary/30 space-y-2">
+              <div className="text-[11px] font-mono text-muted-foreground uppercase font-semibold">
+                Set Status
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {(["new", "reviewing", "approved", "declined"] as AlumniApplicationStatus[]).map(
+                  (st) => (
+                    <Button
+                      key={st}
+                      size="sm"
+                      variant={selectedApp.status === st ? "default" : "outline"}
+                      disabled={isPending || selectedApp.status === st}
+                      onClick={() => handleSetAppStatus(st)}
+                      className="text-xs h-7 px-2.5 rounded-lg border-border capitalize"
+                    >
+                      {st}
+                    </Button>
+                  )
+                )}
+              </div>
             </div>
 
-            <div className="relative w-full sm:w-72">
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-              <Input
-                placeholder="Search published alumni profiles..."
-                value={profilesSearch}
-                onChange={(e) => {
-                  setProfilesSearch(e.target.value);
-                  refreshProfiles(1, profilesFilter, e.target.value);
-                }}
-                className="pl-9 h-8 text-xs bg-card"
+            {/* Candidate details */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="p-3 rounded-lg border border-border bg-card space-y-1">
+                <span className="text-muted-foreground flex items-center gap-1.5 font-medium">
+                  <Mail className="h-3.5 w-3.5" />
+                  Email
+                </span>
+                <a
+                  href={`mailto:${selectedApp.email}`}
+                  className="font-medium text-primary hover:underline block truncate"
+                >
+                  {selectedApp.email}
+                </a>
+              </div>
+
+              <div className="p-3 rounded-lg border border-border bg-card space-y-1">
+                <span className="text-muted-foreground flex items-center gap-1.5 font-medium">
+                  <ExternalLink className="h-3.5 w-3.5" />
+                  Booking / LinkedIn URL
+                </span>
+                <a
+                  href={selectedApp.contact_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-medium text-primary hover:underline block truncate"
+                >
+                  {selectedApp.contact_url}
+                </a>
+              </div>
+            </div>
+
+            {/* Professional Profile */}
+            <div className="p-3 rounded-lg border border-border bg-card space-y-2.5">
+              <div className="text-[11px] font-mono uppercase text-muted-foreground font-semibold">
+                Professional Details
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <span className="text-muted-foreground block text-[11px]">Field / Track</span>
+                  <p className="font-semibold text-foreground">{selectedApp.field}</p>
+                </div>
+                <div>
+                  <span className="text-muted-foreground block text-[11px]">Current Role</span>
+                  <p className="font-medium text-foreground">{selectedApp.occupation}</p>
+                </div>
+                <div>
+                  <span className="text-muted-foreground block text-[11px]">Alma Mater</span>
+                  <p className="font-medium text-foreground">{selectedApp.institution}</p>
+                </div>
+                <div>
+                  <span className="text-muted-foreground block text-[11px]">Graduation Year</span>
+                  <p className="font-mono font-medium text-foreground">{selectedApp.graduation_year}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Bio */}
+            <div className="p-3.5 rounded-lg border border-border bg-card space-y-2">
+              <div className="text-[11px] font-mono uppercase text-muted-foreground font-semibold">
+                Bio & Background
+              </div>
+              <p className="text-foreground leading-relaxed whitespace-pre-wrap font-sans">
+                {selectedApp.bio}
+              </p>
+            </div>
+
+            {/* Topics & Availability */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="p-3 rounded-lg border border-border bg-card space-y-1">
+                <span className="text-muted-foreground block text-[11px]">Topics Offered</span>
+                <p className="font-medium text-foreground">{selectedApp.topics}</p>
+              </div>
+              <div className="p-3 rounded-lg border border-border bg-card space-y-1">
+                <span className="text-muted-foreground block text-[11px]">Availability Schedule</span>
+                <p className="font-medium text-foreground">{selectedApp.availability}</p>
+              </div>
+            </div>
+
+            {/* Admin Review Notes */}
+            <div className="p-3.5 rounded-lg border border-border bg-card space-y-2.5">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-mono uppercase text-muted-foreground font-semibold flex items-center gap-1.5">
+                  <MessageSquare className="h-3.5 w-3.5" />
+                  Admin Review Notes
+                </span>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  disabled={isPending}
+                  onClick={handleSaveNotes}
+                  className="text-[11px] h-7 px-2 gap-1 rounded-lg border-border"
+                >
+                  <Save className="h-3 w-3" />
+                  <span>Save Notes</span>
+                </Button>
+              </div>
+              <textarea
+                rows={3}
+                placeholder="Private internal notes regarding this alumni..."
+                value={adminNotesInput}
+                onChange={(e) => setAdminNotesInput(e.target.value)}
+                className="w-full rounded-lg border border-border bg-background p-3 font-sans text-xs text-foreground placeholder:text-muted-foreground/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary leading-relaxed resize-y"
               />
             </div>
           </div>
+        )}
+      </AdminDrawer>
 
-          {profiles.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-border p-12 text-center text-sm text-muted-foreground">
-              No alumni directory profiles found matching the selected criteria.
-            </div>
-          ) : (
-            <div className="rounded-xl border border-border bg-card overflow-hidden shadow-xs">
-              <div className="overflow-x-auto">
-                <table className="w-full text-xs text-left">
-                  <thead className="bg-muted/50 border-b border-border text-muted-foreground uppercase font-mono text-[10px]">
-                    <tr>
-                      <th className="p-3">Display Name</th>
-                      <th className="p-3">Institution &amp; Class</th>
-                      <th className="p-3">Role &amp; Domain</th>
-                      <th className="p-3">Status</th>
-                      <th className="p-3">Published At</th>
-                      <th className="p-3 text-right">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-border">
-                    {profiles.map((profile) => (
-                      <tr key={profile.id} className="hover:bg-muted/30 transition-colors">
-                        <td className="p-3">
-                          <div className="font-semibold text-foreground">{profile.display_name}</div>
-                          <a
-                            href={profile.contact_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-[11px] text-primary hover:underline inline-flex items-center gap-1"
-                          >
-                            <span>Profile Link</span>
-                            <ExternalLink className="w-3 h-3" />
-                          </a>
-                        </td>
-                        <td className="p-3">
-                          <div>{profile.institution}</div>
-                          <div className="text-muted-foreground">Class of {profile.graduation_year}</div>
-                        </td>
-                        <td className="p-3">
-                          <div className="font-medium text-foreground">{profile.occupation}</div>
-                          <div className="text-muted-foreground">{profile.field}</div>
-                        </td>
-                        <td className="p-3">
-                          <Badge
-                            variant={profile.status === "published" ? "default" : "secondary"}
-                            className="capitalize"
-                          >
-                            {profile.status}
-                          </Badge>
-                        </td>
-                        <td className="p-3 text-muted-foreground">
-                          {new Date(profile.published_at).toLocaleDateString()}
-                        </td>
-                        <td className="p-3 text-right">
-                          <div className="flex items-center justify-end gap-1.5">
-                            {profile.status === "published" ? (
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="h-7 text-xs text-amber-600 dark:text-amber-400 gap-1"
-                                onClick={() => handleToggleProfileStatus(profile)}
-                              >
-                                <EyeOff className="w-3 h-3" />
-                                <span>Unpublish</span>
-                              </Button>
-                            ) : (
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="h-7 text-xs text-emerald-600 dark:text-emerald-400 gap-1"
-                                onClick={() => handleToggleProfileStatus(profile)}
-                              >
-                                <Eye className="w-3 h-3" />
-                                <span>Republish</span>
-                              </Button>
-                            )}
-
-                            <Button asChild variant="outline" size="sm" className="h-7 text-xs">
-                              <Link href={`/alumni-office-hours/${profile.id}`} target="_blank">
-                                View
-                              </Link>
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              {/* Pagination */}
-              <div className="p-3 border-t border-border flex items-center justify-between text-xs text-muted-foreground">
-                <span>
-                  Showing page {profilesPage} of {profilesTotalPages} ({profilesTotal} total profiles)
-                </span>
-                <div className="flex items-center gap-1">
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="h-7 w-7"
-                    disabled={profilesPage <= 1 || isPending}
-                    onClick={() => refreshProfiles(profilesPage - 1)}
-                  >
-                    <ChevronLeft className="h-3.5 w-3.5" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="h-7 w-7"
-                    disabled={profilesPage >= profilesTotalPages || isPending}
-                    onClick={() => refreshProfiles(profilesPage + 1)}
-                  >
-                    <ChevronRight className="h-3.5 w-3.5" />
-                  </Button>
-                </div>
-              </div>
-            </div>
-          )}
-        </TabsContent>
-      </Tabs>
-
-      {/* ── Application Detail Sheet ── */}
-      <Sheet open={!!selectedApp} onOpenChange={(open) => !open && setSelectedApp(null)}>
-        <SheetContent className="w-full sm:max-w-xl overflow-y-auto space-y-6">
-          {selectedApp && (
-            <>
-              <SheetHeader className="space-y-1">
-                <div className="flex items-center justify-between">
-                  <Badge variant={APP_STATUS_CONFIG[selectedApp.status]?.variant || "outline"}>
-                    {APP_STATUS_CONFIG[selectedApp.status]?.label || selectedApp.status}
-                  </Badge>
-                  <span className="text-[11px] font-mono text-muted-foreground">
-                    ID: {selectedApp.id.slice(0, 8)}...
-                  </span>
-                </div>
-                <SheetTitle className="text-xl font-bold font-display">
-                  {selectedApp.full_name}
-                </SheetTitle>
-                <SheetDescription className="text-xs">
-                  Submitted {new Date(selectedApp.created_at).toLocaleString()}
-                </SheetDescription>
-              </SheetHeader>
-
-              {/* Mandatory Identity Verification Notice */}
-              <div className="rounded-xl border border-amber-500/20 bg-amber-500/10 p-3.5 text-xs text-amber-900 dark:text-amber-200 flex items-start gap-2.5">
-                <ShieldAlert className="w-4 h-4 shrink-0 text-amber-600 dark:text-amber-400 mt-0.5" />
-                <p className="font-medium leading-relaxed">
-                  Verify identity (for example on LinkedIn) before approving. Confirm current role and graduation history.
-                </p>
-              </div>
-
-              {/* Private Submitter Details */}
-              <div className="space-y-3 border-y border-border py-4 text-xs">
-                <p className="font-semibold text-foreground uppercase tracking-wider text-[10px] text-muted-foreground">
-                  Private Submitter Fields (Admin Only)
-                </p>
-                <div className="grid grid-cols-2 gap-3 bg-muted/40 p-3 rounded-lg">
-                  <div>
-                    <span className="text-muted-foreground block text-[10px]">Email Address</span>
-                    <a
-                      href={`mailto:${selectedApp.email}`}
-                      className="text-primary hover:underline font-medium break-all"
-                    >
-                      {selectedApp.email}
-                    </a>
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground block text-[10px]">IP Hash (Salted)</span>
-                    <span className="font-mono text-[10px] break-all">{selectedApp.ip_hash.slice(0, 16)}...</span>
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground block text-[10px]">Consent Publicly Given</span>
-                    <span className="font-semibold text-emerald-600 dark:text-emerald-400">Yes (Confirmed)</span>
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground block text-[10px]">Reviewed By</span>
-                    <span>{selectedApp.reviewed_by ? selectedApp.reviewed_by.slice(0, 8) : "Pending"}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Public Application Fields */}
-              <div className="space-y-4 text-xs">
-                <p className="font-semibold text-foreground uppercase tracking-wider text-[10px] text-muted-foreground">
-                  Application Information
-                </p>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <span className="text-muted-foreground block text-[10px]">University / Institution</span>
-                    <span className="font-medium text-foreground">{selectedApp.institution}</span>
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground block text-[10px]">Graduation Year</span>
-                    <span className="font-medium text-foreground">Class of {selectedApp.graduation_year}</span>
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground block text-[10px]">Current Occupation</span>
-                    <span className="font-medium text-foreground">{selectedApp.occupation}</span>
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground block text-[10px]">Field / Expertise</span>
-                    <span className="font-medium text-foreground">{selectedApp.field}</span>
-                  </div>
-                </div>
-
-                <div>
-                  <span className="text-muted-foreground block text-[10px] mb-1">Public Contact Link</span>
-                  <a
-                    href={selectedApp.contact_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-primary hover:underline font-mono text-xs break-all inline-flex items-center gap-1.5"
-                  >
-                    <span>{selectedApp.contact_url}</span>
-                    <ExternalLink className="w-3.5 h-3.5 shrink-0" />
-                  </a>
-                </div>
-
-                <div>
-                  <span className="text-muted-foreground block text-[10px] mb-1">Bio</span>
-                  <div className="p-3 rounded-lg bg-muted/40 text-foreground leading-relaxed whitespace-pre-line">
-                    {selectedApp.bio}
-                  </div>
-                </div>
-
-                <div>
-                  <span className="text-muted-foreground block text-[10px] mb-1">Advising Topics</span>
-                  <div className="p-3 rounded-lg bg-muted/40 text-foreground leading-relaxed whitespace-pre-line">
-                    {selectedApp.topics}
-                  </div>
-                </div>
-
-                <div>
-                  <span className="text-muted-foreground block text-[10px] mb-1">Availability</span>
-                  <div className="p-3 rounded-lg bg-muted/40 text-foreground leading-relaxed whitespace-pre-line">
-                    {selectedApp.availability}
-                  </div>
-                </div>
-              </div>
-
-              {/* Admin Notes */}
-              <div className="space-y-2 border-t border-border pt-4">
-                <label className="text-xs font-semibold text-foreground flex items-center justify-between">
-                  <span>Admin Internal Notes</span>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-6 text-[11px] gap-1"
-                    onClick={handleSaveNotes}
-                    disabled={isPending}
-                  >
-                    <Save className="w-3 h-3" />
-                    <span>Save Notes</span>
-                  </Button>
-                </label>
-                <Textarea
-                  rows={2}
-                  placeholder="Record identity verification results, LinkedIn verification link, notes..."
-                  value={adminNotesInput}
-                  onChange={(e) => setAdminNotesInput(e.target.value)}
-                  className="text-xs"
-                />
-              </div>
-
-              {/* Action Buttons */}
-              <div className="border-t border-border pt-4 flex flex-wrap items-center justify-between gap-2">
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    className="text-xs gap-1"
-                    onClick={() => setDeleteConfirmAppId(selectedApp.id)}
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                    <span>Delete</span>
-                  </Button>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  {selectedApp.status !== "reviewing" && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="text-xs"
-                      onClick={() => handleSetAppStatus("reviewing")}
-                      disabled={isPending}
-                    >
-                      Mark Reviewing
-                    </Button>
-                  )}
-                  {selectedApp.status !== "declined" && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="text-xs text-destructive hover:bg-destructive/10"
-                      onClick={() => handleSetAppStatus("declined")}
-                      disabled={isPending}
-                    >
-                      Decline
-                    </Button>
-                  )}
-                  <Button
-                    variant="default"
-                    size="sm"
-                    className="text-xs gap-1"
-                    onClick={() => handleOpenPublishDialog(selectedApp)}
-                  >
-                    <CheckCircle2 className="w-3.5 h-3.5" />
-                    <span>Approve &amp; Publish</span>
-                  </Button>
-                </div>
-              </div>
-            </>
-          )}
-        </SheetContent>
-      </Sheet>
-
-      {/* ── Publish & Review Dialog ── */}
+      {/* Publish Dialog */}
       <Dialog open={publishDialogOpen} onOpenChange={setPublishDialogOpen}>
-        <DialogContent className="max-w-xl max-h-[90vh] overflow-y-auto">
-          <form onSubmit={handlePublishSubmit} className="space-y-4">
+        <DialogContent className="sm:max-w-xl max-h-[90vh] overflow-y-auto rounded-lg">
+          <form onSubmit={handlePublishSubmit}>
             <DialogHeader>
-              <DialogTitle className="text-lg font-bold font-display">
-                Approve &amp; Publish Alumni Profile
+              <DialogTitle className="text-base font-bold text-foreground">
+                Publish to Alumni Directory
               </DialogTitle>
-              <DialogDescription className="text-xs">
-                Review and finalize the public fields before publishing to the directory. You can edit any field to ensure accuracy and professionalism.
+              <DialogDescription className="text-xs text-muted-foreground">
+                Sanitize and confirm the public profile that will be visible to students and youth.
               </DialogDescription>
             </DialogHeader>
 
-            <div className="space-y-3 text-xs">
+            <div className="space-y-4 py-4 text-xs">
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
                   <label className="font-semibold text-foreground">Display Name</label>
                   <Input
-                    required
                     value={publishForm.displayName}
                     onChange={(e) =>
                       setPublishForm((p) => ({ ...p, displayName: e.target.value }))
                     }
+                    className="h-8 text-xs rounded-lg bg-background border-border"
+                    required
                   />
                 </div>
                 <div className="space-y-1">
                   <label className="font-semibold text-foreground">Graduation Year</label>
                   <Input
                     type="number"
-                    required
-                    min={1970}
-                    max={2100}
                     value={publishForm.graduationYear}
                     onChange={(e) =>
-                      setPublishForm((p) => ({
-                        ...p,
-                        graduationYear: Number(e.target.value),
-                      }))
+                      setPublishForm((p) => ({ ...p, graduationYear: parseInt(e.target.value, 10) }))
                     }
+                    className="h-8 text-xs rounded-lg bg-background border-border"
+                    required
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="font-semibold text-foreground">University / Institution</label>
+                  <label className="font-semibold text-foreground">Institution</label>
                   <Input
-                    required
                     value={publishForm.institution}
                     onChange={(e) =>
                       setPublishForm((p) => ({ ...p, institution: e.target.value }))
                     }
+                    className="h-8 text-xs rounded-lg bg-background border-border"
+                    required
                   />
                 </div>
                 <div className="space-y-1">
                   <label className="font-semibold text-foreground">Field / Domain</label>
                   <Input
-                    required
                     value={publishForm.field}
                     onChange={(e) =>
                       setPublishForm((p) => ({ ...p, field: e.target.value }))
                     }
+                    className="h-8 text-xs rounded-lg bg-background border-border"
+                    required
                   />
                 </div>
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-foreground">Current Occupation / Role</label>
+                <label className="font-semibold text-foreground">Occupation / Title</label>
                 <Input
-                  required
                   value={publishForm.occupation}
                   onChange={(e) =>
                     setPublishForm((p) => ({ ...p, occupation: e.target.value }))
                   }
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className="font-semibold text-foreground">Public Contact Link</label>
-                <Input
-                  type="url"
+                  className="h-8 text-xs rounded-lg bg-background border-border"
                   required
-                  value={publishForm.contactUrl}
-                  onChange={(e) =>
-                    setPublishForm((p) => ({ ...p, contactUrl: e.target.value }))
-                  }
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-foreground">Short Bio (20-600 characters)</label>
+                <label className="font-semibold text-foreground">Public Bio</label>
                 <Textarea
-                  required
                   rows={3}
                   value={publishForm.bio}
                   onChange={(e) =>
                     setPublishForm((p) => ({ ...p, bio: e.target.value }))
                   }
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className="font-semibold text-foreground">Advising Topics</label>
-                <Textarea
+                  className="text-xs rounded-lg bg-background border-border leading-relaxed"
                   required
-                  rows={2}
-                  value={publishForm.topics}
-                  onChange={(e) =>
-                    setPublishForm((p) => ({ ...p, topics: e.target.value }))
-                  }
                 />
               </div>
 
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="font-semibold text-foreground">Topics Offered</label>
+                  <Input
+                    value={publishForm.topics}
+                    onChange={(e) =>
+                      setPublishForm((p) => ({ ...p, topics: e.target.value }))
+                    }
+                    className="h-8 text-xs rounded-lg bg-background border-border"
+                    required
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="font-semibold text-foreground">Availability</label>
+                  <Input
+                    value={publishForm.availability}
+                    onChange={(e) =>
+                      setPublishForm((p) => ({ ...p, availability: e.target.value }))
+                    }
+                    className="h-8 text-xs rounded-lg bg-background border-border"
+                    required
+                  />
+                </div>
+              </div>
+
               <div className="space-y-1">
-                <label className="font-semibold text-foreground">Availability</label>
+                <label className="font-semibold text-foreground">Public Contact / Booking URL</label>
                 <Input
-                  required
-                  value={publishForm.availability}
+                  type="url"
+                  value={publishForm.contactUrl}
                   onChange={(e) =>
-                    setPublishForm((p) => ({ ...p, availability: e.target.value }))
+                    setPublishForm((p) => ({ ...p, contactUrl: e.target.value }))
                   }
+                  className="h-8 text-xs rounded-lg bg-background border-border"
+                  required
                 />
               </div>
             </div>
 
-            <DialogFooter className="pt-2">
+            <DialogFooter className="gap-2 sm:gap-0 pt-2 border-t border-border">
               <Button
                 type="button"
                 variant="outline"
                 size="sm"
                 onClick={() => setPublishDialogOpen(false)}
+                disabled={isPending}
+                className="text-xs h-8 rounded-lg border-border"
               >
                 Cancel
               </Button>
-              <Button type="submit" size="sm" disabled={isPending} className="gap-1.5">
-                {isPending && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
-                <span>Confirm &amp; Publish</span>
+              <Button
+                type="submit"
+                variant="default"
+                size="sm"
+                disabled={isPending}
+                className="text-xs h-8 rounded-lg gap-1.5"
+              >
+                {isPending ? (
+                  <>
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    <span>Publishing...</span>
+                  </>
+                ) : (
+                  <>
+                    <Globe className="h-3.5 w-3.5" />
+                    <span>Publish to Directory</span>
+                  </>
+                )}
               </Button>
             </DialogFooter>
           </form>
         </DialogContent>
       </Dialog>
 
-      {/* ── Delete Confirmation Dialog ── */}
+      {/* Delete Confirmation Dialog */}
       <Dialog
         open={!!deleteConfirmAppId}
         onOpenChange={(open) => !open && setDeleteConfirmAppId(null)}
       >
-        <DialogContent className="max-w-md">
+        <DialogContent className="sm:max-w-md rounded-lg">
           <DialogHeader>
-            <DialogTitle className="text-base font-bold font-display">
+            <DialogTitle className="text-base font-bold text-foreground">
               Delete Alumni Application
             </DialogTitle>
-            <DialogDescription className="text-xs">
-              Are you sure you want to permanently delete this application? If this application has a published profile in the directory, it will also be deleted immediately. This action cannot be undone.
+            <DialogDescription className="text-xs text-muted-foreground">
+              Are you sure you want to permanently delete this alumni application and any linked
+              directory profile? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
-
-          <DialogFooter className="pt-2">
+          <DialogFooter className="gap-2 sm:gap-0 pt-2">
             <Button
               variant="outline"
               size="sm"
               onClick={() => setDeleteConfirmAppId(null)}
+              disabled={isPending}
+              className="text-xs h-8 rounded-lg border-border"
             >
               Cancel
             </Button>
@@ -1007,10 +1192,19 @@ export function AdminAlumniClient({
               size="sm"
               disabled={isPending}
               onClick={handleDeleteApplication}
-              className="gap-1.5"
+              className="text-xs h-8 rounded-lg gap-1.5"
             >
-              {isPending && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
-              <span>Yes, Delete Record</span>
+              {isPending ? (
+                <>
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  <span>Deleting...</span>
+                </>
+              ) : (
+                <>
+                  <Trash2 className="h-3.5 w-3.5" />
+                  <span>Confirm Delete</span>
+                </>
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -1018,4 +1212,3 @@ export function AdminAlumniClient({
     </div>
   );
 }
-

@@ -5,6 +5,10 @@ import {
   CheckCircle2,
   Archive,
   User,
+  Clock,
+  Globe,
+  EyeOff,
+  AlertTriangle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -18,7 +22,15 @@ export type StatusPillVariant =
   | "archived"
   | "admin"
   | "user"
-  | "neutral";
+  | "neutral"
+  | "reviewing"
+  | "accepted"
+  | "waitlisted"
+  | "declined"
+  | "published"
+  | "unpublished"
+  | "draft"
+  | "expired";
 
 export interface StatusPillProps {
   variant: StatusPillVariant;
@@ -57,29 +69,60 @@ function getConfig(variant: StatusPillVariant): PillConfig {
           "bg-[color:var(--data-flows-subtle)] text-[color:var(--data-flows-ink)] border border-[color:var(--data-flows-border)]",
       };
 
+    case "reviewing":
+      return {
+        icon: <Clock className="h-3 w-3 shrink-0" aria-hidden="true" />,
+        label: "Reviewing",
+        style:
+          "bg-[color:var(--data-flows-subtle)] text-[color:var(--data-flows-ink)] border border-[color:var(--data-flows-border)]",
+      };
+
     case "approved":
+    case "accepted":
     case "verified":
       return {
         icon: <ShieldCheck className="h-3 w-3 shrink-0" aria-hidden="true" />,
-        label: variant === "approved" ? "Approved" : "Verified",
+        label:
+          variant === "accepted"
+            ? "Accepted"
+            : variant === "approved"
+            ? "Approved"
+            : "Verified",
+        style:
+          "bg-[color:var(--data-verified-subtle)] text-[color:var(--data-verified-ink)] border border-[color:var(--data-verified-border)]",
+      };
+
+    case "published":
+      return {
+        icon: <Globe className="h-3 w-3 shrink-0" aria-hidden="true" />,
+        label: "Published",
         style:
           "bg-[color:var(--data-verified-subtle)] text-[color:var(--data-verified-ink)] border border-[color:var(--data-verified-border)]",
       };
 
     case "rejected":
+    case "declined":
       return {
         icon: <XCircle className="h-3 w-3 shrink-0" aria-hidden="true" />,
-        label: "Rejected",
+        label: variant === "declined" ? "Declined" : "Rejected",
         style:
           "bg-[color:var(--data-negative-subtle)] text-[color:var(--data-negative-ink)] border border-[color:var(--data-negative-border)]",
       };
 
+    case "waitlisted":
+      return {
+        dot: <Dot className="bg-[color:var(--data-signups)]" />,
+        label: "Waitlisted",
+        style:
+          "bg-[color:var(--data-signups-subtle)] text-[color:var(--data-signups-ink)] border border-[color:var(--data-signups-border)]",
+      };
+
     case "new":
       return {
-        dot: <Dot className="bg-[color:var(--data-users)]" />,
+        dot: <Dot className="bg-[color:var(--data-signups)]" />,
         label: "New",
         style:
-          "bg-[color:var(--data-users-subtle)] text-[color:var(--data-users-ink)] border border-[color:var(--data-users-border)]",
+          "bg-[color:var(--data-signups-subtle)] text-[color:var(--data-signups-ink)] border border-[color:var(--data-signups-border)]",
       };
 
     case "read":
@@ -90,6 +133,30 @@ function getConfig(variant: StatusPillVariant): PillConfig {
         label: "Read",
         style:
           "bg-secondary text-foreground/70 border border-border",
+      };
+
+    case "unpublished":
+      return {
+        icon: <EyeOff className="h-3 w-3 shrink-0" aria-hidden="true" />,
+        label: "Unpublished",
+        style:
+          "bg-secondary text-muted-foreground border border-border",
+      };
+
+    case "draft":
+      return {
+        dot: <Dot className="bg-muted-foreground/60" />,
+        label: "Draft",
+        style:
+          "bg-secondary text-muted-foreground border border-border",
+      };
+
+    case "expired":
+      return {
+        icon: <AlertTriangle className="h-3 w-3 shrink-0" aria-hidden="true" />,
+        label: "Expired",
+        style:
+          "bg-secondary text-muted-foreground border border-border",
       };
 
     case "archived":

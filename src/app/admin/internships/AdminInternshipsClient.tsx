@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   Briefcase,
@@ -13,6 +14,13 @@ import {
   AlertTriangle,
   Edit,
   Eye,
+  EyeOff,
+  Building2,
+  MapPin,
+  Mail,
+  Calendar,
+  DollarSign,
+  ShieldAlert,
 } from "lucide-react";
 import { toast } from "sonner";
 import type { AdminInternshipWithReview } from "@/lib/internships/types";
@@ -30,16 +38,37 @@ import {
   adminDeleteInternshipAction,
   adminFetchInternshipsAction,
 } from "@/lib/internships/actions";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { AdminPageHeader } from "@/components/admin/primitives/AdminPageHeader";
+import { AdminDrawer } from "@/components/admin/primitives/AdminDrawer";
+import { SegmentedControl } from "@/components/admin/primitives/SegmentedControl";
+import { EmptyState } from "@/components/admin/primitives/EmptyState";
+import { StatusPill } from "@/components/admin/people/StatusPill";
+import { AgePill } from "@/components/admin/people/AgePill";
 
 interface AdminInternshipsClientProps {
   initialInternships: AdminInternshipWithReview[];
 }
 
 export function AdminInternshipsClient({ initialInternships }: AdminInternshipsClientProps) {
+  const router = useRouter();
   const [internships, setInternships] = useState<AdminInternshipWithReview[]>(initialInternships);
   const [activeTab, setActiveTab] = useState<"pending" | "published" | "rejected" | "expired">("pending");
   const [search, setSearch] = useState("");
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+
+  // Detail / Review drawer item
+  const [selectedItem, setSelectedItem] = useState<AdminInternshipWithReview | null>(null);
 
   // Edit / Publish Modal
   const [editingItem, setEditingItem] = useState<AdminInternshipWithReview | null>(null);
@@ -97,30 +126,47 @@ export function AdminInternshipsClient({ initialInternships }: AdminInternshipsC
     return { pending, published, rejected, expired };
   }, [internships, today]);
 
+  const tabOptions = useMemo(
+    () => [
+      { id: "pending" as const, label: "Pending", count: counts.pending },
+      { id: "published" as const, label: "Published", count: counts.published },
+      { id: "rejected" as const, label: "Rejected", count: counts.rejected },
+      { id: "expired" as const, label: "Expired", count: counts.expired },
+    ],
+    [counts]
+  );
+
   const displayedInternships = useMemo(() => {
-    return internships.filter((item) => {
-      const isPastDeadline = item.deadline && item.deadline < today;
+    return internships
+      .filter((item) => {
+        const isPastDeadline = item.deadline && item.deadline < today;
+        let tabMatches = false;
+        if (activeTab === "pending") tabMatches = item.status === "pending";
+        else if (activeTab === "published") tabMatches = item.status === "published" && !isPastDeadline;
+        else if (activeTab === "rejected") tabMatches = item.status === "rejected";
+        else if (activeTab === "expired") tabMatches = item.status === "expired" || (item.status === "published" && Boolean(isPastDeadline));
 
-      if (activeTab === "pending") {
-        if (item.status !== "pending") return false;
-      } else if (activeTab === "published") {
-        if (item.status !== "published" || isPastDeadline) return false;
-      } else if (activeTab === "rejected") {
-        if (item.status !== "rejected") return false;
-      } else if (activeTab === "expired") {
-        if (item.status !== "expired" && !isPastDeadline) return false;
-      }
+        if (!tabMatches) return false;
 
-      if (search.trim()) {
-        const q = search.toLowerCase();
-        const matchesTitle = item.title.toLowerCase().includes(q);
-        const matchesOrg = item.organization.toLowerCase().includes(q);
-        const matchesSubmitter = item.submitter_email?.toLowerCase().includes(q);
-        if (!matchesTitle && !matchesOrg && !matchesSubmitter) return false;
-      }
+        if (search.trim()) {
+          const q = search.toLowerCase();
+          const matchTitle = item.title.toLowerCase().includes(q);
+          const matchOrg = item.organization.toLowerCase().includes(q);
+          const matchLoc = item.location.toLowerCase().includes(q);
+          const matchField = item.field.toLowerCase().includes(q);
+          return matchTitle || matchOrg || matchLoc || matchField;
+        }
 
-      return true;
-    });
+        return true;
+      })
+      .sort((a, b) => {
+        // Pending: FIFO oldest first for fairness
+        if (activeTab === "pending") {
+          return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+        }
+        // Others: Newest first
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      });
   }, [internships, activeTab, search, today]);
 
   const refreshList = async () => {
@@ -128,6 +174,7 @@ export function AdminInternshipsClient({ initialInternships }: AdminInternshipsC
     if (res.ok && res.data) {
       setInternships(res.data);
     }
+    router.refresh();
   };
 
   const openEditModal = (item: AdminInternshipWithReview) => {
@@ -144,8 +191,17 @@ export function AdminInternshipsClient({ initialInternships }: AdminInternshipsC
       eligibility: item.eligibility || "",
       apply_url: item.apply_url || "",
       apply_email: item.apply_email || "",
-      deadline: item.deadline || "",
+      deadline: item.deadline ? item.deadline.split("T")[0] : "",
     });
+  };
+
+  const advanceToNext = (currentId: string) => {
+    const currentIndex = displayedInternships.findIndex((i) => i.id === currentId);
+    if (currentIndex !== -1 && currentIndex + 1 < displayedInternships.length) {
+      setSelectedItem(displayedInternships[currentIndex + 1]);
+    } else {
+      setSelectedItem(null);
+    }
   };
 
   const handlePublishSubmit = async (e: React.FormEvent) => {
@@ -168,7 +224,9 @@ export function AdminInternshipsClient({ initialInternships }: AdminInternshipsC
       }
 
       toast.success("Opportunity published successfully");
+      const currentId = editingItem.id;
       setEditingItem(null);
+      advanceToNext(currentId);
       await refreshList();
     } catch {
       toast.error("Network error");
@@ -198,8 +256,10 @@ export function AdminInternshipsClient({ initialInternships }: AdminInternshipsC
       }
 
       toast.success("Opportunity rejected");
+      const currentId = rejectingItem.id;
       setRejectingItem(null);
       setRejectionReason("");
+      advanceToNext(currentId);
       await refreshList();
     } catch {
       toast.error("Network error");
@@ -217,6 +277,9 @@ export function AdminInternshipsClient({ initialInternships }: AdminInternshipsC
         return;
       }
       toast.success("Moved back to pending queue");
+      if (selectedItem?.id === id) {
+        setSelectedItem((prev) => (prev ? { ...prev, status: "pending" } : null));
+      }
       await refreshList();
     } catch {
       toast.error("Network error");
@@ -235,6 +298,9 @@ export function AdminInternshipsClient({ initialInternships }: AdminInternshipsC
       }
       toast.success("Listing deleted permanently");
       setDeletingId(null);
+      if (selectedItem?.id === id) {
+        setSelectedItem(null);
+      }
       await refreshList();
     } catch {
       toast.error("Network error");
@@ -245,515 +311,740 @@ export function AdminInternshipsClient({ initialInternships }: AdminInternshipsC
 
   return (
     <div className="space-y-6">
-      {/* ── Header ── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-xl font-bold text-foreground">Internship Radar Moderation</h1>
-          <p className="text-xs text-muted-foreground">
-            Review community submissions, enforce zero-fee compliance, and manage published opportunities.
-          </p>
-        </div>
+      <AdminPageHeader
+        title="Internship Radar Moderation"
+        description="Verify legitimate student internships, audit suspicious fee keywords, and curate the verified opportunities board."
+        icon={Briefcase}
+        section="programs"
+        actions={
+          <Button asChild variant="outline" size="sm" className="gap-1.5 rounded-lg border-border h-8 text-xs">
+            <Link href="/internships" target="_blank">
+              <ExternalLink className="h-3.5 w-3.5" />
+              <span>Public Board</span>
+            </Link>
+          </Button>
+        }
+      />
 
-        <div className="flex items-center gap-2">
-          <Link
-            href="/internships"
-            target="_blank"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-secondary hover:bg-secondary/80 text-foreground transition-colors"
-          >
-            <span>Live Radar</span>
-            <ExternalLink className="h-3.5 w-3.5" />
-          </Link>
-        </div>
-      </div>
+      {/* Toolbar: Segmented tabs & Search */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <SegmentedControl
+          options={tabOptions}
+          value={activeTab}
+          onChange={(val) => setActiveTab(val)}
+          ariaLabel="Internship status filter"
+        />
 
-      {/* ── Tabs & Search ── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-3">
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setActiveTab("pending")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors ${
-              activeTab === "pending"
-                ? "bg-primary text-primary-foreground"
-                : "bg-secondary/60 hover:bg-secondary text-muted-foreground"
-            }`}
-          >
-            <span>Pending Queue</span>
-            {counts.pending > 0 && (
-              <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
-                activeTab === "pending" ? "bg-white text-primary" : "bg-primary text-primary-foreground"
-              }`}>
-                {counts.pending}
-              </span>
-            )}
-          </button>
-
-          <button
-            onClick={() => setActiveTab("published")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors ${
-              activeTab === "published"
-                ? "bg-primary text-primary-foreground"
-                : "bg-secondary/60 hover:bg-secondary text-muted-foreground"
-            }`}
-          >
-            <span>Published</span>
-            <span className="text-[10px] opacity-75">({counts.published})</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab("rejected")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors ${
-              activeTab === "rejected"
-                ? "bg-primary text-primary-foreground"
-                : "bg-secondary/60 hover:bg-secondary text-muted-foreground"
-            }`}
-          >
-            <span>Rejected</span>
-            <span className="text-[10px] opacity-75">({counts.rejected})</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab("expired")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors ${
-              activeTab === "expired"
-                ? "bg-primary text-primary-foreground"
-                : "bg-secondary/60 hover:bg-secondary text-muted-foreground"
-            }`}
-          >
-            <span>Expired</span>
-            <span className="text-[10px] opacity-75">({counts.expired})</span>
-          </button>
-        </div>
-
-        <div className="relative w-full sm:w-64">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
-          <input
-            type="search"
-            placeholder="Search leads..."
+        <div className="relative w-full sm:w-72">
+          <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search role, company, city..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full h-8 pl-9 pr-3 rounded-md text-xs bg-card border border-border focus:outline-none focus:ring-1 focus:ring-primary text-foreground placeholder:text-muted-foreground"
+            className="h-9 pl-9 text-xs rounded-lg bg-card border-border"
           />
         </div>
       </div>
 
-      {/* ── Listings Table / List ── */}
-      {displayedInternships.length === 0 ? (
-        <div className="text-center py-12 p-6 rounded-2xl border border-dashed border-border bg-card/40 space-y-2">
-          <Briefcase className="h-8 w-8 text-muted-foreground mx-auto stroke-[1.5]" />
-          <p className="text-xs text-muted-foreground">No listings found in this tab.</p>
-        </div>
-      ) : (
-        <div className="space-y-3">
-          {displayedInternships.map((item) => {
-            const suspiciousTerms = detectSuspiciousFeeWords(
-              `${item.title} ${item.description} ${item.eligibility || ""}`
-            );
+      {/* Internships Table */}
+      <div className="rounded-lg border border-border bg-card shadow-xs overflow-hidden">
+        {displayedInternships.length === 0 ? (
+          <EmptyState
+            icon={Briefcase}
+            title="No opportunities found"
+            description={
+              search
+                ? `No results matching "${search}" in ${activeTab}.`
+                : `No internships currently in the "${activeTab}" queue.`
+            }
+          />
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr className="border-b border-border bg-muted/40 font-mono text-[11px] text-muted-foreground uppercase tracking-wider">
+                  <th className="py-3 px-4 font-semibold">Title & Organization</th>
+                  <th className="py-3 px-4 font-semibold">Type & Compensation</th>
+                  <th className="py-3 px-4 font-semibold">Deadline</th>
+                  <th className="py-3 px-4 font-semibold">Status</th>
+                  <th className="py-3 px-4 font-semibold">Submitted</th>
+                  <th className="py-3 px-4 font-semibold text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border/60">
+                {displayedInternships.map((item) => {
+                  const suspicious = detectSuspiciousFeeWords(item.description);
+                  const isPastDeadline = item.deadline && item.deadline < today;
+                  const isActioning = actionLoading === item.id;
 
-            return (
-              <div
-                key={item.id}
-                className="p-4 sm:p-5 rounded-xl border border-border bg-card space-y-3 shadow-2xs"
+                  return (
+                    <tr
+                      key={item.id}
+                      onClick={() => setSelectedItem(item)}
+                      className="hover:bg-secondary/40 transition-colors cursor-pointer group"
+                    >
+                      {/* Title & Organization */}
+                      <td className="py-3 px-4">
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="font-semibold text-foreground truncate max-w-[200px] sm:max-w-none">
+                              {item.title}
+                            </span>
+                            {suspicious.length > 0 && (
+                              <span className="font-mono text-[10px] px-1.5 py-0.2 rounded-sm bg-[color:var(--data-negative-subtle)] text-[color:var(--data-negative-ink)] border border-[color:var(--data-negative-border)] flex items-center gap-1 font-semibold">
+                                <ShieldAlert className="h-3 w-3" />
+                                Suspect
+                              </span>
+                            )}
+                          </div>
+                          <div className="text-muted-foreground truncate max-w-[200px] text-[11px] flex items-center gap-1.5">
+                            <Building2 className="h-3 w-3 shrink-0" />
+                            <span>{item.organization}</span>
+                            <span>•</span>
+                            <span className="font-mono">{item.location}</span>
+                          </div>
+                        </div>
+                      </td>
+
+                      {/* Type & Compensation */}
+                      <td className="py-3 px-4">
+                        <div className="text-foreground font-medium capitalize">
+                          {item.type.replace("-", " ")} ({item.work_mode})
+                        </div>
+                        <div className="text-muted-foreground capitalize text-[11px]">
+                          {item.paid_status === "paid" ? "Paid" : item.paid_status === "stipend" ? "Stipend" : item.paid_status}
+                        </div>
+                      </td>
+
+                      {/* Deadline */}
+                      <td className="py-3 px-4 whitespace-nowrap">
+                        {item.deadline ? (
+                          <span
+                            className={
+                              isPastDeadline
+                                ? "font-mono text-[11px] text-[color:var(--data-negative-ink)] font-semibold"
+                                : "font-mono text-[11px] text-foreground"
+                            }
+                          >
+                            {new Date(item.deadline).toLocaleDateString("en-NG", {
+                              month: "short",
+                              day: "numeric",
+                              year: "numeric",
+                            })}
+                            {isPastDeadline && " (Passed)"}
+                          </span>
+                        ) : (
+                          <span className="text-muted-foreground text-[11px]">Rolling</span>
+                        )}
+                      </td>
+
+                      {/* Status */}
+                      <td className="py-3 px-4">
+                        <StatusPill variant={isPastDeadline && item.status === "published" ? "expired" : (item.status as any)} />
+                      </td>
+
+                      {/* Submitted Date / Age */}
+                      <td className="py-3 px-4 whitespace-nowrap text-muted-foreground text-xs">
+                        {item.status === "pending" ? (
+                          <AgePill submittedAt={item.created_at} />
+                        ) : (
+                          new Date(item.created_at).toLocaleDateString()
+                        )}
+                      </td>
+
+                      {/* Actions */}
+                      <td className="py-3 px-4 text-right">
+                        <div className="flex items-center justify-end gap-1.5" onClick={(e) => e.stopPropagation()}>
+                          {item.status === "pending" && (
+                            <>
+                              <Button
+                                size="sm"
+                                variant="default"
+                                onClick={() => openEditModal(item)}
+                                disabled={isActioning}
+                                className="h-7 px-2.5 text-xs rounded-lg gap-1"
+                              >
+                                Review &amp; Approve
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => {
+                                  setRejectingItem(item);
+                                  setRejectionReason("");
+                                }}
+                                disabled={isActioning}
+                                className="h-7 px-2 text-xs rounded-lg text-[color:var(--data-negative-ink)] hover:bg-[color:var(--data-negative-subtle)] border-border"
+                              >
+                                Reject
+                              </Button>
+                            </>
+                          )}
+
+                          {item.status === "published" && (
+                            <>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => openEditModal(item)}
+                                disabled={isActioning}
+                                className="h-7 px-2 text-xs rounded-lg border-border"
+                              >
+                                <Edit className="h-3 w-3 mr-1" />
+                                Edit
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => handleUnpublish(item.id)}
+                                disabled={isActioning}
+                                className="h-7 px-2 text-xs text-muted-foreground hover:text-foreground"
+                              >
+                                <EyeOff className="h-3 w-3 mr-1" />
+                                Unpublish
+                              </Button>
+                            </>
+                          )}
+
+                          {item.status === "rejected" && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => openEditModal(item)}
+                              disabled={isActioning}
+                              className="h-7 px-2 text-xs rounded-lg border-border"
+                            >
+                              Reconsider
+                            </Button>
+                          )}
+
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => setDeletingId(item.id)}
+                            disabled={isActioning}
+                            className="h-7 w-7 p-0 text-muted-foreground hover:text-[color:var(--data-negative-ink)]"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* Detail / Review Drawer */}
+      <AdminDrawer
+        open={!!selectedItem}
+        onOpenChange={(open) => !open && setSelectedItem(null)}
+        title={selectedItem?.title || "Opportunity Details"}
+        subtitle={
+          selectedItem
+            ? `${selectedItem.organization} • ${selectedItem.location}`
+            : undefined
+        }
+        badge={
+          selectedItem && (
+            <StatusPill variant={selectedItem.status as any} />
+          )
+        }
+        timestamp={
+          selectedItem && (
+            <span className="font-mono text-[11px] text-muted-foreground">
+              {new Date(selectedItem.created_at).toLocaleDateString("en-NG", {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+              })}
+            </span>
+          )
+        }
+        footer={
+          selectedItem && (
+            <div className="flex items-center justify-between w-full gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setDeletingId(selectedItem.id)}
+                className="text-xs text-[color:var(--data-negative-ink)] border-[color:var(--data-negative-border)] hover:bg-[color:var(--data-negative-subtle)] gap-1.5 h-8 rounded-lg"
               >
-                {/* ── Requirement 9: Visible Warning When Text Matches Fee Words ── */}
-                {suspiciousTerms.length > 0 && (
-                  <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 flex items-start gap-2.5 text-xs">
-                    <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
-                    <div>
-                      <strong className="font-semibold">Fee warning detected:</strong> Matched terms{" "}
-                      <span className="font-mono bg-amber-500/20 px-1 py-0.5 rounded">
-                        {suspiciousTerms.join(", ")}
-                      </span>
-                      . Verify this lead does not ask applicants to pay money.
-                    </div>
-                  </div>
+                <Trash2 className="h-3.5 w-3.5" />
+                <span>Delete</span>
+              </Button>
+
+              <div className="flex items-center gap-2">
+                {selectedItem.status === "pending" && (
+                  <>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setRejectingItem(selectedItem);
+                        setRejectionReason("");
+                      }}
+                      className="text-xs h-8 rounded-lg text-[color:var(--data-negative-ink)] hover:bg-[color:var(--data-negative-subtle)] border-border"
+                    >
+                      <XCircle className="h-3.5 w-3.5 mr-1" />
+                      Reject
+                    </Button>
+                    <Button
+                      variant="default"
+                      size="sm"
+                      onClick={() => openEditModal(selectedItem)}
+                      className="text-xs h-8 rounded-lg gap-1.5"
+                    >
+                      <CheckCircle2 className="h-3.5 w-3.5" />
+                      Review &amp; Publish
+                    </Button>
+                  </>
                 )}
 
-                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
-                  <div className="space-y-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="text-[10px] font-semibold uppercase px-2 py-0.5 rounded bg-secondary text-secondary-foreground">
-                        {item.field}
-                      </span>
-                      <span className="text-[10px] font-medium px-2 py-0.5 rounded bg-secondary/60 text-muted-foreground capitalize">
-                        {item.type.replace("-", " ")}
-                      </span>
-                      <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-secondary/80 text-foreground">
-                        {item.paid_status}
-                      </span>
-                    </div>
-
-                    <h2 className="text-base font-bold text-foreground">
-                      {item.title}
-                    </h2>
-
-                    <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
-                      <span className="font-medium text-foreground">{item.organization}</span>
-                      <span>•</span>
-                      <span>{item.location} ({item.work_mode})</span>
-                      {item.deadline && (
-                        <>
-                          <span>•</span>
-                          <span>Deadline: {item.deadline}</span>
-                        </>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Actions */}
-                  <div className="flex items-center gap-2 shrink-0">
-                    {activeTab === "pending" && (
-                      <>
-                        <button
-                          onClick={() => openEditModal(item)}
-                          disabled={actionLoading === item.id}
-                          className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-primary hover:bg-primary/90 text-primary-foreground transition-colors flex items-center gap-1.5"
-                        >
-                          <CheckCircle2 className="h-3.5 w-3.5" />
-                          <span>Review &amp; Publish</span>
-                        </button>
-                        <button
-                          onClick={() => {
-                            setRejectingItem(item);
-                            setRejectionReason("");
-                          }}
-                          disabled={actionLoading === item.id}
-                          className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 transition-colors flex items-center gap-1.5"
-                        >
-                          <XCircle className="h-3.5 w-3.5" />
-                          <span>Reject</span>
-                        </button>
-                      </>
-                    )}
-
-                    {activeTab === "published" && (
-                      <>
-                        <Link
-                          href={`/internships/${item.id}`}
-                          target="_blank"
-                          className="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-secondary hover:bg-secondary/80 text-foreground transition-colors flex items-center gap-1"
-                        >
-                          <Eye className="h-3.5 w-3.5" />
-                          <span>View</span>
-                        </Link>
-                        <button
-                          onClick={() => openEditModal(item)}
-                          className="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-secondary hover:bg-secondary/80 text-foreground transition-colors flex items-center gap-1"
-                        >
-                          <Edit className="h-3.5 w-3.5" />
-                          <span>Edit</span>
-                        </button>
-                        <button
-                          onClick={() => handleUnpublish(item.id)}
-                          disabled={actionLoading === item.id}
-                          className="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 transition-colors"
-                        >
-                          Unpublish
-                        </button>
-                      </>
-                    )}
-
-                    {(activeTab === "rejected" || activeTab === "expired") && (
-                      <button
-                        onClick={() => setDeletingId(item.id)}
-                        disabled={actionLoading === item.id}
-                        className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 transition-colors flex items-center gap-1.5"
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                        <span>Delete</span>
-                      </button>
-                    )}
-                  </div>
-                </div>
-
-                <p className="text-xs text-muted-foreground line-clamp-2">
-                  {item.description}
-                </p>
-
-                {/* Submitter & Reviewer Meta */}
-                <div className="pt-2 border-t border-border flex flex-wrap items-center justify-between gap-2 text-[11px] text-muted-foreground">
-                  <div>
-                    Submitted {new Date(item.created_at).toLocaleDateString()}
-                    {item.submitter_email && (
-                      <span> by <span className="font-mono text-foreground">{item.submitter_email}</span></span>
-                    )}
-                  </div>
-
-                  {item.rejection_reason && (
-                    <div className="text-red-600 dark:text-red-400 font-medium">
-                      Rejected: {item.rejection_reason}
-                    </div>
-                  )}
-
-                  {item.apply_url && (
-                    <a
-                      href={item.apply_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-primary hover:underline font-mono"
+                {selectedItem.status === "published" && (
+                  <>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleUnpublish(selectedItem.id)}
+                      className="text-xs h-8 rounded-lg border-border"
                     >
-                      <span>{item.apply_url.slice(0, 40)}...</span>
-                      <ExternalLink className="h-3 w-3" />
-                    </a>
-                  )}
+                      <EyeOff className="h-3.5 w-3.5 mr-1" />
+                      Unpublish
+                    </Button>
+                    <Button
+                      variant="default"
+                      size="sm"
+                      onClick={() => openEditModal(selectedItem)}
+                      className="text-xs h-8 rounded-lg gap-1.5"
+                    >
+                      <Edit className="h-3.5 w-3.5" />
+                      Edit Opportunity
+                    </Button>
+                  </>
+                )}
+              </div>
+            </div>
+          )
+        }
+      >
+        {selectedItem && (
+          <div className="space-y-5 text-xs p-5">
+            {/* Suspicious Fee Warning */}
+            {detectSuspiciousFeeWords(selectedItem.description).length > 0 && (
+              <div className="p-3.5 rounded-lg border border-[color:var(--data-negative-border)] bg-[color:var(--data-negative-subtle)] space-y-1.5 text-[color:var(--data-negative-ink)]">
+                <div className="flex items-center gap-1.5 font-bold">
+                  <ShieldAlert className="h-4 w-4 shrink-0" />
+                  <span>Fee Warning: Suspicious keywords found</span>
+                </div>
+                <p className="leading-relaxed">
+                  Keywords matched:{" "}
+                  <strong>{detectSuspiciousFeeWords(selectedItem.description).join(", ")}</strong>. Verify this opportunity is 100% free for student applicants.
+                </p>
+              </div>
+            )}
 
-                  {item.apply_email && (
-                    <span className="font-mono text-foreground">
-                      Email: {item.apply_email}
-                    </span>
+            {/* Submitter & Reviewer Meta */}
+            <div className="p-3 rounded-lg border border-border bg-card space-y-2">
+              <div className="text-[11px] font-mono uppercase text-muted-foreground font-semibold">
+                Submission Source
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <span className="text-muted-foreground block text-[11px]">Submitted By</span>
+                  <p className="font-semibold text-foreground">
+                    {selectedItem.submitter_name || selectedItem.submitter_email || "Anonymous Student"}
+                  </p>
+                  {selectedItem.submitter_email && (
+                    <span className="text-muted-foreground text-[11px] block">{selectedItem.submitter_email}</span>
+                  )}
+                </div>
+                <div>
+                  <span className="text-muted-foreground block text-[11px]">Review Status</span>
+                  <p className="font-medium text-foreground capitalize">{selectedItem.status}</p>
+                  {selectedItem.rejection_reason && (
+                    <p className="text-[color:var(--data-negative-ink)] text-[11px] mt-1">
+                      Reason: {selectedItem.rejection_reason}
+                    </p>
                   )}
                 </div>
               </div>
-            );
-          })}
-        </div>
-      )}
-
-      {/* ── Review & Publish Modal ── */}
-      {editingItem && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-card border border-border rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 space-y-5 shadow-xl">
-            <div className="flex items-center justify-between pb-3 border-b border-border">
-              <h3 className="text-base font-bold text-foreground">
-                Review &amp; Edit Opportunity
-              </h3>
-              <button
-                onClick={() => setEditingItem(null)}
-                className="text-muted-foreground hover:text-foreground text-xs"
-              >
-                Close
-              </button>
             </div>
 
-            <form onSubmit={handlePublishSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {/* Key specs */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="p-3 rounded-lg border border-border bg-card space-y-1">
+                <span className="text-muted-foreground block text-[11px]">Work Mode &amp; Field</span>
+                <p className="font-medium text-foreground capitalize">
+                  {selectedItem.work_mode} • {selectedItem.field}
+                </p>
+              </div>
+              <div className="p-3 rounded-lg border border-border bg-card space-y-1">
+                <span className="text-muted-foreground block text-[11px]">Compensation</span>
+                <p className="font-medium text-foreground capitalize">
+                  {selectedItem.paid_status} ({selectedItem.type.replace("-", " ")})
+                </p>
+              </div>
+            </div>
+
+            {/* Description */}
+            <div className="p-3.5 rounded-lg border border-border bg-card space-y-2">
+              <div className="text-[11px] font-mono uppercase text-muted-foreground font-semibold">
+                Opportunity Description
+              </div>
+              <p className="text-foreground leading-relaxed whitespace-pre-wrap font-sans">
+                {selectedItem.description}
+              </p>
+            </div>
+
+            {/* Eligibility */}
+            {selectedItem.eligibility && (
+              <div className="p-3.5 rounded-lg border border-border bg-card space-y-2">
+                <div className="text-[11px] font-mono uppercase text-muted-foreground font-semibold">
+                  Eligibility Criteria
+                </div>
+                <p className="text-foreground leading-relaxed whitespace-pre-wrap font-sans">
+                  {selectedItem.eligibility}
+                </p>
+              </div>
+            )}
+
+            {/* Application Links */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {selectedItem.apply_url && (
+                <div className="p-3 rounded-lg border border-border bg-card space-y-1">
+                  <span className="text-muted-foreground block text-[11px]">Apply Portal</span>
+                  <a
+                    href={selectedItem.apply_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-medium text-primary hover:underline block truncate"
+                  >
+                    {selectedItem.apply_url}
+                  </a>
+                </div>
+              )}
+              {selectedItem.apply_email && (
+                <div className="p-3 rounded-lg border border-border bg-card space-y-1">
+                  <span className="text-muted-foreground block text-[11px]">Apply Email</span>
+                  <a
+                    href={`mailto:${selectedItem.apply_email}`}
+                    className="font-medium text-primary hover:underline block truncate"
+                  >
+                    {selectedItem.apply_email}
+                  </a>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </AdminDrawer>
+
+      {/* Edit / Publish Modal */}
+      <Dialog open={!!editingItem} onOpenChange={(open) => !open && setEditingItem(null)}>
+        <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto rounded-lg">
+          <form onSubmit={handlePublishSubmit}>
+            <DialogHeader>
+              <DialogTitle className="text-base font-bold text-foreground">
+                Review &amp; Edit Opportunity
+              </DialogTitle>
+              <DialogDescription className="text-xs text-muted-foreground">
+                Sanitize role descriptions, verify stipends, and publish directly to the live board.
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-4 py-4 text-xs">
+              <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-[11px] font-semibold text-muted-foreground">Title</label>
-                  <input
-                    type="text"
+                  <label className="font-semibold text-foreground">Job Title *</label>
+                  <Input
                     value={editForm.title}
-                    onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
+                    onChange={(e) => setEditForm((f) => ({ ...f, title: e.target.value }))}
+                    className="h-8 text-xs rounded-lg bg-background border-border"
                     required
-                    className="w-full h-9 px-3 rounded-lg text-xs bg-secondary border border-border text-foreground"
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-[11px] font-semibold text-muted-foreground">Organization</label>
-                  <input
-                    type="text"
+                  <label className="font-semibold text-foreground">Organization / Company *</label>
+                  <Input
                     value={editForm.organization}
-                    onChange={(e) => setEditForm({ ...editForm, organization: e.target.value })}
+                    onChange={(e) => setEditForm((f) => ({ ...f, organization: e.target.value }))}
+                    className="h-8 text-xs rounded-lg bg-background border-border"
                     required
-                    className="w-full h-9 px-3 rounded-lg text-xs bg-secondary border border-border text-foreground"
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="grid grid-cols-3 gap-3">
                 <div className="space-y-1">
-                  <label className="text-[11px] font-semibold text-muted-foreground">Location</label>
-                  <input
-                    type="text"
-                    value={editForm.location}
-                    onChange={(e) => setEditForm({ ...editForm, location: e.target.value })}
-                    required
-                    className="w-full h-9 px-3 rounded-lg text-xs bg-secondary border border-border text-foreground"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-[11px] font-semibold text-muted-foreground">Work Mode</label>
+                  <label className="font-semibold text-foreground">Work Mode</label>
                   <select
                     value={editForm.work_mode}
-                    onChange={(e) => setEditForm({ ...editForm, work_mode: e.target.value })}
-                    className="w-full h-9 px-3 rounded-lg text-xs bg-secondary border border-border text-foreground"
+                    onChange={(e) => setEditForm((f) => ({ ...f, work_mode: e.target.value }))}
+                    className="w-full h-8 px-2 rounded-lg border border-border bg-background text-xs text-foreground capitalize"
                   >
-                    {INTERNSHIP_WORK_MODES.map((w) => (
-                      <option key={w.value} value={w.value}>{w.label}</option>
+                    {INTERNSHIP_WORK_MODES.map((m) => (
+                      <option key={m.value} value={m.value}>
+                        {m.label}
+                      </option>
                     ))}
                   </select>
                 </div>
-              </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div className="space-y-1">
-                  <label className="text-[11px] font-semibold text-muted-foreground">Field</label>
-                  <select
-                    value={editForm.field}
-                    onChange={(e) => setEditForm({ ...editForm, field: e.target.value })}
-                    className="w-full h-9 px-3 rounded-lg text-xs bg-secondary border border-border text-foreground"
-                  >
-                    {INTERNSHIP_FIELDS.map((f) => (
-                      <option key={f.value} value={f.value}>{f.label}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="space-y-1">
-                  <label className="text-[11px] font-semibold text-muted-foreground">Type</label>
+                  <label className="font-semibold text-foreground">Opportunity Type</label>
                   <select
                     value={editForm.type}
-                    onChange={(e) => setEditForm({ ...editForm, type: e.target.value })}
-                    className="w-full h-9 px-3 rounded-lg text-xs bg-secondary border border-border text-foreground"
+                    onChange={(e) => setEditForm((f) => ({ ...f, type: e.target.value }))}
+                    className="w-full h-8 px-2 rounded-lg border border-border bg-background text-xs text-foreground capitalize"
                   >
                     {INTERNSHIP_TYPES.map((t) => (
-                      <option key={t.value} value={t.value}>{t.label}</option>
+                      <option key={t.value} value={t.value}>
+                        {t.label}
+                      </option>
                     ))}
                   </select>
                 </div>
+
                 <div className="space-y-1">
-                  <label className="text-[11px] font-semibold text-muted-foreground">Compensation</label>
+                  <label className="font-semibold text-foreground">Compensation</label>
                   <select
                     value={editForm.paid_status}
-                    onChange={(e) => setEditForm({ ...editForm, paid_status: e.target.value })}
-                    className="w-full h-9 px-3 rounded-lg text-xs bg-secondary border border-border text-foreground"
+                    onChange={(e) => setEditForm((f) => ({ ...f, paid_status: e.target.value }))}
+                    className="w-full h-8 px-2 rounded-lg border border-border bg-background text-xs text-foreground capitalize"
                   >
-                    {INTERNSHIP_PAID_STATUSES.map((p) => (
-                      <option key={p.value} value={p.value}>{p.label}</option>
+                    {INTERNSHIP_PAID_STATUSES.map((s) => (
+                      <option key={s.value} value={s.value}>
+                        {s.label}
+                      </option>
                     ))}
                   </select>
                 </div>
               </div>
 
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="font-semibold text-foreground">Field / Domain</label>
+                  <select
+                    value={editForm.field}
+                    onChange={(e) => setEditForm((f) => ({ ...f, field: e.target.value }))}
+                    className="w-full h-8 px-2 rounded-lg border border-border bg-background text-xs text-foreground capitalize"
+                  >
+                    {INTERNSHIP_FIELDS.map((f) => (
+                      <option key={f.value} value={f.value}>
+                        {f.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="font-semibold text-foreground">Location (City, State) *</label>
+                  <Input
+                    value={editForm.location}
+                    onChange={(e) => setEditForm((f) => ({ ...f, location: e.target.value }))}
+                    className="h-8 text-xs rounded-lg bg-background border-border"
+                    required
+                  />
+                </div>
+              </div>
+
               <div className="space-y-1">
-                <label className="text-[11px] font-semibold text-muted-foreground">Description</label>
-                <textarea
+                <label className="font-semibold text-foreground">Job Description *</label>
+                <Textarea
                   rows={4}
                   value={editForm.description}
-                  onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+                  onChange={(e) => setEditForm((f) => ({ ...f, description: e.target.value }))}
+                  className="text-xs rounded-lg bg-background border-border leading-relaxed"
                   required
-                  className="w-full p-3 rounded-lg text-xs bg-secondary border border-border text-foreground"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-[11px] font-semibold text-muted-foreground">Eligibility (Optional)</label>
-                <textarea
+                <label className="font-semibold text-foreground">Eligibility Criteria (Optional)</label>
+                <Textarea
                   rows={2}
                   value={editForm.eligibility}
-                  onChange={(e) => setEditForm({ ...editForm, eligibility: e.target.value })}
-                  className="w-full p-3 rounded-lg text-xs bg-secondary border border-border text-foreground"
+                  onChange={(e) => setEditForm((f) => ({ ...f, eligibility: e.target.value }))}
+                  className="text-xs rounded-lg bg-background border-border leading-relaxed"
                 />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="grid grid-cols-3 gap-3">
                 <div className="space-y-1">
-                  <label className="text-[11px] font-semibold text-muted-foreground">Apply URL</label>
-                  <input
+                  <label className="font-semibold text-foreground">Apply Portal URL</label>
+                  <Input
                     type="url"
+                    placeholder="https://..."
                     value={editForm.apply_url}
-                    onChange={(e) => setEditForm({ ...editForm, apply_url: e.target.value })}
-                    className="w-full h-9 px-3 rounded-lg text-xs bg-secondary border border-border text-foreground"
+                    onChange={(e) => setEditForm((f) => ({ ...f, apply_url: e.target.value }))}
+                    className="h-8 text-xs rounded-lg bg-background border-border"
                   />
                 </div>
+
                 <div className="space-y-1">
-                  <label className="text-[11px] font-semibold text-muted-foreground">Apply Email</label>
-                  <input
+                  <label className="font-semibold text-foreground">Apply Email</label>
+                  <Input
                     type="email"
+                    placeholder="careers@..."
                     value={editForm.apply_email}
-                    onChange={(e) => setEditForm({ ...editForm, apply_email: e.target.value })}
-                    className="w-full h-9 px-3 rounded-lg text-xs bg-secondary border border-border text-foreground"
+                    onChange={(e) => setEditForm((f) => ({ ...f, apply_email: e.target.value }))}
+                    className="h-8 text-xs rounded-lg bg-background border-border"
                   />
                 </div>
+
                 <div className="space-y-1">
-                  <label className="text-[11px] font-semibold text-muted-foreground">Deadline</label>
-                  <input
+                  <label className="font-semibold text-foreground">Application Deadline</label>
+                  <Input
                     type="date"
                     value={editForm.deadline}
-                    onChange={(e) => setEditForm({ ...editForm, deadline: e.target.value })}
-                    className="w-full h-9 px-3 rounded-lg text-xs bg-secondary border border-border text-foreground"
+                    onChange={(e) => setEditForm((f) => ({ ...f, deadline: e.target.value }))}
+                    className="h-8 text-xs rounded-lg bg-background border-border"
                   />
                 </div>
               </div>
-
-              <div className="pt-3 border-t border-border flex items-center justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => setEditingItem(null)}
-                  className="px-4 py-2 rounded-lg text-xs font-semibold bg-secondary text-foreground"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={actionLoading === editingItem.id}
-                  className="px-5 py-2 rounded-lg text-xs font-semibold bg-primary hover:bg-primary/90 text-primary-foreground flex items-center gap-1.5"
-                >
-                  {actionLoading === editingItem.id && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-                  <span>Approve &amp; Publish</span>
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* ── Rejection Modal ── */}
-      {rejectingItem && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-card border border-border rounded-2xl w-full max-w-md p-6 space-y-4 shadow-xl">
-            <h3 className="text-base font-bold text-foreground">Reject Opportunity Lead</h3>
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              Please enter the reason for rejection. This note will be visible to the submitter in their submission tracker.
-            </p>
-            <form onSubmit={handleRejectSubmit} className="space-y-3">
-              <textarea
-                rows={3}
-                placeholder="e.g. Broken application URL, duplicate listing, or requires application fee."
-                value={rejectionReason}
-                onChange={(e) => setRejectionReason(e.target.value)}
-                required
-                className="w-full p-3 rounded-lg text-xs bg-secondary border border-border text-foreground"
-              />
-              <div className="flex items-center justify-end gap-2 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setRejectingItem(null)}
-                  className="px-4 py-2 rounded-lg text-xs font-semibold bg-secondary text-foreground"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={actionLoading === rejectingItem.id || rejectionReason.trim().length < 5}
-                  className="px-4 py-2 rounded-lg text-xs font-semibold bg-red-600 hover:bg-red-700 text-white flex items-center gap-1.5 disabled:opacity-50"
-                >
-                  {actionLoading === rejectingItem.id && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-                  <span>Confirm Rejection</span>
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* ── Delete Confirmation Modal ── */}
-      {deletingId && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-card border border-border rounded-2xl w-full max-w-sm p-6 space-y-4 shadow-xl text-center">
-            <div className="h-12 w-12 rounded-full bg-red-500/10 text-red-500 mx-auto flex items-center justify-center">
-              <Trash2 className="h-6 w-6" />
             </div>
-            <h3 className="text-base font-bold text-foreground">Delete Opportunity?</h3>
-            <p className="text-xs text-muted-foreground">
-              This action cannot be undone. The listing and all moderation records will be deleted permanently.
-            </p>
-            <div className="flex items-center justify-center gap-2 pt-2">
-              <button
-                onClick={() => setDeletingId(null)}
-                className="px-4 py-2 rounded-lg text-xs font-semibold bg-secondary text-foreground"
+
+            <DialogFooter className="gap-2 sm:gap-0 pt-2 border-t border-border">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setEditingItem(null)}
+                disabled={actionLoading !== null}
+                className="text-xs h-8 rounded-lg border-border"
               >
                 Cancel
-              </button>
-              <button
-                onClick={() => handleDelete(deletingId)}
-                disabled={actionLoading === deletingId}
-                className="px-4 py-2 rounded-lg text-xs font-semibold bg-red-600 hover:bg-red-700 text-white flex items-center gap-1.5"
+              </Button>
+              <Button
+                type="submit"
+                variant="default"
+                size="sm"
+                disabled={actionLoading !== null}
+                className="text-xs h-8 rounded-lg gap-1.5"
               >
-                {actionLoading === deletingId && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-                <span>Delete Permanently</span>
-              </button>
+                {actionLoading !== null ? (
+                  <>
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    <span>Publishing...</span>
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle2 className="h-3.5 w-3.5" />
+                    <span>Approve &amp; Publish</span>
+                  </>
+                )}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Rejection Modal */}
+      <Dialog open={!!rejectingItem} onOpenChange={(open) => !open && setRejectingItem(null)}>
+        <DialogContent className="sm:max-w-md rounded-lg">
+          <form onSubmit={handleRejectSubmit}>
+            <DialogHeader>
+              <DialogTitle className="text-base font-bold text-foreground">
+                Reject Opportunity Lead
+              </DialogTitle>
+              <DialogDescription className="text-xs text-muted-foreground">
+                Provide a reason for moderation review (e.g., fee detected, broken link, not student-friendly).
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="py-3">
+              <Textarea
+                rows={3}
+                placeholder="Reason for rejection (at least 5 characters)..."
+                value={rejectionReason}
+                onChange={(e) => setRejectionReason(e.target.value)}
+                className="text-xs rounded-lg bg-background border-border leading-relaxed"
+                required
+              />
             </div>
-          </div>
-        </div>
-      )}
+
+            <DialogFooter className="gap-2 sm:gap-0 pt-2 border-t border-border">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setRejectingItem(null)}
+                disabled={actionLoading !== null}
+                className="text-xs h-8 rounded-lg border-border"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                variant="destructive"
+                size="sm"
+                disabled={actionLoading !== null || rejectionReason.trim().length < 5}
+                className="text-xs h-8 rounded-lg gap-1.5"
+              >
+                {actionLoading !== null ? (
+                  <>
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    <span>Rejecting...</span>
+                  </>
+                ) : (
+                  <>
+                    <XCircle className="h-3.5 w-3.5" />
+                    <span>Confirm Rejection</span>
+                  </>
+                )}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Modal */}
+      <Dialog open={!!deletingId} onOpenChange={(open) => !open && setDeletingId(null)}>
+        <DialogContent className="sm:max-w-md rounded-lg">
+          <DialogHeader>
+            <DialogTitle className="text-base font-bold text-foreground">
+              Delete Opportunity Listing
+            </DialogTitle>
+            <DialogDescription className="text-xs text-muted-foreground">
+              Are you sure you want to permanently delete this opportunity? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-0 pt-2 border-t border-border">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setDeletingId(null)}
+              disabled={actionLoading !== null}
+              className="text-xs h-8 rounded-lg border-border"
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              size="sm"
+              disabled={actionLoading !== null}
+              onClick={() => deletingId && handleDelete(deletingId)}
+              className="text-xs h-8 rounded-lg gap-1.5"
+            >
+              {actionLoading !== null ? (
+                <>
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  <span>Deleting...</span>
+                </>
+              ) : (
+                <>
+                  <Trash2 className="h-3.5 w-3.5" />
+                  <span>Confirm Delete</span>
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
