@@ -22,8 +22,13 @@ import {
   GraduationCap,
   Globe,
   Save,
+  ChevronDown,
+  ChevronUp,
+  FileText,
+  Check,
 } from "lucide-react";
 import { toast } from "sonner";
+import { LessonMarkdown } from "@/components/skill/LessonMarkdown";
 import type { CampusHub, CampusHubStatus } from "@/lib/campus-hubs/types";
 import { NIGERIAN_STATES } from "@/lib/campus-hubs/constants";
 import { generateSlug } from "@/lib/campus-hubs/validation";
@@ -56,6 +61,7 @@ import { AdminDrawer } from "@/components/admin/primitives/AdminDrawer";
 import { SegmentedControl } from "@/components/admin/primitives/SegmentedControl";
 import { EmptyState } from "@/components/admin/primitives/EmptyState";
 import { StatusPill } from "@/components/admin/people/StatusPill";
+import { cn } from "@/lib/utils";
 
 interface AdminCampusHubsClientProps {
   initialHubs: CampusHub[];
@@ -113,6 +119,48 @@ export function AdminCampusHubsClient({
   });
 
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+
+  // Guide collapsible & mode states
+  const [guideOpen, setGuideOpen] = useState<Record<string, boolean>>({
+    clearance: true,
+    hostel: false,
+    departments: false,
+  });
+  const [guideMode, setGuideMode] = useState<Record<string, "write" | "preview">>({
+    clearance: "write",
+    hostel: "write",
+    departments: "write",
+  });
+
+  const toggleGuideOpen = (key: string) => {
+    setGuideOpen((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  const currentEditingHub = editingHubId ? hubs.find((h) => h.id === editingHubId) : null;
+
+  const isDirty = useMemo(() => {
+    if (!editingHubId) {
+      return Boolean(
+        formData.name.trim() ||
+        formData.slug.trim() ||
+        formData.summary.trim() ||
+        formData.clearance_guide.trim() ||
+        formData.hostel_guide.trim() ||
+        formData.departments_guide.trim()
+      );
+    }
+    const current = hubs.find((h) => h.id === editingHubId);
+    if (!current) return false;
+    return (
+      formData.name !== current.name ||
+      formData.slug !== current.slug ||
+      formData.state !== current.state ||
+      formData.summary !== (current.summary || "") ||
+      formData.clearance_guide !== (current.clearance_guide || "") ||
+      formData.hostel_guide !== (current.hostel_guide || "") ||
+      formData.departments_guide !== (current.departments_guide || "")
+    );
+  }, [formData, editingHubId, hubs]);
 
   // Delete modal state
   const [deletingHub, setDeletingHub] = useState<CampusHub | null>(null);
@@ -181,6 +229,8 @@ export function AdminCampusHubsClient({
       departments_guide: "",
     });
     setFormErrors({});
+    setGuideOpen({ clearance: true, hostel: false, departments: false });
+    setGuideMode({ clearance: "write", hostel: "write", departments: "write" });
     setDrawerOpen(true);
   };
 
@@ -197,6 +247,12 @@ export function AdminCampusHubsClient({
       departments_guide: hub.departments_guide || "",
     });
     setFormErrors({});
+    setGuideOpen({
+      clearance: Boolean(hub.clearance_guide),
+      hostel: Boolean(hub.hostel_guide) && !hub.clearance_guide,
+      departments: Boolean(hub.departments_guide) && !hub.clearance_guide && !hub.hostel_guide,
+    });
+    setGuideMode({ clearance: "write", hostel: "write", departments: "write" });
     setDrawerOpen(true);
   };
 
@@ -417,7 +473,7 @@ export function AdminCampusHubsClient({
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-border bg-muted/40 font-mono text-[11px] text-muted-foreground uppercase tracking-wider">
+                <tr className="border-b border-border bg-muted/40 font-sans text-xs font-medium text-muted-foreground">
                   <th className="py-3 px-4 font-semibold">Campus Hub & Slug</th>
                   <th className="py-3 px-4 font-semibold">State</th>
                   <th className="py-3 px-4 font-semibold">Guides Included</th>
@@ -460,7 +516,7 @@ export function AdminCampusHubsClient({
                         <div className="flex items-center gap-1.5">
                           <span
                             title="Clearance Guide"
-                            className={`h-5 px-1.5 rounded-md font-mono text-[10px] flex items-center gap-1 border ${
+                            className={`h-5 px-1.5 rounded-md font-sans text-[10px] flex items-center gap-1 border ${
                               hasClearance
                                 ? "bg-[color:var(--data-verified-subtle)] text-[color:var(--data-verified-ink)] border-[color:var(--data-verified-border)]"
                                 : "bg-muted/40 text-muted-foreground/50 border-border/40"
@@ -471,7 +527,7 @@ export function AdminCampusHubsClient({
                           </span>
                           <span
                             title="Hostel Guide"
-                            className={`h-5 px-1.5 rounded-md font-mono text-[10px] flex items-center gap-1 border ${
+                            className={`h-5 px-1.5 rounded-md font-sans text-[10px] flex items-center gap-1 border ${
                               hasHostel
                                 ? "bg-[color:var(--data-verified-subtle)] text-[color:var(--data-verified-ink)] border-[color:var(--data-verified-border)]"
                                 : "bg-muted/40 text-muted-foreground/50 border-border/40"
@@ -482,7 +538,7 @@ export function AdminCampusHubsClient({
                           </span>
                           <span
                             title="Departments Guide"
-                            className={`h-5 px-1.5 rounded-md font-mono text-[10px] flex items-center gap-1 border ${
+                            className={`h-5 px-1.5 rounded-md font-sans text-[10px] flex items-center gap-1 border ${
                               hasDepts
                                 ? "bg-[color:var(--data-verified-subtle)] text-[color:var(--data-verified-ink)] border-[color:var(--data-verified-border)]"
                                 : "bg-muted/40 text-muted-foreground/50 border-border/40"
@@ -500,7 +556,7 @@ export function AdminCampusHubsClient({
                       </td>
 
                       {/* Last Reviewed / Published */}
-                      <td className="py-3 px-4 font-mono text-[11px] text-muted-foreground whitespace-nowrap">
+                      <td className="py-3 px-4 font-sans tabular-nums text-xs text-muted-foreground whitespace-nowrap">
                         {hub.last_reviewed_at || hub.published_at
                           ? new Date(hub.last_reviewed_at || hub.published_at || "").toLocaleDateString("en-NG", {
                               month: "short",
@@ -584,45 +640,52 @@ export function AdminCampusHubsClient({
         open={drawerOpen}
         onOpenChange={setDrawerOpen}
         widthClassName="sm:max-w-xl md:max-w-2xl"
-        title={editingHubId ? "Edit Campus Hub" : "Create New Campus Hub"}
+        title={editingHubId ? "Edit campus hub" : "Create new campus hub"}
         subtitle="Manage official school walkthroughs and student relocation guides."
         badge={
           editingHubId && (
-            <span className="font-mono text-[11px] text-muted-foreground">
+            <span className="font-mono text-xs text-muted-foreground">
               /{formData.slug}
             </span>
           )
         }
         footer={
-          <div className="flex items-center justify-between w-full gap-2">
-            {editingHubId ? (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  const target = hubs.find((h) => h.id === editingHubId);
-                  if (target) {
-                    setDeletingHub(target);
-                    setDeleteConfirmOpen(true);
-                  }
-                }}
-                className="text-xs text-[color:var(--data-negative-ink)] border-[color:var(--data-negative-border)] hover:bg-[color:var(--data-negative-subtle)] gap-1.5 h-8 rounded-lg"
-              >
-                <Trash2 className="h-3.5 w-3.5" />
-                <span>Delete</span>
-              </Button>
-            ) : (
-              <div />
-            )}
+          <div className="flex items-center justify-between w-full gap-3">
+            <div className="flex items-center gap-3">
+              {isDirty ? (
+                <div className="flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-400 font-sans">
+                  <span className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse" />
+                  <span>Unsaved changes</span>
+                </div>
+              ) : editingHubId ? (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    const target = hubs.find((h) => h.id === editingHubId);
+                    if (target) {
+                      setDeletingHub(target);
+                      setDeleteConfirmOpen(true);
+                    }
+                  }}
+                  className="text-xs text-[color:var(--data-negative-ink)] border-[color:var(--data-negative-border)] hover:bg-[color:var(--data-negative-subtle)] gap-1.5 h-8 rounded-lg"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                  <span>Delete</span>
+                </Button>
+              ) : (
+                <div />
+              )}
+            </div>
 
             <div className="flex items-center gap-2">
               <Button
                 type="button"
-                variant="outline"
+                variant="ghost"
                 size="sm"
                 onClick={() => setDrawerOpen(false)}
                 disabled={isPending}
-                className="text-xs h-8 rounded-lg border-border"
+                className="text-xs h-9 rounded-md text-muted-foreground hover:text-foreground"
               >
                 Cancel
               </Button>
@@ -632,7 +695,7 @@ export function AdminCampusHubsClient({
                 size="sm"
                 disabled={isPending}
                 onClick={handleSave}
-                className="text-xs h-8 rounded-lg gap-1.5"
+                className="text-xs h-9 rounded-md gap-1.5 px-4"
               >
                 {isPending ? (
                   <>
@@ -642,7 +705,7 @@ export function AdminCampusHubsClient({
                 ) : (
                   <>
                     <Save className="h-3.5 w-3.5" />
-                    <span>{editingHubId ? "Update Hub" : "Create Hub"}</span>
+                    <span>{editingHubId ? "Save changes" : "Create hub"}</span>
                   </>
                 )}
               </Button>
@@ -650,34 +713,60 @@ export function AdminCampusHubsClient({
           </div>
         }
       >
-        <div className="space-y-5 text-xs p-5">
+        <div className="space-y-6 text-xs">
+          {/* Status selector (for edit mode) */}
+          {editingHubId && currentEditingHub && (
+            <div className="flex items-center justify-between p-3 rounded-lg border border-border/60 bg-muted/20">
+              <div>
+                <span className="font-medium text-foreground text-xs block font-sans">Publishing status</span>
+                <span className="text-[11px] text-muted-foreground font-sans">Controls public directory visibility</span>
+              </div>
+              <Select
+                value={currentEditingHub.status}
+                onValueChange={(val) => handleStatusChange(editingHubId, val as CampusHubStatus)}
+                disabled={isPending}
+              >
+                <SelectTrigger className="h-9 text-xs rounded-md w-32 bg-background border-border">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="rounded-md">
+                  <SelectItem value="draft">Draft</SelectItem>
+                  <SelectItem value="published">Published</SelectItem>
+                  <SelectItem value="archived">Archived</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
           {/* Institution Name */}
           <div className="space-y-1.5">
-            <label className="font-semibold text-foreground block">
-              Institution Name *
+            <label className="text-sm font-medium text-foreground block font-sans">
+              Institution name *
             </label>
             <Input
               value={formData.name}
               onChange={(e) => handleNameChange(e.target.value)}
               placeholder="e.g. University of Lagos (UNILAG)"
-              className="h-8 text-xs rounded-lg bg-background border-border"
+              className="h-10 text-sm rounded-md bg-background border-border"
             />
-            <p className="text-[11px] text-muted-foreground">
-              Official university name with acronym.
+            <p className="text-xs text-muted-foreground font-sans">
+              Official university name with common acronym.
             </p>
             {formErrors.name && (
-              <p className="text-[11px] font-medium text-[color:var(--data-negative-ink)]">
+              <p className="text-xs font-medium text-[color:var(--data-negative-ink)] font-sans">
                 {formErrors.name}
               </p>
             )}
           </div>
 
-          {/* URL Slug & Nigerian State */}
-          <div className="grid grid-cols-2 gap-3">
+          {/* URL Slug (2fr) & State (1fr) */}
+          <div className="grid grid-cols-1 sm:grid-cols-[2fr_1fr] gap-3 items-start">
             <div className="space-y-1.5">
-              <label className="font-semibold text-foreground block">URL Slug *</label>
-              <div className="flex items-center rounded-lg border border-border bg-background px-2.5 h-8 focus-within:ring-1 focus-within:ring-primary">
-                <span className="font-mono text-muted-foreground text-[11px] select-none">
+              <label className="text-sm font-medium text-foreground block font-sans">
+                URL slug *
+              </label>
+              <div className="flex items-center rounded-md border border-border bg-background h-10 px-3 focus-within:ring-2 focus-within:ring-ring focus-within:border-transparent transition-shadow">
+                <span className="font-sans text-muted-foreground text-xs select-none whitespace-nowrap pr-1 shrink-0">
                   /campus-hubs/
                 </span>
                 <input
@@ -685,29 +774,31 @@ export function AdminCampusHubsClient({
                   value={formData.slug}
                   onChange={(e) => handleSlugChange(e.target.value)}
                   placeholder="unilag"
-                  className="w-full bg-transparent font-mono text-xs text-foreground focus:outline-none pl-0.5"
+                  className="w-full bg-transparent font-mono text-xs text-foreground focus:outline-hidden min-w-0"
                 />
               </div>
-              <p className="text-[11px] text-muted-foreground">
-                Lowercase letters, numbers, and hyphens.
+              <p className="text-xs text-muted-foreground font-sans">
+                Lowercase alphanumeric with single hyphens.
               </p>
               {formErrors.slug && (
-                <p className="text-[11px] font-medium text-[color:var(--data-negative-ink)]">
+                <p className="text-xs font-medium text-[color:var(--data-negative-ink)] font-sans">
                   {formErrors.slug}
                 </p>
               )}
             </div>
 
             <div className="space-y-1.5">
-              <label className="font-semibold text-foreground block">State *</label>
+              <label className="text-sm font-medium text-foreground block font-sans">
+                State *
+              </label>
               <Select
                 value={formData.state}
                 onValueChange={(val) => setFormData((p) => ({ ...p, state: val }))}
               >
-                <SelectTrigger className="h-8 text-xs rounded-lg bg-background border-border">
+                <SelectTrigger className="h-10 text-xs rounded-md bg-background border-border">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="max-h-60 rounded-lg">
+                <SelectContent className="max-h-60 rounded-md">
                   {NIGERIAN_STATES.map((st) => (
                     <SelectItem key={st} value={st}>
                       {st}
@@ -715,79 +806,264 @@ export function AdminCampusHubsClient({
                   ))}
                 </SelectContent>
               </Select>
-              <p className="text-[11px] text-muted-foreground">Nigerian state location.</p>
+              <p className="text-xs text-muted-foreground font-sans">Nigerian state location.</p>
               {formErrors.state && (
-                <p className="text-[11px] font-medium text-[color:var(--data-negative-ink)]">
+                <p className="text-xs font-medium text-[color:var(--data-negative-ink)] font-sans">
                   {formErrors.state}
                 </p>
               )}
             </div>
           </div>
 
-          {/* Summary */}
+          {/* Short Summary */}
           <div className="space-y-1.5">
-            <label className="font-semibold text-foreground block">Short Summary</label>
+            <label className="text-sm font-medium text-foreground block font-sans">
+              Short summary
+            </label>
             <Textarea
-              rows={2}
+              rows={3}
               value={formData.summary}
               onChange={(e) => setFormData((p) => ({ ...p, summary: e.target.value }))}
               placeholder="Brief overview of the institution, location, and student life..."
-              className="text-xs rounded-lg bg-background border-border leading-relaxed"
+              className="text-xs rounded-md bg-background border-border leading-relaxed"
             />
-            <p className="text-[11px] text-muted-foreground">Max 300 characters.</p>
+            <div className="flex justify-between items-center text-xs text-muted-foreground font-sans">
+              <span>Overview shown on directory cards.</span>
+              <span className="tabular-nums">{formData.summary.length} / 300</span>
+            </div>
             {formErrors.summary && (
-              <p className="text-[11px] font-medium text-[color:var(--data-negative-ink)]">
+              <p className="text-xs font-medium text-[color:var(--data-negative-ink)] font-sans">
                 {formErrors.summary}
               </p>
             )}
           </div>
 
           {/* Clearance Guide */}
-          <div className="space-y-1.5">
-            <label className="font-semibold text-foreground flex items-center gap-1.5">
-              <FileCheck2 className="h-3.5 w-3.5 text-primary" />
-              <span>Freshers Clearance Guide (Markdown)</span>
-            </label>
-            <Textarea
-              rows={5}
-              value={formData.clearance_guide}
-              onChange={(e) => setFormData((p) => ({ ...p, clearance_guide: e.target.value }))}
-              placeholder="Step-by-step checklist of screening requirements, medical tests, and faculty verification..."
-              className="font-mono text-xs rounded-lg bg-background border-border leading-relaxed"
-            />
-            <p className="text-[11px] text-muted-foreground">Markdown supported. Up to 8,000 characters.</p>
+          <div className="border border-border/70 rounded-md overflow-hidden bg-card">
+            <div
+              className="flex items-center justify-between p-3.5 bg-muted/30 cursor-pointer select-none hover:bg-muted/50 transition-colors"
+              onClick={() => toggleGuideOpen("clearance")}
+            >
+              <div className="flex items-center gap-2">
+                {guideOpen.clearance ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
+                <span className="text-sm font-medium text-foreground font-sans">
+                  Freshers clearance guide
+                </span>
+                {formData.clearance_guide.trim().length > 0 && (
+                  <span className="text-[10px] px-1.5 py-0.5 rounded-sm bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-sans font-medium">
+                    Added
+                  </span>
+                )}
+              </div>
+              <div className="flex items-center gap-3" onClick={(e) => e.stopPropagation()}>
+                <span className="text-[11px] text-muted-foreground tabular-nums font-sans">
+                  {formData.clearance_guide.length} chars
+                </span>
+                <div className="flex items-center border border-border/70 rounded-md overflow-hidden bg-background">
+                  <button
+                    type="button"
+                    onClick={() => setGuideMode((p) => ({ ...p, clearance: "write" }))}
+                    className={cn(
+                      "px-2 py-0.5 text-[11px] font-sans transition-colors",
+                      guideMode.clearance === "write"
+                        ? "bg-primary text-primary-foreground font-medium"
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    Write
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setGuideMode((p) => ({ ...p, clearance: "preview" }))}
+                    className={cn(
+                      "px-2 py-0.5 text-[11px] font-sans transition-colors",
+                      guideMode.clearance === "preview"
+                        ? "bg-primary text-primary-foreground font-medium"
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    Preview
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {guideOpen.clearance && (
+              <div className="p-3.5 border-t border-border/70 space-y-1.5">
+                {guideMode.clearance === "write" ? (
+                  <Textarea
+                    rows={6}
+                    value={formData.clearance_guide}
+                    onChange={(e) => setFormData((p) => ({ ...p, clearance_guide: e.target.value }))}
+                    placeholder="Step-by-step checklist of screening requirements, medical tests, and faculty verification..."
+                    className="font-mono text-xs rounded-md bg-background border-border leading-relaxed"
+                  />
+                ) : (
+                  <div className="min-h-[140px] p-3 rounded-md border border-border/40 bg-muted/20 text-xs">
+                    {formData.clearance_guide.trim() ? (
+                      <LessonMarkdown content={formData.clearance_guide} />
+                    ) : (
+                      <p className="text-muted-foreground italic font-sans">Nothing to preview yet.</p>
+                    )}
+                  </div>
+                )}
+                <p className="text-[11px] text-muted-foreground font-sans">
+                  Markdown supported. Up to 8,000 characters.
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Hostel Guide */}
-          <div className="space-y-1.5">
-            <label className="font-semibold text-foreground flex items-center gap-1.5">
-              <Home className="h-3.5 w-3.5 text-primary" />
-              <span>Hostel &amp; Accommodation Guide (Markdown)</span>
-            </label>
-            <Textarea
-              rows={5}
-              value={formData.hostel_guide}
-              onChange={(e) => setFormData((p) => ({ ...p, hostel_guide: e.target.value }))}
-              placeholder="Hall allocations, private off-campus lodge prices, and safety recommendations..."
-              className="font-mono text-xs rounded-lg bg-background border-border leading-relaxed"
-            />
-            <p className="text-[11px] text-muted-foreground">Markdown supported. Up to 8,000 characters.</p>
+          <div className="border border-border/70 rounded-md overflow-hidden bg-card">
+            <div
+              className="flex items-center justify-between p-3.5 bg-muted/30 cursor-pointer select-none hover:bg-muted/50 transition-colors"
+              onClick={() => toggleGuideOpen("hostel")}
+            >
+              <div className="flex items-center gap-2">
+                {guideOpen.hostel ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
+                <span className="text-sm font-medium text-foreground font-sans">
+                  Hostel and accommodation guide
+                </span>
+                {formData.hostel_guide.trim().length > 0 && (
+                  <span className="text-[10px] px-1.5 py-0.5 rounded-sm bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-sans font-medium">
+                    Added
+                  </span>
+                )}
+              </div>
+              <div className="flex items-center gap-3" onClick={(e) => e.stopPropagation()}>
+                <span className="text-[11px] text-muted-foreground tabular-nums font-sans">
+                  {formData.hostel_guide.length} chars
+                </span>
+                <div className="flex items-center border border-border/70 rounded-md overflow-hidden bg-background">
+                  <button
+                    type="button"
+                    onClick={() => setGuideMode((p) => ({ ...p, hostel: "write" }))}
+                    className={cn(
+                      "px-2 py-0.5 text-[11px] font-sans transition-colors",
+                      guideMode.hostel === "write"
+                        ? "bg-primary text-primary-foreground font-medium"
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    Write
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setGuideMode((p) => ({ ...p, hostel: "preview" }))}
+                    className={cn(
+                      "px-2 py-0.5 text-[11px] font-sans transition-colors",
+                      guideMode.hostel === "preview"
+                        ? "bg-primary text-primary-foreground font-medium"
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    Preview
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {guideOpen.hostel && (
+              <div className="p-3.5 border-t border-border/70 space-y-1.5">
+                {guideMode.hostel === "write" ? (
+                  <Textarea
+                    rows={6}
+                    value={formData.hostel_guide}
+                    onChange={(e) => setFormData((p) => ({ ...p, hostel_guide: e.target.value }))}
+                    placeholder="Hall allocations, private off-campus lodge prices, and safety recommendations..."
+                    className="font-mono text-xs rounded-md bg-background border-border leading-relaxed"
+                  />
+                ) : (
+                  <div className="min-h-[140px] p-3 rounded-md border border-border/40 bg-muted/20 text-xs">
+                    {formData.hostel_guide.trim() ? (
+                      <LessonMarkdown content={formData.hostel_guide} />
+                    ) : (
+                      <p className="text-muted-foreground italic font-sans">Nothing to preview yet.</p>
+                    )}
+                  </div>
+                )}
+                <p className="text-[11px] text-muted-foreground font-sans">
+                  Markdown supported. Up to 8,000 characters.
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Departments Guide */}
-          <div className="space-y-1.5">
-            <label className="font-semibold text-foreground flex items-center gap-1.5">
-              <GraduationCap className="h-3.5 w-3.5 text-primary" />
-              <span>Faculties &amp; Departments Walkthrough (Markdown)</span>
-            </label>
-            <Textarea
-              rows={5}
-              value={formData.departments_guide}
-              onChange={(e) => setFormData((p) => ({ ...p, departments_guide: e.target.value }))}
-              placeholder="List of faculties, common course codes, department buildings, and key faculty contacts..."
-              className="font-mono text-xs rounded-lg bg-background border-border leading-relaxed"
-            />
-            <p className="text-[11px] text-muted-foreground">Markdown supported. Up to 8,000 characters.</p>
+          <div className="border border-border/70 rounded-md overflow-hidden bg-card">
+            <div
+              className="flex items-center justify-between p-3.5 bg-muted/30 cursor-pointer select-none hover:bg-muted/50 transition-colors"
+              onClick={() => toggleGuideOpen("departments")}
+            >
+              <div className="flex items-center gap-2">
+                {guideOpen.departments ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
+                <span className="text-sm font-medium text-foreground font-sans">
+                  Faculties and departments guide
+                </span>
+                {formData.departments_guide.trim().length > 0 && (
+                  <span className="text-[10px] px-1.5 py-0.5 rounded-sm bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-sans font-medium">
+                    Added
+                  </span>
+                )}
+              </div>
+              <div className="flex items-center gap-3" onClick={(e) => e.stopPropagation()}>
+                <span className="text-[11px] text-muted-foreground tabular-nums font-sans">
+                  {formData.departments_guide.length} chars
+                </span>
+                <div className="flex items-center border border-border/70 rounded-md overflow-hidden bg-background">
+                  <button
+                    type="button"
+                    onClick={() => setGuideMode((p) => ({ ...p, departments: "write" }))}
+                    className={cn(
+                      "px-2 py-0.5 text-[11px] font-sans transition-colors",
+                      guideMode.departments === "write"
+                        ? "bg-primary text-primary-foreground font-medium"
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    Write
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setGuideMode((p) => ({ ...p, departments: "preview" }))}
+                    className={cn(
+                      "px-2 py-0.5 text-[11px] font-sans transition-colors",
+                      guideMode.departments === "preview"
+                        ? "bg-primary text-primary-foreground font-medium"
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    Preview
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {guideOpen.departments && (
+              <div className="p-3.5 border-t border-border/70 space-y-1.5">
+                {guideMode.departments === "write" ? (
+                  <Textarea
+                    rows={6}
+                    value={formData.departments_guide}
+                    onChange={(e) => setFormData((p) => ({ ...p, departments_guide: e.target.value }))}
+                    placeholder="List of faculties, common course codes, department buildings, and key faculty contacts..."
+                    className="font-mono text-xs rounded-md bg-background border-border leading-relaxed"
+                  />
+                ) : (
+                  <div className="min-h-[140px] p-3 rounded-md border border-border/40 bg-muted/20 text-xs">
+                    {formData.departments_guide.trim() ? (
+                      <LessonMarkdown content={formData.departments_guide} />
+                    ) : (
+                      <p className="text-muted-foreground italic font-sans">Nothing to preview yet.</p>
+                    )}
+                  </div>
+                )}
+                <p className="text-[11px] text-muted-foreground font-sans">
+                  Markdown supported. Up to 8,000 characters.
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </AdminDrawer>

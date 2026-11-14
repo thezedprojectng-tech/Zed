@@ -55,6 +55,7 @@ import { SegmentedControl } from "@/components/admin/primitives/SegmentedControl
 import { EmptyState } from "@/components/admin/primitives/EmptyState";
 import { StatusPill } from "@/components/admin/people/StatusPill";
 import { AgePill } from "@/components/admin/people/AgePill";
+import { PanelSection, FieldList, FieldItem } from "@/components/admin/primitives/PanelSection";
 
 interface AdminInternshipsClientProps {
   initialInternships: AdminInternshipWithReview[];
@@ -362,7 +363,7 @@ export function AdminInternshipsClient({ initialInternships }: AdminInternshipsC
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-border bg-muted/40 font-mono text-[11px] text-muted-foreground uppercase tracking-wider">
+                <tr className="border-b border-border bg-muted/40 font-sans text-xs font-medium text-muted-foreground">
                   <th className="py-3 px-4 font-semibold">Title & Organization</th>
                   <th className="py-3 px-4 font-semibold">Type & Compensation</th>
                   <th className="py-3 px-4 font-semibold">Deadline</th>
@@ -391,17 +392,17 @@ export function AdminInternshipsClient({ initialInternships }: AdminInternshipsC
                               {item.title}
                             </span>
                             {suspicious.length > 0 && (
-                              <span className="font-mono text-[10px] px-1.5 py-0.2 rounded-sm bg-[color:var(--data-negative-subtle)] text-[color:var(--data-negative-ink)] border border-[color:var(--data-negative-border)] flex items-center gap-1 font-semibold">
+                              <span className="font-sans text-[10px] px-1.5 py-0.5 rounded-sm bg-[color:var(--data-negative-subtle)] text-[color:var(--data-negative-ink)] border border-[color:var(--data-negative-border)] flex items-center gap-1 font-medium">
                                 <ShieldAlert className="h-3 w-3" />
                                 Suspect
                               </span>
                             )}
                           </div>
-                          <div className="text-muted-foreground truncate max-w-[200px] text-[11px] flex items-center gap-1.5">
+                          <div className="text-muted-foreground truncate max-w-[200px] text-[11px] flex items-center gap-1.5 font-sans">
                             <Building2 className="h-3 w-3 shrink-0" />
                             <span>{item.organization}</span>
                             <span>•</span>
-                            <span className="font-mono">{item.location}</span>
+                            <span>{item.location}</span>
                           </div>
                         </div>
                       </td>
@@ -422,8 +423,8 @@ export function AdminInternshipsClient({ initialInternships }: AdminInternshipsC
                           <span
                             className={
                               isPastDeadline
-                                ? "font-mono text-[11px] text-[color:var(--data-negative-ink)] font-semibold"
-                                : "font-mono text-[11px] text-foreground"
+                                ? "font-sans tabular-nums text-xs text-[color:var(--data-negative-ink)] font-semibold"
+                                : "font-sans tabular-nums text-xs text-foreground"
                             }
                           >
                             {new Date(item.deadline).toLocaleDateString("en-NG", {
@@ -434,7 +435,7 @@ export function AdminInternshipsClient({ initialInternships }: AdminInternshipsC
                             {isPastDeadline && " (Passed)"}
                           </span>
                         ) : (
-                          <span className="text-muted-foreground text-[11px]">Rolling</span>
+                          <span className="text-muted-foreground text-[11px] font-sans">Rolling</span>
                         )}
                       </td>
 
@@ -555,7 +556,7 @@ export function AdminInternshipsClient({ initialInternships }: AdminInternshipsC
         }
         timestamp={
           selectedItem && (
-            <span className="font-mono text-[11px] text-muted-foreground">
+            <span className="tabular-nums font-sans text-xs text-muted-foreground">
               {new Date(selectedItem.created_at).toLocaleDateString("en-NG", {
                 month: "short",
                 day: "numeric",
@@ -632,7 +633,7 @@ export function AdminInternshipsClient({ initialInternships }: AdminInternshipsC
         }
       >
         {selectedItem && (
-          <div className="space-y-5 text-xs p-5">
+          <div className="space-y-5 text-xs">
             {/* Suspicious Fee Warning */}
             {detectSuspiciousFeeWords(selectedItem.description).length > 0 && (
               <div className="p-3.5 rounded-lg border border-[color:var(--data-negative-border)] bg-[color:var(--data-negative-subtle)] space-y-1.5 text-[color:var(--data-negative-ink)]">
@@ -648,97 +649,90 @@ export function AdminInternshipsClient({ initialInternships }: AdminInternshipsC
             )}
 
             {/* Submitter & Reviewer Meta */}
-            <div className="p-3 rounded-lg border border-border bg-card space-y-2">
-              <div className="text-[11px] font-mono uppercase text-muted-foreground font-semibold">
-                Submission Source
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <span className="text-muted-foreground block text-[11px]">Submitted By</span>
-                  <p className="font-semibold text-foreground">
+            <PanelSection title="Submission source">
+              <FieldList columns={2}>
+                <FieldItem label="Submitted by">
+                  <span className="font-sans font-semibold text-foreground">
                     {selectedItem.submitter_name || selectedItem.submitter_email || "Anonymous Student"}
-                  </p>
+                  </span>
                   {selectedItem.submitter_email && (
-                    <span className="text-muted-foreground text-[11px] block">{selectedItem.submitter_email}</span>
+                    <span className="text-muted-foreground text-[11px] block font-sans">
+                      {selectedItem.submitter_email}
+                    </span>
                   )}
-                </div>
-                <div>
-                  <span className="text-muted-foreground block text-[11px]">Review Status</span>
-                  <p className="font-medium text-foreground capitalize">{selectedItem.status}</p>
+                </FieldItem>
+                <FieldItem label="Review status">
+                  <span className="font-sans text-foreground capitalize">{selectedItem.status}</span>
                   {selectedItem.rejection_reason && (
-                    <p className="text-[color:var(--data-negative-ink)] text-[11px] mt-1">
+                    <p className="text-[color:var(--data-negative-ink)] text-[11px] mt-1 font-sans">
                       Reason: {selectedItem.rejection_reason}
                     </p>
                   )}
-                </div>
-              </div>
-            </div>
-
-            {/* Key specs */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="p-3 rounded-lg border border-border bg-card space-y-1">
-                <span className="text-muted-foreground block text-[11px]">Work Mode &amp; Field</span>
-                <p className="font-medium text-foreground capitalize">
-                  {selectedItem.work_mode} • {selectedItem.field}
-                </p>
-              </div>
-              <div className="p-3 rounded-lg border border-border bg-card space-y-1">
-                <span className="text-muted-foreground block text-[11px]">Compensation</span>
-                <p className="font-medium text-foreground capitalize">
-                  {selectedItem.paid_status} ({selectedItem.type.replace("-", " ")})
-                </p>
-              </div>
-            </div>
+                </FieldItem>
+                <FieldItem label="Work mode & field">
+                  <span className="font-sans text-foreground capitalize">
+                    {selectedItem.work_mode} • {selectedItem.field}
+                  </span>
+                </FieldItem>
+                <FieldItem label="Compensation">
+                  <span className="font-sans text-foreground capitalize">
+                    {selectedItem.paid_status} ({selectedItem.type.replace("-", " ")})
+                  </span>
+                </FieldItem>
+              </FieldList>
+            </PanelSection>
 
             {/* Description */}
-            <div className="p-3.5 rounded-lg border border-border bg-card space-y-2">
-              <div className="text-[11px] font-mono uppercase text-muted-foreground font-semibold">
-                Opportunity Description
-              </div>
-              <p className="text-foreground leading-relaxed whitespace-pre-wrap font-sans">
-                {selectedItem.description}
-              </p>
+            <div className="border-t border-border/60 pt-6">
+              <PanelSection title="Opportunity description">
+                <p className="text-foreground leading-relaxed whitespace-pre-wrap font-sans">
+                  {selectedItem.description}
+                </p>
+              </PanelSection>
             </div>
 
             {/* Eligibility */}
             {selectedItem.eligibility && (
-              <div className="p-3.5 rounded-lg border border-border bg-card space-y-2">
-                <div className="text-[11px] font-mono uppercase text-muted-foreground font-semibold">
-                  Eligibility Criteria
-                </div>
-                <p className="text-foreground leading-relaxed whitespace-pre-wrap font-sans">
-                  {selectedItem.eligibility}
-                </p>
+              <div className="border-t border-border/60 pt-6">
+                <PanelSection title="Eligibility criteria">
+                  <p className="text-foreground leading-relaxed whitespace-pre-wrap font-sans">
+                    {selectedItem.eligibility}
+                  </p>
+                </PanelSection>
               </div>
             )}
 
             {/* Application Links */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {selectedItem.apply_url && (
-                <div className="p-3 rounded-lg border border-border bg-card space-y-1">
-                  <span className="text-muted-foreground block text-[11px]">Apply Portal</span>
-                  <a
-                    href={selectedItem.apply_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-medium text-primary hover:underline block truncate"
-                  >
-                    {selectedItem.apply_url}
-                  </a>
-                </div>
-              )}
-              {selectedItem.apply_email && (
-                <div className="p-3 rounded-lg border border-border bg-card space-y-1">
-                  <span className="text-muted-foreground block text-[11px]">Apply Email</span>
-                  <a
-                    href={`mailto:${selectedItem.apply_email}`}
-                    className="font-medium text-primary hover:underline block truncate"
-                  >
-                    {selectedItem.apply_email}
-                  </a>
-                </div>
-              )}
-            </div>
+            {(selectedItem.apply_url || selectedItem.apply_email) && (
+              <div className="border-t border-border/60 pt-6">
+                <PanelSection title="Application channels">
+                  <FieldList columns={2}>
+                    {selectedItem.apply_url && (
+                      <FieldItem label="Apply portal">
+                        <a
+                          href={selectedItem.apply_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="font-medium text-primary hover:underline block truncate font-sans"
+                        >
+                          {selectedItem.apply_url}
+                        </a>
+                      </FieldItem>
+                    )}
+                    {selectedItem.apply_email && (
+                      <FieldItem label="Apply email">
+                        <a
+                          href={`mailto:${selectedItem.apply_email}`}
+                          className="font-medium text-primary hover:underline block truncate font-sans"
+                        >
+                          {selectedItem.apply_email}
+                        </a>
+                      </FieldItem>
+                    )}
+                  </FieldList>
+                </PanelSection>
+              </div>
+            )}
           </div>
         )}
       </AdminDrawer>

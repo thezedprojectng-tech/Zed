@@ -58,6 +58,7 @@ import { SegmentedControl } from "@/components/admin/primitives/SegmentedControl
 import { EmptyState } from "@/components/admin/primitives/EmptyState";
 import { StatusPill } from "@/components/admin/people/StatusPill";
 import { AgePill } from "@/components/admin/people/AgePill";
+import { PanelSection, FieldList, FieldItem } from "@/components/admin/primitives/PanelSection";
 
 interface AdminAlumniClientProps {
   initialApplications: AlumniApplicationRow[];
@@ -461,7 +462,7 @@ export function AdminAlumniClient({
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse text-xs">
                   <thead>
-                    <tr className="border-b border-border bg-muted/40 font-mono text-[11px] text-muted-foreground uppercase tracking-wider">
+                    <tr className="border-b border-border bg-muted/40 font-sans text-xs font-medium text-muted-foreground">
                       <th className="py-3 px-4 font-semibold">Candidate</th>
                       <th className="py-3 px-4 font-semibold">Field & Role</th>
                       <th className="py-3 px-4 font-semibold">Grad Year & School</th>
@@ -482,7 +483,7 @@ export function AdminAlumniClient({
                           {/* Candidate */}
                           <td className="py-3 px-4">
                             <div className="flex items-center gap-3">
-                              <div className="h-8 w-8 rounded-full bg-[color:var(--data-signups-subtle)] border border-[color:var(--data-signups-border)] text-[color:var(--data-signups-ink)] flex items-center justify-center font-mono font-bold text-[11px] shrink-0">
+                              <div className="h-8 w-8 rounded-full bg-[color:var(--data-signups-subtle)] border border-[color:var(--data-signups-border)] text-[color:var(--data-signups-ink)] flex items-center justify-center font-sans font-semibold text-[11px] shrink-0">
                                 {initials}
                               </div>
                               <div className="min-w-0">
@@ -508,7 +509,7 @@ export function AdminAlumniClient({
 
                           {/* Grad Year & School */}
                           <td className="py-3 px-4">
-                            <div className="text-foreground font-mono text-[11px]">
+                            <div className="text-foreground font-sans tabular-nums text-xs">
                               Class of {app.graduation_year}
                             </div>
                             <div className="text-muted-foreground truncate max-w-[180px] text-[11px]">
@@ -651,7 +652,7 @@ export function AdminAlumniClient({
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse text-xs">
                   <thead>
-                    <tr className="border-b border-border bg-muted/40 font-mono text-[11px] text-muted-foreground uppercase tracking-wider">
+                    <tr className="border-b border-border bg-muted/40 font-sans text-xs font-medium text-muted-foreground">
                       <th className="py-3 px-4 font-semibold">Alumni</th>
                       <th className="py-3 px-4 font-semibold">Field & Institution</th>
                       <th className="py-3 px-4 font-semibold">Role & Occupation</th>
@@ -671,14 +672,14 @@ export function AdminAlumniClient({
                           {/* Alumni */}
                           <td className="py-3 px-4">
                             <div className="flex items-center gap-3">
-                              <div className="h-8 w-8 rounded-full bg-[color:var(--data-verified-subtle)] border border-[color:var(--data-verified-border)] text-[color:var(--data-verified-ink)] flex items-center justify-center font-mono font-bold text-[11px] shrink-0">
+                              <div className="h-8 w-8 rounded-full bg-[color:var(--data-verified-subtle)] border border-[color:var(--data-verified-border)] text-[color:var(--data-verified-ink)] flex items-center justify-center font-sans font-semibold text-[11px] shrink-0">
                                 {initials}
                               </div>
                               <div className="min-w-0">
                                 <div className="font-semibold text-foreground truncate max-w-[180px] sm:max-w-none">
                                   {profile.display_name}
                                 </div>
-                                <div className="text-muted-foreground font-mono text-[11px]">
+                                <div className="text-muted-foreground font-sans text-xs tabular-nums">
                                   Class of {profile.graduation_year}
                                 </div>
                               </div>
@@ -708,7 +709,7 @@ export function AdminAlumniClient({
                           </td>
 
                           {/* Published Date */}
-                          <td className="py-3 px-4 font-mono text-[11px] text-muted-foreground whitespace-nowrap">
+                          <td className="py-3 px-4 font-sans text-xs tabular-nums text-muted-foreground whitespace-nowrap">
                             {profile.published_at
                               ? new Date(profile.published_at).toLocaleDateString("en-NG", {
                                   month: "short",
@@ -817,7 +818,7 @@ export function AdminAlumniClient({
         }
         timestamp={
           selectedApp && (
-            <span className="font-mono text-[11px] text-muted-foreground">
+            <span className="tabular-nums font-sans text-xs text-muted-foreground">
               {new Date(selectedApp.created_at).toLocaleDateString("en-NG", {
                 month: "short",
                 day: "numeric",
@@ -866,12 +867,9 @@ export function AdminAlumniClient({
         }
       >
         {selectedApp && (
-          <div className="space-y-5 text-xs p-5">
+          <div className="space-y-6 text-xs">
             {/* Quick Status Bar */}
-            <div className="p-3 rounded-lg border border-border bg-secondary/30 space-y-2">
-              <div className="text-[11px] font-mono text-muted-foreground uppercase font-semibold">
-                Set Status
-              </div>
+            <PanelSection title="Set status">
               <div className="flex flex-wrap gap-1.5">
                 {(["new", "reviewing", "approved", "declined"] as AlumniApplicationStatus[]).map(
                   (st) => (
@@ -881,118 +879,103 @@ export function AdminAlumniClient({
                       variant={selectedApp.status === st ? "default" : "outline"}
                       disabled={isPending || selectedApp.status === st}
                       onClick={() => handleSetAppStatus(st)}
-                      className="text-xs h-7 px-2.5 rounded-lg border-border capitalize"
+                      className="text-xs h-8 px-2.5 rounded-md border-border capitalize font-sans"
                     >
                       {st}
                     </Button>
                   )
                 )}
               </div>
-            </div>
+            </PanelSection>
 
             {/* Candidate details */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="p-3 rounded-lg border border-border bg-card space-y-1">
-                <span className="text-muted-foreground flex items-center gap-1.5 font-medium">
-                  <Mail className="h-3.5 w-3.5" />
-                  Email
-                </span>
-                <a
-                  href={`mailto:${selectedApp.email}`}
-                  className="font-medium text-primary hover:underline block truncate"
-                >
-                  {selectedApp.email}
-                </a>
-              </div>
-
-              <div className="p-3 rounded-lg border border-border bg-card space-y-1">
-                <span className="text-muted-foreground flex items-center gap-1.5 font-medium">
-                  <ExternalLink className="h-3.5 w-3.5" />
-                  Booking / LinkedIn URL
-                </span>
-                <a
-                  href={selectedApp.contact_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="font-medium text-primary hover:underline block truncate"
-                >
-                  {selectedApp.contact_url}
-                </a>
-              </div>
+            <div className="border-t border-border/60 pt-6">
+              <PanelSection title="Candidate details">
+                <FieldList columns={2}>
+                  <FieldItem label="Email">
+                    <a
+                      href={`mailto:${selectedApp.email}`}
+                      className="font-medium text-primary hover:underline block truncate font-sans"
+                    >
+                      {selectedApp.email}
+                    </a>
+                  </FieldItem>
+                  <FieldItem label="Booking / LinkedIn URL">
+                    <a
+                      href={selectedApp.contact_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-medium text-primary hover:underline block truncate font-sans"
+                    >
+                      {selectedApp.contact_url}
+                    </a>
+                  </FieldItem>
+                </FieldList>
+              </PanelSection>
             </div>
 
             {/* Professional Profile */}
-            <div className="p-3 rounded-lg border border-border bg-card space-y-2.5">
-              <div className="text-[11px] font-mono uppercase text-muted-foreground font-semibold">
-                Professional Details
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <span className="text-muted-foreground block text-[11px]">Field / Track</span>
-                  <p className="font-semibold text-foreground">{selectedApp.field}</p>
-                </div>
-                <div>
-                  <span className="text-muted-foreground block text-[11px]">Current Role</span>
-                  <p className="font-medium text-foreground">{selectedApp.occupation}</p>
-                </div>
-                <div>
-                  <span className="text-muted-foreground block text-[11px]">Alma Mater</span>
-                  <p className="font-medium text-foreground">{selectedApp.institution}</p>
-                </div>
-                <div>
-                  <span className="text-muted-foreground block text-[11px]">Graduation Year</span>
-                  <p className="font-mono font-medium text-foreground">{selectedApp.graduation_year}</p>
-                </div>
-              </div>
+            <div className="border-t border-border/60 pt-6">
+              <PanelSection title="Professional details">
+                <FieldList columns={2}>
+                  <FieldItem label="Field / Track" value={selectedApp.field} />
+                  <FieldItem label="Current role" value={selectedApp.occupation} />
+                  <FieldItem label="Alma mater" value={selectedApp.institution} />
+                  <FieldItem label="Graduation year">
+                    <span className="font-sans tabular-nums text-foreground">{selectedApp.graduation_year}</span>
+                  </FieldItem>
+                </FieldList>
+              </PanelSection>
             </div>
 
             {/* Bio */}
-            <div className="p-3.5 rounded-lg border border-border bg-card space-y-2">
-              <div className="text-[11px] font-mono uppercase text-muted-foreground font-semibold">
-                Bio & Background
-              </div>
-              <p className="text-foreground leading-relaxed whitespace-pre-wrap font-sans">
-                {selectedApp.bio}
-              </p>
+            <div className="border-t border-border/60 pt-6">
+              <PanelSection title="Bio & background">
+                <p className="text-foreground leading-relaxed whitespace-pre-wrap font-sans">
+                  {selectedApp.bio || <span className="text-muted-foreground italic font-sans">Not provided</span>}
+                </p>
+              </PanelSection>
             </div>
 
             {/* Topics & Availability */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="p-3 rounded-lg border border-border bg-card space-y-1">
-                <span className="text-muted-foreground block text-[11px]">Topics Offered</span>
-                <p className="font-medium text-foreground">{selectedApp.topics}</p>
-              </div>
-              <div className="p-3 rounded-lg border border-border bg-card space-y-1">
-                <span className="text-muted-foreground block text-[11px]">Availability Schedule</span>
-                <p className="font-medium text-foreground">{selectedApp.availability}</p>
-              </div>
+            <div className="border-t border-border/60 pt-6">
+              <PanelSection title="Topics & availability">
+                <FieldList columns={2}>
+                  <FieldItem label="Topics offered">
+                    <span className="font-sans text-foreground">{selectedApp.topics}</span>
+                  </FieldItem>
+                  <FieldItem label="Availability schedule">
+                    <span className="font-sans text-foreground">{selectedApp.availability}</span>
+                  </FieldItem>
+                </FieldList>
+              </PanelSection>
             </div>
 
             {/* Admin Review Notes */}
-            <div className="p-3.5 rounded-lg border border-border bg-card space-y-2.5">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-mono uppercase text-muted-foreground font-semibold flex items-center gap-1.5">
-                  <MessageSquare className="h-3.5 w-3.5" />
-                  Admin Review Notes
-                </span>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  disabled={isPending}
-                  onClick={handleSaveNotes}
-                  className="text-[11px] h-7 px-2 gap-1 rounded-lg border-border"
-                >
-                  <Save className="h-3 w-3" />
-                  <span>Save Notes</span>
-                </Button>
-              </div>
-              <textarea
-                rows={3}
-                placeholder="Private internal notes regarding this alumni..."
-                value={adminNotesInput}
-                onChange={(e) => setAdminNotesInput(e.target.value)}
-                className="w-full rounded-lg border border-border bg-background p-3 font-sans text-xs text-foreground placeholder:text-muted-foreground/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary leading-relaxed resize-y"
-              />
+            <div className="border-t border-border/60 pt-6">
+              <PanelSection
+                title="Admin review notes"
+                action={
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={isPending}
+                    onClick={handleSaveNotes}
+                    className="text-xs h-8 px-2.5 gap-1.5 rounded-md border-border font-sans"
+                  >
+                    <Save className="h-3.5 w-3.5" />
+                    <span>Save notes</span>
+                  </Button>
+                }
+              >
+                <textarea
+                  rows={3}
+                  placeholder="Private internal notes regarding this alumni..."
+                  value={adminNotesInput}
+                  onChange={(e) => setAdminNotesInput(e.target.value)}
+                  className="w-full rounded-md border border-border bg-background p-3 font-sans text-xs text-foreground placeholder:text-muted-foreground/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary leading-relaxed resize-y"
+                />
+              </PanelSection>
             </div>
           </div>
         )}

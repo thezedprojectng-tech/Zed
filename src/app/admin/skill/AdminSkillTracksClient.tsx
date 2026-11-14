@@ -1,14 +1,41 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useMemo, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
-  AdminTrackListItem,
+  GraduationCap,
+  Plus,
+  Search,
+  MoreHorizontal,
+  Edit,
+  Eye,
+  EyeOff,
+  ExternalLink,
+  Loader2,
+  BookOpen,
+  Award,
+} from "lucide-react";
+import { toast } from "sonner";
+import type { AdminTrackListItem } from "@/lib/skill/admin-actions";
+import {
   adminCreateTrackAction,
-  adminUpdateTrackAction,
   adminSetTrackPublishedAction,
 } from "@/lib/skill/admin-actions";
+import { trackSchema } from "@/lib/skill/validation";
+import { AdminPageHeader } from "@/components/admin/primitives/AdminPageHeader";
+import { SegmentedControl } from "@/components/admin/primitives/SegmentedControl";
+import { EmptyState } from "@/components/admin/primitives/EmptyState";
+import { StatusPill } from "@/components/admin/people/StatusPill";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Dialog,
   DialogContent,
@@ -17,423 +44,524 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card";
 import {
-  GraduationCap,
-  Plus,
-  BookOpen,
-  ArrowRight,
-  Edit,
-  Eye,
-  EyeOff,
-  AlertCircle,
-  Loader2,
-} from "lucide-react";
-import { toast } from "sonner";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
-interface Props {
+interface AdminSkillTracksClientProps {
   initialTracks: AdminTrackListItem[];
 }
 
-export function AdminSkillTracksClient({ initialTracks }: Props) {
+export function AdminSkillTracksClient({
+  initialTracks,
+}: AdminSkillTracksClientProps) {
   const router = useRouter();
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const [tracks, setTracks] = useState<AdminTrackListItem[]>(initialTracks);
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<"title_asc" | "lessons_desc" | "points_desc" | "created_desc">("title_asc");
   const [isPending, startTransition] = useTransition();
 
-  // Dialog states
+  // Create track dialog state
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
-  const [editTrack, setEditTrack] = useState<AdminTrackListItem | null>(null);
+  const [createTitle, setCreateTitle] = useState("");
+  const [createSlug, setCreateSlug] = useState("");
+  const [createDesc, setCreateDesc] = useState("");
+  const [hasManuallyEditedSlug, setHasManuallyEditedSlug] = useState(false);
+  const [createErrors, setCreateErrors] = useState<Record<string, string>>({});
 
-  // Form states
-  const [title, setTitle] = useState("");
-  const [slug, setSlug] = useState("");
-  const [description, setDescription] = useState("");
-  const [formError, setFormError] = useState<string | null>(null);
-
-  const resetForm = () => {
-    setTitle("");
-    setSlug("");
-    setDescription("");
-    setFormError(null);
-  };
-
-  const openCreateDialog = () => {
-    resetForm();
-    setCreateDialogOpen(true);
-  };
-
-  const openEditDialog = (track: AdminTrackListItem) => {
-    setTitle(track.title);
-    setSlug(track.slug);
-    setDescription(track.description);
-    setFormError(null);
-    setEditTrack(track);
-  };
-
-  // Auto-generate slug from title if creating
-  const handleTitleChange = (val: string) => {
-    setTitle(val);
-    if (createDialogOpen && !editTrack) {
-      const autoSlug = val
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-+|-+$/g, "");
-      setSlug(autoSlug);
-    }
-  };
-
-  const handleSaveTrack = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setFormError(null);
-
-    startTransition(async () => {
-      if (editTrack) {
-        const res = await adminUpdateTrackAction(editTrack.id, {
-          title,
-          slug,
-          description,
-        });
-        if (!res.ok) {
-          setFormError(res.error);
-          toast.error(res.error);
-          return;
-        }
-        toast.success("Track updated successfully");
-        setEditTrack(null);
-        resetForm();
-        router.refresh();
-      } else {
-        const res = await adminCreateTrackAction({
-          title,
-          slug,
-          description,
-        });
-        if (!res.ok) {
-          setFormError(res.error);
-          toast.error(res.error);
-          return;
-        }
-        toast.success("Track created successfully");
-        setCreateDialogOpen(false);
-        resetForm();
-        router.refresh();
+  // Keyboard shortcut: '/' focuses search input
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "/" && !["INPUT", "TEXTAREA"].includes((e.target as HTMLElement)?.tagName)) {
+        e.preventDefault();
+        searchInputRef.current?.focus();
       }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  // Counts
+  const totalCount = tracks.length;
+  const publishedCount = tracks.filter((t) => t.is_published).length;
+  const draftCount = tracks.filter((t) => !t.is_published).length;
+  const totalLessons = tracks.reduce((acc, t) => acc + (t.lesson_count || 0), 0);
+
+  const tabOptions = useMemo(
+    () => [
+      { id: "all", label: `All (${totalCount})` },
+      { id: "published", label: `Published (${publishedCount})` },
+      { id: "draft", label: `Draft (${draftCount})` },
+    ],
+    [totalCount, publishedCount, draftCount]
+  );
+
+  const filteredTracks = useMemo(() => {
+    let list = tracks.filter((track) => {
+      if (statusFilter === "published" && !track.is_published) return false;
+      if (statusFilter === "draft" && track.is_published) return false;
+
+      const q = search.trim().toLowerCase();
+      if (q) {
+        const matchTitle = track.title.toLowerCase().includes(q);
+        const matchSlug = track.slug.toLowerCase().includes(q);
+        const matchDesc = track.description.toLowerCase().includes(q);
+        return matchTitle || matchSlug || matchDesc;
+      }
+      return true;
     });
-  };
 
-  const handleTogglePublish = (track: AdminTrackListItem) => {
-    const nextState = !track.is_published;
-    if (nextState && track.lesson_count === 0) {
-      toast.error("Cannot publish a track with no lessons. Please add at least 1 lesson first.");
-      return;
-    }
+    list.sort((a, b) => {
+      if (sortBy === "lessons_desc") return b.lesson_count - a.lesson_count;
+      if (sortBy === "points_desc") return b.total_points - a.total_points;
+      if (sortBy === "created_desc") {
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      }
+      return a.title.localeCompare(b.title);
+    });
 
+    return list;
+  }, [tracks, statusFilter, search, sortBy]);
+
+  const handleTogglePublished = (track: AdminTrackListItem) => {
     startTransition(async () => {
-      const res = await adminSetTrackPublishedAction(track.id, nextState);
+      const newStatus = !track.is_published;
+      const res = await adminSetTrackPublishedAction(track.id, newStatus);
       if (!res.ok) {
-        toast.error(res.error);
+        toast.error(res.error || "Failed to update track status");
         return;
       }
+
+      setTracks((prev) =>
+        prev.map((t) => (t.id === track.id ? { ...t, is_published: newStatus } : t))
+      );
       toast.success(
-        nextState ? `Published "${track.title}"` : `Unpublished "${track.title}"`
+        newStatus
+          ? `Track "${track.title}" published`
+          : `Track "${track.title}" unpublished to draft`
       );
       router.refresh();
     });
   };
 
-  const publishedCount = initialTracks.filter((t) => t.is_published).length;
-  const draftCount = initialTracks.length - publishedCount;
-  const totalLessons = initialTracks.reduce((sum, t) => sum + t.lesson_count, 0);
-  const totalPoints = initialTracks.reduce((sum, t) => sum + t.total_points, 0);
+  const handleTitleChange = (val: string) => {
+    setCreateTitle(val);
+    if (!hasManuallyEditedSlug) {
+      setCreateSlug(
+        val
+          .toLowerCase()
+          .trim()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-+|-+$/g, "")
+      );
+    }
+    if (createErrors.title) {
+      setCreateErrors((prev) => {
+        const next = { ...prev };
+        delete next.title;
+        return next;
+      });
+    }
+  };
+
+  const handleCreateTrack = () => {
+    setCreateErrors({});
+    const parsed = trackSchema.safeParse({
+      title: createTitle,
+      slug: createSlug,
+      description: createDesc,
+    });
+
+    if (!parsed.success) {
+      const errs: Record<string, string> = {};
+      parsed.error.issues.forEach((issue) => {
+        const path = issue.path[0]?.toString() || "form";
+        if (!errs[path]) errs[path] = issue.message;
+      });
+      setCreateErrors(errs);
+      return;
+    }
+
+    startTransition(async () => {
+      const res = await adminCreateTrackAction({
+        title: createTitle,
+        slug: createSlug,
+        description: createDesc,
+      });
+
+      if (!res.ok) {
+        toast.error(res.error || "Failed to create track");
+        return;
+      }
+
+      toast.success("Learning track created");
+      setCreateDialogOpen(false);
+      setCreateTitle("");
+      setCreateSlug("");
+      setCreateDesc("");
+      setHasManuallyEditedSlug(false);
+
+      if (res.data?.track_id) {
+        router.push(`/admin/skill/${res.data.track_id}`);
+      } else {
+        router.refresh();
+      }
+    });
+  };
+
+  const clearFilters = () => {
+    setSearch("");
+    setStatusFilter("all");
+    setSortBy("title_asc");
+  };
 
   return (
     <div className="space-y-6">
-      {/* Top Banner & Quick Actions */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-5">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground flex items-center gap-2">
-            <GraduationCap className="h-6 w-6 text-primary" />
-            <span>Skill Content Management</span>
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Manage practical learning tracks, lessons, publishing status, and point allocations.
-          </p>
-        </div>
+      {/* Header */}
+      <AdminPageHeader
+        title="Skill content"
+        description={`${totalCount} ${totalCount === 1 ? "track" : "tracks"} · ${totalLessons} ${totalLessons === 1 ? "lesson" : "lessons"}`}
+        icon={GraduationCap}
+        section="programs"
+        actions={
+          <Button
+            size="sm"
+            variant="default"
+            onClick={() => {
+              setCreateTitle("");
+              setCreateSlug("");
+              setCreateDesc("");
+              setHasManuallyEditedSlug(false);
+              setCreateErrors({});
+              setCreateDialogOpen(true);
+            }}
+            className="gap-1.5 rounded-lg h-9 text-xs"
+          >
+            <Plus className="h-4 w-4" />
+            <span>New track</span>
+          </Button>
+        }
+      />
 
-        <Button onClick={openCreateDialog} className="gap-2 shrink-0">
-          <Plus className="h-4 w-4" />
-          <span>New Track</span>
-        </Button>
-      </div>
+      {/* Toolbar: Status Tabs + Sort + Search */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <SegmentedControl
+          options={tabOptions}
+          value={statusFilter}
+          onChange={setStatusFilter}
+          ariaLabel="Skill tracks status filter"
+        />
 
-      {/* Stats Summary Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
-        <Card className="p-4 border-border bg-card">
-          <p className="font-mono text-[11px] uppercase text-muted-foreground">Total Tracks</p>
-          <p className="text-2xl font-bold font-mono text-foreground mt-1">
-            {initialTracks.length}
-          </p>
-          <div className="flex items-center gap-2 mt-1 text-xs">
-            <span className="text-emerald-500 font-semibold">{publishedCount} published</span>
-            <span className="text-muted-foreground">·</span>
-            <span className="text-amber-500 font-semibold">{draftCount} draft</span>
+        <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+          {/* Sort selector */}
+          <div className="w-36 shrink-0">
+            <Select value={sortBy} onValueChange={(val: any) => setSortBy(val)}>
+              <SelectTrigger className="h-9 text-xs rounded-lg bg-card border-border">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="rounded-lg">
+                <SelectItem value="title_asc">Title (A-Z)</SelectItem>
+                <SelectItem value="lessons_desc">Most lessons</SelectItem>
+                <SelectItem value="points_desc">Most points</SelectItem>
+                <SelectItem value="created_desc">Newest first</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-        </Card>
 
-        <Card className="p-4 border-border bg-card">
-          <p className="font-mono text-[11px] uppercase text-muted-foreground">Total Lessons</p>
-          <p className="text-2xl font-bold font-mono text-foreground mt-1">
-            {totalLessons}
-          </p>
-          <p className="text-xs text-muted-foreground mt-1">Across all tracks</p>
-        </Card>
-
-        <Card className="p-4 border-border bg-card">
-          <p className="font-mono text-[11px] uppercase text-muted-foreground">Skill Points</p>
-          <p className="text-2xl font-bold font-mono text-primary mt-1">
-            {totalPoints.toLocaleString()}
-          </p>
-          <p className="text-xs text-muted-foreground mt-1">Available to earn</p>
-        </Card>
-
-        <Card className="p-4 border-border bg-card">
-          <p className="font-mono text-[11px] uppercase text-muted-foreground">Target Level</p>
-          <p className="text-2xl font-bold font-mono text-foreground mt-1">
-            Level {totalPoints >= 250 ? (totalPoints >= 500 ? (totalPoints >= 1000 ? 5 : 4) : 3) : 2}
-          </p>
-          <p className="text-xs text-muted-foreground mt-1">
-            {totalPoints >= 250 ? "Clears Level 3 (250 pts)" : "Under Level 3"}
-          </p>
-        </Card>
+          {/* Search with '/' shortcut hint */}
+          <div className="relative w-full sm:w-64">
+            <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              ref={searchInputRef}
+              placeholder="Search tracks, slugs..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="h-9 pl-9 pr-8 text-xs rounded-lg bg-card border-border"
+            />
+            <kbd className="absolute right-2.5 top-2.5 hidden sm:inline-block px-1.5 py-0.5 text-[10px] font-mono text-muted-foreground bg-muted/60 border border-border/80 rounded">
+              /
+            </kbd>
+          </div>
+        </div>
       </div>
 
-      {/* Tracks Grid */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-base font-semibold text-foreground">All Learning Tracks</h2>
-          <span className="text-xs text-muted-foreground font-mono">
-            {initialTracks.length} tracks configured
-          </span>
-        </div>
-
-        {initialTracks.length === 0 ? (
-          <Card className="p-10 border-border bg-card text-center space-y-3">
-            <BookOpen className="h-10 w-10 text-muted-foreground mx-auto" />
-            <h3 className="text-base font-semibold text-foreground">No tracks yet</h3>
-            <p className="text-sm text-muted-foreground max-w-sm mx-auto">
-              Create your first practical learning track to start adding lessons and skill points.
-            </p>
-            <Button onClick={openCreateDialog} className="gap-2 mt-2">
-              <Plus className="h-4 w-4" />
-              <span>Create Track</span>
-            </Button>
-          </Card>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {initialTracks.map((track) => (
-              <Card
-                key={track.id}
-                className="p-5 border-border bg-card shadow-xs flex flex-col justify-between gap-4 hover:border-primary/40 transition-colors"
+      {/* Table Container */}
+      <div className="rounded-lg border border-border bg-card shadow-xs overflow-hidden">
+        {tracks.length === 0 ? (
+          <EmptyState
+            icon={GraduationCap}
+            title="No skill tracks yet"
+            description="Create your first structured learning track to host courses and lessons."
+            action={
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setCreateDialogOpen(true)}
+                className="gap-1.5 rounded-lg border-border h-8 text-xs"
               >
-                <div className="space-y-2.5">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <Badge
-                        variant="outline"
-                        className={
-                          track.is_published
-                            ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-500 font-mono text-[10px]"
-                            : "border-amber-500/30 bg-amber-500/10 text-amber-500 font-mono text-[10px]"
-                        }
-                      >
-                        {track.is_published ? "Published" : "Draft"}
-                      </Badge>
+                <Plus className="h-3.5 w-3.5" />
+                <span>Create first track</span>
+              </Button>
+            }
+          />
+        ) : filteredTracks.length === 0 ? (
+          <EmptyState
+            icon={Search}
+            title="No matching tracks"
+            description="No skill tracks match your active search and filter criteria."
+            action={
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={clearFilters}
+                className="rounded-lg border-border h-8 text-xs"
+              >
+                Clear filters
+              </Button>
+            }
+          />
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr className="border-b border-border bg-muted/40 font-sans text-xs font-medium text-muted-foreground">
+                  <th className="py-3 px-4 font-semibold">Track & Slug</th>
+                  <th className="py-3 px-4 font-semibold">Lessons</th>
+                  <th className="py-3 px-4 font-semibold">Skill Points</th>
+                  <th className="py-3 px-4 font-semibold">Status</th>
+                  <th className="py-3 px-4 font-semibold">Created</th>
+                  <th className="py-3 px-4 font-semibold text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border/60">
+                {filteredTracks.map((track) => (
+                  <tr
+                    key={track.id}
+                    onClick={() => router.push(`/admin/skill/${track.id}`)}
+                    className="hover:bg-secondary/40 transition-colors cursor-pointer group"
+                  >
+                    {/* Track Title & Slug */}
+                    <td className="py-3 px-4">
+                      <div className="min-w-0">
+                        <span className="font-semibold text-foreground truncate max-w-[240px] sm:max-w-none block font-sans">
+                          {track.title}
+                        </span>
+                        <span className="font-mono text-muted-foreground text-[11px] truncate block">
+                          /{track.slug}
+                        </span>
+                      </div>
+                    </td>
 
-                      <span className="font-mono text-xs text-muted-foreground">
-                        /{track.slug}
+                    {/* Lesson Count */}
+                    <td className="py-3 px-4 font-sans tabular-nums text-foreground">
+                      <span className="inline-flex items-center gap-1.5">
+                        <BookOpen className="h-3.5 w-3.5 text-muted-foreground" />
+                        <span>{track.lesson_count} {track.lesson_count === 1 ? "lesson" : "lessons"}</span>
                       </span>
-                    </div>
+                    </td>
 
-                    <span className="font-mono text-xs font-semibold text-primary shrink-0">
-                      +{track.total_points} pts
-                    </span>
-                  </div>
+                    {/* Skill Points */}
+                    <td className="py-3 px-4">
+                      <span className="inline-flex items-center gap-1 font-sans tabular-nums font-semibold px-2 py-0.5 rounded-full text-[11px] bg-[color:var(--data-signups-subtle)] text-[color:var(--data-signups-ink)] border border-[color:var(--data-signups-border)]">
+                        <Award className="h-3 w-3" />
+                        <span>{track.total_points} pts</span>
+                      </span>
+                    </td>
 
-                  <h3 className="text-base font-semibold text-foreground leading-snug">
-                    {track.title}
-                  </h3>
+                    {/* Status */}
+                    <td className="py-3 px-4">
+                      <StatusPill variant={track.is_published ? "verified" : "pending"} />
+                    </td>
 
-                  <p className="text-xs text-muted-foreground line-clamp-3 leading-relaxed">
-                    {track.description}
-                  </p>
-                </div>
+                    {/* Created Date */}
+                    <td className="py-3 px-4 font-sans tabular-nums text-xs text-muted-foreground whitespace-nowrap">
+                      {new Date(track.created_at).toLocaleDateString("en-NG", {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      })}
+                    </td>
 
-                <div className="space-y-3 pt-3 border-t border-border">
-                  <div className="flex items-center justify-between text-xs font-mono text-muted-foreground">
-                    <span className="flex items-center gap-1.5">
-                      <BookOpen className="h-3.5 w-3.5" />
-                      <span>{track.lesson_count} lessons</span>
-                    </span>
-                    <span>Created {new Date(track.created_at).toLocaleDateString()}</span>
-                  </div>
-
-                  <div className="flex items-center justify-between gap-2 pt-1">
-                    <div className="flex items-center gap-1.5">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => openEditDialog(track)}
-                        className="h-8 px-2 text-xs text-muted-foreground hover:text-foreground"
+                    {/* Actions Menu */}
+                    <td className="py-3 px-4 text-right">
+                      <div
+                        className="flex items-center justify-end gap-1.5"
+                        onClick={(e) => e.stopPropagation()}
                       >
-                        <Edit className="h-3.5 w-3.5 mr-1" />
-                        Edit
-                      </Button>
+                        <Button
+                          asChild
+                          size="sm"
+                          variant="outline"
+                          className="h-7 px-2 text-xs rounded-md border-border"
+                        >
+                          <Link href={`/admin/skill/${track.id}`}>
+                            <Edit className="h-3 w-3 mr-1" />
+                            Manage
+                          </Link>
+                        </Button>
 
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        disabled={isPending}
-                        onClick={() => handleTogglePublish(track)}
-                        className={`h-8 px-2 text-xs ${
-                          track.is_published
-                            ? "text-amber-500 hover:text-amber-400"
-                            : "text-emerald-500 hover:text-emerald-400"
-                        }`}
-                      >
-                        {track.is_published ? (
-                          <>
-                            <EyeOff className="h-3.5 w-3.5 mr-1" />
-                            Unpublish
-                          </>
-                        ) : (
-                          <>
-                            <Eye className="h-3.5 w-3.5 mr-1" />
-                            Publish
-                          </>
-                        )}
-                      </Button>
-                    </div>
-
-                    <Button asChild size="sm" variant="outline" className="h-8 gap-1.5 text-xs">
-                      <Link href={`/admin/skill/${track.id}`}>
-                        <span>Manage Lessons</span>
-                        <ArrowRight className="h-3.5 w-3.5" />
-                      </Link>
-                    </Button>
-                  </div>
-                </div>
-              </Card>
-            ))}
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground rounded-md"
+                              aria-label="Track actions"
+                            >
+                              <MoreHorizontal className="h-3.5 w-3.5" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-44 rounded-md">
+                            <DropdownMenuItem asChild className="text-xs gap-2">
+                              <Link href={`/skill/${track.slug}`} target="_blank">
+                                <ExternalLink className="h-3.5 w-3.5 text-muted-foreground" />
+                                <span>View student view</span>
+                              </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => handleTogglePublished(track)}
+                              className="text-xs gap-2"
+                            >
+                              {track.is_published ? (
+                                <>
+                                  <EyeOff className="h-3.5 w-3.5 text-amber-600" />
+                                  <span>Unpublish to draft</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Eye className="h-3.5 w-3.5 text-emerald-600" />
+                                  <span>Publish track</span>
+                                </>
+                              )}
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
       </div>
 
-      {/* Create / Edit Track Dialog */}
-      <Dialog
-        open={createDialogOpen || editTrack !== null}
-        onOpenChange={(open) => {
-          if (!open) {
-            setCreateDialogOpen(false);
-            setEditTrack(null);
-            resetForm();
-          }
-        }}
-      >
-        <DialogContent className="sm:max-w-md bg-card border-border">
+      {/* New Track Dialog */}
+      <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
+        <DialogContent className="sm:max-w-md rounded-lg">
           <DialogHeader>
-            <DialogTitle>
-              {editTrack ? "Edit Track Details" : "Create New Track"}
+            <DialogTitle className="text-base font-semibold text-foreground font-sans">
+              Create learning track
             </DialogTitle>
-            <DialogDescription>
-              {editTrack
-                ? "Update the track title, URL slug, and description."
-                : "Create a learning track. You can add lessons and publish it once ready."}
+            <DialogDescription className="text-xs text-muted-foreground font-sans">
+              Add a new structured curriculum track to host modules and lessons.
             </DialogDescription>
           </DialogHeader>
 
-          <form onSubmit={handleSaveTrack} className="space-y-4 py-2">
-            {formError && (
-              <div className="flex items-start gap-2 p-3 rounded-md bg-destructive/10 border border-destructive/20 text-destructive text-xs">
-                <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
-                <span>{formError}</span>
-              </div>
-            )}
-
+          <div className="space-y-4 py-2 text-xs">
+            {/* Title */}
             <div className="space-y-1.5">
-              <Label htmlFor="track-title" className="text-xs">
-                Title <span className="text-destructive">*</span>
-              </Label>
+              <label className="text-xs font-medium text-foreground block font-sans">
+                Track title *
+              </label>
               <Input
-                id="track-title"
-                value={title}
+                value={createTitle}
                 onChange={(e) => handleTitleChange(e.target.value)}
-                placeholder="e.g. Freelancing & Getting Paid Online"
-                maxLength={120}
-                required
+                placeholder="e.g. Modern Frontend Engineering"
+                className="h-9 text-xs rounded-md bg-background border-border"
               />
-              <span className="text-[10px] text-muted-foreground font-mono">
-                {title.length}/120 characters
-              </span>
+              {createErrors.title && (
+                <p className="text-[11px] font-medium text-[color:var(--data-negative-ink)] font-sans">
+                  {createErrors.title}
+                </p>
+              )}
             </div>
 
+            {/* URL Slug */}
             <div className="space-y-1.5">
-              <Label htmlFor="track-slug" className="text-xs">
-                URL Slug <span className="text-destructive">*</span>
-              </Label>
-              <Input
-                id="track-slug"
-                value={slug}
-                onChange={(e) => setSlug(e.target.value)}
-                placeholder="e.g. freelancing-and-getting-paid-online"
-                maxLength={120}
-                required
-              />
-              <span className="text-[10px] text-muted-foreground">
-                Lowercase letters, numbers, and hyphens only.
-              </span>
+              <label className="text-xs font-medium text-foreground block font-sans">
+                URL slug *
+              </label>
+              <div className="flex items-center rounded-md border border-border bg-background h-9 px-2.5 focus-within:ring-2 focus-within:ring-ring">
+                <span className="font-sans text-muted-foreground text-xs select-none pr-1">
+                  /skill/
+                </span>
+                <input
+                  type="text"
+                  value={createSlug}
+                  onChange={(e) => {
+                    setHasManuallyEditedSlug(true);
+                    setCreateSlug(e.target.value);
+                  }}
+                  placeholder="frontend-engineering"
+                  className="w-full bg-transparent font-mono text-xs text-foreground focus:outline-hidden"
+                />
+              </div>
+              {createErrors.slug && (
+                <p className="text-[11px] font-medium text-[color:var(--data-negative-ink)] font-sans">
+                  {createErrors.slug}
+                </p>
+              )}
             </div>
 
+            {/* Description */}
             <div className="space-y-1.5">
-              <Label htmlFor="track-description" className="text-xs">
-                Description <span className="text-destructive">*</span>
-              </Label>
+              <label className="text-xs font-medium text-foreground block font-sans">
+                Description *
+              </label>
               <Textarea
-                id="track-description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Explain what practical skills users will learn in this track..."
-                rows={4}
-                maxLength={500}
-                required
+                rows={3}
+                value={createDesc}
+                onChange={(e) => setCreateDesc(e.target.value)}
+                placeholder="Overview of curriculum objectives and learner outcomes..."
+                className="text-xs rounded-md bg-background border-border leading-relaxed font-sans"
               />
-              <span className="text-[10px] text-muted-foreground font-mono">
-                {description.length}/500 characters
-              </span>
+              {createErrors.description && (
+                <p className="text-[11px] font-medium text-[color:var(--data-negative-ink)] font-sans">
+                  {createErrors.description}
+                </p>
+              )}
             </div>
+          </div>
 
-            <DialogFooter className="pt-2">
-              <Button
-                type="button"
-                variant="outline"
-                disabled={isPending}
-                onClick={() => {
-                  setCreateDialogOpen(false);
-                  setEditTrack(null);
-                  resetForm();
-                }}
-              >
-                Cancel
-              </Button>
-              <Button type="submit" disabled={isPending} className="gap-2">
-                {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
-                <span>{editTrack ? "Save Changes" : "Create Track"}</span>
-              </Button>
-            </DialogFooter>
-          </form>
+          <DialogFooter className="gap-2 sm:gap-0 pt-2 border-t border-border">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setCreateDialogOpen(false)}
+              disabled={isPending}
+              className="text-xs h-8 rounded-md border-border"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              variant="default"
+              size="sm"
+              disabled={isPending}
+              onClick={handleCreateTrack}
+              className="text-xs h-8 rounded-md gap-1.5"
+            >
+              {isPending ? (
+                <>
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  <span>Creating...</span>
+                </>
+              ) : (
+                <>
+                  <Plus className="h-3.5 w-3.5" />
+                  <span>Create track</span>
+                </>
+              )}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

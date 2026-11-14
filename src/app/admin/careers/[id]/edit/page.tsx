@@ -29,9 +29,5 @@ export default async function AdminEditCareerRolePage({ params }: PageProps) {
     notFound();
   }
 
-  return (
-    <div className="max-w-4xl mx-auto py-2">
-      <AdminCareerFormClient mode="edit" initialRole={role} />
-    </div>
-  );
+  return <AdminCareerFormClient mode="edit" initialRole={role} />;
 }

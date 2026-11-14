@@ -47,6 +47,7 @@ import { SegmentedControl } from "@/components/admin/primitives/SegmentedControl
 import { EmptyState } from "@/components/admin/primitives/EmptyState";
 import { StatusPill } from "@/components/admin/people/StatusPill";
 import { AgePill } from "@/components/admin/people/AgePill";
+import { PanelSection, FieldList, FieldItem } from "@/components/admin/primitives/PanelSection";
 
 interface AdminMentorshipClientProps {
   initialApplications: MentorshipApplicationRow[];
@@ -238,7 +239,7 @@ export function AdminMentorshipClient({
         icon={Users}
         section="programs"
         badge={
-          <span className="font-mono text-xs font-semibold px-2 py-0.5 rounded-full bg-[color:var(--data-signups-subtle)] text-[color:var(--data-signups-ink)] border border-[color:var(--data-signups-border)]">
+          <span className="font-sans tabular-nums text-xs font-semibold px-2 py-0.5 rounded-full bg-[color:var(--data-signups-subtle)] text-[color:var(--data-signups-ink)] border border-[color:var(--data-signups-border)]">
             {total} total
           </span>
         }
@@ -291,7 +292,7 @@ export function AdminMentorshipClient({
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-border bg-muted/40 font-mono text-[11px] text-muted-foreground uppercase tracking-wider">
+                <tr className="border-b border-border bg-muted/40 font-sans text-xs font-medium text-muted-foreground">
                   <th className="py-3 px-4 font-semibold">Applicant</th>
                   <th className="py-3 px-4 font-semibold">Track & Experience</th>
                   <th className="py-3 px-4 font-semibold">Location & Age</th>
@@ -312,7 +313,7 @@ export function AdminMentorshipClient({
                       {/* Applicant */}
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-3">
-                          <div className="h-8 w-8 rounded-full bg-[color:var(--data-signups-subtle)] border border-[color:var(--data-signups-border)] text-[color:var(--data-signups-ink)] flex items-center justify-center font-mono font-bold text-[11px] shrink-0">
+                          <div className="h-8 w-8 rounded-full bg-[color:var(--data-signups-subtle)] border border-[color:var(--data-signups-border)] text-[color:var(--data-signups-ink)] flex items-center justify-center font-sans font-semibold text-[11px] shrink-0">
                             {initials}
                           </div>
                           <div className="min-w-0">
@@ -341,8 +342,8 @@ export function AdminMentorshipClient({
                         <div className="text-foreground truncate max-w-[180px]">
                           {app.location}
                         </div>
-                        <div className="text-muted-foreground font-mono text-[11px]">
-                          Age: {app.age}
+                        <div className="text-muted-foreground font-sans text-xs tabular-nums">
+                          Age: {app.age ?? "N/A"}
                         </div>
                       </td>
 
@@ -429,7 +430,7 @@ export function AdminMentorshipClient({
         }
         timestamp={
           selectedApp && (
-            <span className="font-mono text-[11px] text-muted-foreground">
+            <span className="tabular-nums font-sans text-xs text-muted-foreground">
               {new Date(selectedApp.created_at).toLocaleDateString("en-NG", {
                 month: "short",
                 day: "numeric",
@@ -478,12 +479,9 @@ export function AdminMentorshipClient({
         }
       >
         {selectedApp && (
-          <div className="space-y-5 text-xs p-5">
+          <div className="space-y-6 text-xs">
             {/* Quick Status Bar */}
-            <div className="p-3 rounded-lg border border-border bg-secondary/30 space-y-2">
-              <div className="text-[11px] font-mono text-muted-foreground uppercase font-semibold">
-                Set Status
-              </div>
+            <PanelSection title="Set status">
               <div className="flex flex-wrap gap-1.5">
                 {(["new", "reviewing", "accepted", "waitlisted", "declined"] as MentorshipStatus[]).map(
                   (st) => (
@@ -493,140 +491,88 @@ export function AdminMentorshipClient({
                       variant={selectedApp.status === st ? "default" : "outline"}
                       disabled={isPending || selectedApp.status === st}
                       onClick={() => handleStatusChange(selectedApp.id, st)}
-                      className="text-xs h-7 px-2.5 rounded-lg border-border capitalize"
+                      className="text-xs h-8 px-2.5 rounded-md border-border capitalize font-sans"
                     >
                       {st}
                     </Button>
                   )
                 )}
               </div>
-            </div>
+            </PanelSection>
 
             {/* Contact details */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="p-3 rounded-lg border border-border bg-card space-y-1">
-                <span className="text-muted-foreground flex items-center gap-1.5 font-medium">
-                  <Mail className="h-3.5 w-3.5" />
-                  Email
-                </span>
-                <a
-                  href={`mailto:${selectedApp.email}`}
-                  className="font-medium text-primary hover:underline block truncate"
-                >
-                  {selectedApp.email}
-                </a>
-              </div>
-
-              <div className="p-3 rounded-lg border border-border bg-card space-y-1">
-                <span className="text-muted-foreground flex items-center gap-1.5 font-medium">
-                  <Phone className="h-3.5 w-3.5" />
-                  Phone / WhatsApp
-                </span>
-                <a
-                  href={`tel:${selectedApp.phone}`}
-                  className="font-medium text-foreground hover:underline block truncate"
-                >
-                  {selectedApp.phone}
-                </a>
-              </div>
+            <div className="border-t border-border/60 pt-6">
+              <PanelSection title="Candidate profile">
+                <FieldList columns={2}>
+                  <FieldItem label="Email">
+                    <a
+                      href={`mailto:${selectedApp.email}`}
+                      className="font-medium text-primary hover:underline block truncate font-sans"
+                    >
+                      {selectedApp.email}
+                    </a>
+                  </FieldItem>
+                  <FieldItem label="Phone / WhatsApp">
+                    <a
+                      href={`tel:${selectedApp.phone}`}
+                      className="font-medium text-foreground hover:underline block truncate font-sans"
+                    >
+                      {selectedApp.phone}
+                    </a>
+                  </FieldItem>
+                  <FieldItem label="Interest area" value={selectedApp.interest_area} />
+                  <FieldItem label="Experience level">
+                    <span className="font-sans text-foreground capitalize">{selectedApp.experience_level}</span>
+                  </FieldItem>
+                  <FieldItem label="Location" value={selectedApp.location} />
+                  <FieldItem label="Age" value={selectedApp.age || undefined} />
+                  <FieldItem label="Institution" value={selectedApp.institution || undefined} />
+                  <FieldItem label="Format & availability">
+                    <span className="font-sans text-foreground capitalize">
+                      {selectedApp.preferred_format.replace("_", " ")} ({selectedApp.availability})
+                    </span>
+                  </FieldItem>
+                  {selectedApp.skills && (
+                    <FieldItem label="Current skills" span={2} value={selectedApp.skills} />
+                  )}
+                </FieldList>
+              </PanelSection>
             </div>
-
-            {/* Track, Location, Age */}
-            <div className="p-3 rounded-lg border border-border bg-card space-y-2.5">
-              <div className="text-[11px] font-mono uppercase text-muted-foreground font-semibold">
-                Candidate Profile
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <span className="text-muted-foreground block text-[11px]">Interest Area</span>
-                  <p className="font-semibold text-foreground">{selectedApp.interest_area}</p>
-                </div>
-                <div>
-                  <span className="text-muted-foreground block text-[11px]">Experience Level</span>
-                  <p className="font-medium text-foreground capitalize">
-                    {selectedApp.experience_level}
-                  </p>
-                </div>
-                <div>
-                  <span className="text-muted-foreground block text-[11px]">Location</span>
-                  <p className="font-medium text-foreground">{selectedApp.location}</p>
-                </div>
-                <div>
-                  <span className="text-muted-foreground block text-[11px]">Age</span>
-                  <p className="font-medium text-foreground">{selectedApp.age}</p>
-                </div>
-              </div>
-            </div>
-
-            {/* University & Format */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="p-3 rounded-lg border border-border bg-card space-y-1">
-                <span className="text-muted-foreground flex items-center gap-1 text-[11px]">
-                  <GraduationCap className="h-3 w-3" />
-                  Institution
-                </span>
-                <p className="font-medium text-foreground truncate">
-                  {selectedApp.institution || "Not specified"}
-                </p>
-              </div>
-
-              <div className="p-3 rounded-lg border border-border bg-card space-y-1">
-                <span className="text-muted-foreground flex items-center gap-1 text-[11px]">
-                  <Calendar className="h-3 w-3" />
-                  Format & Availability
-                </span>
-                <p className="font-medium text-foreground truncate capitalize">
-                  {selectedApp.preferred_format.replace("_", " ")} ({selectedApp.availability})
-                </p>
-              </div>
-            </div>
-
-            {/* Skills */}
-            {selectedApp.skills && (
-              <div className="p-3 rounded-lg border border-border bg-card space-y-1">
-                <span className="text-muted-foreground flex items-center gap-1 text-[11px]">
-                  <Wrench className="h-3 w-3" />
-                  Current Skills
-                </span>
-                <p className="font-medium text-foreground">{selectedApp.skills}</p>
-              </div>
-            )}
 
             {/* Goals */}
-            <div className="p-3.5 rounded-lg border border-border bg-card space-y-2">
-              <div className="text-[11px] font-mono uppercase text-muted-foreground font-semibold">
-                Goals &amp; Expectations
-              </div>
-              <p className="text-foreground leading-relaxed whitespace-pre-wrap font-sans">
-                {selectedApp.goals}
-              </p>
+            <div className="border-t border-border/60 pt-6">
+              <PanelSection title="Goals & expectations">
+                <p className="text-foreground leading-relaxed whitespace-pre-wrap font-sans">
+                  {selectedApp.goals || <span className="text-muted-foreground italic font-sans">Not provided</span>}
+                </p>
+              </PanelSection>
             </div>
 
-            {/* Admin Review Notes (Preserved) */}
-            <div className="p-3.5 rounded-lg border border-border bg-card space-y-2.5">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-mono uppercase text-muted-foreground font-semibold flex items-center gap-1.5">
-                  <MessageSquare className="h-3.5 w-3.5" />
-                  Admin Review Notes
-                </span>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  disabled={isPending}
-                  onClick={() => handleSaveNotes(selectedApp.id)}
-                  className="text-[11px] h-7 px-2 gap-1 rounded-lg border-border"
-                >
-                  <Save className="h-3 w-3" />
-                  <span>Save Notes</span>
-                </Button>
-              </div>
-              <textarea
-                rows={3}
-                placeholder="Add private internal notes about this applicant..."
-                value={adminNotesInput}
-                onChange={(e) => setAdminNotesInput(e.target.value)}
-                className="w-full rounded-lg border border-border bg-background p-3 font-sans text-xs text-foreground placeholder:text-muted-foreground/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary leading-relaxed resize-y"
-              />
+            {/* Admin Review Notes */}
+            <div className="border-t border-border/60 pt-6">
+              <PanelSection
+                title="Admin review notes"
+                action={
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={isPending}
+                    onClick={() => handleSaveNotes(selectedApp.id)}
+                    className="text-xs h-8 px-2.5 gap-1.5 rounded-md border-border font-sans"
+                  >
+                    <Save className="h-3.5 w-3.5" />
+                    <span>Save notes</span>
+                  </Button>
+                }
+              >
+                <textarea
+                  rows={3}
+                  placeholder="Add private internal notes about this applicant..."
+                  value={adminNotesInput}
+                  onChange={(e) => setAdminNotesInput(e.target.value)}
+                  className="w-full rounded-md border border-border bg-background p-3 font-sans text-xs text-foreground placeholder:text-muted-foreground/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary leading-relaxed resize-y"
+                />
+              </PanelSection>
             </div>
           </div>
         )}

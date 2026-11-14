@@ -6,16 +6,12 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export const metadata: Metadata = {
-  title: "Admin Console — New Career Role",
+  title: "New Career Role — Admin Console",
   description: "Create and publish a new career opportunity at Zed.",
 };
 
 export default async function AdminNewCareerRolePage() {
   await requireAdmin();
 
-  return (
-    <div className="max-w-4xl mx-auto py-2">
-      <AdminCareerFormClient mode="create" />
-    </div>
-  );
+  return <AdminCareerFormClient mode="create" />;
 }

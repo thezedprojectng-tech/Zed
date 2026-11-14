@@ -7,17 +7,13 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export const metadata: Metadata = {
-  title: "Admin Console — Careers & Job Openings",
-  description: "Manage public career opportunities, status, and job specifications.",
+  title: "Careers — Admin Console",
+  description: "Manage public career opportunities, roles, status and specifications.",
 };
 
 export default async function AdminCareersPage() {
   await requireAdmin();
   const roles = await adminGetRoles();
 
-  return (
-    <div className="max-w-6xl mx-auto py-2">
-      <AdminCareersClient initialRoles={roles} />
-    </div>
-  );
+  return <AdminCareersClient initialRoles={roles} />;
 }

@@ -1,37 +1,45 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition, useMemo, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
   Save,
-  Eye,
-  Edit3,
-  Briefcase,
-  MapPin,
-  Clock,
-  Flame,
-  CheckCircle2,
-  AlertCircle,
+  Globe,
+  Loader2,
   ExternalLink,
+  Lock,
+  Calendar,
+  AlertCircle,
+  Briefcase,
 } from "lucide-react";
 import { toast } from "sonner";
-import {
-  CAREERS_WHATSAPP_DISPLAY,
-  type CareerRoleRow,
-  type JobLocation,
-  type JobType,
-} from "@/data/careers";
+import type { CareerRoleRow, CareerRoleStatus, JobLocation, JobType } from "@/data/careers";
 import {
   slugify,
   parseLines,
   formatLines,
   LOCATION_OPTIONS,
   TYPE_OPTIONS,
-  type CareerRoleInput,
+  careerRoleSchema,
 } from "@/lib/careers/validation";
-import { adminSaveRoleAction } from "@/lib/careers/admin-actions";
+import {
+  adminSaveRoleAction,
+  adminSetRoleStatusAction,
+} from "@/lib/careers/admin-actions";
+import { PanelSection } from "@/components/admin/primitives/PanelSection";
+import { AdminCard } from "@/components/admin/primitives/AdminCard";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface AdminCareerFormClientProps {
   mode: "create" | "edit";
@@ -43,29 +51,19 @@ export function AdminCareerFormClient({
   initialRole,
 }: AdminCareerFormClientProps) {
   const router = useRouter();
+  const [isPending, startTransition] = useTransition();
 
-  // Form state
+  // Form states
   const [title, setTitle] = useState(initialRole?.title || "");
   const [slug, setSlug] = useState(initialRole?.slug || "");
-  const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState(
-    mode === "edit"
-  );
+  const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState(mode === "edit");
   const [department, setDepartment] = useState(initialRole?.department || "");
-  const [location, setLocation] = useState<JobLocation>(
-    initialRole?.location || "Remote"
-  );
-  const [type, setType] = useState<JobType>(
-    initialRole?.type || "Full-time"
-  );
-  const [featured, setFeatured] = useState<boolean>(
-    initialRole?.featured || false
-  );
+  const [location, setLocation] = useState<JobLocation>(initialRole?.location || "Remote");
+  const [type, setType] = useState<JobType>(initialRole?.type || "Full-time");
+  const [featured, setFeatured] = useState<boolean>(initialRole?.featured || false);
   const [summary, setSummary] = useState(initialRole?.summary || "");
 
-  // Textarea multiline state
-  const [aboutText, setAboutText] = useState(
-    formatLines(initialRole?.about)
-  );
+  // Multiline array states
   const [responsibilitiesText, setResponsibilitiesText] = useState(
     formatLines(initialRole?.responsibilities)
   );
@@ -75,40 +73,107 @@ export function AdminCareerFormClient({
   const [niceToHaveText, setNiceToHaveText] = useState(
     formatLines(initialRole?.nice_to_have)
   );
+  const [aboutText, setAboutText] = useState(
+    formatLines(initialRole?.about)
+  );
 
-  const [activeTab, setActiveTab] = useState<"edit" | "preview">("edit");
-  const [isSaving, setIsSaving] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  // Status state
+  const [status, setStatus] = useState<CareerRoleStatus>(initialRole?.status || "draft");
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
-  // If a role is currently published or was ever published (posted_at is not null),
-  // the slug is locked to avoid breaking external links.
+  // Slug locked if published or ever posted
   const isSlugLocked =
     mode === "edit" &&
     Boolean(initialRole?.status === "published" || initialRole?.posted_at);
 
-  const handleTitleChange = (newTitle: string) => {
-    setTitle(newTitle);
+  const handleTitleChange = (val: string) => {
+    setTitle(val);
     if (!isSlugManuallyEdited && !isSlugLocked) {
-      setSlug(slugify(newTitle));
+      setSlug(slugify(val));
+    }
+    if (fieldErrors.title) {
+      setFieldErrors((prev) => {
+        const next = { ...prev };
+        delete next.title;
+        return next;
+      });
     }
   };
 
-  const handleSlugChange = (newSlug: string) => {
+  const handleSlugChange = (val: string) => {
     setIsSlugManuallyEdited(true);
-    setSlug(slugify(newSlug));
+    setSlug(slugify(val));
+    if (fieldErrors.slug) {
+      setFieldErrors((prev) => {
+        const next = { ...prev };
+        delete next.slug;
+        return next;
+      });
+    }
   };
 
-  const parsedAbout = parseLines(aboutText);
-  const parsedResponsibilities = parseLines(responsibilitiesText);
-  const parsedRequirements = parseLines(requirementsText);
-  const parsedNiceToHave = parseLines(niceToHaveText);
+  // Dirty tracking
+  const isDirty = useMemo(() => {
+    if (mode === "create") {
+      return Boolean(
+        title.trim() ||
+        department.trim() ||
+        summary.trim() ||
+        responsibilitiesText.trim() ||
+        requirementsText.trim() ||
+        niceToHaveText.trim() ||
+        aboutText.trim()
+      );
+    }
+    if (!initialRole) return false;
+    return (
+      title !== initialRole.title ||
+      slug !== initialRole.slug ||
+      department !== initialRole.department ||
+      location !== initialRole.location ||
+      type !== initialRole.type ||
+      featured !== initialRole.featured ||
+      summary !== initialRole.summary ||
+      responsibilitiesText !== formatLines(initialRole.responsibilities) ||
+      requirementsText !== formatLines(initialRole.requirements) ||
+      niceToHaveText !== formatLines(initialRole.nice_to_have) ||
+      aboutText !== formatLines(initialRole.about) ||
+      status !== initialRole.status
+    );
+  }, [
+    mode,
+    initialRole,
+    title,
+    slug,
+    department,
+    location,
+    type,
+    featured,
+    summary,
+    responsibilitiesText,
+    requirementsText,
+    niceToHaveText,
+    aboutText,
+    status,
+  ]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setErrorMessage(null);
-    setIsSaving(true);
+  // Leave page dirty prompt
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (isDirty) {
+        e.preventDefault();
+        e.returnValue = "";
+      }
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [isDirty]);
 
-    const inputData: CareerRoleInput = {
+  // Save handler
+  const handleSave = useCallback(() => {
+    setFieldErrors({});
+
+    const inputData = {
       title,
       slug,
       department,
@@ -116,491 +181,490 @@ export function AdminCareerFormClient({
       type,
       featured,
       summary,
-      about: parsedAbout,
-      responsibilities: parsedResponsibilities,
-      requirements: parsedRequirements,
-      nice_to_have: parsedNiceToHave,
+      responsibilities: parseLines(responsibilitiesText),
+      requirements: parseLines(requirementsText),
+      nice_to_have: parseLines(niceToHaveText),
+      about: parseLines(aboutText),
     };
 
-    try {
-      const res = await adminSaveRoleAction({
-        id: mode === "edit" ? initialRole?.id : null,
-        input: inputData,
+    const parsed = careerRoleSchema.safeParse(inputData);
+    if (!parsed.success) {
+      const errs: Record<string, string> = {};
+      parsed.error.issues.forEach((issue) => {
+        const path = issue.path[0]?.toString() || "form";
+        if (!errs[path]) errs[path] = issue.message;
       });
-
-      if (!res.ok) {
-        setErrorMessage(res.error);
-        toast.error(res.error);
-        setIsSaving(false);
-        return;
-      }
-
-      toast.success(
-        mode === "create"
-          ? "Role created as draft."
-          : "Role updated successfully."
-      );
-
-      router.push("/admin/careers");
-      router.refresh();
-    } catch {
-      const msg = "Failed to save role. Please check your connection.";
-      setErrorMessage(msg);
-      toast.error(msg);
-      setIsSaving(false);
+      setFieldErrors(errs);
+      toast.error("Please fix the highlighted errors before saving");
+      return;
     }
-  };
+
+    startTransition(async () => {
+      try {
+        const res = await adminSaveRoleAction({
+          id: initialRole?.id ?? null,
+          input: inputData,
+        });
+
+        if (!res.ok) {
+          toast.error(res.error || "Failed to save career role");
+          return;
+        }
+
+        const roleId = res.data?.role_id || initialRole?.id;
+
+        // If status changed in edit mode, sync it
+        if (mode === "edit" && roleId && status !== initialRole?.status) {
+          await adminSetRoleStatusAction({
+            roleId,
+            status,
+            slug: res.data?.slug || slug,
+          });
+        }
+
+        toast.success(
+          mode === "create" ? "Career role created" : "Career role updated"
+        );
+
+        if (mode === "create" && roleId) {
+          router.push(`/admin/careers/${roleId}/edit`);
+        } else {
+          router.refresh();
+        }
+      } catch {
+        toast.error("An unexpected error occurred while saving");
+      }
+    });
+  }, [
+    title,
+    slug,
+    department,
+    location,
+    type,
+    featured,
+    summary,
+    responsibilitiesText,
+    requirementsText,
+    niceToHaveText,
+    aboutText,
+    initialRole,
+    mode,
+    status,
+    router,
+  ]);
+
+  // Shortcut Cmd/Ctrl + S
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "s") {
+        e.preventDefault();
+        handleSave();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [handleSave]);
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border pb-5">
-        <div className="space-y-1">
-          <Link
-            href="/admin/careers"
-            className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors group"
+    <div className="max-w-[1120px] mx-auto space-y-6 pb-20">
+      {/* Header Bar */}
+      <div className="flex items-center justify-between gap-4 border-b border-border/60 pb-4">
+        <div className="flex items-center gap-3 min-w-0">
+          <Button
+            asChild
+            variant="ghost"
+            size="sm"
+            className="h-8 px-2 text-xs text-muted-foreground hover:text-foreground gap-1.5 rounded-md"
           >
-            <ArrowLeft className="size-3.5 group-hover:-translate-x-0.5 transition-transform" />
-            <span>Back to roles list</span>
-          </Link>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">
-            {mode === "create" ? "Create Career Role" : `Edit Role: ${initialRole?.title}`}
+            <Link href="/admin/careers">
+              <ArrowLeft className="h-4 w-4" />
+              <span>Back to careers</span>
+            </Link>
+          </Button>
+          <div className="h-4 w-px bg-border/60" />
+          <h1 className="text-lg font-semibold text-foreground truncate font-sans">
+            {mode === "create" ? "New career role" : `Edit ${initialRole?.title}`}
           </h1>
         </div>
 
-        {/* View mode toggle */}
-        <div className="flex items-center gap-2">
-          <div className="inline-flex rounded-lg border border-border bg-muted p-0.5">
-            <button
-              type="button"
-              onClick={() => setActiveTab("edit")}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors cursor-pointer ${
-                activeTab === "edit"
-                  ? "bg-background text-foreground shadow-xs font-semibold"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              <Edit3 className="size-3.5" />
-              <span>Form</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveTab("preview")}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors cursor-pointer ${
-                activeTab === "preview"
-                  ? "bg-background text-foreground shadow-xs font-semibold"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              <Eye className="size-3.5" />
-              <span>Live Preview</span>
-            </button>
-          </div>
-        </div>
+        {mode === "edit" && initialRole?.status === "published" && (
+          <Button
+            asChild
+            variant="outline"
+            size="sm"
+            className="h-8 text-xs gap-1.5 rounded-md border-border"
+          >
+            <Link href={`/careers/${initialRole.slug}`} target="_blank">
+              <ExternalLink className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">View live listing</span>
+            </Link>
+          </Button>
+        )}
       </div>
 
-      {/* Error alert banner */}
-      {errorMessage && (
-        <div className="rounded-xl border border-destructive/20 bg-destructive/10 p-4 flex items-start gap-3 text-destructive text-sm">
-          <AlertCircle className="size-5 shrink-0 mt-0.5" />
-          <div className="space-y-1">
-            <p className="font-semibold">Unable to save role</p>
-            <p className="text-xs leading-relaxed">{errorMessage}</p>
-          </div>
-        </div>
-      )}
-
-      {activeTab === "edit" ? (
-        <form onSubmit={handleSubmit} className="space-y-8">
-          {/* Main Attributes */}
-          <div className="rounded-2xl border border-border bg-card p-5 sm:p-6 space-y-5">
-            <h2 className="text-base font-semibold text-foreground border-b border-border pb-3">
-              Role Details
-            </h2>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Title */}
+      {/* 2-Column Responsive Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-8 items-start">
+        {/* Left Column: Form Sections */}
+        <div className="space-y-8 min-w-0">
+          {/* Basics Section */}
+          <PanelSection
+            title="Basics"
+            description="Core role specifications visible in listings and application headers."
+          >
+            <div className="space-y-4 pt-1">
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-foreground">
-                  Role Title <span className="text-destructive">*</span>
+                <label className="text-sm font-medium text-foreground block font-sans">
+                  Role title *
                 </label>
-                <input
-                  type="text"
-                  required
+                <Input
                   value={title}
                   onChange={(e) => handleTitleChange(e.target.value)}
                   placeholder="e.g. Senior Frontend Engineer"
-                  className="w-full px-3.5 py-2 text-sm bg-background border border-border rounded-lg outline-none focus:ring-2 focus:ring-primary/40 text-foreground"
+                  className="h-10 text-sm rounded-md bg-card border-border"
                 />
-                <p className="text-[11px] text-muted-foreground">Between 3 and 120 characters.</p>
-              </div>
-
-              {/* Slug */}
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <label className="text-xs font-semibold text-foreground">
-                    URL Slug <span className="text-destructive">*</span>
-                  </label>
-                  {isSlugLocked && (
-                    <span className="text-[10px] font-mono text-amber-600 dark:text-amber-400">
-                      Locked (already published)
-                    </span>
-                  )}
-                </div>
-                <div className="flex items-center rounded-lg border border-border bg-background focus-within:ring-2 focus-within:ring-primary/40 overflow-hidden">
-                  <span className="pl-3 text-xs font-mono text-muted-foreground select-none">
-                    /careers/
-                  </span>
-                  <input
-                    type="text"
-                    required
-                    disabled={isSlugLocked}
-                    value={slug}
-                    onChange={(e) => handleSlugChange(e.target.value)}
-                    placeholder="senior-frontend-engineer"
-                    className="w-full px-2 py-2 text-sm bg-transparent outline-none text-foreground font-mono disabled:opacity-60 disabled:cursor-not-allowed"
-                  />
-                </div>
-                <p className="text-[11px] text-muted-foreground">
-                  Lowercase letters, numbers, and hyphens.
-                </p>
-              </div>
-
-              {/* Department */}
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-foreground">
-                  Department <span className="text-destructive">*</span>
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={department}
-                  onChange={(e) => setDepartment(e.target.value)}
-                  placeholder="e.g. Engineering, Design, Product, Growth"
-                  className="w-full px-3.5 py-2 text-sm bg-background border border-border rounded-lg outline-none focus:ring-2 focus:ring-primary/40 text-foreground"
-                />
-                <p className="text-[11px] text-muted-foreground">
-                  Used automatically to build department filter tabs.
-                </p>
-              </div>
-
-              {/* Location & Type */}
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-foreground">
-                    Location <span className="text-destructive">*</span>
-                  </label>
-                  <select
-                    value={location}
-                    onChange={(e) => setLocation(e.target.value as JobLocation)}
-                    className="w-full px-3 py-2 text-sm bg-background border border-border rounded-lg outline-none focus:ring-2 focus:ring-primary/40 text-foreground cursor-pointer"
-                  >
-                    {LOCATION_OPTIONS.map((loc) => (
-                      <option key={loc} value={loc}>
-                        {loc}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-foreground">
-                    Type <span className="text-destructive">*</span>
-                  </label>
-                  <select
-                    value={type}
-                    onChange={(e) => setType(e.target.value as JobType)}
-                    className="w-full px-3 py-2 text-sm bg-background border border-border rounded-lg outline-none focus:ring-2 focus:ring-primary/40 text-foreground cursor-pointer"
-                  >
-                    {TYPE_OPTIONS.map((t) => (
-                      <option key={t} value={t}>
-                        {t}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            {/* Featured Switch */}
-            <div className="flex items-center gap-3 pt-2">
-              <input
-                type="checkbox"
-                id="featured-switch"
-                checked={featured}
-                onChange={(e) => setFeatured(e.target.checked)}
-                className="size-4 rounded border-border text-primary focus:ring-primary cursor-pointer"
-              />
-              <label
-                htmlFor="featured-switch"
-                className="text-xs sm:text-sm font-medium text-foreground cursor-pointer select-none"
-              >
-                Mark as &ldquo;Hot&rdquo; / Featured role (highlighted with flame badge)
-              </label>
-            </div>
-
-            {/* Summary */}
-            <div className="space-y-1.5">
-              <div className="flex items-center justify-between">
-                <label className="text-xs font-semibold text-foreground">
-                  Summary <span className="text-destructive">*</span>
-                </label>
-                <span className="text-[11px] font-mono text-muted-foreground">
-                  {summary.length}/300
-                </span>
-              </div>
-              <textarea
-                required
-                rows={2}
-                maxLength={300}
-                value={summary}
-                onChange={(e) => setSummary(e.target.value)}
-                placeholder="A concise 1-2 sentence overview shown in the roles list and search previews."
-                className="w-full px-3.5 py-2 text-sm bg-background border border-border rounded-lg outline-none focus:ring-2 focus:ring-primary/40 text-foreground resize-none"
-              />
-            </div>
-          </div>
-
-          {/* Detailed Lists */}
-          <div className="rounded-2xl border border-border bg-card p-5 sm:p-6 space-y-6">
-            <div className="border-b border-border pb-3">
-              <h2 className="text-base font-semibold text-foreground">
-                Role Content & Specifications
-              </h2>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                Type one item per line. Blank lines are automatically skipped. Plain text only.
-              </p>
-            </div>
-
-            <div className="space-y-5">
-              {/* About the role */}
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <label className="text-xs font-semibold text-foreground">
-                    About the role paragraphs ({parsedAbout.length}/5)
-                  </label>
-                  <span className="text-[11px] text-muted-foreground">
-                    Max 5 paragraphs
-                  </span>
-                </div>
-                <textarea
-                  rows={4}
-                  value={aboutText}
-                  onChange={(e) => setAboutText(e.target.value)}
-                  placeholder={`You will shape our web platform.\nWe are looking for builders who take end-to-end ownership.`}
-                  className="w-full px-3.5 py-2.5 text-xs sm:text-sm font-sans bg-background border border-border rounded-lg outline-none focus:ring-2 focus:ring-primary/40 text-foreground"
-                />
-              </div>
-
-              {/* Responsibilities */}
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <label className="text-xs font-semibold text-foreground">
-                    Responsibilities ({parsedResponsibilities.length}/15){" "}
-                    <span className="text-destructive">*</span>
-                  </label>
-                  <span className="text-[11px] text-muted-foreground">
-                    At least 1 required before publishing (Max 15)
-                  </span>
-                </div>
-                <textarea
-                  rows={5}
-                  value={responsibilitiesText}
-                  onChange={(e) => setResponsibilitiesText(e.target.value)}
-                  placeholder={`Develop accessible, responsive UI components for the web platform.\nWork with product and design to craft intuitive user flows.\nEnsure high performance and SEO best practices across public pages.`}
-                  className="w-full px-3.5 py-2.5 text-xs sm:text-sm font-sans bg-background border border-border rounded-lg outline-none focus:ring-2 focus:ring-primary/40 text-foreground"
-                />
-              </div>
-
-              {/* Requirements */}
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <label className="text-xs font-semibold text-foreground">
-                    Requirements ({parsedRequirements.length}/15){" "}
-                    <span className="text-destructive">*</span>
-                  </label>
-                  <span className="text-[11px] text-muted-foreground">
-                    At least 1 required before publishing (Max 15)
-                  </span>
-                </div>
-                <textarea
-                  rows={5}
-                  value={requirementsText}
-                  onChange={(e) => setRequirementsText(e.target.value)}
-                  placeholder={`3+ years of professional React and TypeScript experience.\nDeep understanding of semantic HTML, accessibility, and modern CSS.\nComfortable shipping iteratively and taking feedback.`}
-                  className="w-full px-3.5 py-2.5 text-xs sm:text-sm font-sans bg-background border border-border rounded-lg outline-none focus:ring-2 focus:ring-primary/40 text-foreground"
-                />
-              </div>
-
-              {/* Nice to have */}
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <label className="text-xs font-semibold text-foreground">
-                    Nice to have ({parsedNiceToHave.length}/10)
-                  </label>
-                  <span className="text-[11px] text-muted-foreground">
-                    Optional (Max 10)
-                  </span>
-                </div>
-                <textarea
-                  rows={3}
-                  value={niceToHaveText}
-                  onChange={(e) => setNiceToHaveText(e.target.value)}
-                  placeholder={`Experience with Next.js App Router and Turbopack.\nActive open source portfolio or previous startup experience.`}
-                  className="w-full px-3.5 py-2.5 text-xs sm:text-sm font-sans bg-background border border-border rounded-lg outline-none focus:ring-2 focus:ring-primary/40 text-foreground"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Form Actions */}
-          <div className="flex items-center justify-end gap-3 pt-2">
-            <Link
-              href="/admin/careers"
-              className="px-4 py-2.5 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
-            >
-              Cancel
-            </Link>
-            <button
-              type="submit"
-              disabled={isSaving}
-              className="inline-flex items-center gap-2 px-6 py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground text-xs sm:text-sm font-semibold rounded-lg shadow-sm transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary cursor-pointer disabled:opacity-50"
-            >
-              <Save className="size-4" />
-              <span>{isSaving ? "Saving role..." : "Save Role"}</span>
-            </button>
-          </div>
-        </form>
-      ) : (
-        /* Live Preview View */
-        <div className="space-y-6">
-          <div className="rounded-xl border border-border bg-muted/30 p-4 flex items-center justify-between">
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <Eye className="size-4 text-primary" />
-              <span>
-                Previewing: <strong className="text-foreground">{title || "Untitled Role"}</strong>
-              </span>
-            </div>
-            <button
-              type="button"
-              onClick={() => setActiveTab("edit")}
-              className="text-xs font-medium text-primary hover:underline cursor-pointer"
-            >
-              Return to editor
-            </button>
-          </div>
-
-          {/* Role Preview Card */}
-          <div className="rounded-2xl border border-border bg-background p-6 sm:p-10 max-w-3xl mx-auto space-y-10 shadow-xs">
-            {/* Header */}
-            <div className="space-y-4 border-b border-border pb-8">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="inline-flex items-center gap-1 rounded-full border border-border bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
-                  <Briefcase className="size-3" />
-                  {department || "Department"}
-                </span>
-                {featured && (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-semibold text-amber-600 border border-amber-100 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-900">
-                    <Flame className="size-2.5" />
-                    Hot
-                  </span>
+                {fieldErrors.title && (
+                  <p className="text-xs font-medium text-[color:var(--data-negative-ink)] font-sans">
+                    {fieldErrors.title}
+                  </p>
                 )}
               </div>
 
-              <h1 className="text-2xl sm:text-4xl font-bold tracking-tight text-foreground leading-[1.15]">
-                {title || "Job Title Preview"}
-              </h1>
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-foreground block font-sans">
+                  Department *
+                </label>
+                <Input
+                  value={department}
+                  onChange={(e) => setDepartment(e.target.value)}
+                  placeholder="e.g. Engineering, Product, Growth"
+                  className="h-10 text-sm rounded-md bg-card border-border"
+                />
+                {fieldErrors.department && (
+                  <p className="text-xs font-medium text-[color:var(--data-negative-ink)] font-sans">
+                    {fieldErrors.department}
+                  </p>
+                )}
+              </div>
 
-              <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-                {summary || "A brief role summary will appear here."}
-              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium text-foreground block font-sans">
+                    Location *
+                  </label>
+                  <Select value={location} onValueChange={(val: any) => setLocation(val)}>
+                    <SelectTrigger className="h-10 text-xs rounded-md bg-card border-border">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-md">
+                      {LOCATION_OPTIONS.map((loc) => (
+                        <SelectItem key={loc} value={loc}>
+                          {loc}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-              <div className="flex flex-wrap items-center gap-2 pt-2">
-                <span className="inline-flex items-center gap-1 rounded-full border border-border bg-muted px-2.5 py-0.5 text-xs font-medium text-foreground">
-                  <MapPin className="size-2.5" />
-                  {location}
-                </span>
-                <span className="inline-flex items-center gap-1 rounded-full border border-border bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
-                  <Clock className="size-2.5" />
-                  {type}
-                </span>
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium text-foreground block font-sans">
+                    Employment type *
+                  </label>
+                  <Select value={type} onValueChange={(val: any) => setType(val)}>
+                    <SelectTrigger className="h-10 text-xs rounded-md bg-card border-border">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-md">
+                      {TYPE_OPTIONS.map((t) => (
+                        <SelectItem key={t} value={t}>
+                          {t}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="pt-2">
+                <label className="flex items-center gap-2 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={featured}
+                    onChange={(e) => setFeatured(e.target.checked)}
+                    className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
+                  />
+                  <span className="text-sm text-foreground font-sans">
+                    Feature this opening at the top of the careers page
+                  </span>
+                </label>
               </div>
             </div>
+          </PanelSection>
 
-            {/* About */}
-            {parsedAbout.length > 0 && (
-              <div className="space-y-3">
-                <h2 className="text-lg font-bold text-foreground">About the role</h2>
-                <div className="space-y-2 text-sm text-foreground/90 leading-relaxed">
-                  {parsedAbout.map((p, i) => (
-                    <p key={i}>{p}</p>
-                  ))}
+          {/* Summary Section */}
+          <PanelSection
+            title="Summary"
+            description="Brief highlight shown on search cards and social shares."
+          >
+            <div className="space-y-1.5 pt-1">
+              <Textarea
+                rows={3}
+                value={summary}
+                onChange={(e) => setSummary(e.target.value)}
+                placeholder="High-impact 1-2 sentence pitch describing who this person is and what they will build..."
+                className="text-xs rounded-md bg-card border-border leading-relaxed"
+              />
+              <div className="flex justify-between items-center text-xs text-muted-foreground font-sans">
+                <span>Maximum 300 characters.</span>
+                <span className="tabular-nums">{summary.length} / 300</span>
+              </div>
+              {fieldErrors.summary && (
+                <p className="text-xs font-medium text-[color:var(--data-negative-ink)] font-sans">
+                  {fieldErrors.summary}
+                </p>
+              )}
+            </div>
+          </PanelSection>
+
+          {/* Responsibilities Section */}
+          <PanelSection
+            title="Responsibilities"
+            description="Key expectations and deliverables. Enter one bullet point per line."
+          >
+            <div className="space-y-1.5 pt-1">
+              <Textarea
+                rows={6}
+                value={responsibilitiesText}
+                onChange={(e) => setResponsibilitiesText(e.target.value)}
+                placeholder="Architect and scale clean Next.js interfaces&#10;Collaborate with design and product leads&#10;Mentor junior engineering fellows"
+                className="text-xs rounded-md bg-card border-border leading-relaxed font-sans"
+              />
+              <p className="text-xs text-muted-foreground font-sans">
+                Each non-empty line becomes a distinct bullet in public specification.
+              </p>
+              {fieldErrors.responsibilities && (
+                <p className="text-xs font-medium text-[color:var(--data-negative-ink)] font-sans">
+                  {fieldErrors.responsibilities}
+                </p>
+              )}
+            </div>
+          </PanelSection>
+
+          {/* Requirements Section */}
+          <PanelSection
+            title="Requirements"
+            description="Core skills and baseline competencies needed. Enter one bullet point per line."
+          >
+            <div className="space-y-1.5 pt-1">
+              <Textarea
+                rows={6}
+                value={requirementsText}
+                onChange={(e) => setRequirementsText(e.target.value)}
+                placeholder="3+ years production TypeScript and React experience&#10;Strong understanding of web accessibility standards&#10;Demonstrated product craftsmanship"
+                className="text-xs rounded-md bg-card border-border leading-relaxed font-sans"
+              />
+              <p className="text-xs text-muted-foreground font-sans">
+                Each non-empty line becomes a requirement bullet.
+              </p>
+              {fieldErrors.requirements && (
+                <p className="text-xs font-medium text-[color:var(--data-negative-ink)] font-sans">
+                  {fieldErrors.requirements}
+                </p>
+              )}
+            </div>
+          </PanelSection>
+
+          {/* Nice to Have Section */}
+          <PanelSection
+            title="Nice to have"
+            description="Bonus qualifications and preferred experience. Enter one bullet point per line."
+          >
+            <div className="space-y-1.5 pt-1">
+              <Textarea
+                rows={5}
+                value={niceToHaveText}
+                onChange={(e) => setNiceToHaveText(e.target.value)}
+                placeholder="Experience with Supabase or PostgreSQL schemas&#10;Background in youth education or civic technology in Nigeria"
+                className="text-xs rounded-md bg-card border-border leading-relaxed font-sans"
+              />
+              <p className="text-xs text-muted-foreground font-sans">
+                Optional benefits and bonuses. Leave blank if none.
+              </p>
+              {fieldErrors.nice_to_have && (
+                <p className="text-xs font-medium text-[color:var(--data-negative-ink)] font-sans">
+                  {fieldErrors.nice_to_have}
+                </p>
+              )}
+            </div>
+          </PanelSection>
+
+          {/* About Zed Section */}
+          <PanelSection
+            title="About the team"
+            description="Overview of mission and workplace culture. Enter one bullet point per line."
+          >
+            <div className="space-y-1.5 pt-1">
+              <Textarea
+                rows={4}
+                value={aboutText}
+                onChange={(e) => setAboutText(e.target.value)}
+                placeholder="Zed builds sovereign civic infrastructure for Nigerian students and youth."
+                className="text-xs rounded-md bg-card border-border leading-relaxed font-sans"
+              />
+              <p className="text-xs text-muted-foreground font-sans">
+                Leave blank to inherit the global platform boilerplate.
+              </p>
+            </div>
+          </PanelSection>
+        </div>
+
+        {/* Right Sticky Column: Publish Card */}
+        <div className="space-y-6 lg:sticky lg:top-20">
+          <AdminCard className="p-5 space-y-5 rounded-lg border-border">
+            <h2 className="text-sm font-semibold text-foreground font-sans">
+              Publishing &amp; URL
+            </h2>
+
+            {/* Status Select */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-foreground block font-sans">
+                Status
+              </label>
+              <Select
+                value={status}
+                onValueChange={(val: CareerRoleStatus) => setStatus(val)}
+                disabled={isPending}
+              >
+                <SelectTrigger className="h-9 text-xs rounded-md bg-background border-border">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="rounded-md">
+                  <SelectItem value="draft">Draft (Internal)</SelectItem>
+                  <SelectItem value="published">Published (Live)</SelectItem>
+                  <SelectItem value="closed">Closed (Archived)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* URL Slug */}
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-medium text-foreground block font-sans">
+                  URL slug *
+                </label>
+                {isSlugLocked && (
+                  <span className="text-[10px] text-muted-foreground flex items-center gap-1 font-sans">
+                    <Lock className="h-3 w-3" /> Locked
+                  </span>
+                )}
+              </div>
+              <div className="flex items-center rounded-md border border-border bg-background h-9 px-2.5 focus-within:ring-2 focus-within:ring-ring transition-shadow">
+                <span className="font-sans text-muted-foreground text-xs select-none pr-1">
+                  /careers/
+                </span>
+                <input
+                  type="text"
+                  value={slug}
+                  disabled={isSlugLocked}
+                  onChange={(e) => handleSlugChange(e.target.value)}
+                  placeholder="frontend-engineer"
+                  className="w-full bg-transparent font-mono text-xs text-foreground focus:outline-hidden disabled:opacity-60"
+                />
+              </div>
+              {fieldErrors.slug && (
+                <p className="text-[11px] font-medium text-[color:var(--data-negative-ink)] font-sans">
+                  {fieldErrors.slug}
+                </p>
+              )}
+            </div>
+
+            {/* Posted / Created Metadata */}
+            {initialRole?.posted_at && (
+              <div className="text-xs text-muted-foreground space-y-1 border-t border-border/60 pt-3 font-sans">
+                <div className="flex justify-between">
+                  <span>First published:</span>
+                  <span className="tabular-nums">
+                    {new Date(initialRole.posted_at).toLocaleDateString("en-NG", {
+                      day: "numeric",
+                      month: "short",
+                      year: "numeric",
+                    })}
+                  </span>
                 </div>
               </div>
             )}
 
-            {/* Responsibilities */}
-            {parsedResponsibilities.length > 0 && (
-              <div className="space-y-3">
-                <h2 className="text-lg font-bold text-foreground">Responsibilities</h2>
-                <ul className="space-y-2 text-sm text-foreground/90">
-                  {parsedResponsibilities.map((item, i) => (
-                    <li key={i} className="flex items-start gap-2.5">
-                      <CheckCircle2 className="size-4 text-primary shrink-0 mt-0.5" />
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
+            {/* Dirty Status & Save Button */}
+            <div className="pt-2 space-y-3">
+              {isDirty && (
+                <div className="flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-400 font-sans">
+                  <span className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse" />
+                  <span>Unsaved changes</span>
+                </div>
+              )}
 
-            {/* Requirements */}
-            {parsedRequirements.length > 0 && (
-              <div className="space-y-3">
-                <h2 className="text-lg font-bold text-foreground">Requirements</h2>
-                <ul className="space-y-2 text-sm text-foreground/90">
-                  {parsedRequirements.map((item, i) => (
-                    <li key={i} className="flex items-start gap-2.5">
-                      <CheckCircle2 className="size-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
+              <Button
+                type="button"
+                variant="default"
+                disabled={isPending}
+                onClick={handleSave}
+                className="w-full h-10 text-xs rounded-md gap-1.5"
+              >
+                {isPending ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <span>Saving...</span>
+                  </>
+                ) : (
+                  <>
+                    <Save className="h-4 w-4" />
+                    <span>{mode === "create" ? "Create role" : "Save changes"}</span>
+                  </>
+                )}
+              </Button>
 
-            {/* Nice to have */}
-            {parsedNiceToHave.length > 0 && (
-              <div className="space-y-3">
-                <h2 className="text-lg font-bold text-foreground">Nice to have</h2>
-                <ul className="space-y-2 text-sm text-muted-foreground">
-                  {parsedNiceToHave.map((item, i) => (
-                    <li key={i} className="flex items-start gap-2.5">
-                      <span className="inline-block size-1.5 rounded-full bg-muted-foreground/60 shrink-0 mt-2" />
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {/* How to apply preview */}
-            <div className="rounded-xl border border-border bg-muted/40 p-5 space-y-3">
-              <h3 className="text-sm font-bold text-foreground">How to apply</h3>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                Applicants send their full name, intro, and CV/portfolio link on WhatsApp:{" "}
-                <strong className="text-foreground">{CAREERS_WHATSAPP_DISPLAY}</strong>
+              <p className="text-[11px] text-center text-muted-foreground font-sans">
+                Shortcut: <kbd className="font-mono text-[10px] bg-muted px-1.5 py-0.5 rounded border border-border">Ctrl+S</kbd>
               </p>
-              <div className="pt-1">
-                <span className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#25D366] text-white text-xs font-semibold rounded-lg opacity-90">
-                  <span>Apply on WhatsApp</span>
-                  <ExternalLink className="size-3" />
-                </span>
-              </div>
             </div>
-          </div>
+          </AdminCard>
         </div>
-      )}
+      </div>
+
+      {/* Mobile Sticky Bottom Bar */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 p-3 bg-card/95 backdrop-blur-xs border-t border-border flex items-center justify-between gap-3 z-30">
+        <div>
+          {isDirty && (
+            <span className="text-xs text-amber-600 dark:text-amber-400 font-sans flex items-center gap-1">
+              <span className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse" />
+              Unsaved changes
+            </span>
+          )}
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
+            asChild
+            variant="ghost"
+            size="sm"
+            className="text-xs h-9 rounded-md"
+          >
+            <Link href="/admin/careers">Cancel</Link>
+          </Button>
+          <Button
+            size="sm"
+            variant="default"
+            disabled={isPending}
+            onClick={handleSave}
+            className="text-xs h-9 rounded-md gap-1.5"
+          >
+            {isPending ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <Save className="h-3.5 w-3.5" />
+            )}
+            <span>Save</span>
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }

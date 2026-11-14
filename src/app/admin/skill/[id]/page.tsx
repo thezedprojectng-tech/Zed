@@ -1,4 +1,4 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { requireAdmin } from "@/lib/auth/admin-guard";
 import { getAdminTrackDetail } from "@/lib/skill/admin-actions";
@@ -15,8 +15,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { id } = await params;
   const track = await getAdminTrackDetail(id);
   return {
-    title: track ? `Admin Console — ${track.title}` : "Admin Console — Track Detail",
-    description: "Manage learning track lessons and point configurations",
+    title: track ? `Track: ${track.title} — Admin Console` : "Track Details — Admin Console",
+    description: "Manage learning track lessons, modules and point configurations",
   };
 }
 
@@ -29,9 +29,5 @@ export default async function AdminTrackDetailPage({ params }: PageProps) {
     notFound();
   }
 
-  return (
-    <div className="max-w-6xl mx-auto py-2">
-      <AdminTrackDetailClient initialTrack={track} />
-    </div>
-  );
+  return <AdminTrackDetailClient initialTrack={track} />;
 }

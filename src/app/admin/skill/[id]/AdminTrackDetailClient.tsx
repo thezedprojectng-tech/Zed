@@ -1,39 +1,8 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import {
-  AdminTrackDetail,
-  AdminLessonItem,
-  adminUpdateTrackAction,
-  adminSetTrackPublishedAction,
-  adminSaveLessonAction,
-  adminReorderLessonsAction,
-  adminDeleteLessonAction,
-} from "@/lib/skill/admin-actions";
-import {
-  canPublishTrack,
-  reorderLessonList,
-  lessonSchema,
-  trackSchema,
-} from "@/lib/skill/validation";
-import { LessonMarkdown } from "@/components/skill/LessonMarkdown";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   ArrowLeft,
   BookOpen,
@@ -42,188 +11,239 @@ import {
   ArrowDown,
   Edit,
   Trash2,
+  ExternalLink,
+  Award,
+  Loader2,
+  Save,
+  CheckCircle2,
+  XCircle,
   Eye,
   EyeOff,
-  AlertTriangle,
-  AlertCircle,
-  Loader2,
-  Users,
+  GripVertical,
 } from "lucide-react";
 import { toast } from "sonner";
+import type { AdminTrackDetail, AdminLessonItem } from "@/lib/skill/admin-actions";
+import {
+  adminUpdateTrackAction,
+  adminSetTrackPublishedAction,
+  adminSaveLessonAction,
+  adminReorderLessonsAction,
+  adminDeleteLessonAction,
+} from "@/lib/skill/admin-actions";
+import {
+  lessonSchema,
+  trackSchema,
+  reorderLessonList,
+} from "@/lib/skill/validation";
+import { LessonMarkdown } from "@/components/skill/LessonMarkdown";
+import { PanelSection } from "@/components/admin/primitives/PanelSection";
+import { AdminCard } from "@/components/admin/primitives/AdminCard";
+import { StatusPill } from "@/components/admin/people/StatusPill";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
 
-interface Props {
+interface AdminTrackDetailClientProps {
   initialTrack: AdminTrackDetail;
 }
 
-export function AdminTrackDetailClient({ initialTrack }: Props) {
+export function AdminTrackDetailClient({
+  initialTrack,
+}: AdminTrackDetailClientProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
-  // Track edit modal
-  const [trackModalOpen, setTrackModalOpen] = useState(false);
+  // Track editable states
   const [trackTitle, setTrackTitle] = useState(initialTrack.title);
   const [trackSlug, setTrackSlug] = useState(initialTrack.slug);
   const [trackDesc, setTrackDesc] = useState(initialTrack.description);
-  const [trackError, setTrackError] = useState<string | null>(null);
+  const [isPublished, setIsPublished] = useState(initialTrack.is_published);
+  const [trackErrors, setTrackErrors] = useState<Record<string, string>>({});
 
-  // Lesson editor modal
+  // Lessons list state (ordered)
+  const [lessons, setLessons] = useState<AdminLessonItem[]>(initialTrack.lessons || []);
+
+  // Lesson editor modal state
   const [lessonModalOpen, setLessonModalOpen] = useState(false);
-  const [editingLesson, setEditingLesson] = useState<AdminLessonItem | null>(null);
+  const [editingLessonId, setEditingLessonId] = useState<string | null>(null);
   const [lessonTitle, setLessonTitle] = useState("");
   const [lessonSummary, setLessonSummary] = useState("");
   const [lessonContent, setLessonContent] = useState("");
   const [lessonPoints, setLessonPoints] = useState(15);
-  const [lessonPos, setLessonPos] = useState(1);
-  const [lessonError, setLessonError] = useState<string | null>(null);
-  const [editorTab, setEditorTab] = useState<"edit" | "preview">("edit");
+  const [lessonPosition, setLessonPosition] = useState(1);
+  const [lessonErrors, setLessonErrors] = useState<Record<string, string>>({});
+  const [lessonEditorMode, setLessonEditorMode] = useState<"write" | "preview">("write");
 
-  // Delete lesson modal
+  // Lesson deletion modal state
   const [deletingLesson, setDeletingLesson] = useState<AdminLessonItem | null>(null);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
-  // Track Edit Handlers
-  const handleOpenTrackEdit = () => {
-    setTrackTitle(initialTrack.title);
-    setTrackSlug(initialTrack.slug);
-    setTrackDesc(initialTrack.description);
-    setTrackError(null);
-    setTrackModalOpen(true);
-  };
+  // Compute total points from lessons
+  const totalPoints = useMemo(
+    () => lessons.reduce((acc, l) => acc + (l.skill_points || 0), 0),
+    [lessons]
+  );
 
-  const handleSaveTrack = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setTrackError(null);
+  const isTrackDirty = useMemo(
+    () =>
+      trackTitle !== initialTrack.title ||
+      trackSlug !== initialTrack.slug ||
+      trackDesc !== initialTrack.description,
+    [trackTitle, trackSlug, trackDesc, initialTrack]
+  );
 
-    const validation = trackSchema.safeParse({
+  // Track Save handler
+  const handleSaveTrack = () => {
+    setTrackErrors({});
+    const parsed = trackSchema.safeParse({
       title: trackTitle,
       slug: trackSlug,
       description: trackDesc,
     });
 
-    if (!validation.success) {
-      const msg = validation.error.issues[0]?.message ?? "Validation failed";
-      setTrackError(msg);
+    if (!parsed.success) {
+      const errs: Record<string, string> = {};
+      parsed.error.issues.forEach((issue) => {
+        const path = issue.path[0]?.toString() || "form";
+        if (!errs[path]) errs[path] = issue.message;
+      });
+      setTrackErrors(errs);
+      toast.error("Please fix the errors before updating track");
       return;
     }
 
     startTransition(async () => {
-      const res = await adminUpdateTrackAction(initialTrack.id, validation.data);
+      const res = await adminUpdateTrackAction(initialTrack.id, {
+        title: trackTitle,
+        slug: trackSlug,
+        description: trackDesc,
+      });
+
       if (!res.ok) {
-        setTrackError(res.error);
-        toast.error(res.error);
+        toast.error(res.error || "Failed to update track");
         return;
       }
-      toast.success("Track updated");
-      setTrackModalOpen(false);
+
+      toast.success("Track details updated");
       router.refresh();
     });
   };
 
+  // Toggle Track Publishing
   const handleTogglePublish = () => {
-    const nextState = !initialTrack.is_published;
-    if (nextState) {
-      const check = canPublishTrack(initialTrack.lessons);
-      if (!check.allowed) {
-        toast.error(check.reason || "Track cannot be published");
-        return;
-      }
-    }
-
     startTransition(async () => {
-      const res = await adminSetTrackPublishedAction(initialTrack.id, nextState);
+      const nextPublished = !isPublished;
+      const res = await adminSetTrackPublishedAction(initialTrack.id, nextPublished);
+
       if (!res.ok) {
-        toast.error(res.error);
+        toast.error(res.error || "Failed to toggle publishing status");
         return;
       }
+
+      setIsPublished(nextPublished);
       toast.success(
-        nextState
-          ? `Published "${initialTrack.title}"`
-          : `Unpublished "${initialTrack.title}"`
+        nextPublished
+          ? "Track is now published and visible to learners"
+          : "Track reverted to draft"
       );
       router.refresh();
     });
   };
 
-  // Lesson Edit Handlers
-  const handleOpenNewLesson = () => {
-    const nextPos =
-      initialTrack.lessons.length > 0
-        ? Math.max(...initialTrack.lessons.map((l) => l.position)) + 1
-        : 1;
-
-    setEditingLesson(null);
+  // Lesson editor handlers
+  const openNewLessonModal = () => {
+    setEditingLessonId(null);
     setLessonTitle("");
     setLessonSummary("");
     setLessonContent("");
     setLessonPoints(15);
-    setLessonPos(nextPos);
-    setLessonError(null);
-    setEditorTab("edit");
+    setLessonPosition(lessons.length + 1);
+    setLessonErrors({});
+    setLessonEditorMode("write");
     setLessonModalOpen(true);
   };
 
-  const handleOpenEditLesson = (lesson: AdminLessonItem) => {
-    setEditingLesson(lesson);
+  const openEditLessonModal = (lesson: AdminLessonItem) => {
+    setEditingLessonId(lesson.id);
     setLessonTitle(lesson.title);
     setLessonSummary(lesson.summary);
     setLessonContent(lesson.content_md);
     setLessonPoints(lesson.skill_points);
-    setLessonPos(lesson.position);
-    setLessonError(null);
-    setEditorTab("edit");
+    setLessonPosition(lesson.position);
+    setLessonErrors({});
+    setLessonEditorMode("write");
     setLessonModalOpen(true);
   };
 
-  const handleSaveLesson = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLessonError(null);
-
-    const validation = lessonSchema.safeParse({
+  const handleSaveLesson = () => {
+    setLessonErrors({});
+    const inputData = {
       title: lessonTitle,
       summary: lessonSummary,
       content_md: lessonContent,
       skill_points: Number(lessonPoints),
-      position: Number(lessonPos),
-    });
+      position: Number(lessonPosition),
+    };
 
-    if (!validation.success) {
-      const msg = validation.error.issues[0]?.message ?? "Validation failed";
-      setLessonError(msg);
+    const parsed = lessonSchema.safeParse(inputData);
+    if (!parsed.success) {
+      const errs: Record<string, string> = {};
+      parsed.error.issues.forEach((issue) => {
+        const path = issue.path[0]?.toString() || "form";
+        if (!errs[path]) errs[path] = issue.message;
+      });
+      setLessonErrors(errs);
+      toast.error("Please fix the highlighted errors");
       return;
     }
 
     startTransition(async () => {
       const res = await adminSaveLessonAction({
-        lessonId: editingLesson ? editingLesson.id : null,
+        lessonId: editingLessonId ?? null,
         trackId: initialTrack.id,
-        input: validation.data,
+        input: inputData,
       });
 
       if (!res.ok) {
-        setLessonError(res.error);
-        toast.error(res.error);
+        toast.error(res.error || "Failed to save lesson");
         return;
       }
 
-      toast.success(
-        editingLesson ? "Lesson updated successfully" : "Lesson created successfully"
-      );
+      toast.success(editingLessonId ? "Lesson updated" : "Lesson created");
       setLessonModalOpen(false);
       router.refresh();
     });
   };
 
-  // Reorder Lessons
+  // Reorder lessons
   const handleMoveLesson = (index: number, direction: "up" | "down") => {
     const targetIndex = direction === "up" ? index - 1 : index + 1;
-    if (targetIndex < 0 || targetIndex >= initialTrack.lessons.length) return;
+    if (targetIndex < 0 || targetIndex >= lessons.length) return;
 
-    const reordered = reorderLessonList(initialTrack.lessons, index, targetIndex);
-    const orderedIds = reordered.map((l) => l.id);
+    const newLessons = [...lessons];
+    const [moved] = newLessons.splice(index, 1);
+    newLessons.splice(targetIndex, 0, moved);
+
+    // Reassign position numbers
+    const updated = newLessons.map((l, i) => ({ ...l, position: i + 1 }));
+    setLessons(updated);
 
     startTransition(async () => {
-      const res = await adminReorderLessonsAction(initialTrack.id, orderedIds);
+      const ids = updated.map((l) => l.id);
+      const res = await adminReorderLessonsAction(initialTrack.id, ids);
       if (!res.ok) {
-        toast.error(res.error);
+        toast.error(res.error || "Failed to reorder lessons");
+        setLessons(initialTrack.lessons || []);
         return;
       }
       toast.success("Lessons reordered");
@@ -231,572 +251,581 @@ export function AdminTrackDetailClient({ initialTrack }: Props) {
     });
   };
 
-  // Delete Lesson
+  // Delete lesson
   const handleDeleteLesson = () => {
     if (!deletingLesson) return;
-
-    if (deletingLesson.completion_count > 0) {
-      toast.error(
-        `Cannot delete a lesson that users have already completed (${deletingLesson.completion_count} completions). Please unpublish the track instead.`
-      );
-      setDeletingLesson(null);
-      return;
-    }
+    setIsDeleting(true);
 
     startTransition(async () => {
       const res = await adminDeleteLessonAction(deletingLesson.id, initialTrack.id);
       if (!res.ok) {
-        toast.error(res.error);
+        toast.error(res.error || "Failed to delete lesson");
+        setIsDeleting(false);
         return;
       }
+
+      setLessons((prev) => prev.filter((l) => l.id !== deletingLesson.id));
       toast.success("Lesson deleted");
+      setDeleteConfirmOpen(false);
       setDeletingLesson(null);
+      setIsDeleting(false);
       router.refresh();
     });
   };
 
-  const totalPoints = initialTrack.lessons.reduce((acc, l) => acc + l.skill_points, 0);
-
   return (
-    <div className="space-y-6">
-      {/* Back button */}
-      <div>
-        <Link
-          href="/admin/skill"
-          className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+    <div className="max-w-[1120px] mx-auto space-y-6 pb-20">
+      {/* Header Bar */}
+      <div className="flex items-center justify-between gap-4 border-b border-border/60 pb-4">
+        <div className="flex items-center gap-3 min-w-0">
+          <Button
+            asChild
+            variant="ghost"
+            size="sm"
+            className="h-8 px-2 text-xs text-muted-foreground hover:text-foreground gap-1.5 rounded-md"
+          >
+            <Link href="/admin/skill">
+              <ArrowLeft className="h-4 w-4" />
+              <span>Back to tracks</span>
+            </Link>
+          </Button>
+          <div className="h-4 w-px bg-border/60" />
+          <h1 className="text-lg font-semibold text-foreground truncate font-sans">
+            {initialTrack.title}
+          </h1>
+        </div>
+
+        <Button
+          asChild
+          variant="outline"
+          size="sm"
+          className="h-8 text-xs gap-1.5 rounded-md border-border"
         >
-          <ArrowLeft className="h-3.5 w-3.5" />
-          <span>Back to All Tracks</span>
-        </Link>
+          <Link href={`/skill/${initialTrack.slug}`} target="_blank">
+            <ExternalLink className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Student curriculum view</span>
+          </Link>
+        </Button>
       </div>
 
-      {/* Track Header Card */}
-      <Card className="p-6 border-border bg-card shadow-xs space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-          <div className="space-y-2 max-w-2xl">
-            <div className="flex items-center gap-2 flex-wrap">
-              <Badge
-                variant="outline"
-                className={
-                  initialTrack.is_published
-                    ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-500 font-mono text-[10px]"
-                    : "border-amber-500/30 bg-amber-500/10 text-amber-500 font-mono text-[10px]"
-                }
-              >
-                {initialTrack.is_published ? "Published" : "Draft"}
-              </Badge>
-
-              <span className="font-mono text-xs text-muted-foreground">
-                Slug: /{initialTrack.slug}
-              </span>
-            </div>
-
-            <h1 className="text-2xl font-bold text-foreground">
-              {initialTrack.title}
-            </h1>
-
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              {initialTrack.description}
-            </p>
-          </div>
-
-          <div className="flex items-center gap-2 shrink-0">
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={handleOpenTrackEdit}
-              className="gap-1.5"
-            >
-              <Edit className="h-3.5 w-3.5" />
-              <span>Edit Details</span>
-            </Button>
-
-            <Button
-              size="sm"
-              variant={initialTrack.is_published ? "outline" : "default"}
-              disabled={isPending}
-              onClick={handleTogglePublish}
-              className="gap-1.5"
-            >
-              {initialTrack.is_published ? (
-                <>
-                  <EyeOff className="h-3.5 w-3.5 text-amber-500" />
-                  <span>Unpublish</span>
-                </>
-              ) : (
-                <>
-                  <Eye className="h-3.5 w-3.5 text-emerald-500" />
-                  <span>Publish</span>
-                </>
-              )}
-            </Button>
-          </div>
-        </div>
-
-        {/* Track quick metrics bar */}
-        <div className="flex items-center gap-6 pt-3 border-t border-border text-xs font-mono text-muted-foreground flex-wrap">
-          <span>
-            Lessons:{" "}
-            <strong className="text-foreground">{initialTrack.lessons.length}</strong>
-          </span>
-          <span>
-            Track Points:{" "}
-            <strong className="text-primary font-bold">+{totalPoints} pts</strong>
-          </span>
-          <span>
-            Created:{" "}
-            <span className="text-foreground">
-              {new Date(initialTrack.created_at).toLocaleDateString()}
-            </span>
-          </span>
-        </div>
-      </Card>
-
-      {/* Lessons Section */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-base font-semibold text-foreground">
-              Track Lessons ({initialTrack.lessons.length})
-            </h2>
-            <p className="text-xs text-muted-foreground">
-              Lessons are presented in ascending numerical position order.
-            </p>
-          </div>
-
-          <Button onClick={handleOpenNewLesson} size="sm" className="gap-1.5">
-            <Plus className="h-4 w-4" />
-            <span>Add Lesson</span>
-          </Button>
-        </div>
-
-        {initialTrack.lessons.length === 0 ? (
-          <Card className="p-8 border-border bg-card text-center space-y-3">
-            <BookOpen className="h-8 w-8 text-muted-foreground mx-auto" />
-            <h3 className="text-sm font-semibold text-foreground">No lessons yet</h3>
-            <p className="text-xs text-muted-foreground max-w-sm mx-auto">
-              Add your first lesson to this track. You need at least 1 lesson before publishing.
-            </p>
-            <Button onClick={handleOpenNewLesson} size="sm" className="gap-1.5 mt-2">
-              <Plus className="h-4 w-4" />
-              <span>Add First Lesson</span>
-            </Button>
-          </Card>
-        ) : (
-          <div className="space-y-3">
-            {initialTrack.lessons.map((lesson, index) => (
-              <Card
-                key={lesson.id}
-                className="p-4 border-border bg-card shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4"
-              >
-                <div className="flex items-start gap-3.5 min-w-0">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-md border border-border bg-secondary font-mono text-xs font-bold text-foreground shrink-0 mt-0.5">
-                    {lesson.position}
-                  </div>
-
-                  <div className="space-y-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <h3 className="text-sm font-semibold text-foreground truncate">
-                        {lesson.title}
-                      </h3>
-                      <Badge
-                        variant="outline"
-                        className="font-mono text-[10px] border-primary/20 bg-primary/10 text-primary py-0 px-1.5"
-                      >
-                        +{lesson.skill_points} pts
-                      </Badge>
-                      {lesson.completion_count > 0 ? (
-                        <Badge
-                          variant="outline"
-                          className="font-mono text-[10px] border-emerald-500/30 bg-emerald-500/10 text-emerald-500 py-0 px-1.5 flex items-center gap-1"
-                        >
-                          <Users className="h-3 w-3" />
-                          <span>{lesson.completion_count} completed</span>
-                        </Badge>
-                      ) : (
-                        <span className="text-[10px] font-mono text-muted-foreground">
-                          0 completions
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
-                      {lesson.summary}
+      {/* 2-Column Responsive Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-8 items-start">
+        {/* Left Column: Track Details & Lessons List */}
+        <div className="space-y-8 min-w-0">
+          {/* Track Basics Form */}
+          <PanelSection
+            title="Track details"
+            description="Manage title, description, and vanity slug for this learning track."
+          >
+            <div className="space-y-4 pt-1">
+              <div className="grid grid-cols-1 sm:grid-cols-[2fr_1fr] gap-4 items-start">
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium text-foreground block font-sans">
+                    Title *
+                  </label>
+                  <Input
+                    value={trackTitle}
+                    onChange={(e) => setTrackTitle(e.target.value)}
+                    className="h-10 text-sm rounded-md bg-card border-border"
+                  />
+                  {trackErrors.title && (
+                    <p className="text-xs font-medium text-[color:var(--data-negative-ink)] font-sans">
+                      {trackErrors.title}
                     </p>
-                  </div>
+                  )}
                 </div>
 
-                {/* Actions & Ordering */}
-                <div className="flex items-center gap-1.5 self-end sm:self-center shrink-0">
-                  {/* Reorder Buttons */}
-                  <Button
-                    size="icon-sm"
-                    variant="ghost"
-                    disabled={isPending || index === 0}
-                    onClick={() => handleMoveLesson(index, "up")}
-                    aria-label="Move lesson up"
-                    title="Move up"
-                    className="h-8 w-8 text-muted-foreground hover:text-foreground"
-                  >
-                    <ArrowUp className="h-4 w-4" />
-                  </Button>
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium text-foreground block font-sans">
+                    URL slug *
+                  </label>
+                  <div className="flex items-center rounded-md border border-border bg-card h-10 px-2.5 focus-within:ring-2 focus-within:ring-ring">
+                    <span className="font-sans text-muted-foreground text-xs select-none pr-1">
+                      /skill/
+                    </span>
+                    <input
+                      type="text"
+                      value={trackSlug}
+                      onChange={(e) => setTrackSlug(e.target.value)}
+                      className="w-full bg-transparent font-mono text-xs text-foreground focus:outline-hidden min-w-0"
+                    />
+                  </div>
+                  {trackErrors.slug && (
+                    <p className="text-xs font-medium text-[color:var(--data-negative-ink)] font-sans">
+                      {trackErrors.slug}
+                    </p>
+                  )}
+                </div>
+              </div>
 
-                  <Button
-                    size="icon-sm"
-                    variant="ghost"
-                    disabled={isPending || index === initialTrack.lessons.length - 1}
-                    onClick={() => handleMoveLesson(index, "down")}
-                    aria-label="Move lesson down"
-                    title="Move down"
-                    className="h-8 w-8 text-muted-foreground hover:text-foreground"
-                  >
-                    <ArrowDown className="h-4 w-4" />
-                  </Button>
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-foreground block font-sans">
+                  Description *
+                </label>
+                <Textarea
+                  rows={3}
+                  value={trackDesc}
+                  onChange={(e) => setTrackDesc(e.target.value)}
+                  className="text-xs rounded-md bg-card border-border leading-relaxed font-sans"
+                />
+                {trackErrors.description && (
+                  <p className="text-xs font-medium text-[color:var(--data-negative-ink)] font-sans">
+                    {trackErrors.description}
+                  </p>
+                )}
+              </div>
 
-                  {/* Edit */}
+              {isTrackDirty && (
+                <div className="flex items-center justify-between pt-1">
+                  <div className="flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-400 font-sans">
+                    <span className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse" />
+                    <span>Unsaved track changes</span>
+                  </div>
+                  <Button
+                    size="sm"
+                    variant="default"
+                    disabled={isPending}
+                    onClick={handleSaveTrack}
+                    className="h-8 text-xs rounded-md gap-1.5"
+                  >
+                    {isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
+                    <span>Update track</span>
+                  </Button>
+                </div>
+              )}
+            </div>
+          </PanelSection>
+
+          {/* Lessons Section */}
+          <PanelSection
+            title="Lessons & curriculum"
+            description="Ordered lesson sequence. Learners unlock rewards and skill points as they progress."
+            action={
+              <Button
+                size="sm"
+                variant="default"
+                onClick={openNewLessonModal}
+                className="gap-1.5 rounded-md h-8 text-xs"
+              >
+                <Plus className="h-3.5 w-3.5" />
+                <span>Add lesson</span>
+              </Button>
+            }
+          >
+            <div className="space-y-2 pt-1">
+              {lessons.length === 0 ? (
+                <div className="p-8 text-center border border-dashed border-border/80 rounded-lg space-y-3">
+                  <BookOpen className="h-8 w-8 text-muted-foreground mx-auto" />
+                  <p className="text-xs text-muted-foreground font-sans">
+                    No lessons created in this track yet. Add the first lesson to begin building curriculum.
+                  </p>
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() => handleOpenEditLesson(lesson)}
-                    className="h-8 px-2.5 text-xs gap-1"
+                    onClick={openNewLessonModal}
+                    className="text-xs h-8 rounded-md gap-1.5"
                   >
-                    <Edit className="h-3.5 w-3.5" />
-                    <span>Edit</span>
-                  </Button>
-
-                  {/* Delete */}
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => setDeletingLesson(lesson)}
-                    className="h-8 px-2 text-xs text-destructive hover:bg-destructive/10"
-                    title={
-                      lesson.completion_count > 0
-                        ? "Completed by users (cannot delete)"
-                        : "Delete lesson"
-                    }
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
+                    <Plus className="h-3.5 w-3.5" />
+                    <span>Create lesson 1</span>
                   </Button>
                 </div>
-              </Card>
-            ))}
-          </div>
-        )}
-      </div>
+              ) : (
+                <div className="rounded-lg border border-border bg-card divide-y divide-border/60 overflow-hidden">
+                  {lessons.map((lesson, idx) => (
+                    <div
+                      key={lesson.id}
+                      onClick={() => openEditLessonModal(lesson)}
+                      className="p-3.5 flex items-center justify-between gap-3 text-xs hover:bg-muted/40 transition-colors cursor-pointer group"
+                    >
+                      {/* Left: Reorder Controls + Position + Title */}
+                      <div className="flex items-center gap-3 min-w-0">
+                        {/* Up/Down buttons */}
+                        <div
+                          className="flex flex-col gap-0.5 shrink-0"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <button
+                            type="button"
+                            disabled={idx === 0 || isPending}
+                            onClick={() => handleMoveLesson(idx, "up")}
+                            className="p-0.5 text-muted-foreground hover:text-foreground disabled:opacity-20 transition-colors"
+                            aria-label="Move lesson up"
+                          >
+                            <ArrowUp className="h-3 w-3" />
+                          </button>
+                          <button
+                            type="button"
+                            disabled={idx === lessons.length - 1 || isPending}
+                            onClick={() => handleMoveLesson(idx, "down")}
+                            className="p-0.5 text-muted-foreground hover:text-foreground disabled:opacity-20 transition-colors"
+                            aria-label="Move lesson down"
+                          >
+                            <ArrowDown className="h-3 w-3" />
+                          </button>
+                        </div>
 
-      {/* Lesson Editor Dialog */}
-      <Dialog
-        open={lessonModalOpen}
-        onOpenChange={(open) => {
-          if (!open) {
-            setLessonModalOpen(false);
-            setEditingLesson(null);
-            setLessonError(null);
-          }
-        }}
-      >
-        <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-y-auto bg-card border-border">
-          <DialogHeader>
-            <DialogTitle>
-              {editingLesson ? "Edit Lesson" : "Add New Lesson"}
-            </DialogTitle>
-            <DialogDescription>
-              Draft or update structured Markdown content and lesson details.
-            </DialogDescription>
-          </DialogHeader>
+                        <span className="font-sans font-semibold text-xs tabular-nums text-muted-foreground w-5 text-center shrink-0">
+                          {idx + 1}
+                        </span>
 
-          <form onSubmit={handleSaveLesson} className="space-y-4 py-1">
-            {lessonError && (
-              <div className="flex items-start gap-2 p-3 rounded-md bg-destructive/10 border border-destructive/20 text-destructive text-xs">
-                <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
-                <span>{lessonError}</span>
-              </div>
-            )}
+                        <div className="min-w-0">
+                          <span className="font-medium text-foreground truncate font-sans block text-sm">
+                            {lesson.title}
+                          </span>
+                          <span className="text-xs text-muted-foreground truncate font-sans block">
+                            {lesson.summary}
+                          </span>
+                        </div>
+                      </div>
 
-            {/* Safety Warning for Existing Completions */}
-            {editingLesson && editingLesson.completion_count > 0 && (
-              <div className="flex items-start gap-3 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3.5 text-xs text-amber-600 dark:text-amber-400">
-                <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5 text-amber-500" />
-                <div className="space-y-1">
-                  <p className="font-semibold text-amber-700 dark:text-amber-300">
-                    Safety Rule Notice: Existing User Completions
-                  </p>
-                  <p className="leading-relaxed">
-                    <strong>{editingLesson.completion_count} user(s)</strong> have already
-                    completed this lesson. Modifying the skill points value will only apply
-                    to future completions and will <strong>not</strong> alter points already
-                    earned by existing users.
-                  </p>
+                      {/* Right: Points + Completion badge + Actions */}
+                      <div
+                        className="flex items-center gap-2.5 shrink-0"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <span className="font-sans tabular-nums font-semibold text-[11px] px-2 py-0.5 rounded-full bg-[color:var(--data-signups-subtle)] text-[color:var(--data-signups-ink)] border border-[color:var(--data-signups-border)]">
+                          {lesson.skill_points} pts
+                        </span>
+
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => openEditLessonModal(lesson)}
+                          className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground rounded-md"
+                          aria-label="Edit lesson"
+                        >
+                          <Edit className="h-3.5 w-3.5" />
+                        </Button>
+
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => {
+                            setDeletingLesson(lesson);
+                            setDeleteConfirmOpen(true);
+                          }}
+                          className="h-7 w-7 p-0 text-muted-foreground hover:text-destructive rounded-md"
+                          aria-label="Delete lesson"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              </div>
-            )}
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div className="sm:col-span-2 space-y-1.5">
-                <Label htmlFor="lesson-title" className="text-xs">
-                  Title <span className="text-destructive">*</span>
-                </Label>
-                <Input
-                  id="lesson-title"
-                  value={lessonTitle}
-                  onChange={(e) => setLessonTitle(e.target.value)}
-                  placeholder="e.g. Structuring a Modern Professional CV"
-                  maxLength={120}
-                  required
-                />
-                <span className="text-[10px] text-muted-foreground font-mono">
-                  {lessonTitle.length}/120 characters
-                </span>
-              </div>
-
-              <div className="space-y-1.5">
-                <Label htmlFor="lesson-points" className="text-xs">
-                  Skill Points (0–100) <span className="text-destructive">*</span>
-                </Label>
-                <Input
-                  id="lesson-points"
-                  type="number"
-                  min={0}
-                  max={100}
-                  value={lessonPoints}
-                  onChange={(e) => setLessonPoints(Number(e.target.value))}
-                  required
-                />
-              </div>
+              )}
             </div>
+          </PanelSection>
+        </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
-              <div className="sm:col-span-3 space-y-1.5">
-                <Label htmlFor="lesson-summary" className="text-xs">
-                  Summary <span className="text-destructive">*</span>
-                </Label>
-                <Input
-                  id="lesson-summary"
-                  value={lessonSummary}
-                  onChange={(e) => setLessonSummary(e.target.value)}
-                  placeholder="A concise 1-sentence overview of what this lesson covers..."
-                  maxLength={300}
-                  required
-                />
-                <span className="text-[10px] text-muted-foreground font-mono">
-                  {lessonSummary.length}/300 characters
-                </span>
-              </div>
+        {/* Right Sticky Column: Track Publishing Card */}
+        <div className="space-y-6 lg:sticky lg:top-20">
+          <AdminCard className="p-5 space-y-5 rounded-lg border-border">
+            <h2 className="text-sm font-semibold text-foreground font-sans">
+              Track overview
+            </h2>
 
-              <div className="space-y-1.5">
-                <Label htmlFor="lesson-pos" className="text-xs">
-                  Position
-                </Label>
-                <Input
-                  id="lesson-pos"
-                  type="number"
-                  min={1}
-                  value={lessonPos}
-                  onChange={(e) => setLessonPos(Number(e.target.value))}
-                  required
-                />
-              </div>
-            </div>
-
-            {/* Markdown Content with Live Preview Tabs */}
+            {/* Publishing Status Toggle */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label className="text-xs">
-                  Lesson Content (Markdown) <span className="text-destructive">*</span>
-                </Label>
-                <span className="text-[10px] font-mono text-muted-foreground">
-                  {lessonContent.length}/20,000 characters
-                </span>
+                <span className="text-xs font-medium text-foreground font-sans">Status</span>
+                <StatusPill variant={isPublished ? "verified" : "pending"} />
               </div>
-
-              <Tabs
-                value={editorTab}
-                onValueChange={(v) => setEditorTab(v as "edit" | "preview")}
-                className="w-full"
-              >
-                <TabsList className="grid w-full grid-cols-2 h-9 bg-secondary">
-                  <TabsTrigger value="edit" className="text-xs font-mono">
-                    Edit Markdown
-                  </TabsTrigger>
-                  <TabsTrigger value="preview" className="text-xs font-mono">
-                    Live Preview
-                  </TabsTrigger>
-                </TabsList>
-
-                <TabsContent value="edit" className="mt-2">
-                  <Textarea
-                    value={lessonContent}
-                    onChange={(e) => setLessonContent(e.target.value)}
-                    placeholder="Write structured lesson content in Markdown: ### Headings, bullet points, and a 'Try this' section..."
-                    rows={12}
-                    maxLength={20000}
-                    className="font-mono text-xs leading-relaxed resize-y"
-                    required
-                  />
-                  <p className="text-[10px] text-muted-foreground mt-1">
-                    Tip: Use headings (`###`), bullet lists (`-`), bold labels (`**bold**`), and a closing `Try this:` action.
-                  </p>
-                </TabsContent>
-
-                <TabsContent value="preview" className="mt-2">
-                  <div className="rounded-lg border border-border bg-card p-4 min-h-[250px] max-h-[400px] overflow-y-auto">
-                    {lessonContent.trim().length > 0 ? (
-                      <LessonMarkdown content={lessonContent} />
-                    ) : (
-                      <p className="text-xs text-muted-foreground italic">
-                        Type content in the editor to see the live preview.
-                      </p>
-                    )}
-                  </div>
-                </TabsContent>
-              </Tabs>
-            </div>
-
-            <DialogFooter className="pt-3">
               <Button
                 type="button"
-                variant="outline"
+                variant={isPublished ? "outline" : "default"}
+                size="sm"
                 disabled={isPending}
-                onClick={() => {
-                  setLessonModalOpen(false);
-                  setEditingLesson(null);
-                  setLessonError(null);
-                }}
+                onClick={handleTogglePublish}
+                className="w-full text-xs h-9 rounded-md gap-1.5"
               >
-                Cancel
+                {isPending ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : isPublished ? (
+                  <>
+                    <EyeOff className="h-3.5 w-3.5" />
+                    <span>Unpublish to draft</span>
+                  </>
+                ) : (
+                  <>
+                    <Eye className="h-3.5 w-3.5" />
+                    <span>Publish track</span>
+                  </>
+                )}
               </Button>
-              <Button type="submit" disabled={isPending} className="gap-2">
-                {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
-                <span>{editingLesson ? "Save Lesson" : "Create Lesson"}</span>
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
+            </div>
 
-      {/* Delete Lesson Confirmation / Block Alert */}
-      <Dialog
-        open={deletingLesson !== null}
-        onOpenChange={(open: boolean) => !open && setDeletingLesson(null)}
-      >
-        <DialogContent className="bg-card border-border">
+            {/* Metrics */}
+            <div className="border-t border-border/60 pt-4 space-y-2.5 text-xs font-sans">
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">Total lessons:</span>
+                <span className="font-semibold text-foreground tabular-nums">
+                  {lessons.length}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">Total skill points:</span>
+                <span className="font-semibold text-foreground tabular-nums">
+                  {totalPoints} pts
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">URL slug:</span>
+                <span className="font-mono text-muted-foreground text-[11px] truncate max-w-[140px]">
+                  /{trackSlug}
+                </span>
+              </div>
+            </div>
+
+            {/* View student curriculum link */}
+            <div className="border-t border-border/60 pt-4">
+              <Button
+                asChild
+                variant="outline"
+                size="sm"
+                className="w-full text-xs h-8 rounded-md gap-1.5 border-border"
+              >
+                <Link href={`/skill/${initialTrack.slug}`} target="_blank">
+                  <ExternalLink className="h-3.5 w-3.5" />
+                  <span>View curriculum</span>
+                </Link>
+              </Button>
+            </div>
+          </AdminCard>
+        </div>
+      </div>
+
+      {/* Lesson Editor Modal */}
+      <Dialog open={lessonModalOpen} onOpenChange={setLessonModalOpen}>
+        <DialogContent className="sm:max-w-xl md:max-w-2xl rounded-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-destructive">
-              <AlertTriangle className="h-5 w-5" />
-              <span>Delete Lesson</span>
+            <DialogTitle className="text-base font-semibold text-foreground font-sans">
+              {editingLessonId ? "Edit lesson" : "Add new lesson"}
             </DialogTitle>
-            <DialogDescription className="text-xs leading-relaxed">
-              {deletingLesson && deletingLesson.completion_count > 0 ? (
-                <span className="text-destructive font-semibold">
-                  Cannot delete this lesson: {deletingLesson.completion_count} user(s) have
-                  already completed it and earned skill points. To hide this lesson, unpublish
-                  the track instead.
-                </span>
-              ) : (
-                <span>
-                  Are you sure you want to delete &quot;{deletingLesson?.title}&quot;? This action
-                  cannot be undone.
-                </span>
-              )}
+            <DialogDescription className="text-xs text-muted-foreground font-sans">
+              Curate lesson summary, position index, skill reward points, and markdown body.
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter className="gap-2">
+
+          <div className="space-y-4 py-2 text-xs">
+            {/* Title */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-foreground block font-sans">
+                Lesson title *
+              </label>
+              <Input
+                value={lessonTitle}
+                onChange={(e) => setLessonTitle(e.target.value)}
+                placeholder="e.g. Introduction to Semantic HTML"
+                className="h-9 text-xs rounded-md bg-background border-border"
+              />
+              {lessonErrors.title && (
+                <p className="text-[11px] font-medium text-[color:var(--data-negative-ink)] font-sans">
+                  {lessonErrors.title}
+                </p>
+              )}
+            </div>
+
+            {/* Position & Points */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-foreground block font-sans">
+                  Position index *
+                </label>
+                <Input
+                  type="number"
+                  min={1}
+                  value={lessonPosition}
+                  onChange={(e) => setLessonPosition(Number(e.target.value))}
+                  className="h-9 text-xs rounded-md bg-background border-border font-sans tabular-nums"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-foreground block font-sans">
+                  Skill points reward *
+                </label>
+                <Input
+                  type="number"
+                  min={0}
+                  value={lessonPoints}
+                  onChange={(e) => setLessonPoints(Number(e.target.value))}
+                  className="h-9 text-xs rounded-md bg-background border-border font-sans tabular-nums"
+                />
+              </div>
+            </div>
+
+            {/* Summary */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-foreground block font-sans">
+                Summary *
+              </label>
+              <Textarea
+                rows={2}
+                value={lessonSummary}
+                onChange={(e) => setLessonSummary(e.target.value)}
+                placeholder="Brief takeaway and learning objectives..."
+                className="text-xs rounded-md bg-background border-border leading-relaxed font-sans"
+              />
+              <div className="flex justify-between items-center text-[11px] text-muted-foreground font-sans">
+                <span>Core overview of topic.</span>
+                <span className="tabular-nums">{lessonSummary.length} chars</span>
+              </div>
+              {lessonErrors.summary && (
+                <p className="text-[11px] font-medium text-[color:var(--data-negative-ink)] font-sans">
+                  {lessonErrors.summary}
+                </p>
+              )}
+            </div>
+
+            {/* Markdown Content (with Write | Preview toggle) */}
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-medium text-foreground block font-sans">
+                  Lesson content (Markdown) *
+                </label>
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] text-muted-foreground tabular-nums font-sans">
+                    {lessonContent.length} chars
+                  </span>
+                  <div className="flex items-center border border-border rounded-md overflow-hidden bg-background">
+                    <button
+                      type="button"
+                      onClick={() => setLessonEditorMode("write")}
+                      className={cn(
+                        "px-2.5 py-1 text-[11px] font-sans transition-colors",
+                        lessonEditorMode === "write"
+                          ? "bg-primary text-primary-foreground font-medium"
+                          : "text-muted-foreground hover:text-foreground"
+                      )}
+                    >
+                      Write
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setLessonEditorMode("preview")}
+                      className={cn(
+                        "px-2.5 py-1 text-[11px] font-sans transition-colors",
+                        lessonEditorMode === "preview"
+                          ? "bg-primary text-primary-foreground font-medium"
+                          : "text-muted-foreground hover:text-foreground"
+                      )}
+                    >
+                      Preview
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {lessonEditorMode === "write" ? (
+                <Textarea
+                  rows={10}
+                  value={lessonContent}
+                  onChange={(e) => setLessonContent(e.target.value)}
+                  placeholder="## Section Heading&#10;&#10;Write comprehensive markdown content with code samples and checklists..."
+                  className="font-mono text-xs rounded-md bg-background border-border leading-relaxed"
+                />
+              ) : (
+                <div className="min-h-[220px] p-4 rounded-md border border-border/60 bg-muted/20 text-xs overflow-y-auto max-h-[360px]">
+                  {lessonContent.trim() ? (
+                    <LessonMarkdown content={lessonContent} />
+                  ) : (
+                    <p className="text-muted-foreground italic font-sans">
+                      Write markdown to see a preview.
+                    </p>
+                  )}
+                </div>
+              )}
+              {lessonErrors.content_md && (
+                <p className="text-[11px] font-medium text-[color:var(--data-negative-ink)] font-sans">
+                  {lessonErrors.content_md}
+                </p>
+              )}
+            </div>
+          </div>
+
+          <DialogFooter className="gap-2 sm:gap-0 pt-2 border-t border-border">
             <Button
               type="button"
               variant="outline"
+              size="sm"
+              onClick={() => setLessonModalOpen(false)}
               disabled={isPending}
-              onClick={() => setDeletingLesson(null)}
+              className="text-xs h-8 rounded-md border-border"
             >
               Cancel
             </Button>
-            {deletingLesson && deletingLesson.completion_count === 0 && (
-              <Button
-                type="button"
-                onClick={handleDeleteLesson}
-                disabled={isPending}
-                className="bg-destructive text-destructive-foreground hover:bg-destructive/90 gap-1.5"
-              >
-                {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
-                <span>Delete</span>
-              </Button>
-            )}
+            <Button
+              type="button"
+              variant="default"
+              size="sm"
+              disabled={isPending}
+              onClick={handleSaveLesson}
+              className="text-xs h-8 rounded-md gap-1.5"
+            >
+              {isPending ? (
+                <>
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  <span>Saving...</span>
+                </>
+              ) : (
+                <>
+                  <Save className="h-3.5 w-3.5" />
+                  <span>{editingLessonId ? "Save changes" : "Create lesson"}</span>
+                </>
+              )}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* Track Edit Metadata Dialog */}
-      <Dialog open={trackModalOpen} onOpenChange={(open: boolean) => setTrackModalOpen(open)}>
-        <DialogContent className="sm:max-w-md bg-card border-border">
+      {/* Delete Lesson Confirmation Dialog */}
+      <Dialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+        <DialogContent className="sm:max-w-md rounded-lg">
           <DialogHeader>
-            <DialogTitle>Edit Track Metadata</DialogTitle>
-            <DialogDescription>
-              Update the track title, slug, and summary description.
+            <DialogTitle className="text-base font-bold text-foreground font-sans">
+              Delete lesson?
+            </DialogTitle>
+            <DialogDescription className="text-xs text-muted-foreground font-sans">
+              Are you sure you want to permanently delete{" "}
+              <strong className="text-foreground">{deletingLesson?.title}</strong>? Note: if any
+              students have completed this lesson, deletion will be rejected to protect student
+              records.
             </DialogDescription>
           </DialogHeader>
-
-          <form onSubmit={handleSaveTrack} className="space-y-4 py-2">
-            {trackError && (
-              <div className="flex items-start gap-2 p-3 rounded-md bg-destructive/10 border border-destructive/20 text-destructive text-xs">
-                <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
-                <span>{trackError}</span>
-              </div>
-            )}
-
-            <div className="space-y-1.5">
-              <Label htmlFor="meta-title" className="text-xs">
-                Title <span className="text-destructive">*</span>
-              </Label>
-              <Input
-                id="meta-title"
-                value={trackTitle}
-                onChange={(e) => setTrackTitle(e.target.value)}
-                maxLength={120}
-                required
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <Label htmlFor="meta-slug" className="text-xs">
-                Slug <span className="text-destructive">*</span>
-              </Label>
-              <Input
-                id="meta-slug"
-                value={trackSlug}
-                onChange={(e) => setTrackSlug(e.target.value)}
-                maxLength={120}
-                required
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <Label htmlFor="meta-desc" className="text-xs">
-                Description <span className="text-destructive">*</span>
-              </Label>
-              <Textarea
-                id="meta-desc"
-                value={trackDesc}
-                onChange={(e) => setTrackDesc(e.target.value)}
-                rows={4}
-                maxLength={500}
-                required
-              />
-            </div>
-
-            <DialogFooter className="pt-2">
-              <Button
-                type="button"
-                variant="outline"
-                disabled={isPending}
-                onClick={() => setTrackModalOpen(false)}
-              >
-                Cancel
-              </Button>
-              <Button type="submit" disabled={isPending} className="gap-2">
-                {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
-                <span>Save Track</span>
-              </Button>
-            </DialogFooter>
-          </form>
+          <DialogFooter className="gap-2 sm:gap-0 pt-2 border-t border-border">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setDeleteConfirmOpen(false);
+                setDeletingLesson(null);
+              }}
+              disabled={isDeleting}
+              className="text-xs h-8 rounded-lg border-border"
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              size="sm"
+              disabled={isDeleting}
+              onClick={handleDeleteLesson}
+              className="text-xs h-8 rounded-lg gap-1.5"
+            >
+              {isDeleting ? (
+                <>
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  <span>Deleting...</span>
+                </>
+              ) : (
+                <>
+                  <Trash2 className="h-3.5 w-3.5" />
+                  <span>Confirm delete</span>
+                </>
+              )}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

@@ -99,13 +99,13 @@ export function AdminTopBar({ adminUser }: AdminTopBarProps) {
       </div>
 
       {/* Right: "Back to app", Theme toggle, Admin user chip */}
-      <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+      <div className="flex items-center gap-2 sm:gap-3 shrink-0 min-w-0">
         {/* "Back to app" as a ghost button */}
         <Button
           variant="ghost"
           size="sm"
           asChild
-          className="h-8 px-2.5 text-xs text-muted-foreground hover:text-foreground hover:bg-secondary/60 gap-1.5"
+          className="h-8 px-2.5 text-xs text-muted-foreground hover:text-foreground hover:bg-secondary/60 gap-1.5 shrink-0"
         >
           <Link href="/home">
             <ArrowLeft className="h-3.5 w-3.5" strokeWidth={1.75} />
@@ -120,7 +120,7 @@ export function AdminTopBar({ adminUser }: AdminTopBarProps) {
               <Button
                 variant="ghost"
                 size="icon-sm"
-                className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-secondary/60"
+                className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-secondary/60 shrink-0"
                 aria-label="Toggle theme"
               >
                 <Sun className="h-3.5 w-3.5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" strokeWidth={1.75} />
@@ -174,10 +174,10 @@ export function AdminTopBar({ adminUser }: AdminTopBarProps) {
           </DropdownMenu>
         )}
 
-        <div className="h-4 w-px bg-border/60" />
+        <div className="h-4 w-px bg-border/60 shrink-0" />
 
         {/* Admin Avatar + Tooltip Email (email hidden under 768px, font-sans not monospace) */}
-        <div className="flex items-center gap-2.5 pl-0.5">
+        <div className="flex items-center gap-2.5 pl-0.5 min-w-0">
           <Avatar className="h-7 w-7 border border-border shrink-0">
             <AvatarImage src={adminUser.avatarUrl || ""} alt={adminUser.fullName} />
             <AvatarFallback className="bg-secondary text-foreground text-[10px] font-bold">
@@ -185,13 +185,13 @@ export function AdminTopBar({ adminUser }: AdminTopBarProps) {
             </AvatarFallback>
           </Avatar>
 
-          <div className="hidden md:flex flex-col text-left leading-tight">
-            <span className="text-xs font-semibold text-foreground truncate max-w-[120px] font-sans">
+          <div className="hidden md:flex flex-col text-left leading-tight min-w-0">
+            <span className="text-xs font-semibold text-foreground truncate max-w-[160px] lg:max-w-[200px] font-sans">
               {adminUser.fullName}
             </span>
             <Tooltip>
               <TooltipTrigger asChild>
-                <span className="text-[11px] text-muted-foreground truncate max-w-[150px] font-sans cursor-default">
+                <span className="text-[11px] text-muted-foreground truncate min-w-0 max-w-[160px] lg:max-w-[200px] font-sans cursor-default">
                   {adminUser.email || "admin@zed.gov.ng"}
                 </span>
               </TooltipTrigger>

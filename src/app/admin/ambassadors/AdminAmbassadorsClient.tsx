@@ -42,6 +42,7 @@ import { SegmentedControl } from "@/components/admin/primitives/SegmentedControl
 import { EmptyState } from "@/components/admin/primitives/EmptyState";
 import { StatusPill } from "@/components/admin/people/StatusPill";
 import { AgePill } from "@/components/admin/people/AgePill";
+import { PanelSection, FieldList, FieldItem } from "@/components/admin/primitives/PanelSection";
 
 interface AdminAmbassadorsClientProps {
   initialApplications: AmbassadorApplicationRow[];
@@ -200,7 +201,7 @@ export function AdminAmbassadorsClient({
         icon={GraduationCap}
         section="programs"
         badge={
-          <span className="font-mono text-xs font-semibold px-2 py-0.5 rounded-full bg-[color:var(--data-signups-subtle)] text-[color:var(--data-signups-ink)] border border-[color:var(--data-signups-border)]">
+          <span className="font-sans tabular-nums text-xs font-semibold px-2 py-0.5 rounded-full bg-[color:var(--data-signups-subtle)] text-[color:var(--data-signups-ink)] border border-[color:var(--data-signups-border)]">
             {total} total
           </span>
         }
@@ -253,7 +254,7 @@ export function AdminAmbassadorsClient({
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-border bg-muted/40 font-mono text-[11px] text-muted-foreground uppercase tracking-wider">
+                <tr className="border-b border-border bg-muted/40 font-sans text-xs font-medium text-muted-foreground">
                   <th className="py-3 px-4 font-semibold">Applicant</th>
                   <th className="py-3 px-4 font-semibold">Institution & State</th>
                   <th className="py-3 px-4 font-semibold">Course & Level</th>
@@ -274,7 +275,7 @@ export function AdminAmbassadorsClient({
                       {/* Applicant */}
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-3">
-                          <div className="h-8 w-8 rounded-full bg-[color:var(--data-signups-subtle)] border border-[color:var(--data-signups-border)] text-[color:var(--data-signups-ink)] flex items-center justify-center font-mono font-bold text-[11px] shrink-0">
+                          <div className="h-8 w-8 rounded-full bg-[color:var(--data-signups-subtle)] border border-[color:var(--data-signups-border)] text-[color:var(--data-signups-ink)] flex items-center justify-center font-sans font-semibold text-[11px] shrink-0">
                             {initials}
                           </div>
                           <div className="min-w-0">
@@ -293,7 +294,7 @@ export function AdminAmbassadorsClient({
                         <div className="text-foreground font-medium truncate max-w-[200px]">
                           {app.institution}
                         </div>
-                        <div className="text-muted-foreground font-mono text-[11px]">
+                        <div className="text-muted-foreground font-sans text-xs">
                           {app.state}
                         </div>
                       </td>
@@ -391,7 +392,7 @@ export function AdminAmbassadorsClient({
         }
         timestamp={
           selectedApp && (
-            <span className="font-mono text-[11px] text-muted-foreground">
+            <span className="tabular-nums font-sans text-xs text-muted-foreground">
               {new Date(selectedApp.created_at).toLocaleDateString("en-NG", {
                 month: "short",
                 day: "numeric",
@@ -440,12 +441,9 @@ export function AdminAmbassadorsClient({
         }
       >
         {selectedApp && (
-          <div className="space-y-5 text-xs p-5">
+          <div className="space-y-6 text-xs">
             {/* Quick Status Bar */}
-            <div className="p-3 rounded-lg border border-border bg-secondary/30 space-y-2">
-              <div className="text-[11px] font-mono text-muted-foreground uppercase font-semibold">
-                Set Status
-              </div>
+            <PanelSection title="Set status">
               <div className="flex flex-wrap gap-1.5">
                 {(["new", "reviewing", "approved", "rejected"] as AmbassadorStatus[]).map(
                   (st) => (
@@ -455,7 +453,7 @@ export function AdminAmbassadorsClient({
                       variant={selectedApp.status === st ? "default" : "outline"}
                       disabled={isPending || selectedApp.status === st}
                       onClick={() => handleStatusChange(selectedApp.id, st)}
-                      className="text-xs h-7 px-2.5 rounded-lg border-border"
+                      className="text-xs h-8 px-2.5 rounded-md border-border font-sans"
                     >
                       {st === "new"
                         ? "New"
@@ -468,93 +466,53 @@ export function AdminAmbassadorsClient({
                   )
                 )}
               </div>
-            </div>
+            </PanelSection>
 
-            {/* Contact details */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="p-3 rounded-lg border border-border bg-card space-y-1">
-                <span className="text-muted-foreground flex items-center gap-1.5 font-medium">
-                  <Mail className="h-3.5 w-3.5" />
-                  Email
-                </span>
-                <a
-                  href={`mailto:${selectedApp.email}`}
-                  className="font-medium text-primary hover:underline block truncate"
-                >
-                  {selectedApp.email}
-                </a>
-              </div>
-
-              <div className="p-3 rounded-lg border border-border bg-card space-y-1">
-                <span className="text-muted-foreground flex items-center gap-1.5 font-medium">
-                  <Phone className="h-3.5 w-3.5" />
-                  Phone / WhatsApp
-                </span>
-                <a
-                  href={`tel:${selectedApp.phone}`}
-                  className="font-medium text-foreground hover:underline block truncate"
-                >
-                  {selectedApp.phone}
-                </a>
-              </div>
+            {/* Candidate details */}
+            <div className="border-t border-border/60 pt-6">
+              <PanelSection title="Candidate profile">
+                <FieldList columns={2}>
+                  <FieldItem label="Email">
+                    <a
+                      href={`mailto:${selectedApp.email}`}
+                      className="font-medium text-primary hover:underline block truncate font-sans"
+                    >
+                      {selectedApp.email}
+                    </a>
+                  </FieldItem>
+                  <FieldItem label="Phone / WhatsApp">
+                    <a
+                      href={`tel:${selectedApp.phone}`}
+                      className="font-medium text-foreground hover:underline block truncate font-sans"
+                    >
+                      {selectedApp.phone}
+                    </a>
+                  </FieldItem>
+                </FieldList>
+              </PanelSection>
             </div>
 
             {/* Academic details */}
-            <div className="p-3 rounded-lg border border-border bg-card space-y-2.5">
-              <div className="text-[11px] font-mono uppercase text-muted-foreground font-semibold">
-                Academic Profile
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <span className="text-muted-foreground block text-[11px]">Institution</span>
-                  <p className="font-semibold text-foreground">{selectedApp.institution}</p>
-                </div>
-                <div>
-                  <span className="text-muted-foreground block text-[11px]">State</span>
-                  <p className="font-medium text-foreground">{selectedApp.state}</p>
-                </div>
-                <div>
-                  <span className="text-muted-foreground block text-[11px]">Course</span>
-                  <p className="font-medium text-foreground">{selectedApp.course}</p>
-                </div>
-                <div>
-                  <span className="text-muted-foreground block text-[11px]">Level</span>
-                  <p className="font-medium text-foreground">{selectedApp.level}</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Social & Referral */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="p-3 rounded-lg border border-border bg-card space-y-1">
-                <span className="text-muted-foreground flex items-center gap-1 text-[11px]">
-                  <Share2 className="h-3 w-3" />
-                  Social Handle
-                </span>
-                <p className="font-medium text-foreground truncate">
-                  {selectedApp.social_handle || "None provided"}
-                </p>
-              </div>
-
-              <div className="p-3 rounded-lg border border-border bg-card space-y-1">
-                <span className="text-muted-foreground flex items-center gap-1 text-[11px]">
-                  <Calendar className="h-3 w-3" />
-                  Referral Code
-                </span>
-                <p className="font-mono font-medium text-foreground truncate">
-                  {selectedApp.referral_code || "None"}
-                </p>
-              </div>
+            <div className="border-t border-border/60 pt-6">
+              <PanelSection title="Academic profile">
+                <FieldList columns={2}>
+                  <FieldItem label="Institution" value={selectedApp.institution} />
+                  <FieldItem label="State" value={selectedApp.state} />
+                  <FieldItem label="Course" value={selectedApp.course} />
+                  <FieldItem label="Level" value={selectedApp.level} />
+                  <FieldItem label="Social handle" value={selectedApp.social_handle || undefined} />
+                  <FieldItem label="Referral code" value={selectedApp.referral_code || undefined} mono />
+                </FieldList>
+              </PanelSection>
             </div>
 
             {/* Statement of Purpose */}
-            <div className="p-3.5 rounded-lg border border-border bg-card space-y-2">
-              <div className="text-[11px] font-mono uppercase text-muted-foreground font-semibold">
-                Why Campus Ambassador
-              </div>
-              <p className="text-foreground leading-relaxed whitespace-pre-wrap font-sans">
-                {selectedApp.why_ambassador}
-              </p>
+            <div className="border-t border-border/60 pt-6">
+              <PanelSection title="Why campus ambassador">
+                <p className="text-foreground leading-relaxed whitespace-pre-wrap font-sans">
+                  {selectedApp.why_ambassador || <span className="text-muted-foreground italic font-sans">Not provided</span>}
+                </p>
+              </PanelSection>
             </div>
           </div>
         )}

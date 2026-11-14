@@ -40,6 +40,7 @@ export function AdminDrawer({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         showCloseButton={false}
+        onOpenAutoFocus={(e) => e.preventDefault()}
         className={cn(
           "p-0 flex flex-col h-full bg-card border-l border-border/80 shadow-2xl focus:outline-hidden",
           widthClassName,
@@ -64,12 +65,12 @@ export function AdminDrawer({
 
           <div className="flex items-center gap-3 shrink-0">
             {timestamp && (
-              <span className="font-mono text-xs text-muted-foreground hidden xs:inline-block sm:inline-block">
+              <span className="tabular-nums text-xs text-muted-foreground hidden xs:inline-block sm:inline-block">
                 {timestamp}
               </span>
             )}
             <SheetClose
-              className="rounded-lg p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted/80 transition-colors focus:ring-2 focus:ring-ring focus:outline-hidden"
+              className="rounded-lg p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted/80 transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-hidden"
               aria-label="Close drawer"
             >
               <X className="h-4 w-4" />

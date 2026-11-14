@@ -53,6 +53,7 @@ import {
   SheetDescription,
 } from "@/components/ui/sheet";
 import { toast } from "sonner";
+import { PanelSection, FieldList, FieldItem } from "@/components/admin/primitives/PanelSection";
 
 interface AdminFundingClientProps {
   initialSubmissions: FundingSubmissionRow[];
@@ -166,13 +167,13 @@ export function AdminFundingClient({
             Review project proposals, track evaluation stages, and manage notes.
           </p>
         </div>
-        <div className="text-xs font-mono text-muted-foreground bg-muted/60 px-3 py-1.5 rounded-md self-start sm:self-auto">
+        <div className="text-xs font-sans tabular-nums text-muted-foreground bg-muted/60 px-3 py-1.5 rounded-md self-start sm:self-auto">
           Total: {submissions.length} proposals
         </div>
       </div>
 
       {loadError && (
-        <div className="p-4 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive text-sm flex items-center gap-2">
+        <div className="p-4 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-sm flex items-center gap-2">
           <AlertCircle className="w-4 h-4 shrink-0" />
           <span>{loadError}</span>
         </div>
@@ -219,10 +220,10 @@ export function AdminFundingClient({
       </div>
 
       {/* ── Table of Submissions ──────────────────────────────────────────── */}
-      <div className="rounded-xl border border-border bg-card overflow-hidden shadow-sm">
+      <div className="rounded-lg border border-border bg-card overflow-hidden shadow-xs">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="bg-muted/40 border-b border-border/80 text-xs font-medium text-muted-foreground uppercase tracking-wider select-none">
+            <thead className="bg-muted/40 border-b border-border/80 text-xs font-medium text-muted-foreground select-none">
               <tr>
                 <th className="py-3 px-4">Project Title & Category</th>
                 <th className="py-3 px-4">Applicant (Admin Only)</th>
@@ -259,7 +260,7 @@ export function AdminFundingClient({
                       <td className="py-3.5 px-4 text-xs max-w-xs">
                         <div className="font-medium text-foreground">{item.full_name}</div>
                         <div className="text-muted-foreground truncate">{item.email}</div>
-                        <div className="text-muted-foreground font-mono">{item.phone}</div>
+                        <div className="text-muted-foreground font-sans tabular-nums">{item.phone}</div>
                       </td>
 
                       {/* Stage */}
@@ -270,7 +271,7 @@ export function AdminFundingClient({
                       </td>
 
                       {/* Funding Needed */}
-                      <td className="py-3.5 px-4 font-mono text-xs font-semibold text-foreground">
+                      <td className="py-3.5 px-4 font-sans tabular-nums text-xs font-semibold text-foreground">
                         {formatNaira(item.funding_needed_ngn)}
                       </td>
 
@@ -314,7 +315,10 @@ export function AdminFundingClient({
 
       {/* ── Detail Drawer ─────────────────────────────────────────────────── */}
       <Sheet open={!!selectedItem} onOpenChange={(open) => !open && setSelectedItem(null)}>
-        <SheetContent className="w-full sm:max-w-xl overflow-y-auto p-6 space-y-6">
+        <SheetContent
+          onOpenAutoFocus={(e) => e.preventDefault()}
+          className="w-full sm:max-w-xl overflow-y-auto p-6 space-y-6 rounded-lg focus-visible:outline-hidden"
+        >
           {selectedItem && (
             <>
               <SheetHeader className="space-y-2 border-b border-border/80 pb-4">
@@ -325,113 +329,88 @@ export function AdminFundingClient({
                   >
                     {STATUS_CONFIG[selectedItem.status].label}
                   </Badge>
-                  <span className="text-xs text-muted-foreground uppercase tracking-wide">
+                  <span className="text-xs text-muted-foreground font-sans">
                     {selectedItem.stage} stage
                   </span>
                 </div>
-                <SheetTitle className="text-xl font-bold text-foreground">
+                <SheetTitle className="text-xl font-bold text-foreground font-sans">
                   {selectedItem.project_title}
                 </SheetTitle>
-                <SheetDescription className="text-xs text-muted-foreground">
+                <SheetDescription className="text-xs text-muted-foreground font-sans">
                   Category: {selectedItem.category} &bull; ID: {selectedItem.id}
                 </SheetDescription>
               </SheetHeader>
 
               {/* Applicant contact section (Admins only) */}
-              <div className="p-4 rounded-xl border border-border/80 bg-muted/30 space-y-2">
-                <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  Applicant Information
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                  <div>
-                    <span className="text-muted-foreground">Full Name:</span>{" "}
-                    <span className="font-semibold text-foreground">{selectedItem.full_name}</span>
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground">User ID:</span>{" "}
-                    <span className="font-mono text-foreground">
+              <PanelSection title="Applicant information">
+                <FieldList columns={2}>
+                  <FieldItem label="Full name">
+                    <span className="font-sans font-semibold text-foreground">{selectedItem.full_name}</span>
+                  </FieldItem>
+                  <FieldItem label="User identifier">
+                    <span className="font-mono text-foreground text-[11px] truncate block">
                       {selectedItem.user_id || "Guest (Non-logged-in)"}
                     </span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <Mail className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                  </FieldItem>
+                  <FieldItem label="Email">
                     <a
                       href={`mailto:${selectedItem.email}`}
-                      className="text-primary hover:underline truncate"
+                      className="font-medium text-primary hover:underline truncate block font-sans"
                     >
                       {selectedItem.email}
                     </a>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <Phone className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-                    <span className="font-mono text-foreground">{selectedItem.phone}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Funding summary & link */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                <div className="p-3 rounded-lg border border-border bg-card">
-                  <span className="text-muted-foreground">Funding Needed:</span>
-                  <div className="text-lg font-bold font-mono text-primary pt-0.5">
-                    {formatNaira(selectedItem.funding_needed_ngn)}
-                  </div>
-                </div>
-
-                <div className="p-3 rounded-lg border border-border bg-card">
-                  <span className="text-muted-foreground">Pitch / Demo Link:</span>
-                  <div className="pt-1 truncate">
+                  </FieldItem>
+                  <FieldItem label="Phone">
+                    <span className="font-sans tabular-nums text-foreground">{selectedItem.phone}</span>
+                  </FieldItem>
+                  <FieldItem label="Funding needed">
+                    <span className="text-base font-bold font-sans tabular-nums text-primary block">
+                      {formatNaira(selectedItem.funding_needed_ngn)}
+                    </span>
+                  </FieldItem>
+                  <FieldItem label="Pitch / Demo link">
                     {selectedItem.link ? (
                       <a
                         href={selectedItem.link}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-primary hover:underline font-medium text-xs truncate max-w-full"
+                        className="inline-flex items-center gap-1 text-primary hover:underline font-medium text-xs truncate max-w-full font-sans"
                       >
                         <ExternalLink className="w-3.5 h-3.5 shrink-0" />
                         <span className="truncate">{selectedItem.link}</span>
                       </a>
                     ) : (
-                      <span className="text-muted-foreground italic">No link provided</span>
+                      <span className="text-muted-foreground italic font-sans">No link provided</span>
                     )}
-                  </div>
-                </div>
-              </div>
+                  </FieldItem>
+                </FieldList>
+              </PanelSection>
 
               {/* Pitch narrative blocks */}
-              <div className="space-y-4 text-xs sm:text-sm">
-                <div>
-                  <h4 className="font-semibold text-foreground text-xs uppercase tracking-wider mb-1.5 text-muted-foreground">
-                    One-Paragraph Summary
-                  </h4>
-                  <div className="p-3 rounded-lg border border-border/80 bg-muted/20 text-foreground leading-relaxed whitespace-pre-wrap">
+              <div className="border-t border-border/60 pt-6 space-y-4">
+                <PanelSection title="One-paragraph summary">
+                  <p className="text-foreground leading-relaxed whitespace-pre-wrap font-sans text-xs sm:text-sm">
                     {selectedItem.summary}
-                  </div>
-                </div>
+                  </p>
+                </PanelSection>
 
-                <div>
-                  <h4 className="font-semibold text-foreground text-xs uppercase tracking-wider mb-1.5 text-muted-foreground">
-                    The Problem Solved
-                  </h4>
-                  <div className="p-3 rounded-lg border border-border/80 bg-muted/20 text-foreground leading-relaxed whitespace-pre-wrap">
+                <PanelSection title="The problem solved">
+                  <p className="text-foreground leading-relaxed whitespace-pre-wrap font-sans text-xs sm:text-sm">
                     {selectedItem.problem}
-                  </div>
-                </div>
+                  </p>
+                </PanelSection>
 
-                <div>
-                  <h4 className="font-semibold text-foreground text-xs uppercase tracking-wider mb-1.5 text-muted-foreground">
-                    Execution Plan For Capital
-                  </h4>
-                  <div className="p-3 rounded-lg border border-border/80 bg-muted/20 text-foreground leading-relaxed whitespace-pre-wrap">
+                <PanelSection title="Execution plan for capital">
+                  <p className="text-foreground leading-relaxed whitespace-pre-wrap font-sans text-xs sm:text-sm">
                     {selectedItem.plan}
-                  </div>
-                </div>
+                  </p>
+                </PanelSection>
               </div>
 
               {/* Audit & Security metadata */}
-              <div className="text-[11px] text-muted-foreground font-mono space-y-1 border-t border-border/80 pt-3">
+              <div className="text-[11px] text-muted-foreground font-sans tabular-nums space-y-1 border-t border-border/80 pt-3">
                 <div>Submitted: {new Date(selectedItem.created_at).toLocaleString("en-NG")}</div>
-                <div className="truncate">Client IP Hash: {selectedItem.ip_hash}</div>
+                <div className="truncate font-sans">IP hash: <span className="font-mono">{selectedItem.ip_hash}</span></div>
                 {selectedItem.reviewed_at && (
                   <div>Reviewed at: {new Date(selectedItem.reviewed_at).toLocaleString("en-NG")}</div>
                 )}

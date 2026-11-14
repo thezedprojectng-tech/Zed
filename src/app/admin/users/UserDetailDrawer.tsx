@@ -12,6 +12,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
   Dialog,
   DialogClose,
   DialogContent,
@@ -33,12 +38,16 @@ import {
   Fingerprint,
   Building2,
   CheckCircle2,
+  Clock,
   Circle,
   UserX,
 } from "lucide-react";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 import { deleteUserAction, changeUserRoleAction, adminClearUserProfileAction } from "./actions";
 import { getLevelName } from "@/types";
+import { PanelSection, FieldList, FieldItem } from "@/components/admin/primitives/PanelSection";
+import { StatusPill } from "@/components/admin/people/StatusPill";
 
 export interface UserDetail {
   id: string;
@@ -86,6 +95,8 @@ const guideNames: Record<string, string> = {
   cac: "CAC Business Registration",
 };
 
+const GUIDES_LIST = ["passport", "nysc", "nin-bvn", "cac"] as const;
+
 export function UserDetailDrawer({
   user,
   currentAdminId,
@@ -116,6 +127,10 @@ export function UserDetailDrawer({
     if (parts.length >= 2) return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
     return parts[0].slice(0, 2).toUpperCase();
   };
+
+  const startedGuidesCount = GUIDES_LIST.filter(
+    (fid) => user.guidesProgress?.[fid]?.started
+  ).length;
 
   const handleDelete = () => {
     startTransition(async () => {
@@ -171,40 +186,53 @@ export function UserDetailDrawer({
   return (
     <>
       <Sheet open={open} onOpenChange={onOpenChange}>
-        <SheetContent className="w-full sm:max-w-md p-0 flex flex-col bg-card border-border overflow-y-auto">
-          {/* Header */}
-          <SheetHeader className="p-5 border-b border-border/70 text-left space-y-4">
-            <div className="flex items-center gap-3">
-              <Avatar className="h-12 w-12 border border-border shrink-0">
+        <SheetContent
+          onOpenAutoFocus={(e) => e.preventDefault()}
+          className="w-full sm:max-w-md p-0 flex flex-col bg-card border-border overflow-y-auto focus-visible:outline-hidden"
+        >
+          {/* Identity Header: Avatar, Name, Email (with Tooltip), Pills in clean row */}
+          <SheetHeader className="p-5 border-b border-border/70 text-left space-y-3">
+            <div className="flex items-start gap-3.5">
+              <Avatar className="h-12 w-12 border border-border shrink-0 rounded-lg">
                 <AvatarImage src={user.avatar_url || ""} />
-                <AvatarFallback className="font-mono text-sm font-bold">
+                <AvatarFallback className="font-sans text-sm font-bold bg-muted text-foreground">
                   {getInitials(user.full_name)}
                 </AvatarFallback>
               </Avatar>
-              <div className="min-w-0 flex-1">
-                <SheetTitle className="text-base font-bold text-foreground truncate">
-                  {user.full_name || "User"}
-                </SheetTitle>
-                <SheetDescription className="text-xs font-mono text-muted-foreground truncate">
-                  {user.email || user.masked_phone}
+
+              <div className="min-w-0 flex-1 space-y-1">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <SheetTitle className="text-base font-semibold text-foreground truncate font-sans">
+                    {user.full_name || "User"}
+                  </SheetTitle>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span className="text-xs text-muted-foreground truncate max-w-[160px] font-sans cursor-default hover:text-foreground transition-colors">
+                        {user.email || user.masked_phone}
+                      </span>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom" align="start" className="text-xs font-sans">
+                      {user.email || user.masked_phone}
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+
+                <SheetDescription className="sr-only">
+                  User details and management options for {user.full_name}
                 </SheetDescription>
-                <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
+
+                {/* Identity Badges / Pills in one clean row */}
+                <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
+                  <StatusPill
+                    variant={user.role === "admin" ? "admin" : "user"}
+                    size="sm"
+                  />
                   <Badge
                     variant="outline"
-                    className={
-                      user.role === "admin"
-                        ? "border-amber-500/30 bg-amber-500/10 text-amber-500 text-[10px] font-mono uppercase"
-                        : "border-border text-muted-foreground text-[10px] font-mono"
-                    }
-                  >
-                    {user.role}
-                  </Badge>
-                  <Badge
-                    variant="outline"
-                    className={`text-[10px] font-mono gap-1 ${
+                    className={`text-[10px] rounded-md font-sans font-medium py-0.5 px-2 gap-1 ${
                       user.is_verified
-                        ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-500"
-                        : "border-amber-500/30 bg-amber-500/10 text-amber-500"
+                        ? "border-[color:var(--data-verified-border)] bg-[color:var(--data-verified-subtle)] text-[color:var(--data-verified-ink)]"
+                        : "border-[color:var(--data-flows-border)] bg-[color:var(--data-flows-subtle)] text-[color:var(--data-flows-ink)]"
                     }`}
                   >
                     {user.is_verified ? (
@@ -221,7 +249,7 @@ export function UserDetailDrawer({
                   </Badge>
                   <Badge
                     variant="outline"
-                    className="border-primary/30 bg-primary/10 text-primary text-[10px] font-mono"
+                    className="border-primary/30 bg-primary/10 text-primary text-[10px] rounded-md font-sans font-medium py-0.5 px-2"
                   >
                     Level {user.level_id} · {getLevelName(user.level_id)}
                   </Badge>
@@ -230,182 +258,172 @@ export function UserDetailDrawer({
             </div>
           </SheetHeader>
 
-          {/* Profile Details & Metadata */}
-          <div className="p-5 space-y-6 flex-1">
-            {/* Metadata Grid */}
-            <div className="space-y-2">
-              <h4 className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground font-semibold">
-                Account Information
-              </h4>
-              <div className="rounded-lg border border-border bg-secondary/20 p-3 space-y-2 text-xs">
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground flex items-center gap-1.5">
-                    <Phone className="h-3.5 w-3.5" />
-                    Phone (Masked)
-                  </span>
-                  <span className="font-mono text-foreground">{user.masked_phone}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground flex items-center gap-1.5">
-                    <Calendar className="h-3.5 w-3.5" />
-                    Joined Date
-                  </span>
-                  <span className="font-mono text-foreground">
-                    {new Date(user.created_at).toLocaleString("en-GB", {
+          {/* Profile Details & Metadata - 24px vertical rhythm, separated by 1px soft borders */}
+          <div className="p-5 space-y-6 flex-1 text-xs">
+            {/* Account Information Section */}
+            <PanelSection title="Account information">
+              <FieldList columns={2}>
+                <FieldItem label="Phone (masked)">
+                  <span className="tabular-nums text-xs">{user.masked_phone}</span>
+                </FieldItem>
+                <FieldItem label="Joined date">
+                  <span className="font-sans text-xs tabular-nums">
+                    {new Date(user.created_at).toLocaleDateString("en-GB", {
                       day: "numeric",
                       month: "short",
                       year: "numeric",
-                      hour: "2-digit",
-                      minute: "2-digit",
                     })}
                   </span>
-                </div>
+                </FieldItem>
                 {user.updated_at && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">Last Updated</span>
-                    <span className="font-mono text-foreground">
+                  <FieldItem label="Last updated">
+                    <span className="font-sans text-xs tabular-nums">
                       {new Date(user.updated_at).toLocaleDateString("en-GB", {
                         day: "numeric",
                         month: "short",
                         year: "numeric",
                       })}
                     </span>
-                  </div>
+                  </FieldItem>
                 )}
-              </div>
-            </div>
+                <FieldItem label="User identifier" span={2}>
+                  <span className="font-mono text-[11px] text-muted-foreground break-all select-all">
+                    {user.id}
+                  </span>
+                </FieldItem>
+              </FieldList>
+            </PanelSection>
 
-            {/* Guide Progress */}
-            <div className="space-y-2.5">
-              <h4 className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground font-semibold">
-                Guide Progress (nav_progress)
-              </h4>
-              <div className="space-y-2">
-                {["passport", "nysc", "nin-bvn", "cac"].map((fid) => {
-                  const Icon = guideIcons[fid] || BookOpen;
-                  const name = guideNames[fid] || fid;
-                  const prog = user.guidesProgress?.[fid];
-                  const completedCount = prog?.completed_steps?.length || 0;
-                  const totalSteps = prog?.steps?.length || 0;
-                  const isDone =
-                    prog?.completed || (totalSteps > 0 && completedCount === totalSteps);
+            {/* Guide Progress Section */}
+            <div className="border-t border-border/60 pt-6">
+              <PanelSection
+                title="Guide progress"
+                description={`${startedGuidesCount} of ${GUIDES_LIST.length} guides started`}
+              >
+                <div className="space-y-1.5 pt-1">
+                  {GUIDES_LIST.map((fid) => {
+                    const Icon = guideIcons[fid] || BookOpen;
+                    const name = guideNames[fid] || fid;
+                    const prog = user.guidesProgress?.[fid];
+                    const completedCount = prog?.completed_steps?.length || 0;
+                    const totalSteps = prog?.steps?.length || 0;
+                    const isDone =
+                      prog?.completed || (totalSteps > 0 && completedCount === totalSteps);
 
-                  return (
-                    <div
-                      key={fid}
-                      className="rounded-lg border border-border bg-card p-3 flex items-center justify-between gap-3 text-xs"
-                    >
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <div className="p-1.5 rounded-md border border-border bg-secondary/50 text-muted-foreground">
-                          <Icon className="h-3.5 w-3.5" />
+                    return (
+                      <div
+                        key={fid}
+                        className="flex items-center justify-between gap-3 text-xs py-1.5 px-1"
+                      >
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <Icon className="h-4 w-4 text-muted-foreground shrink-0" />
+                          <div className="min-w-0">
+                            <span className="font-medium text-foreground truncate font-sans block">
+                              {name}
+                            </span>
+                            {prog?.started && (
+                              <span className="text-[11px] text-muted-foreground font-sans tabular-nums">
+                                {completedCount} of {totalSteps || "?"} steps completed
+                              </span>
+                            )}
+                          </div>
                         </div>
-                        <div className="min-w-0">
-                          <p className="font-medium text-foreground truncate">{name}</p>
-                          <p className="text-[10px] font-mono text-muted-foreground">
-                            {prog?.started
-                              ? `${completedCount} of ${totalSteps || "?"} steps completed`
-                              : "Not started"}
-                          </p>
-                        </div>
+
+                        <span
+                          className={cn(
+                            "text-xs font-sans shrink-0",
+                            isDone
+                              ? "text-emerald-600 dark:text-emerald-400 font-medium"
+                              : prog?.started
+                              ? "text-blue-600 dark:text-blue-400 font-medium"
+                              : "text-muted-foreground"
+                          )}
+                        >
+                          {isDone ? "Completed" : prog?.started ? "In progress" : "Not started"}
+                        </span>
                       </div>
-
-                      {isDone ? (
-                        <Badge
-                          variant="outline"
-                          className="border-emerald-500/30 bg-emerald-500/10 text-emerald-500 text-[10px] font-mono gap-1 shrink-0"
-                        >
-                          <CheckCircle2 className="h-3 w-3" />
-                          Complete
-                        </Badge>
-                      ) : prog?.started ? (
-                        <Badge
-                          variant="outline"
-                          className="border-blue-500/30 bg-blue-500/10 text-blue-400 text-[10px] font-mono shrink-0"
-                        >
-                          In Progress
-                        </Badge>
-                      ) : (
-                        <Badge
-                          variant="outline"
-                          className="border-border text-muted-foreground text-[10px] font-mono shrink-0"
-                        >
-                          Idle
-                        </Badge>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
+                    );
+                  })}
+                </div>
+              </PanelSection>
             </div>
 
-            {/* Actions with Safeguards */}
-            <div className="space-y-2.5 pt-2 border-t border-border/70">
-              <h4 className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground font-semibold">
-                Administrative Actions
-              </h4>
+            {/* Manage Access Section */}
+            <div className="border-t border-border/60 pt-6">
+              <PanelSection
+                title="Manage access"
+                description="Elevate permissions, moderate profile content, or manage account roles."
+              >
+                <div className="space-y-2.5">
+                  <div className="grid grid-cols-2 gap-2">
+                    {/* Make admin / Demote button */}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setSelectedRole(user.role === "admin" ? "user" : "admin");
+                        setRoleDialogOpen(true);
+                      }}
+                      disabled={isSelf}
+                      className="gap-1.5 text-xs h-9 rounded-md border-border hover:bg-secondary font-sans"
+                    >
+                      <UserCog className="h-3.5 w-3.5" />
+                      <span>{user.role === "admin" ? "Demote from admin" : "Make admin"}</span>
+                    </Button>
 
-              <div className="space-y-2">
-                <div className="grid grid-cols-2 gap-2">
-                  {/* Change Role Button */}
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      setSelectedRole(user.role === "admin" ? "user" : "admin");
-                      setRoleDialogOpen(true);
-                    }}
-                    disabled={isSelf}
-                    className="gap-1.5 text-xs border-border hover:bg-secondary"
-                  >
-                    <UserCog className="h-3.5 w-3.5" />
-                    <span>{user.role === "admin" ? "Demote to User" : "Make Admin"}</span>
-                  </Button>
+                    {/* Clear Profile Moderation Button */}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setClearUsername(false);
+                        setClearDisplayName(false);
+                        setClearAvatar(false);
+                        setClearReason("");
+                        setClearProfileDialogOpen(true);
+                      }}
+                      disabled={isSelf}
+                      className="gap-1.5 text-xs h-9 rounded-md border-border hover:bg-secondary font-sans"
+                    >
+                      <UserX className="h-3.5 w-3.5" />
+                      <span>Clear profile fields</span>
+                    </Button>
+                  </div>
 
-                  {/* Delete User Button */}
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => {
-                      setTypedEmail("");
-                      setDeleteDialogOpen(true);
-                    }}
-                    disabled={isSelf || isTargetAdmin}
-                    className="gap-1.5 text-xs"
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                    <span>Delete User</span>
-                  </Button>
+                  {isSelf && (
+                    <p className="text-[11px] text-muted-foreground font-sans">
+                      You cannot modify permissions or delete your own admin account.
+                    </p>
+                  )}
+                  {!isSelf && isTargetAdmin && (
+                    <p className="text-[11px] text-muted-foreground font-sans">
+                      Administrators cannot be directly deleted. Demote to user first if required.
+                    </p>
+                  )}
                 </div>
+              </PanelSection>
+            </div>
 
-                {/* Clear Profile Moderation Button */}
+            {/* Danger Zone Section */}
+            <div className="border-t border-destructive/20 pt-6">
+              <PanelSection
+                title="Danger zone"
+                description="Irreversible actions regarding this user account and associated data."
+              >
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => {
-                    setClearUsername(false);
-                    setClearDisplayName(false);
-                    setClearAvatar(false);
-                    setClearReason("");
-                    setClearProfileDialogOpen(true);
+                    setTypedEmail("");
+                    setDeleteDialogOpen(true);
                   }}
-                  disabled={isSelf}
-                  className="w-full gap-1.5 text-xs border-amber-500/30 text-amber-600 hover:bg-amber-500/10 hover:text-amber-700 dark:text-amber-400"
+                  disabled={isSelf || isTargetAdmin}
+                  className="w-full gap-2 text-xs h-9 rounded-md border-destructive/40 text-destructive hover:bg-destructive/10 hover:text-destructive font-sans font-medium"
                 >
-                  <UserX className="h-3.5 w-3.5" />
-                  <span>Clear Profile Fields</span>
+                  <Trash2 className="h-3.5 w-3.5" />
+                  <span>Delete user</span>
                 </Button>
-              </div>
-
-              {isSelf && (
-                <p className="text-[10px] text-muted-foreground font-mono">
-                  * You cannot modify or delete your own admin account.
-                </p>
-              )}
-              {!isSelf && isTargetAdmin && (
-                <p className="text-[10px] text-muted-foreground font-mono">
-                  * Other administrators cannot be directly deleted. Demote first if necessary.
-                </p>
-              )}
+              </PanelSection>
             </div>
           </div>
         </SheetContent>
@@ -413,21 +431,21 @@ export function UserDetailDrawer({
 
       {/* Delete User Safeguard Dialog */}
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md rounded-lg">
           <DialogHeader>
-            <DialogTitle className="text-base text-destructive flex items-center gap-2">
+            <DialogTitle className="text-base text-destructive flex items-center gap-2 font-sans font-semibold">
               <Trash2 className="h-4 w-4" />
-              Permanently Delete User?
+              Permanently delete user?
             </DialogTitle>
-            <DialogDescription className="text-xs text-muted-foreground pt-1 space-y-2">
-              <p>
+            <DialogDescription className="text-xs text-muted-foreground pt-1 space-y-2 font-sans">
+              <span>
                 This action is irreversible. It will delete the user account from Supabase Auth and cascade
                 to all user profiles, documents, and guide progress.
-              </p>
-              <div className="p-2.5 rounded-md border border-border bg-secondary/50 font-mono text-[11px] text-foreground">
+              </span>
+              <span className="block p-2.5 rounded-md border border-border bg-secondary/50 font-sans text-xs text-foreground mt-2">
                 To confirm, type the user&apos;s email address:
-                <strong className="block mt-0.5 text-foreground">{expectedEmail || "(no email on file)"}</strong>
-              </div>
+                <strong className="block mt-0.5 text-foreground font-sans">{expectedEmail || "(no email on file)"}</strong>
+              </span>
             </DialogDescription>
           </DialogHeader>
 
@@ -437,13 +455,13 @@ export function UserDetailDrawer({
               value={typedEmail}
               onChange={(e) => setTypedEmail(e.target.value)}
               placeholder="Type user's email to confirm..."
-              className="w-full h-9 px-3 rounded-lg border border-border bg-secondary/40 text-xs font-mono text-foreground placeholder:text-muted-foreground outline-none focus:border-destructive transition-colors"
+              className="w-full h-10 px-3 rounded-md border border-border bg-background text-xs font-sans text-foreground placeholder:text-muted-foreground outline-none focus:border-destructive transition-colors"
             />
           </div>
 
           <DialogFooter className="gap-2 sm:gap-0">
             <DialogClose asChild>
-              <Button variant="outline" size="sm" disabled={isPending}>
+              <Button variant="outline" size="sm" disabled={isPending} className="h-9 rounded-md">
                 Cancel
               </Button>
             </DialogClose>
@@ -456,7 +474,7 @@ export function UserDetailDrawer({
                 typedEmail.trim().toLowerCase() !== expectedEmail.trim().toLowerCase()
               }
               onClick={handleDelete}
-              className="gap-1.5"
+              className="gap-1.5 h-9 rounded-md"
             >
               {isPending ? (
                 <>
@@ -464,7 +482,7 @@ export function UserDetailDrawer({
                   Deleting...
                 </>
               ) : (
-                "Delete Account"
+                "Delete account"
               )}
             </Button>
           </DialogFooter>
@@ -473,13 +491,13 @@ export function UserDetailDrawer({
 
       {/* Clear Profile Fields Dialog */}
       <Dialog open={clearProfileDialogOpen} onOpenChange={setClearProfileDialogOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md rounded-lg">
           <DialogHeader>
-            <DialogTitle className="text-base flex items-center gap-2">
+            <DialogTitle className="text-base flex items-center gap-2 font-sans font-semibold">
               <UserX className="h-4 w-4 text-amber-500" />
-              Clear Profile Fields
+              Clear profile fields
             </DialogTitle>
-            <DialogDescription className="text-xs text-muted-foreground pt-1">
+            <DialogDescription className="text-xs text-muted-foreground pt-1 font-sans">
               Reset profile fields for{" "}
               <strong className="text-foreground">{user.full_name}</strong> that violate community guidelines or impersonate official staff. An entry will be permanently logged in the audit ledger.
             </DialogDescription>
@@ -487,11 +505,11 @@ export function UserDetailDrawer({
 
           <div className="py-3 space-y-4">
             <div>
-              <label className="text-xs font-semibold text-foreground block mb-2">
+              <label className="text-xs font-semibold text-foreground block mb-2 font-sans">
                 Select fields to clear:
               </label>
               <div className="space-y-2">
-                <label className="flex items-center gap-2 text-xs text-foreground cursor-pointer select-none">
+                <label className="flex items-center gap-2 text-xs text-foreground cursor-pointer select-none font-sans">
                   <input
                     type="checkbox"
                     checked={clearUsername}
@@ -500,16 +518,16 @@ export function UserDetailDrawer({
                   />
                   <span>Username (resets to null)</span>
                 </label>
-                <label className="flex items-center gap-2 text-xs text-foreground cursor-pointer select-none">
+                <label className="flex items-center gap-2 text-xs text-foreground cursor-pointer select-none font-sans">
                   <input
                     type="checkbox"
                     checked={clearDisplayName}
                     onChange={(e) => setClearDisplayName(e.target.checked)}
                     className="rounded border-border text-primary focus:ring-primary h-4 w-4"
                   />
-                  <span>Display Name (resets to null)</span>
+                  <span>Display name (resets to null)</span>
                 </label>
-                <label className="flex items-center gap-2 text-xs text-foreground cursor-pointer select-none">
+                <label className="flex items-center gap-2 text-xs text-foreground cursor-pointer select-none font-sans">
                   <input
                     type="checkbox"
                     checked={clearAvatar}
@@ -522,7 +540,7 @@ export function UserDetailDrawer({
             </div>
 
             <div>
-              <label htmlFor="clear-reason" className="text-xs font-semibold text-foreground block mb-1">
+              <label htmlFor="clear-reason" className="text-xs font-semibold text-foreground block mb-1 font-sans">
                 Reason for action <span className="text-destructive">*</span>
               </label>
               <textarea
@@ -531,9 +549,9 @@ export function UserDetailDrawer({
                 onChange={(e) => setClearReason(e.target.value)}
                 rows={3}
                 placeholder="e.g. Offensive username, impersonation, or copyright infringement..."
-                className="w-full p-2.5 rounded-lg border border-border bg-secondary/40 text-xs text-foreground placeholder:text-muted-foreground outline-none focus:border-primary transition-colors resize-none"
+                className="w-full p-2.5 rounded-md border border-border bg-background text-xs text-foreground placeholder:text-muted-foreground outline-none focus:border-primary transition-colors resize-none font-sans"
               />
-              <p className="text-[10px] text-muted-foreground mt-1">
+              <p className="text-[11px] text-muted-foreground mt-1 font-sans">
                 Required for admin audit compliance (minimum 3 characters).
               </p>
             </div>
@@ -541,7 +559,7 @@ export function UserDetailDrawer({
 
           <DialogFooter className="gap-2 sm:gap-0">
             <DialogClose asChild>
-              <Button variant="outline" size="sm" disabled={isPending}>
+              <Button variant="outline" size="sm" disabled={isPending} className="h-9 rounded-md">
                 Cancel
               </Button>
             </DialogClose>
@@ -554,7 +572,7 @@ export function UserDetailDrawer({
                 clearReason.trim().length < 3
               }
               onClick={handleClearProfile}
-              className="gap-1.5"
+              className="gap-1.5 h-9 rounded-md"
             >
               {isPending ? (
                 <>
@@ -562,7 +580,7 @@ export function UserDetailDrawer({
                   Clearing...
                 </>
               ) : (
-                "Clear Selected Fields"
+                "Clear selected fields"
               )}
             </Button>
           </DialogFooter>
@@ -571,13 +589,13 @@ export function UserDetailDrawer({
 
       {/* Change Role Safeguard Dialog */}
       <Dialog open={roleDialogOpen} onOpenChange={setRoleDialogOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md rounded-lg">
           <DialogHeader>
-            <DialogTitle className="text-base flex items-center gap-2">
+            <DialogTitle className="text-base flex items-center gap-2 font-sans font-semibold">
               <UserCog className="h-4 w-4 text-primary" />
-              Change User Role
+              Change user role
             </DialogTitle>
-            <DialogDescription className="text-xs text-muted-foreground pt-1">
+            <DialogDescription className="text-xs text-muted-foreground pt-1 font-sans">
               Change permissions for{" "}
               <strong className="text-foreground">{user.full_name}</strong>.
               Administrators have full read access to all user data, moderation tools, and the audit ledger.
@@ -585,38 +603,38 @@ export function UserDetailDrawer({
           </DialogHeader>
 
           <div className="py-3 space-y-2">
-            <label className="text-xs font-semibold text-foreground">Select New Role:</label>
+            <label className="text-xs font-semibold text-foreground font-sans">Select new role:</label>
             <div className="grid grid-cols-2 gap-2">
               <button
                 type="button"
                 onClick={() => setSelectedRole("user")}
-                className={`p-3 rounded-lg border text-left text-xs transition-colors ${
+                className={`p-3 rounded-md border text-left text-xs transition-colors cursor-pointer ${
                   selectedRole === "user"
                     ? "border-primary bg-primary/10 text-foreground font-semibold"
                     : "border-border text-muted-foreground hover:bg-secondary/40"
                 }`}
               >
-                <span className="block font-medium">Standard User</span>
-                <span className="text-[10px] text-muted-foreground">Standard access</span>
+                <span className="block font-medium font-sans">Standard user</span>
+                <span className="text-[11px] text-muted-foreground font-sans">Standard access</span>
               </button>
               <button
                 type="button"
                 onClick={() => setSelectedRole("admin")}
-                className={`p-3 rounded-lg border text-left text-xs transition-colors ${
+                className={`p-3 rounded-md border text-left text-xs transition-colors cursor-pointer ${
                   selectedRole === "admin"
-                    ? "border-amber-500 bg-amber-500/10 text-foreground font-semibold"
+                    ? "border-[color:var(--data-flows-border)] bg-[color:var(--data-flows-subtle)] text-foreground font-semibold"
                     : "border-border text-muted-foreground hover:bg-secondary/40"
                 }`}
               >
-                <span className="block font-medium text-amber-500">Administrator</span>
-                <span className="text-[10px] text-muted-foreground">Full console access</span>
+                <span className="block font-medium text-[color:var(--data-flows-ink)] font-sans">Administrator</span>
+                <span className="text-[11px] text-muted-foreground font-sans">Full console access</span>
               </button>
             </div>
           </div>
 
           <DialogFooter className="gap-2 sm:gap-0">
             <DialogClose asChild>
-              <Button variant="outline" size="sm" disabled={isPending}>
+              <Button variant="outline" size="sm" disabled={isPending} className="h-9 rounded-md">
                 Cancel
               </Button>
             </DialogClose>
@@ -625,7 +643,7 @@ export function UserDetailDrawer({
               size="sm"
               disabled={isPending || selectedRole === user.role}
               onClick={handleRoleChange}
-              className="gap-1.5"
+              className="gap-1.5 h-9 rounded-md"
             >
               {isPending ? (
                 <>
@@ -633,7 +651,7 @@ export function UserDetailDrawer({
                   Saving...
                 </>
               ) : (
-                "Update Role"
+                "Update role"
               )}
             </Button>
           </DialogFooter>

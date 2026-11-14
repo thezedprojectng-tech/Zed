@@ -496,7 +496,7 @@ export function AdminContactClient({
             ) : (
               groupedMessages.map((grp) => (
                 <div key={grp.title}>
-                  <div className="sticky top-0 z-10 px-3 py-1 bg-secondary/60 backdrop-blur-xs text-[10px] font-semibold text-muted-foreground uppercase tracking-wider border-b border-border/40">
+                  <div className="sticky top-0 z-10 px-3 py-1 bg-secondary/60 backdrop-blur-xs text-[11px] font-medium text-muted-foreground border-b border-border/40 font-sans">
                     {grp.title}
                   </div>
                   <div>
