@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
 import {
   Breadcrumb,
@@ -12,41 +12,19 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Search,
-  Sun,
-  Moon,
-  WifiOff,
-  User,
-  ShieldCheck,
-  LogOut,
-  LayoutDashboard,
-} from "lucide-react";
-import { useAuthStore } from "@/store/useAuthStore";
-import { signOut } from "@/lib/auth/actions";
-import { getLevelName } from "@/types";
+import { Search, Sun, Moon, WifiOff, PanelLeft } from "lucide-react";
 import { useIsMounted, useIsOnline } from "@/lib/hooks";
 import { MobileDrawerTrigger } from "./MobileDrawer";
 import { NotificationBell } from "./NotificationBell";
+import { UserMenu } from "./UserMenu";
+import { useAppSidebar } from "./AppSidebarContext";
 
 interface TopBarProps {
   onOpenCommand: () => void;
-  /** Whether the mobile drawer is open */
   drawerOpen: boolean;
-  /** Called to open the mobile drawer */
   onDrawerOpen: () => void;
-  /** Called to close the mobile drawer */
   onDrawerClose: () => void;
 }
 
@@ -63,6 +41,14 @@ const routeLabels: Record<string, string> = {
   verify: "Bank Verification",
   admin: "Admin",
   users: "Users",
+  skill: "Zed Skill",
+  mining: "Zed Mining",
+  market: "Zed Market",
+  internships: "Internship Radar",
+  news: "News",
+  referrals: "Referrals",
+  fund: "Fund your idea",
+  whitepaper: "White paper",
 };
 
 export function TopBar({
@@ -72,51 +58,36 @@ export function TopBar({
   onDrawerClose,
 }: TopBarProps) {
   const pathname = usePathname();
-  const router = useRouter();
   const { theme, setTheme, resolvedTheme } = useTheme();
-  const { user, profile, clearUser } = useAuthStore();
   const isOnline = useIsOnline();
   const mounted = useIsMounted();
-
-  const handleSignOut = async () => {
-    clearUser();
-    await signOut();
-    router.push("/login");
-  };
+  const { isCollapsed, toggleCollapse } = useAppSidebar();
 
   const currentTheme = resolvedTheme || theme || "dark";
-
-  // Compute breadcrumbs from pathname segments
   const segments = pathname.split("/").filter(Boolean);
 
-  const getInitials = (name?: string | null) => {
-    if (!name) return "ZE";
-    const parts = name.trim().split(" ");
-    if (parts.length >= 2) return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
-    return parts[0].slice(0, 2).toUpperCase();
-  };
-
-  const fullName = profile?.full_name || (user?.user_metadata?.full_name as string | undefined);
-  const displayName = profile?.display_name || fullName;
-  const avatarPath = profile?.avatar_path;
-  const avatarUrl = avatarPath
-    ? `/api/avatar/${avatarPath}`
-    : profile?.avatar_url || (user?.user_metadata?.avatar_url as string | undefined);
-  const email = user?.email;
-  const civicLevel = profile?.level_id || 1;
-
   return (
-    <header className="sticky top-0 z-30 flex h-14 w-full items-center justify-between border-hairline-b bg-background/80 px-2 md:px-6 backdrop-blur-md">
-      {/* Left: hamburger (mobile) + breadcrumbs / logo */}
-      <div className="flex items-center gap-1 min-w-0">
-        {/* Mobile hamburger — hidden on md+ */}
+    <header className="sticky top-0 z-30 flex h-14 w-full items-center justify-between border-b border-border/50 bg-background/90 px-3 md:px-6 backdrop-blur-md">
+      {/* Left: Mobile hamburger (mobile) / sidebar toggle (desktop) + breadcrumbs / mobile logo */}
+      <div className="flex items-center gap-1.5 sm:gap-2.5 min-w-0">
         <MobileDrawerTrigger
           open={drawerOpen}
           onOpen={onDrawerOpen}
           onClose={onDrawerClose}
         />
 
-        {/* Desktop breadcrumbs — hidden on mobile */}
+        {/* Desktop sidebar toggle button */}
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          onClick={toggleCollapse}
+          className="hidden md:flex text-muted-foreground hover:text-foreground h-8 w-8 cursor-pointer"
+          aria-label={isCollapsed ? "Expand sidebar (Ctrl+B)" : "Collapse sidebar (Ctrl+B)"}
+        >
+          <PanelLeft className="h-4 w-4 stroke-[1.5]" />
+        </Button>
+
+        {/* Desktop breadcrumbs */}
         <Breadcrumb className="hidden sm:flex">
           <BreadcrumbList className="text-xs">
             <BreadcrumbItem>
@@ -137,12 +108,12 @@ export function TopBar({
                   <BreadcrumbSeparator />
                   <BreadcrumbItem>
                     {isLast ? (
-                      <BreadcrumbPage className="font-medium capitalize text-foreground">
+                      <BreadcrumbPage className="font-medium text-foreground">
                         {label}
                       </BreadcrumbPage>
                     ) : (
                       <BreadcrumbLink asChild>
-                        <Link href={href} className="capitalize hover:text-foreground">
+                        <Link href={href} className="hover:text-foreground">
                           {label}
                         </Link>
                       </BreadcrumbLink>
@@ -154,52 +125,56 @@ export function TopBar({
           </BreadcrumbList>
         </Breadcrumb>
 
-        {/* Mobile logo — visible only on xs (no hamburger text; hamburger is beside it) */}
-        <Link href="/home" className="sm:hidden flex items-center ml-1" aria-label="Zed Home">
+        {/* Mobile logo — visible only on xs */}
+        <Link
+          href="/home"
+          className="sm:hidden flex items-center ml-0.5 shrink-0"
+          aria-label="Zed Home"
+        >
           <Image
             src="/icons/zed-logo-full-dark.png"
             alt="Zed"
-            width={90}
-            height={45}
-            className="h-6 w-auto object-contain dark:hidden"
+            width={80}
+            height={40}
+            className="h-5 w-auto object-contain dark:hidden"
           />
           <Image
             src="/icons/zed-logo-full-light.png"
             alt="Zed"
-            width={90}
-            height={45}
-            className="h-6 w-auto object-contain hidden dark:block"
+            width={80}
+            height={40}
+            className="h-5 w-auto object-contain hidden dark:block"
           />
         </Link>
       </div>
 
-      {/* Right: Actions & Tools */}
-      <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-        {/* Offline Badge */}
+      {/* Right: Tools & Actions (guaranteed no overflow at 390px) */}
+      <div className="flex items-center gap-1 sm:gap-2 shrink-0">
         {!isOnline && (
           <Badge
             variant="outline"
-            className="gap-1 border-amber-500/30 bg-amber-500/10 text-amber-500 text-[11px] font-mono px-2 py-0.5"
+            className="gap-1 border-amber-500/30 bg-amber-500/10 text-amber-500 text-[10px] px-1.5 py-0.5 font-sans"
           >
             <WifiOff className="h-3 w-3" />
-            <span className="hidden sm:inline">Offline Mode</span>
+            <span className="hidden sm:inline">Offline</span>
           </Badge>
         )}
 
-        {/* Search Command Trigger */}
+        {/* Search trigger */}
         <button
           type="button"
           onClick={onOpenCommand}
-          className="flex h-8 items-center gap-2 rounded-md border-hairline bg-card/60 px-2.5 text-xs text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
+          aria-label="Search guides"
+          className="flex h-8 items-center gap-1.5 rounded-md border border-border/70 bg-card/60 px-2 sm:px-2.5 text-xs text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors cursor-pointer"
         >
-          <Search className="h-3.5 w-3.5" />
-          <span className="hidden sm:inline">Search guides...</span>
-          <kbd className="hidden sm:inline-flex h-4 items-center rounded border border-border bg-secondary/80 px-1 font-mono text-[10px] text-muted-foreground">
-            ctrl + K
+          <Search className="h-3.5 w-3.5 stroke-[1.5]" />
+          <span className="hidden sm:inline">Search guides…</span>
+          <kbd className="hidden sm:inline-flex h-4 items-center rounded border border-border bg-secondary/80 px-1 font-sans text-[10px] text-muted-foreground">
+            Ctrl + K
           </kbd>
         </button>
 
-        {/* Notifications Bell Popover */}
+        {/* Notifications */}
         <NotificationBell />
 
         {/* Theme Toggle */}
@@ -208,92 +183,19 @@ export function TopBar({
             variant="ghost"
             size="icon-sm"
             onClick={() => setTheme(currentTheme === "light" ? "dark" : "light")}
-            className="text-muted-foreground hover:text-foreground"
+            className="text-muted-foreground hover:text-foreground h-8 w-8 cursor-pointer"
             aria-label="Toggle theme"
           >
             {currentTheme === "light" ? (
-              <Moon className="h-4 w-4 text-foreground" />
+              <Moon className="h-4 w-4 text-foreground stroke-[1.5]" />
             ) : (
-              <Sun className="h-4 w-4 text-foreground" />
+              <Sun className="h-4 w-4 text-foreground stroke-[1.5]" />
             )}
           </Button>
         )}
 
-        {/* User Profile Avatar Dropdown */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button
-              type="button"
-              className="rounded-full ring-offset-background transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-              aria-label="User menu"
-            >
-              <Avatar className="h-7 w-7 border-hairline">
-                <AvatarImage src={avatarUrl || ""} />
-                <AvatarFallback className="bg-secondary font-mono text-[11px] font-semibold text-foreground">
-                  {getInitials(fullName)}
-                </AvatarFallback>
-              </Avatar>
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            align="end"
-            className="w-56 border-hairline bg-popover shadow-lg"
-          >
-            <DropdownMenuLabel className="font-normal">
-              <div className="flex flex-col space-y-1">
-                <p className="text-xs font-semibold leading-none text-foreground truncate">
-                  {displayName || "User"}
-                </p>
-                {profile?.username ? (
-                  <p className="text-[11px] leading-none text-primary font-mono">
-                    @{profile.username}
-                  </p>
-                ) : (
-                  <p className="text-[11px] leading-none text-muted-foreground font-mono">
-                    {email || ""}
-                  </p>
-                )}
-                <div className="mt-1.5 flex items-center gap-1.5">
-                  <Badge
-                    variant="outline"
-                    className="border-primary/30 bg-primary/10 text-primary text-[10px] py-0 px-1.5 font-mono"
-                  >
-                    {getLevelName(civicLevel)}
-                  </Badge>
-                </div>
-              </div>
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem asChild>
-              <Link href="/profile" className="cursor-pointer">
-                <User className="mr-2 h-4 w-4" />
-                <span>Profile & Credentials</span>
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link href="/verify" className="cursor-pointer">
-                <ShieldCheck className="mr-2 h-4 w-4" />
-                <span>Verify account</span>
-              </Link>
-            </DropdownMenuItem>
-            {profile?.role === "admin" && (
-              <DropdownMenuItem asChild>
-                <Link href="/admin" className="cursor-pointer text-amber-500 focus:text-amber-500">
-                  <LayoutDashboard className="mr-2 h-4 w-4" />
-                  <span>Admin Dashboard</span>
-                </Link>
-              </DropdownMenuItem>
-            )}
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onClick={handleSignOut}
-              className="text-destructive focus:bg-destructive/10 focus:text-destructive cursor-pointer"
-            >
-              <LogOut className="mr-2 h-4 w-4" />
-              <span>Sign out</span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {/* User avatar dropdown (same component as sidebar user menu) */}
+        <UserMenu align="end" side="bottom" />
       </div>
     </header>
   );
