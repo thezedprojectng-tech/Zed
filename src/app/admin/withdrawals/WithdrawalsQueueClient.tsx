@@ -1,13 +1,10 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useTransition, useMemo, useEffect, useCallback, useRef } from "react";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { toast } from "sonner";
 import {
   Search,
-  Filter,
-  CheckCircle2,
-  XCircle,
   Banknote,
   Clock,
   Building2,
@@ -15,12 +12,11 @@ import {
   Eye,
   EyeOff,
   Loader2,
-  ArrowUpDown,
-  Coins,
   AlertCircle,
+  Coins,
+  CheckCircle2,
+  ChevronRight,
 } from "lucide-react";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -32,6 +28,19 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
+import {
+  AdminPageHeader,
+  SegmentedControl,
+  EmptyState,
+  AdminDrawer,
+} from "@/components/admin/primitives";
+import {
+  PanelSection,
+  FieldList,
+  FieldItem,
+} from "@/components/admin/primitives/PanelSection";
+import { StatusPill } from "@/components/admin/people/StatusPill";
+import { AgePill } from "@/components/admin/people/AgePill";
 import { maskAccountNumber } from "@/lib/withdraw/helpers";
 import { adminReviewWithdrawalAction } from "@/lib/withdraw/actions";
 import type { WithdrawalRequest, WithdrawalStatus } from "@/lib/withdraw/types";
@@ -42,48 +51,160 @@ interface WithdrawalsQueueClientProps {
   loadError?: string | null;
 }
 
+type TabKey = "action-needed" | "approved" | "paid" | "rejected" | "cancelled" | "all";
+
 export function WithdrawalsQueueClient({
   initialRequests,
   loadError,
 }: WithdrawalsQueueClientProps) {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
   const [requests, setRequests] = useState<WithdrawalRequest[]>(initialRequests);
-  const [statusFilter, setStatusFilter] = useState<string>("pending");
-  const [searchQuery, setSearchQuery] = useState<string>("");
   const [unmaskedIds, setUnmaskedIds] = useState<Record<string, boolean>>({});
   const [isPending, startTransition] = useTransition();
 
-  // Dialog states for reject and mark paid
+  // Read URL parameters
+  const initialTabParam = (searchParams.get("tab") as TabKey) || "action-needed";
+  const [activeTab, setActiveTab] = useState<TabKey>(initialTabParam);
+  const [searchQuery, setSearchQuery] = useState<string>(searchParams.get("q") || "");
+
+  // Selection / Detail Drawer
+  const [selectedRequest, setSelectedRequest] = useState<WithdrawalRequest | null>(() => {
+    const targetId = searchParams.get("id");
+    if (targetId) {
+      return initialRequests.find((r) => r.id === targetId) || null;
+    }
+    return null;
+  });
+
+  // Dialog targets
+  const [approveDialogTarget, setApproveDialogTarget] = useState<WithdrawalRequest | null>(null);
   const [rejectDialogTarget, setRejectDialogTarget] = useState<WithdrawalRequest | null>(null);
   const [rejectReason, setRejectReason] = useState<string>("");
-
   const [paidDialogTarget, setPaidDialogTarget] = useState<WithdrawalRequest | null>(null);
   const [paidNote, setPaidNote] = useState<string>("");
 
+  // Sync URL state
+  const updateUrl = useCallback(
+    (newTab: TabKey, newQuery: string, newId: string | null) => {
+      const params = new URLSearchParams();
+      if (newTab !== "action-needed") params.set("tab", newTab);
+      if (newQuery.trim()) params.set("q", newQuery.trim());
+      if (newId) params.set("id", newId);
+      const str = params.toString();
+      router.replace(str ? `${pathname}?${str}` : pathname, { scroll: false });
+    },
+    [pathname, router]
+  );
+
+  // Focus search with '/' shortcut
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "/" && !["INPUT", "TEXTAREA"].includes((e.target as HTMLElement)?.tagName)) {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
   // Quick stats
-  const pendingRequests = requests.filter((r) => r.status === "pending");
-  const approvedRequests = requests.filter((r) => r.status === "approved");
-  const paidRequests = requests.filter((r) => r.status === "paid");
+  const pendingRequests = useMemo(() => requests.filter((r) => r.status === "pending"), [requests]);
+  const approvedRequests = useMemo(() => requests.filter((r) => r.status === "approved"), [requests]);
+  const paidRequests = useMemo(() => requests.filter((r) => r.status === "paid"), [requests]);
+  const rejectedRequests = useMemo(() => requests.filter((r) => r.status === "rejected"), [requests]);
+  const cancelledRequests = useMemo(() => requests.filter((r) => r.status === "cancelled"), [requests]);
 
-  const totalPendingNaira = pendingRequests.reduce((sum, r) => sum + r.amount_ngn, 0);
-  const totalApprovedNaira = approvedRequests.reduce((sum, r) => sum + r.amount_ngn, 0);
-  const totalPaidNaira = paidRequests.reduce((sum, r) => sum + r.amount_ngn, 0);
+  const totalPendingNaira = useMemo(
+    () => pendingRequests.reduce((sum, r) => sum + r.amount_ngn, 0),
+    [pendingRequests]
+  );
+  const totalApprovedNaira = useMemo(
+    () => approvedRequests.reduce((sum, r) => sum + r.amount_ngn, 0),
+    [approvedRequests]
+  );
+  const totalPaidNaira = useMemo(
+    () => paidRequests.reduce((sum, r) => sum + r.amount_ngn, 0),
+    [paidRequests]
+  );
 
-  // Filtered requests
-  const filteredRequests = requests.filter((req) => {
-    if (statusFilter !== "all" && req.status !== statusFilter) {
-      return false;
+  // Tab options with counts
+  const tabOptions = useMemo(
+    () => [
+      { id: "action-needed" as TabKey, label: "Action needed", count: pendingRequests.length },
+      { id: "approved" as TabKey, label: "Approved (Transfer pending)", count: approvedRequests.length },
+      { id: "paid" as TabKey, label: "Paid", count: paidRequests.length },
+      { id: "rejected" as TabKey, label: "Rejected", count: rejectedRequests.length },
+      { id: "cancelled" as TabKey, label: "Cancelled", count: cancelledRequests.length },
+      { id: "all" as TabKey, label: "All records", count: requests.length },
+    ],
+    [
+      pendingRequests.length,
+      approvedRequests.length,
+      paidRequests.length,
+      rejectedRequests.length,
+      cancelledRequests.length,
+      requests.length,
+    ]
+  );
+
+  // Filtered & sorted requests
+  const filteredRequests = useMemo(() => {
+    let list = requests.filter((req) => {
+      if (activeTab === "action-needed") {
+        if (req.status !== "pending") return false;
+      } else if (activeTab !== "all") {
+        if (req.status !== activeTab) return false;
+      }
+
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase();
+        const matchName = req.user_name?.toLowerCase().includes(q) ?? false;
+        const matchEmail = req.user_email?.toLowerCase().includes(q) ?? false;
+        const matchBank = req.bank_name.toLowerCase().includes(q);
+        const matchAccName = req.account_name.toLowerCase().includes(q);
+        const matchAccNum = req.account_number.includes(q);
+        const matchId = req.id.toLowerCase().includes(q);
+        return matchName || matchEmail || matchBank || matchAccName || matchAccNum || matchId;
+      }
+      return true;
+    });
+
+    // Action-needed tab sorts oldest first (FIFO - oldest awaiting payouts first)
+    if (activeTab === "action-needed") {
+      list = [...list].sort(
+        (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+      );
+    } else {
+      list = [...list].sort(
+        (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      );
     }
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
-      const matchName = req.user_name?.toLowerCase().includes(q) ?? false;
-      const matchBank = req.bank_name.toLowerCase().includes(q);
-      const matchAccName = req.account_name.toLowerCase().includes(q);
-      const matchAccNum = req.account_number.includes(q);
-      return matchName || matchBank || matchAccName || matchAccNum;
-    }
-    return true;
-  });
+
+    return list;
+  }, [requests, activeTab, searchQuery]);
+
+  // Auto-advance helper
+  const advanceToNext = useCallback(
+    (currentId: string, updatedList: WithdrawalRequest[]) => {
+      const currentIndex = updatedList.findIndex((r) => r.id === currentId);
+      if (currentIndex !== -1 && currentIndex + 1 < updatedList.length) {
+        setSelectedRequest(updatedList[currentIndex + 1]);
+        updateUrl(activeTab, searchQuery, updatedList[currentIndex + 1].id);
+      } else if (currentIndex > 0) {
+        setSelectedRequest(updatedList[currentIndex - 1]);
+        updateUrl(activeTab, searchQuery, updatedList[currentIndex - 1].id);
+      } else {
+        setSelectedRequest(null);
+        updateUrl(activeTab, searchQuery, null);
+      }
+    },
+    [activeTab, searchQuery, updateUrl]
+  );
 
   const toggleMask = (id: string) => {
     setUnmaskedIds((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -95,17 +216,27 @@ export function WithdrawalsQueueClient({
   };
 
   // ── Actions ──────────────────────────────────────────────────────────────
-  const handleApprove = (req: WithdrawalRequest) => {
+  const handleConfirmApprove = () => {
+    if (!approveDialogTarget) return;
+    const target = approveDialogTarget;
+
     startTransition(async () => {
-      const res = await adminReviewWithdrawalAction(req.id, "approved");
+      const res = await adminReviewWithdrawalAction(target.id, "approved");
       if (!res.ok) {
         toast.error(res.error);
         return;
       }
-      toast.success(`Request #${req.id.slice(0, 8)} approved.`);
-      setRequests((prev) =>
-        prev.map((r) => (r.id === req.id ? { ...r, status: "approved" as WithdrawalStatus } : r))
+      toast.success(`Request #${target.id.slice(0, 8)} approved for payout.`);
+      const updated = requests.map((r) =>
+        r.id === target.id ? { ...r, status: "approved" as WithdrawalStatus } : r
       );
+      setRequests(updated);
+      setApproveDialogTarget(null);
+
+      // Auto advance
+      if (selectedRequest?.id === target.id) {
+        advanceToNext(target.id, updated.filter((r) => r.status === "pending"));
+      }
       router.refresh();
     });
   };
@@ -116,10 +247,11 @@ export function WithdrawalsQueueClient({
       toast.error("Please provide a rejection reason.");
       return;
     }
+    const target = rejectDialogTarget;
 
     startTransition(async () => {
       const res = await adminReviewWithdrawalAction(
-        rejectDialogTarget.id,
+        target.id,
         "rejected",
         undefined,
         rejectReason.trim()
@@ -129,31 +261,36 @@ export function WithdrawalsQueueClient({
         return;
       }
       toast.success(
-        `Request #${rejectDialogTarget.id.slice(0, 8)} rejected. ${rejectDialogTarget.amount_zed} ZED refunded to user.`
+        `Request #${target.id.slice(0, 8)} rejected. ${target.amount_zed.toLocaleString()} ZED refunded.`
       );
-      setRequests((prev) =>
-        prev.map((r) =>
-          r.id === rejectDialogTarget.id
-            ? {
-                ...r,
-                status: "rejected" as WithdrawalStatus,
-                reject_reason: rejectReason.trim(),
-              }
-            : r
-        )
+      const updated = requests.map((r) =>
+        r.id === target.id
+          ? {
+              ...r,
+              status: "rejected" as WithdrawalStatus,
+              reject_reason: rejectReason.trim(),
+            }
+          : r
       );
+      setRequests(updated);
       setRejectDialogTarget(null);
       setRejectReason("");
+
+      // Auto advance
+      if (selectedRequest?.id === target.id) {
+        advanceToNext(target.id, updated.filter((r) => r.status === "pending"));
+      }
       router.refresh();
     });
   };
 
   const handleConfirmPaid = () => {
     if (!paidDialogTarget) return;
+    const target = paidDialogTarget;
 
     startTransition(async () => {
       const res = await adminReviewWithdrawalAction(
-        paidDialogTarget.id,
+        target.id,
         "paid",
         paidNote.trim() || undefined
       );
@@ -161,289 +298,243 @@ export function WithdrawalsQueueClient({
         toast.error(res.error);
         return;
       }
-      toast.success(`Request #${paidDialogTarget.id.slice(0, 8)} marked as paid.`);
-      setRequests((prev) =>
-        prev.map((r) =>
-          r.id === paidDialogTarget.id
-            ? {
-                ...r,
-                status: "paid" as WithdrawalStatus,
-                admin_note: paidNote.trim() || null,
-              }
-            : r
-        )
+      toast.success(`Request #${target.id.slice(0, 8)} marked as completed bank transfer.`);
+      const updated = requests.map((r) =>
+        r.id === target.id
+          ? {
+              ...r,
+              status: "paid" as WithdrawalStatus,
+              admin_note: paidNote.trim() || null,
+            }
+          : r
       );
+      setRequests(updated);
       setPaidDialogTarget(null);
       setPaidNote("");
+
+      // Auto advance
+      if (selectedRequest?.id === target.id) {
+        advanceToNext(target.id, updated.filter((r) => r.status === "approved"));
+      }
       router.refresh();
     });
   };
 
-  const renderStatusBadge = (status: WithdrawalStatus) => {
+  const handleSelectRow = (req: WithdrawalRequest) => {
+    setSelectedRequest(req);
+    updateUrl(activeTab, searchQuery, req.id);
+  };
+
+  const handleCloseDrawer = () => {
+    setSelectedRequest(null);
+    updateUrl(activeTab, searchQuery, null);
+  };
+
+  const renderStatus = (status: WithdrawalStatus) => {
     switch (status) {
       case "pending":
-        return (
-          <Badge
-            variant="outline"
-            className="border-amber-500/30 bg-amber-500/10 text-amber-500 font-mono text-[10px] uppercase font-semibold"
-          >
-            Pending
-          </Badge>
-        );
+        return <StatusPill variant="pending" label="Pending" />;
       case "approved":
-        return (
-          <Badge
-            variant="outline"
-            className="border-blue-500/30 bg-blue-500/10 text-blue-500 font-mono text-[10px] uppercase font-semibold"
-          >
-            Approved
-          </Badge>
-        );
+        return <StatusPill variant="reviewing" label="Approved (Transfer pending)" />;
       case "paid":
-        return (
-          <Badge
-            variant="outline"
-            className="border-emerald-500/30 bg-emerald-500/10 text-emerald-500 font-mono text-[10px] uppercase font-semibold"
-          >
-            Paid
-          </Badge>
-        );
+        return <StatusPill variant="verified" label="Paid" />;
       case "rejected":
-        return (
-          <Badge
-            variant="outline"
-            className="border-rose-500/30 bg-rose-500/10 text-rose-500 font-mono text-[10px] uppercase font-semibold"
-          >
-            Rejected
-          </Badge>
-        );
+        return <StatusPill variant="rejected" label="Rejected" />;
       case "cancelled":
-        return (
-          <Badge
-            variant="outline"
-            className="border-muted bg-muted/20 text-muted-foreground font-mono text-[10px] uppercase font-semibold"
-          >
-            Cancelled
-          </Badge>
-        );
+        return <StatusPill variant="neutral" label="Cancelled" />;
       default:
-        return null;
+        return <StatusPill variant="neutral" label={status} />;
     }
   };
 
   return (
     <div className="space-y-6">
-      {/* ── Top bar ──────────────────────────────────────────────────────── */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-xl font-bold tracking-tight text-foreground">
-            ZED Withdrawals Queue
-          </h1>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            Manual bank transfer queue. Approve requests and mark transfers completed.
-          </p>
-        </div>
-      </div>
+      {/* ── Page Header ──────────────────────────────────────────────────── */}
+      <AdminPageHeader
+        title="Withdrawals Queue"
+        description="Review, approve, and execute bank transfers for citizen ZED token redemptions."
+        icon={Banknote}
+        section="money"
+      />
 
-      {/* ── Error Callout Banner ─────────────────────────────────────────── */}
+      {/* ── Error Banner ─────────────────────────────────────────────────── */}
       {loadError && (
-        <Card className="p-4 border-rose-500/30 bg-rose-500/10 flex items-start gap-3">
-          <AlertCircle className="h-5 w-5 text-rose-500 shrink-0 mt-0.5" />
+        <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-4 flex items-start gap-3">
+          <AlertCircle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
           <div className="text-xs space-y-1">
-            <p className="font-semibold text-foreground">
-              Failed to load withdrawal requests
-            </p>
+            <p className="font-semibold text-foreground">Failed to load withdrawal requests</p>
             <p className="text-muted-foreground">{loadError}</p>
           </div>
-        </Card>
+        </div>
       )}
 
       {/* ── Metric Summary Cards ─────────────────────────────────────────── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-        <Card className="p-4 border-border bg-card shadow-xs">
-          <div className="flex items-center justify-between">
-            <span className="font-mono text-[10px] uppercase text-muted-foreground">
-              Pending Queue
-            </span>
-            <Clock className="h-4 w-4 text-amber-500" />
+        <div className="rounded-lg border border-border/70 bg-card p-4 shadow-2xs">
+          <div className="flex items-center justify-between text-muted-foreground">
+            <span className="text-xs font-medium">Action Needed</span>
+            <Clock className="h-4 w-4 text-[color:var(--data-flows)]" />
           </div>
-          <p className="mt-2 font-mono text-xl font-bold text-foreground">
-            {pendingRequests.length} requests
+          <p className="mt-2 text-2xl font-bold font-sans tabular-nums text-foreground">
+            {pendingRequests.length}
           </p>
-          <p className="font-mono text-xs text-amber-500 mt-0.5">
-            ₦{totalPendingNaira.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+          <p className="font-sans tabular-nums text-xs text-[color:var(--data-flows-ink)] mt-0.5">
+            ₦{totalPendingNaira.toLocaleString(undefined, { minimumFractionDigits: 2 })} awaiting review
           </p>
-        </Card>
+        </div>
 
-        <Card className="p-4 border-border bg-card shadow-xs">
-          <div className="flex items-center justify-between">
-            <span className="font-mono text-[10px] uppercase text-muted-foreground">
-              Approved (Pending Transfer)
-            </span>
-            <CheckCircle2 className="h-4 w-4 text-blue-500" />
+        <div className="rounded-lg border border-border/70 bg-card p-4 shadow-2xs">
+          <div className="flex items-center justify-between text-muted-foreground">
+            <span className="text-xs font-medium">Approved (Payout Pending)</span>
+            <CheckCircle2 className="h-4 w-4 text-[color:var(--data-users)]" />
           </div>
-          <p className="mt-2 font-mono text-xl font-bold text-foreground">
-            {approvedRequests.length} requests
+          <p className="mt-2 text-2xl font-bold font-sans tabular-nums text-foreground">
+            {approvedRequests.length}
           </p>
-          <p className="font-mono text-xs text-blue-500 mt-0.5">
-            ₦{totalApprovedNaira.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+          <p className="font-sans tabular-nums text-xs text-[color:var(--data-users-ink)] mt-0.5">
+            ₦{totalApprovedNaira.toLocaleString(undefined, { minimumFractionDigits: 2 })} ready to transfer
           </p>
-        </Card>
+        </div>
 
-        <Card className="p-4 border-border bg-card shadow-xs">
-          <div className="flex items-center justify-between">
-            <span className="font-mono text-[10px] uppercase text-muted-foreground">
-              Total Paid Out
-            </span>
-            <Banknote className="h-4 w-4 text-emerald-500" />
+        <div className="rounded-lg border border-border/70 bg-card p-4 shadow-2xs">
+          <div className="flex items-center justify-between text-muted-foreground">
+            <span className="text-xs font-medium">Total Paid Out</span>
+            <Banknote className="h-4 w-4 text-[color:var(--data-verified)]" />
           </div>
-          <p className="mt-2 font-mono text-xl font-bold text-foreground">
-            {paidRequests.length} transfers
+          <p className="mt-2 text-2xl font-bold font-sans tabular-nums text-foreground">
+            {paidRequests.length}
           </p>
-          <p className="font-mono text-xs text-emerald-500 mt-0.5">
-            ₦{totalPaidNaira.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+          <p className="font-sans tabular-nums text-xs text-[color:var(--data-verified-ink)] mt-0.5">
+            ₦{totalPaidNaira.toLocaleString(undefined, { minimumFractionDigits: 2 })} successfully disbursed
           </p>
-        </Card>
+        </div>
 
-        <Card className="p-4 border-border bg-card shadow-xs">
-          <div className="flex items-center justify-between">
-            <span className="font-mono text-[10px] uppercase text-muted-foreground">
-              Total Requests
-            </span>
+        <div className="rounded-lg border border-border/70 bg-card p-4 shadow-2xs">
+          <div className="flex items-center justify-between text-muted-foreground">
+            <span className="text-xs font-medium">Total Requests</span>
             <Coins className="h-4 w-4 text-primary" />
           </div>
-          <p className="mt-2 font-mono text-xl font-bold text-foreground">
-            {requests.length} total
+          <p className="mt-2 text-2xl font-bold font-sans tabular-nums text-foreground">
+            {requests.length}
           </p>
-          <p className="font-mono text-xs text-muted-foreground mt-0.5">
-            Lifetime records
+          <p className="text-xs text-muted-foreground mt-0.5">
+            Lifetime recorded redemptions
           </p>
-        </Card>
+        </div>
       </div>
 
-      {/* ── Filters & Search ──────────────────────────────────────────────── */}
-      <Card className="p-4 border-border bg-card shadow-xs space-y-3">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          {/* Status filter pills */}
-          <div className="flex flex-wrap items-center gap-1.5">
-            {[
-              { id: "all", label: "All", count: requests.length },
-              { id: "pending", label: "Pending", count: pendingRequests.length },
-              { id: "approved", label: "Approved", count: approvedRequests.length },
-              { id: "paid", label: "Paid", count: paidRequests.length },
-              {
-                id: "rejected",
-                label: "Rejected",
-                count: requests.filter((r) => r.status === "rejected").length,
-              },
-              {
-                id: "cancelled",
-                label: "Cancelled",
-                count: requests.filter((r) => r.status === "cancelled").length,
-              },
-            ].map((f) => (
-              <button
-                key={f.id}
-                onClick={() => setStatusFilter(f.id)}
-                className={cn(
-                  "flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-mono font-medium transition-colors border",
-                  statusFilter === f.id
-                    ? "bg-secondary text-foreground border-border shadow-xs font-semibold"
-                    : "border-transparent text-muted-foreground hover:bg-secondary/60 hover:text-foreground"
-                )}
-              >
-                <span>{f.label}</span>
-                <span className="text-[10px] opacity-70">({f.count})</span>
-              </button>
-            ))}
-          </div>
+      {/* ── Toolbar: Tabs + Search ────────────────────────────────────────── */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <SegmentedControl
+          options={tabOptions}
+          value={activeTab}
+          onChange={(tab) => {
+            setActiveTab(tab);
+            updateUrl(tab, searchQuery, selectedRequest?.id || null);
+          }}
+          ariaLabel="Withdrawal status filter"
+        />
 
-          {/* Search bar */}
-          <div className="relative w-full sm:w-64">
-            <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
-            <Input
-              type="text"
-              placeholder="Search citizen or bank..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-8 text-xs h-8"
-            />
-          </div>
+        <div className="relative w-full sm:w-72">
+          <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            ref={searchInputRef}
+            type="text"
+            placeholder="Search citizen, bank, account..."
+            value={searchQuery}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              updateUrl(activeTab, e.target.value, selectedRequest?.id || null);
+            }}
+            className="pl-9 pr-8 text-xs h-9 rounded-lg bg-card border-border"
+          />
+          <kbd className="absolute right-2.5 top-2.5 hidden sm:inline-block px-1.5 py-0.5 text-[10px] font-mono text-muted-foreground bg-muted/60 border border-border/80 rounded">
+            /
+          </kbd>
         </div>
-      </Card>
+      </div>
 
-      {/* ── Requests Table / List ─────────────────────────────────────────── */}
-      <Card className="border-border bg-card shadow-xs overflow-hidden">
+      {/* ── Requests Table ────────────────────────────────────────────────── */}
+      <div className="rounded-lg border border-border/70 bg-card shadow-2xs overflow-hidden">
         {filteredRequests.length === 0 ? (
-          <div className="p-12 text-center space-y-2">
-            <Coins className="h-8 w-8 text-muted-foreground mx-auto" />
-            <p className="text-sm font-semibold text-foreground">No withdrawal requests found</p>
-            <p className="text-xs text-muted-foreground">
-              Try adjusting your filter or search query.
-            </p>
-          </div>
+          <EmptyState
+            icon={Coins}
+            title="No withdrawal requests found"
+            description={
+              searchQuery
+                ? "No records match your active search and status filter."
+                : activeTab === "action-needed"
+                ? "All clear! There are currently no pending withdrawal requests requiring admin action."
+                : "No requests recorded under this status."
+            }
+          />
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-xs">
+            <table className="w-full text-left text-xs" role="table">
               <thead>
-                <tr className="border-b border-border bg-secondary/30 text-muted-foreground text-[10px] font-mono uppercase">
-                  <th className="text-left px-4 py-3">Citizen</th>
-                  <th className="text-left px-4 py-3">Amount (ZED / NGN)</th>
-                  <th className="text-left px-4 py-3">Bank Destination</th>
-                  <th className="text-left px-4 py-3">Status</th>
-                  <th className="text-left px-4 py-3">Requested At</th>
-                  <th className="text-right px-4 py-3">Actions</th>
+                <tr className="border-b border-border/70 bg-secondary/30 text-muted-foreground text-xs font-medium">
+                  <th className="py-3 px-4">Citizen</th>
+                  <th className="py-3 px-4">Amount (ZED / NGN)</th>
+                  <th className="py-3 px-4">Bank Destination</th>
+                  <th className="py-3 px-4">Status</th>
+                  <th className="py-3 px-4">Waiting Time</th>
+                  <th className="py-3 px-4 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border/60">
+              <tbody className="divide-y divide-border/50">
                 {filteredRequests.map((req) => {
                   const isUnmasked = Boolean(unmaskedIds[req.id]);
                   const displayAcc = isUnmasked
                     ? req.account_number
                     : maskAccountNumber(req.account_number);
+                  const isSelected = selectedRequest?.id === req.id;
 
                   return (
                     <tr
                       key={req.id}
-                      className="hover:bg-secondary/20 transition-colors"
+                      onClick={() => handleSelectRow(req)}
+                      className={cn(
+                        "hover:bg-secondary/30 transition-colors cursor-pointer group",
+                        isSelected && "bg-secondary/40 font-medium"
+                      )}
                     >
                       {/* Citizen */}
-                      <td className="px-4 py-3 align-top">
+                      <td className="py-3.5 px-4 align-top">
                         <p className="font-semibold text-foreground text-xs">
                           {req.user_name || "Citizen"}
                         </p>
-                        <p className="font-mono text-[11px] text-muted-foreground">
+                        <p className="text-[11px] text-muted-foreground truncate max-w-[200px]">
                           {req.user_email || req.user_id.slice(0, 8)}
                         </p>
                       </td>
 
                       {/* Amounts */}
-                      <td className="px-4 py-3 align-top whitespace-nowrap">
-                        <p className="font-mono font-bold text-foreground">
+                      <td className="py-3.5 px-4 align-top whitespace-nowrap">
+                        <p className="font-sans font-bold tabular-nums text-foreground">
                           {req.amount_zed.toLocaleString()} ZED
                         </p>
-                        <p className="font-mono text-[11px] font-semibold text-emerald-500">
+                        <p className="font-sans tabular-nums text-xs text-foreground font-semibold">
                           ₦{req.amount_ngn.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                         </p>
-                        <p className="font-mono text-[9px] text-muted-foreground">
+                        <p className="text-[11px] text-muted-foreground font-sans tabular-nums">
                           @ ₦{req.price_ngn_snapshot.toFixed(2)}/ZED
                         </p>
                       </td>
 
                       {/* Bank Details */}
-                      <td className="px-4 py-3 align-top">
+                      <td className="py-3.5 px-4 align-top" onClick={(e) => e.stopPropagation()}>
                         <div className="space-y-0.5">
-                          <p className="font-semibold text-foreground flex items-center gap-1.5">
-                            <Building2 className="h-3 w-3 text-muted-foreground" />
+                          <p className="font-medium text-foreground flex items-center gap-1.5">
+                            <Building2 className="h-3.5 w-3.5 text-muted-foreground" />
                             {req.bank_name}
                           </p>
-                          <div className="flex items-center gap-1.5 font-mono text-[11px] text-foreground">
-                            <span>{displayAcc}</span>
+                          <div className="flex items-center gap-1.5 text-xs text-foreground">
+                            <span className="font-mono">{displayAcc}</span>
                             <button
                               type="button"
                               onClick={() => toggleMask(req.id)}
                               title={isUnmasked ? "Mask account" : "Reveal full account"}
-                              className="text-muted-foreground hover:text-foreground"
+                              className="text-muted-foreground hover:text-foreground p-0.5 rounded transition-colors"
                             >
                               {isUnmasked ? (
                                 <EyeOff className="h-3 w-3" />
@@ -457,7 +548,7 @@ export function WithdrawalsQueueClient({
                                 copyToClipboard(req.account_number, "Account number")
                               }
                               title="Copy account number"
-                              className="text-muted-foreground hover:text-foreground"
+                              className="text-muted-foreground hover:text-foreground p-0.5 rounded transition-colors"
                             >
                               <Copy className="h-3 w-3" />
                             </button>
@@ -469,52 +560,43 @@ export function WithdrawalsQueueClient({
                       </td>
 
                       {/* Status */}
-                      <td className="px-4 py-3 align-top whitespace-nowrap">
-                        {renderStatusBadge(req.status)}
+                      <td className="py-3.5 px-4 align-top whitespace-nowrap">
+                        {renderStatus(req.status)}
                         {req.reject_reason && (
-                          <p className="text-[10px] text-rose-500 font-mono mt-1 max-w-xs truncate" title={req.reject_reason}>
+                          <p className="text-[11px] text-destructive mt-1 max-w-xs truncate" title={req.reject_reason}>
                             {req.reject_reason}
                           </p>
                         )}
                         {req.admin_note && (
-                          <p className="text-[10px] text-muted-foreground font-mono mt-1 max-w-xs truncate" title={req.admin_note}>
-                            Note: {req.admin_note}
+                          <p className="text-[11px] text-muted-foreground mt-1 max-w-xs truncate" title={req.admin_note}>
+                            Ref: {req.admin_note}
                           </p>
                         )}
                       </td>
 
-                      {/* Date */}
-                      <td className="px-4 py-3 align-top whitespace-nowrap font-mono text-[11px] text-muted-foreground">
-                        {new Date(req.created_at).toLocaleDateString("en-GB", {
-                          day: "numeric",
-                          month: "short",
-                          year: "numeric",
-                        })}
-                        <br />
-                        {new Date(req.created_at).toLocaleTimeString("en-GB", {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
+                      {/* Age */}
+                      <td className="py-3.5 px-4 align-top whitespace-nowrap">
+                        <AgePill submittedAt={req.created_at} />
                       </td>
 
                       {/* Actions */}
-                      <td className="px-4 py-3 align-top text-right whitespace-nowrap">
+                      <td className="py-3.5 px-4 align-top text-right whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
                         <div className="flex items-center justify-end gap-1.5">
                           {req.status === "pending" && (
                             <>
                               <Button
                                 size="sm"
                                 variant="outline"
-                                className="h-7 px-2 text-[11px] border-blue-500/30 text-blue-500 hover:bg-blue-500/10"
+                                className="h-7 px-2.5 text-xs rounded-lg border-border"
                                 disabled={isPending}
-                                onClick={() => handleApprove(req)}
+                                onClick={() => setApproveDialogTarget(req)}
                               >
                                 Approve
                               </Button>
                               <Button
                                 size="sm"
                                 variant="outline"
-                                className="h-7 px-2 text-[11px] border-rose-500/30 text-rose-500 hover:bg-rose-500/10"
+                                className="h-7 px-2.5 text-xs rounded-lg border-destructive/40 text-destructive hover:bg-destructive/10"
                                 disabled={isPending}
                                 onClick={() => {
                                   setRejectDialogTarget(req);
@@ -530,7 +612,7 @@ export function WithdrawalsQueueClient({
                             <>
                               <Button
                                 size="sm"
-                                className="h-7 px-2.5 text-[11px] bg-emerald-600 hover:bg-emerald-700 text-white font-medium"
+                                className="h-7 px-2.5 text-xs rounded-lg font-medium"
                                 disabled={isPending}
                                 onClick={() => {
                                   setPaidDialogTarget(req);
@@ -542,7 +624,7 @@ export function WithdrawalsQueueClient({
                               <Button
                                 size="sm"
                                 variant="outline"
-                                className="h-7 px-2 text-[11px] border-rose-500/30 text-rose-500 hover:bg-rose-500/10"
+                                className="h-7 px-2 text-xs rounded-lg border-destructive/40 text-destructive hover:bg-destructive/10"
                                 disabled={isPending}
                                 onClick={() => {
                                   setRejectDialogTarget(req);
@@ -554,17 +636,14 @@ export function WithdrawalsQueueClient({
                             </>
                           )}
 
-                          {req.status === "paid" && (
-                            <span className="text-[11px] font-mono text-emerald-500 font-medium">
-                              Completed ✓
-                            </span>
-                          )}
-
-                          {(req.status === "rejected" || req.status === "cancelled") && (
-                            <span className="text-[11px] font-mono text-muted-foreground">
-                              Closed
-                            </span>
-                          )}
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-7 px-2 text-xs rounded-lg text-muted-foreground hover:text-foreground"
+                            onClick={() => handleSelectRow(req)}
+                          >
+                            <ChevronRight className="h-4 w-4" />
+                          </Button>
                         </div>
                       </td>
                     </tr>
@@ -574,37 +653,311 @@ export function WithdrawalsQueueClient({
             </table>
           </div>
         )}
-      </Card>
+      </div>
 
-      {/* ── Reject Modal ─────────────────────────────────────────────────── */}
+      {/* ── Detail Drawer ─────────────────────────────────────────────────── */}
+      <AdminDrawer
+        open={Boolean(selectedRequest)}
+        onOpenChange={(open) => !open && handleCloseDrawer()}
+        title={
+          selectedRequest
+            ? `Withdrawal #${selectedRequest.id.slice(0, 8)}`
+            : "Withdrawal Details"
+        }
+        subtitle={selectedRequest?.user_name || "Citizen payout request"}
+        badge={selectedRequest ? renderStatus(selectedRequest.status) : undefined}
+        timestamp={
+          selectedRequest ? (
+            <AgePill submittedAt={selectedRequest.created_at} />
+          ) : undefined
+        }
+        footer={
+          selectedRequest && (
+            <div className="flex items-center justify-between w-full gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleCloseDrawer}
+                className="rounded-lg text-xs"
+              >
+                Close
+              </Button>
+
+              <div className="flex items-center gap-2">
+                {selectedRequest.status === "pending" && (
+                  <>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="rounded-lg text-xs border-destructive/40 text-destructive hover:bg-destructive/10"
+                      disabled={isPending}
+                      onClick={() => {
+                        setRejectDialogTarget(selectedRequest);
+                        setRejectReason("");
+                      }}
+                    >
+                      Reject &amp; Refund
+                    </Button>
+                    <Button
+                      size="sm"
+                      className="rounded-lg text-xs"
+                      disabled={isPending}
+                      onClick={() => setApproveDialogTarget(selectedRequest)}
+                    >
+                      Approve Payout
+                    </Button>
+                  </>
+                )}
+
+                {selectedRequest.status === "approved" && (
+                  <>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="rounded-lg text-xs border-destructive/40 text-destructive hover:bg-destructive/10"
+                      disabled={isPending}
+                      onClick={() => {
+                        setRejectDialogTarget(selectedRequest);
+                        setRejectReason("");
+                      }}
+                    >
+                      Reject &amp; Refund
+                    </Button>
+                    <Button
+                      size="sm"
+                      className="rounded-lg text-xs"
+                      disabled={isPending}
+                      onClick={() => {
+                        setPaidDialogTarget(selectedRequest);
+                        setPaidNote("");
+                      }}
+                    >
+                      Mark as Paid
+                    </Button>
+                  </>
+                )}
+              </div>
+            </div>
+          )
+        }
+      >
+        {selectedRequest && (
+          <div className="space-y-6">
+            {/* Amount details */}
+            <PanelSection title="Redemption amounts">
+              <FieldList columns={2}>
+                <FieldItem label="Amount in ZED">
+                  <span className="font-sans font-bold tabular-nums text-foreground text-sm">
+                    {selectedRequest.amount_zed.toLocaleString()} ZED
+                  </span>
+                </FieldItem>
+                <FieldItem label="Naira payout amount">
+                  <span className="font-sans font-bold tabular-nums text-foreground text-sm">
+                    ₦{selectedRequest.amount_ngn.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                  </span>
+                </FieldItem>
+                <FieldItem label="Conversion rate snapshot">
+                  <span className="font-sans tabular-nums text-muted-foreground">
+                    ₦{selectedRequest.price_ngn_snapshot.toFixed(4)} per 1 ZED
+                  </span>
+                </FieldItem>
+                <FieldItem label="Current status">
+                  {renderStatus(selectedRequest.status)}
+                </FieldItem>
+              </FieldList>
+            </PanelSection>
+
+            {/* Destination Bank Details */}
+            <PanelSection title="Bank destination account">
+              <FieldList columns={2}>
+                <FieldItem label="Bank name">
+                  <span className="font-medium text-foreground">{selectedRequest.bank_name}</span>
+                </FieldItem>
+                <FieldItem label="Account name">
+                  <span className="font-medium text-foreground">{selectedRequest.account_name}</span>
+                </FieldItem>
+                <FieldItem label="Account number" span={2}>
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-xs">
+                      {unmaskedIds[selectedRequest.id]
+                        ? selectedRequest.account_number
+                        : maskAccountNumber(selectedRequest.account_number)}
+                    </span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 px-1.5 text-xs text-muted-foreground hover:text-foreground"
+                      onClick={() => toggleMask(selectedRequest.id)}
+                    >
+                      {unmaskedIds[selectedRequest.id] ? "Mask" : "Reveal"}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 px-1.5 text-xs text-muted-foreground hover:text-foreground"
+                      onClick={() => copyToClipboard(selectedRequest.account_number, "Account number")}
+                    >
+                      <Copy className="h-3 w-3 mr-1" />
+                      Copy
+                    </Button>
+                  </div>
+                </FieldItem>
+              </FieldList>
+            </PanelSection>
+
+            {/* Citizen Details */}
+            <PanelSection title="Citizen identity">
+              <FieldList columns={2}>
+                <FieldItem label="Full name">
+                  <span className="text-foreground">{selectedRequest.user_name || "Citizen"}</span>
+                </FieldItem>
+                <FieldItem label="Email address">
+                  <span className="text-foreground">{selectedRequest.user_email || "Not specified"}</span>
+                </FieldItem>
+                <FieldItem label="User identifier" span={2}>
+                  <span className="font-mono text-[11px] text-muted-foreground">
+                    {selectedRequest.user_id}
+                  </span>
+                </FieldItem>
+              </FieldList>
+            </PanelSection>
+
+            {/* Timestamps & Audit */}
+            <PanelSection title="Audit & history">
+              <FieldList columns={1}>
+                <FieldItem label="Request submitted">
+                  <span className="font-sans tabular-nums text-muted-foreground">
+                    {new Date(selectedRequest.created_at).toLocaleString("en-NG", {
+                      dateStyle: "medium",
+                      timeStyle: "short",
+                    })}
+                  </span>
+                </FieldItem>
+                {selectedRequest.reject_reason && (
+                  <FieldItem label="Rejection reason">
+                    <span className="text-destructive font-medium">{selectedRequest.reject_reason}</span>
+                  </FieldItem>
+                )}
+                {selectedRequest.admin_note && (
+                  <FieldItem label="Payment reference / admin note">
+                    <span className="text-foreground font-mono">{selectedRequest.admin_note}</span>
+                  </FieldItem>
+                )}
+              </FieldList>
+            </PanelSection>
+          </div>
+        )}
+      </AdminDrawer>
+
+      {/* ── Confirm Approve Modal ─────────────────────────────────────────── */}
+      <Dialog
+        open={Boolean(approveDialogTarget)}
+        onOpenChange={(open) => !open && setApproveDialogTarget(null)}
+      >
+        <DialogContent className="sm:max-w-md rounded-lg">
+          <DialogHeader>
+            <DialogTitle className="text-base font-semibold text-foreground">
+              Confirm Withdrawal Approval
+            </DialogTitle>
+            <DialogDescription className="text-xs text-muted-foreground">
+              Review payout details before approving this request for bank transfer.
+            </DialogDescription>
+          </DialogHeader>
+
+          {approveDialogTarget && (
+            <div className="rounded-lg border border-border/70 bg-secondary/30 p-3 space-y-2 text-xs">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Citizen:</span>
+                <span className="font-medium text-foreground">
+                  {approveDialogTarget.user_name || approveDialogTarget.user_email || approveDialogTarget.user_id.slice(0, 8)}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Amount:</span>
+                <span className="font-sans font-bold tabular-nums text-foreground">
+                  {approveDialogTarget.amount_zed.toLocaleString()} ZED (₦{approveDialogTarget.amount_ngn.toLocaleString(undefined, { minimumFractionDigits: 2 })})
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Destination:</span>
+                <span className="font-medium text-foreground text-right">
+                  {approveDialogTarget.bank_name} · {approveDialogTarget.account_number} ({approveDialogTarget.account_name})
+                </span>
+              </div>
+            </div>
+          )}
+
+          <DialogFooter className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setApproveDialogTarget(null)}
+              disabled={isPending}
+              className="rounded-lg text-xs"
+            >
+              Cancel
+            </Button>
+            <Button
+              size="sm"
+              onClick={handleConfirmApprove}
+              disabled={isPending}
+              className="rounded-lg text-xs"
+            >
+              {isPending && <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />}
+              Confirm Approval
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* ── Confirm Reject Modal ──────────────────────────────────────────── */}
       <Dialog
         open={Boolean(rejectDialogTarget)}
         onOpenChange={(open) => !open && setRejectDialogTarget(null)}
       >
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md rounded-lg">
           <DialogHeader>
-            <DialogTitle className="text-base font-bold text-foreground">
-              Reject Withdrawal Request
+            <DialogTitle className="text-base font-semibold text-foreground">
+              Reject Withdrawal &amp; Refund
             </DialogTitle>
             <DialogDescription className="text-xs text-muted-foreground">
               Rejecting will automatically refund{" "}
-              <span className="font-mono font-semibold text-foreground">
+              <span className="font-sans font-bold tabular-nums text-foreground">
                 {rejectDialogTarget?.amount_zed.toLocaleString()} ZED
               </span>{" "}
-              back into the citizen&apos;s wallet.
+              to the citizen&apos;s wallet balance.
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-3 py-2">
-            <Label htmlFor="reject-reason" className="text-xs">
-              Rejection Reason (shared with citizen)
+          {rejectDialogTarget && (
+            <div className="rounded-lg border border-border/70 bg-secondary/30 p-3 space-y-1.5 text-xs">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Citizen:</span>
+                <span className="font-medium text-foreground">
+                  {rejectDialogTarget.user_name || rejectDialogTarget.user_email || rejectDialogTarget.user_id.slice(0, 8)}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Amount:</span>
+                <span className="font-sans font-semibold tabular-nums text-foreground">
+                  ₦{rejectDialogTarget.amount_ngn.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                </span>
+              </div>
+            </div>
+          )}
+
+          <div className="space-y-2 py-2">
+            <Label htmlFor="reject-reason" className="text-xs font-medium">
+              Rejection reason (visible to citizen)
             </Label>
             <Input
               id="reject-reason"
-              placeholder="e.g. Account name mismatch with bank record, invalid account number"
+              placeholder="e.g. Account name mismatch with registered KYC name"
               value={rejectReason}
               onChange={(e) => setRejectReason(e.target.value)}
-              className="text-xs"
+              className="text-xs rounded-lg"
             />
           </div>
 
@@ -614,6 +967,7 @@ export function WithdrawalsQueueClient({
               size="sm"
               onClick={() => setRejectDialogTarget(null)}
               disabled={isPending}
+              className="rounded-lg text-xs"
             >
               Cancel
             </Button>
@@ -622,43 +976,44 @@ export function WithdrawalsQueueClient({
               size="sm"
               onClick={handleConfirmReject}
               disabled={isPending || !rejectReason.trim()}
+              className="rounded-lg text-xs"
             >
-              {isPending ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : null}
-              Confirm Rejection & Refund
+              {isPending && <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />}
+              Confirm Rejection &amp; Refund
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* ── Mark Paid Modal ──────────────────────────────────────────────── */}
+      {/* ── Confirm Mark Paid Modal ───────────────────────────────────────── */}
       <Dialog
         open={Boolean(paidDialogTarget)}
         onOpenChange={(open) => !open && setPaidDialogTarget(null)}
       >
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md rounded-lg">
           <DialogHeader>
-            <DialogTitle className="text-base font-bold text-foreground">
-              Confirm Bank Transfer
+            <DialogTitle className="text-base font-semibold text-foreground">
+              Confirm Bank Transfer Disbursed
             </DialogTitle>
             <DialogDescription className="text-xs text-muted-foreground">
               Confirm that you have transferred{" "}
-              <span className="font-mono font-bold text-emerald-500">
+              <span className="font-sans font-bold tabular-nums text-foreground">
                 ₦{paidDialogTarget?.amount_ngn.toLocaleString(undefined, { minimumFractionDigits: 2 })}
               </span>{" "}
               to {paidDialogTarget?.bank_name} ({paidDialogTarget?.account_number}) - {paidDialogTarget?.account_name}.
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-3 py-2">
-            <Label htmlFor="paid-note" className="text-xs">
-              Payment Reference / Admin Note (optional)
+          <div className="space-y-2 py-2">
+            <Label htmlFor="paid-note" className="text-xs font-medium">
+              Payment reference or bank session ID (optional)
             </Label>
             <Input
               id="paid-note"
-              placeholder="e.g. NIP reference 20261017001928"
+              placeholder="e.g. NIP session 100004202611150001"
               value={paidNote}
               onChange={(e) => setPaidNote(e.target.value)}
-              className="text-xs"
+              className="text-xs rounded-lg"
             />
           </div>
 
@@ -668,17 +1023,18 @@ export function WithdrawalsQueueClient({
               size="sm"
               onClick={() => setPaidDialogTarget(null)}
               disabled={isPending}
+              className="rounded-lg text-xs"
             >
               Cancel
             </Button>
             <Button
               size="sm"
-              className="bg-emerald-600 hover:bg-emerald-700 text-white"
               onClick={handleConfirmPaid}
               disabled={isPending}
+              className="rounded-lg text-xs"
             >
-              {isPending ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : null}
-              Confirm Paid
+              {isPending && <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />}
+              Confirm Transfer Executed
             </Button>
           </DialogFooter>
         </DialogContent>

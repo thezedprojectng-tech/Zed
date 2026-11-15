@@ -13,9 +13,8 @@ import {
   AlertTriangle,
   Loader2,
   CheckCircle2,
+  Sliders,
 } from "lucide-react";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -28,6 +27,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { AdminPageHeader } from "@/components/admin/primitives";
 import { MINING_LEVEL_MAP } from "@/data/levels";
 import {
   adminSaveLevelRequirementsAction,
@@ -106,7 +106,8 @@ export function LevelRulesClient({ initialRules, initialError }: LevelRulesClien
   });
 
   const [previewResults, setPreviewResults] = useState<PromotionPreviewItem[] | null>(null);
-  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [isConfirmApplyOpen, setIsConfirmApplyOpen] = useState(false);
+  const [isConfirmSaveOpen, setIsConfirmSaveOpen] = useState(false);
 
   // Normalise a rules state into a sorted comparable key
   const normaliseState = (
@@ -126,6 +127,13 @@ export function LevelRulesClient({ initialRules, initialError }: LevelRulesClien
     .join("|");
 
   const isDirty = normaliseState(rulesState) !== savedKey;
+
+  // Count active rules total
+  const totalActiveRules = LEVELS.reduce(
+    (acc, lvl) =>
+      acc + ALLOWED_REQUIREMENT_TYPES.filter((t) => rulesState[lvl][t].enabled).length,
+    0
+  );
 
   // Checkbox toggle
   const toggleRule = (lvl: 2 | 3 | 4 | 5, type: RequirementType, checked: boolean) => {
@@ -204,8 +212,16 @@ export function LevelRulesClient({ initialRules, initialError }: LevelRulesClien
     return payload;
   };
 
-  // Save rules
-  const handleSave = () => {
+  // Save rules — click handler (opens confirm dialog)
+  const handleSaveClick = () => {
+    const payload = getRulesPayload();
+    if (payload === null) return;
+    setIsConfirmSaveOpen(true);
+  };
+
+  // Confirmed save
+  const handleConfirmedSave = () => {
+    setIsConfirmSaveOpen(false);
     const payload = getRulesPayload();
     if (payload === null) return;
     startSaveTransition(async () => {
@@ -242,7 +258,7 @@ export function LevelRulesClient({ initialRules, initialError }: LevelRulesClien
   const handleApply = () => {
     startApplyTransition(async () => {
       const res = await adminApplyPromotionsAction();
-      setIsConfirmOpen(false);
+      setIsConfirmApplyOpen(false);
       if (!res.ok) {
         toast.error(res.error);
         return;
@@ -257,204 +273,189 @@ export function LevelRulesClient({ initialRules, initialError }: LevelRulesClien
   const previewTotal = previewResults?.reduce((acc, curr) => acc + curr.user_count, 0) ?? 0;
 
   return (
-    <div className="space-y-6 max-w-5xl">
-      {/* ── Page Header ──────────────────────────────────────────────────── */}
-      <div className="border-b border-border pb-4">
-        <h1 className="text-xl font-bold tracking-tight text-foreground">
-          Level Promotion Rules
-        </h1>
-        <p className="text-xs text-muted-foreground mt-0.5">
-          Configure automatic promotion criteria per level. A user must satisfy ALL enabled requirements of a level to reach it.
-        </p>
-      </div>
+    <>
+      <div className="space-y-5 max-w-5xl">
+        <AdminPageHeader
+          title="Level promotion rules"
+          description="Configure automatic promotion criteria per level. Users must satisfy ALL enabled requirements to advance."
+          icon={Sliders}
+          section="money"
+        />
 
-      {initialError && (
-        <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-xs text-destructive flex items-center gap-2">
-          <ShieldAlert className="h-4 w-4 shrink-0" />
-          <span>Failed to load existing rules: {initialError}</span>
-        </div>
-      )}
-
-      {/* Non-blocking warnings */}
-      {warnings.length > 0 && (
-        <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-4 space-y-1.5 text-xs text-amber-500">
-          <div className="flex items-center gap-1.5 font-semibold">
-            <AlertTriangle className="h-4 w-4 shrink-0" />
-            <span>Threshold Consistency Warning</span>
+        {initialError && (
+          <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-xs text-destructive flex items-center gap-2">
+            <ShieldAlert className="h-4 w-4 shrink-0" />
+            <span>Failed to load existing rules: {initialError}</span>
           </div>
-          <ul className="list-disc list-inside space-y-1 pl-1">
-            {warnings.map((w, idx) => (
-              <li key={idx}>{w}</li>
-            ))}
-          </ul>
-        </div>
-      )}
+        )}
 
-      {/* ── Action Bar ───────────────────────────────────────────────────── */}
-      <div className="flex items-center justify-between gap-3 flex-wrap bg-card border border-border p-3.5 rounded-lg">
-        <div className="flex flex-col gap-1">
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <Zap className="h-4 w-4 text-primary" />
-            <span>Rules take effect automatically on user claims, lesson completions, and referrals.</span>
-          </div>
-          {isDirty && (
-            <p className="text-[11px] text-amber-500 font-medium pl-6">
-              Save your changes before previewing or applying.
-            </p>
-          )}
-        </div>
-
-        <div className="flex items-center gap-2.5">
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={handlePreview}
-            disabled={isPreviewing || isSaving || isDirty}
-            className="text-xs"
-          >
-            {isPreviewing ? (
-              <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />
-            ) : (
-              <Eye className="h-3.5 w-3.5 mr-1.5" />
-            )}
-            Preview promotions
-          </Button>
-
-          <Button
-            type="button"
-            variant="secondary"
-            size="sm"
-            onClick={() => setIsConfirmOpen(true)}
-            disabled={isApplying || isSaving || previewResults === null || isDirty}
-            className="text-xs"
-          >
-            {isApplying ? (
-              <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />
-            ) : (
-              <Zap className="h-3.5 w-3.5 mr-1.5" />
-            )}
-            Apply promotions now
-          </Button>
-
-          <Button
-            type="button"
-            size="sm"
-            onClick={handleSave}
-            disabled={isSaving || isPreviewing}
-            className="text-xs bg-primary text-primary-foreground hover:bg-primary/90 font-medium"
-          >
-            {isSaving ? (
-              <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />
-            ) : (
-              <Save className="h-3.5 w-3.5 mr-1.5" />
-            )}
-            Save rules
-          </Button>
-        </div>
-      </div>
-
-      {/* ── Preview Panel (if available) ─────────────────────────────────── */}
-      {previewResults !== null && (
-        <Card className="p-4 border-primary/30 bg-primary/5 space-y-2">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 text-primary" />
-              <h2 className="text-xs font-semibold text-foreground">
-                Promotion Preview Results
-              </h2>
+        {/* Non-blocking warnings */}
+        {warnings.length > 0 && (
+          <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-4 space-y-1.5 text-xs text-amber-500">
+            <div className="flex items-center gap-1.5 font-semibold">
+              <AlertTriangle className="h-4 w-4 shrink-0" />
+              <span>Threshold consistency warning</span>
             </div>
-            <Badge variant="outline" className="font-mono text-[10px] text-primary border-primary/30">
-              {previewTotal} qualifying user{previewTotal === 1 ? "" : "s"}
-            </Badge>
-          </div>
-
-          {previewResults.length === 0 ? (
-            <p className="text-xs text-muted-foreground">
-              No users qualify for automatic promotion under the current criteria.
-            </p>
-          ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2">
-              {previewResults.map((item) => (
-                <div
-                  key={item.to_level}
-                  className="rounded border border-border bg-card p-2 text-center"
-                >
-                  <p className="text-[11px] text-muted-foreground font-mono">
-                    To Level {item.to_level} ({MINING_LEVEL_MAP[item.to_level as 2|3|4|5]?.name})
-                  </p>
-                  <p className="text-lg font-bold font-mono text-foreground">
-                    {item.user_count}
-                  </p>
-                </div>
+            <ul className="list-disc list-inside space-y-1 pl-1">
+              {warnings.map((w, idx) => (
+                <li key={idx}>{w}</li>
               ))}
+            </ul>
+          </div>
+        )}
+
+        {/* ── Sticky Action Bar ──────────────────────────────────────────── */}
+        <div className="sticky top-0 z-10 rounded-lg border border-border/70 bg-card/95 backdrop-blur-sm shadow-sm p-3.5 flex items-center justify-between gap-3 flex-wrap motion-safe:transition-shadow motion-safe:duration-150">
+          <div className="flex flex-col gap-0.5">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <Zap className="h-3.5 w-3.5 text-primary" />
+              <span>Rules take effect automatically on user claims, lesson completions, and referrals.</span>
             </div>
-          )}
-        </Card>
-      )}
+            {isDirty && (
+              <p className="text-[11px] text-amber-500 font-medium pl-5">
+                Save your changes before previewing or applying.
+              </p>
+            )}
+          </div>
 
-      {/* ── Level Cards (Levels 2 to 5) ──────────────────────────────────── */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {LEVELS.map((lvl) => {
-          const levelData = MINING_LEVEL_MAP[lvl];
-          const activeCount = ALLOWED_REQUIREMENT_TYPES.filter(
-            (t) => rulesState[lvl][t].enabled
-          ).length;
-          const isLocked = activeCount === 0;
-
-          return (
-            <Card
-              key={lvl}
-              className="p-5 border-border bg-card flex flex-col justify-between space-y-4"
+          <div className="flex items-center gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handlePreview}
+              disabled={isPreviewing || isSaving || isDirty}
+              className="text-xs motion-safe:transition-all motion-safe:duration-150"
             >
-              <div className="space-y-4">
-                {/* Level Title & Header */}
-                <div className="flex items-start justify-between border-b border-border pb-3">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h2 className="text-sm font-bold text-foreground">
-                        Level {lvl} — {levelData.name}
-                      </h2>
-                      <Badge
-                        variant="outline"
-                        className="font-mono text-[10px] border-primary/30 text-primary bg-primary/5"
-                      >
-                        ×{levelData.multiplier.toFixed(1)} Mining ({levelData.dailyCap} ZED/day)
-                      </Badge>
+              {isPreviewing ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />
+              ) : (
+                <Eye className="h-3.5 w-3.5 mr-1.5" />
+              )}
+              Preview
+            </Button>
+
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              onClick={() => setIsConfirmApplyOpen(true)}
+              disabled={isApplying || isSaving || previewResults === null || isDirty}
+              className="text-xs motion-safe:transition-all motion-safe:duration-150"
+            >
+              {isApplying ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />
+              ) : (
+                <Zap className="h-3.5 w-3.5 mr-1.5" />
+              )}
+              Apply now
+            </Button>
+
+            <Button
+              type="button"
+              size="sm"
+              onClick={handleSaveClick}
+              disabled={isSaving || isPreviewing}
+              className="text-xs motion-safe:transition-all motion-safe:duration-150"
+            >
+              {isSaving ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />
+              ) : (
+                <Save className="h-3.5 w-3.5 mr-1.5" />
+              )}
+              Save rules
+            </Button>
+          </div>
+        </div>
+
+        {/* ── Preview Panel ──────────────────────────────────────────────── */}
+        {previewResults !== null && (
+          <div className="rounded-lg border border-border/70 bg-card shadow-2xs overflow-hidden">
+            <div className="flex items-center justify-between px-5 py-3.5 border-b border-border/60">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="h-4 w-4 text-primary" />
+                <h2 className="text-sm font-medium text-foreground">Promotion preview</h2>
+              </div>
+              <span className="text-xs text-muted-foreground tabular-nums">
+                {previewTotal} qualifying user{previewTotal === 1 ? "" : "s"}
+              </span>
+            </div>
+
+            <div className="p-5">
+              {previewResults.length === 0 ? (
+                <p className="text-xs text-muted-foreground">
+                  No users qualify for automatic promotion under the current criteria.
+                </p>
+              ) : (
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  {previewResults.map((item) => (
+                    <div
+                      key={item.to_level}
+                      className="rounded-lg border border-border/70 bg-secondary/30 p-3 text-center"
+                    >
+                      <p className="text-[11px] text-muted-foreground">
+                        To level {item.to_level}{" "}
+                        <span className="whitespace-nowrap">
+                          ({MINING_LEVEL_MAP[item.to_level as 2 | 3 | 4 | 5]?.name})
+                        </span>
+                      </p>
+                      <p className="text-2xl font-bold font-sans tabular-nums text-foreground mt-0.5">
+                        {item.user_count}
+                      </p>
                     </div>
-                    <p className="text-[11px] text-muted-foreground mt-0.5">
-                      Hardcoded rate from levels matrix.
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* ── Level Cards ───────────────────────────────────────────────── */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {LEVELS.map((lvl) => {
+            const levelData = MINING_LEVEL_MAP[lvl];
+            const activeCount = ALLOWED_REQUIREMENT_TYPES.filter(
+              (t) => rulesState[lvl][t].enabled
+            ).length;
+            const isLocked = activeCount === 0;
+
+            return (
+              <div
+                key={lvl}
+                className="rounded-lg border border-border/70 bg-card shadow-2xs flex flex-col"
+              >
+                {/* Level header */}
+                <div className="flex items-start justify-between px-5 py-4 border-b border-border/60">
+                  <div>
+                    <h2 className="text-sm font-semibold text-foreground">
+                      Level {lvl} — {levelData.name}
+                    </h2>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      ×{levelData.multiplier.toFixed(1)} mining · {levelData.dailyCap} ZED/day
                     </p>
                   </div>
 
                   {isLocked ? (
-                    <Badge
-                      variant="outline"
-                      className="font-mono text-[10px] border-destructive/40 text-destructive bg-destructive/5 shrink-0 flex items-center gap-1"
-                    >
+                    <span className="inline-flex items-center gap-1 text-[11px] font-medium text-destructive bg-destructive/10 border border-destructive/30 rounded-md px-2 py-0.5 shrink-0">
                       <Lock className="h-3 w-3" />
                       Locked
-                    </Badge>
+                    </span>
                   ) : (
-                    <Badge
-                      variant="outline"
-                      className="font-mono text-[10px] border-border text-muted-foreground shrink-0 flex items-center gap-1"
-                    >
+                    <span className="inline-flex items-center gap-1 text-[11px] font-medium text-muted-foreground border border-border/60 rounded-md px-2 py-0.5 shrink-0">
                       <Unlock className="h-3 w-3" />
                       {activeCount} rule{activeCount === 1 ? "" : "s"} (AND)
-                    </Badge>
+                    </span>
                   )}
                 </div>
 
-                {isLocked && (
-                  <div className="rounded-md border border-muted bg-secondary/40 p-2.5 text-center text-xs text-muted-foreground flex items-center justify-center gap-1.5">
-                    <Lock className="h-3.5 w-3.5 text-muted-foreground/60" />
-                    <span>Locked: nobody can reach this level automatically.</span>
-                  </div>
-                )}
+                <div className="px-5 py-4 space-y-2 flex-1">
+                  {isLocked && (
+                    <div className="rounded-md border border-muted bg-secondary/40 px-3 py-2 text-center text-xs text-muted-foreground flex items-center justify-center gap-1.5 mb-2">
+                      <Lock className="h-3.5 w-3.5 text-muted-foreground/60" />
+                      <span>No requirements — nobody can reach this level automatically.</span>
+                    </div>
+                  )}
 
-                {/* 4 Requirement Rows */}
-                <div className="space-y-3">
                   {ALLOWED_REQUIREMENT_TYPES.map((type) => {
                     const rule = rulesState[lvl][type];
                     const meta = REQUIREMENT_LABELS[type];
@@ -463,10 +464,10 @@ export function LevelRulesClient({ initialRules, initialError }: LevelRulesClien
                     return (
                       <div
                         key={type}
-                        className={`p-2.5 rounded-lg border transition-colors flex items-center justify-between gap-3 ${
+                        className={`flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg border motion-safe:transition-colors motion-safe:duration-150 ${
                           rule.enabled
-                            ? "border-border bg-secondary/30"
-                            : "border-transparent bg-transparent opacity-60"
+                            ? "border-border/60 bg-secondary/30"
+                            : "border-transparent bg-transparent opacity-50"
                         }`}
                       >
                         <div className="flex items-center gap-2.5 flex-1 min-w-0">
@@ -496,9 +497,9 @@ export function LevelRulesClient({ initialRules, initialError }: LevelRulesClien
                             onChange={(e) =>
                               setThreshold(lvl, type, e.target.value)
                             }
-                            className="h-8 w-24 text-xs font-mono text-right"
+                            className="h-8 w-24 text-xs font-sans tabular-nums text-right"
                           />
-                          <span className="text-[11px] font-mono text-muted-foreground w-12 text-left">
+                          <span className="text-[11px] text-muted-foreground w-12 text-left">
                             {meta.unit}
                           </span>
                         </div>
@@ -506,25 +507,66 @@ export function LevelRulesClient({ initialRules, initialError }: LevelRulesClien
                     );
                   })}
                 </div>
-              </div>
 
-              <div className="pt-2 text-[11px] text-muted-foreground/70 font-mono">
-                {isLocked
-                  ? "Enable at least one requirement to unlock auto-promotion."
-                  : `User must satisfy all ${activeCount} requirement${activeCount === 1 ? "" : "s"} above.`}
+                <div className="px-5 pb-4 text-[11px] text-muted-foreground/70">
+                  {isLocked
+                    ? "Enable at least one requirement to unlock auto-promotion."
+                    : `User must satisfy all ${activeCount} requirement${activeCount === 1 ? "" : "s"} above.`}
+                </div>
               </div>
-            </Card>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
 
-      {/* ── Irreversible Confirmation Dialog ─────────────────────────────── */}
-      <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
+      {/* ── Confirm Save Dialog ───────────────────────────────────────── */}
+      <Dialog open={isConfirmSaveOpen} onOpenChange={setIsConfirmSaveOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-foreground">
+              <Save className="h-4 w-4" />
+              Save level promotion rules?
+            </DialogTitle>
+            <DialogDescription>
+              {totalActiveRules} active rule{totalActiveRules === 1 ? "" : "s"} across levels 2–5. Users must satisfy all enabled criteria to auto-advance.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-0 pt-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setIsConfirmSaveOpen(false)}
+              disabled={isSaving}
+              className="text-xs"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              onClick={handleConfirmedSave}
+              disabled={isSaving}
+              className="text-xs"
+            >
+              {isSaving ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />
+              ) : (
+                <Save className="h-3.5 w-3.5 mr-1.5" />
+              )}
+              Save rules
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* ── Confirm Apply Promotions Dialog ──────────────────────────── */}
+      <Dialog open={isConfirmApplyOpen} onOpenChange={setIsConfirmApplyOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-foreground">
               <AlertTriangle className="h-5 w-5 text-amber-500" />
-              Apply Level Promotions Now?
+              Apply level promotions now?
             </DialogTitle>
             <DialogDescription>
               Review the details below before confirming this irreversible action.
@@ -534,11 +576,11 @@ export function LevelRulesClient({ initialRules, initialError }: LevelRulesClien
                 This operation will recalculate all registered users and promote those who qualify based on the rules currently saved in the database.
               </p>
               <div className="rounded-md border border-amber-500/30 bg-amber-500/10 p-3 text-amber-500 font-medium">
-                ⚠️ <strong>Irreversible:</strong> Users are never demoted. Once promoted, their level cannot be automatically reduced even if rules change later.
+                Irreversible: users are never demoted. Once promoted, their level cannot be automatically reduced even if rules change later.
               </div>
               {previewResults && (
-                <div className="text-xs text-foreground font-mono">
-                  Promotions to be applied: <strong>{previewTotal}</strong> total user{previewTotal === 1 ? "" : "s"}.
+                <div className="text-xs text-foreground">
+                  Promotions to be applied: <strong className="font-sans tabular-nums">{previewTotal}</strong> total user{previewTotal === 1 ? "" : "s"}.
                 </div>
               )}
             </div>
@@ -549,7 +591,7 @@ export function LevelRulesClient({ initialRules, initialError }: LevelRulesClien
               type="button"
               variant="outline"
               size="sm"
-              onClick={() => setIsConfirmOpen(false)}
+              onClick={() => setIsConfirmApplyOpen(false)}
               disabled={isApplying}
               className="text-xs"
             >
@@ -566,12 +608,11 @@ export function LevelRulesClient({ initialRules, initialError }: LevelRulesClien
               {isApplying ? (
                 <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />
               ) : null}
-              Confirm &amp; Apply Now
+              Confirm &amp; apply now
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 }
-

@@ -1,14 +1,12 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import {
-  Users,
-  Gift,
-  Settings,
-  RefreshCw,
+  Share2,
   Search,
+  Users,
   CheckCircle2,
   Clock,
   ShieldAlert,
@@ -16,12 +14,27 @@ import {
   Trophy,
   Loader2,
   AlertCircle,
+  Gift,
+  RefreshCw,
+  Settings,
 } from "lucide-react";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import {
+  AdminPageHeader,
+  SegmentedControl,
+  EmptyState,
+} from "@/components/admin/primitives";
+import { StatusPill } from "@/components/admin/people/StatusPill";
 import {
   adminUpdateReferralSettingsAction,
   adminProcessPendingReferralsAction,
@@ -53,16 +66,39 @@ export function AdminReferralsClient({
     enabled: initialData?.settings.enabled ?? false,
     referrer_reward_zed: initialData?.settings.referrer_reward_zed ?? 100,
     referee_reward_zed: initialData?.settings.referee_reward_zed ?? 50,
-    max_rewarded_per_referrer: initialData?.settings.max_rewarded_per_referrer ?? 50,
+    max_rewarded_per_referrer:
+      initialData?.settings.max_rewarded_per_referrer ?? 50,
   });
 
   // Table filter state
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
 
+  // Confirm dialog state
+  const [showProcessConfirm, setShowProcessConfirm] = useState(false);
+  const [showSaveSettingsConfirm, setShowSaveSettingsConfirm] = useState(false);
+
+  // Search bar ref for '/' shortcut
+  const searchRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (
+        e.key === "/" &&
+        document.activeElement?.tagName !== "INPUT" &&
+        document.activeElement?.tagName !== "TEXTAREA"
+      ) {
+        e.preventDefault();
+        searchRef.current?.focus();
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
   if (loadError || !data) {
     return (
-      <Card className="p-8 border-destructive/20 bg-destructive/5 text-center">
+      <div className="p-8 rounded-lg border border-destructive/20 bg-destructive/5 text-center">
         <AlertCircle className="h-10 w-10 text-destructive mx-auto mb-3" />
         <h2 className="text-lg font-semibold text-foreground mb-1">
           Unable to Load Referral Data
@@ -73,7 +109,7 @@ export function AdminReferralsClient({
         <Button variant="outline" onClick={() => router.refresh()}>
           Retry
         </Button>
-      </Card>
+      </div>
     );
   }
 
@@ -111,7 +147,9 @@ export function AdminReferralsClient({
         return;
       }
       toast.success(
-        `Processed pending referrals (${res.processedCount} user${res.processedCount === 1 ? "" : "s"} rewarded).`
+        `Processed pending referrals (${res.processedCount} user${
+          res.processedCount === 1 ? "" : "s"
+        } rewarded).`
       );
       router.refresh();
     });
@@ -131,168 +169,166 @@ export function AdminReferralsClient({
     return true;
   });
 
-  const getStatusBadge = (status: ReferralStatus) => {
-    switch (status) {
-      case "rewarded":
-        return (
-          <Badge className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/15 font-medium">
-            Rewarded
-          </Badge>
-        );
-      case "pending":
-        return (
-          <Badge variant="outline" className="text-amber-600 dark:text-amber-400 border-amber-500/30 bg-amber-500/10 font-medium">
-            Pending
-          </Badge>
-        );
-      case "capped":
-        return (
-          <Badge variant="secondary" className="text-zinc-600 dark:text-zinc-400 bg-zinc-500/10 border-border font-medium">
-            Capped
-          </Badge>
-        );
-      case "rejected":
-        return (
-          <Badge variant="destructive" className="font-medium">
-            Rejected
-          </Badge>
-        );
-      default:
-        return <Badge variant="outline">{status}</Badge>;
-    }
+  // SegmentedControl tab options with counts
+  const statusTabs = [
+    { value: "all" as const, label: "All", count: referrals.length },
+    {
+      value: "pending" as const,
+      label: "Pending",
+      count: referrals.filter((r) => r.status === "pending").length,
+    },
+    {
+      value: "rewarded" as const,
+      label: "Rewarded",
+      count: referrals.filter((r) => r.status === "rewarded").length,
+    },
+    {
+      value: "capped" as const,
+      label: "Capped",
+      count: referrals.filter((r) => r.status === "capped").length,
+    },
+    {
+      value: "rejected" as const,
+      label: "Rejected",
+      count: referrals.filter((r) => r.status === "rejected").length,
+    },
+  ];
+
+  const statusToPill: Record<ReferralStatus, "verified" | "pending" | "neutral" | "rejected"> = {
+    rewarded: "verified",
+    pending: "pending",
+    capped: "neutral",
+    rejected: "rejected",
+  };
+
+  const rankLabel = (index: number) => {
+    if (index === 0) return "1st";
+    if (index === 1) return "2nd";
+    if (index === 2) return "3rd";
+    return `${index + 1}`;
   };
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-12">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <h1 className="text-2xl font-bold tracking-tight text-foreground">
-              Referral Program Management
-            </h1>
-            <Badge
+      <AdminPageHeader
+        title="Referral program"
+        description="Configure invite rewards, review referral activity, and track top referrers."
+        icon={Share2}
+        section="money"
+        actions={
+          <>
+            <Button
               variant="outline"
-              className={cn(
-                "font-semibold text-xs",
-                settings.enabled
-                  ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30"
-                  : "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30"
-              )}
+              size="sm"
+              onClick={() => setShowProcessConfirm(true)}
+              disabled={isPending}
+              className="gap-2 h-9 transition-all duration-150"
             >
-              {settings.enabled ? "Active" : "Disabled"}
-            </Badge>
-          </div>
-          <p className="text-sm text-muted-foreground">
-            Configure invite rewards, review verified referral payouts, and track top referrers.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleProcessPending}
-            disabled={isPending}
-            className="gap-2 h-9"
-          >
-            {isPending ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <RefreshCw className="h-4 w-4 text-primary" />
-            )}
-            Process Pending
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => router.refresh()}
-            className="h-9"
-          >
-            Refresh
-          </Button>
-        </div>
-      </div>
+              {isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <RefreshCw className="h-4 w-4" />
+              )}
+              Process pending
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => router.refresh()}
+              className="h-9"
+            >
+              Refresh
+            </Button>
+          </>
+        }
+      />
 
       {/* Metrics Row */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3.5">
-        <Card className="p-4 bg-card/60 backdrop-blur-sm border-border">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-muted-foreground">Total Invites</span>
-            <Users className="h-4 w-4 text-muted-foreground" />
+        {[
+          {
+            label: "Total invites",
+            value: stats.totalReferrals.toLocaleString(),
+            icon: Users,
+            sub: "All-time tracked",
+            color: "text-foreground",
+          },
+          {
+            label: "Pending",
+            value: stats.totalPending.toLocaleString(),
+            icon: Clock,
+            sub: "Awaiting verification",
+            color: "text-amber-600 dark:text-amber-400",
+          },
+          {
+            label: "Rewarded",
+            value: stats.totalRewarded.toLocaleString(),
+            icon: CheckCircle2,
+            sub: "Successfully credited",
+            color: "text-emerald-600 dark:text-emerald-400",
+          },
+          {
+            label: "Capped",
+            value: stats.totalCapped.toLocaleString(),
+            icon: ShieldAlert,
+            sub: "Exceeded max cap",
+            color: "text-foreground",
+          },
+          {
+            label: "ZED distributed",
+            value: stats.totalZedPaid.toLocaleString(),
+            icon: Coins,
+            sub: "Total reward tokens",
+            color: "text-amber-500",
+          },
+        ].map(({ label, value, icon: Icon, sub, color }) => (
+          <div
+            key={label}
+            className="rounded-lg border border-border/70 bg-card shadow-2xs p-4 col-span-1 last:col-span-2 md:last:col-span-1"
+          >
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-medium text-muted-foreground">
+                {label}
+              </span>
+              <Icon className="h-4 w-4 text-muted-foreground" />
+            </div>
+            <div className={cn("mt-2 text-2xl font-bold tracking-tight font-sans tabular-nums", color)}>
+              {value}
+            </div>
+            <p className="text-[11px] text-muted-foreground mt-0.5">{sub}</p>
           </div>
-          <div className="mt-2 text-2xl font-bold tracking-tight text-foreground">
-            {stats.totalReferrals.toLocaleString()}
-          </div>
-          <p className="text-[11px] text-muted-foreground mt-0.5">All-time tracked</p>
-        </Card>
-
-        <Card className="p-4 bg-card/60 backdrop-blur-sm border-border">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-muted-foreground">Pending</span>
-            <Clock className="h-4 w-4 text-amber-500" />
-          </div>
-          <div className="mt-2 text-2xl font-bold tracking-tight text-amber-600 dark:text-amber-400">
-            {stats.totalPending.toLocaleString()}
-          </div>
-          <p className="text-[11px] text-muted-foreground mt-0.5">Awaiting user verification</p>
-        </Card>
-
-        <Card className="p-4 bg-card/60 backdrop-blur-sm border-border">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-muted-foreground">Rewarded</span>
-            <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-          </div>
-          <div className="mt-2 text-2xl font-bold tracking-tight text-emerald-600 dark:text-emerald-400">
-            {stats.totalRewarded.toLocaleString()}
-          </div>
-          <p className="text-[11px] text-muted-foreground mt-0.5">Successfully credited</p>
-        </Card>
-
-        <Card className="p-4 bg-card/60 backdrop-blur-sm border-border">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-muted-foreground">Capped</span>
-            <ShieldAlert className="h-4 w-4 text-zinc-400" />
-          </div>
-          <div className="mt-2 text-2xl font-bold tracking-tight text-foreground">
-            {stats.totalCapped.toLocaleString()}
-          </div>
-          <p className="text-[11px] text-muted-foreground mt-0.5">Exceeded max referrer cap</p>
-        </Card>
-
-        <Card className="p-4 bg-card/60 backdrop-blur-sm border-border col-span-2 md:col-span-1">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-muted-foreground">ZED Distributed</span>
-            <Coins className="h-4 w-4 text-amber-500" />
-          </div>
-          <div className="mt-2 text-2xl font-bold tracking-tight text-amber-500">
-            {stats.totalZedPaid.toLocaleString()}
-          </div>
-          <p className="text-[11px] text-muted-foreground mt-0.5">Total reward tokens paid</p>
-        </Card>
+        ))}
       </div>
 
-      {/* Main Grid: Settings & Top Referrers */}
+      {/* Settings + Top Referrers */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Settings Card */}
-        <Card className="p-5 bg-card/60 backdrop-blur-sm border-border flex flex-col justify-between">
+        {/* Program Settings */}
+        <div className="rounded-lg border border-border/70 bg-card shadow-2xs p-5 flex flex-col justify-between">
           <div>
             <div className="flex items-center gap-2 mb-4">
               <div className="p-2 rounded-lg bg-primary/10 text-primary">
                 <Settings className="h-4 w-4" />
               </div>
               <div>
-                <h2 className="text-base font-semibold text-foreground">Program Settings</h2>
-                <p className="text-xs text-muted-foreground">Configure program status and reward amounts</p>
+                <h2 className="text-base font-semibold text-foreground">
+                  Program settings
+                </h2>
+                <p className="text-xs text-muted-foreground">
+                  Configure status and reward amounts
+                </p>
               </div>
             </div>
 
-            <form id="referral-settings-form" onSubmit={handleSaveSettings} className="space-y-4">
-              {/* Program Enabled Switch (Accessible semantic toggle) */}
+            <form id="referral-settings-form" onSubmit={(e) => { e.preventDefault(); setShowSaveSettingsConfirm(true); }} className="space-y-4">
+              {/* Program Enabled Switch */}
               <div className="flex items-center justify-between p-3 rounded-lg border border-border bg-background/50">
                 <div className="space-y-0.5">
-                  <Label htmlFor="referral-enabled-toggle" className="text-sm font-medium cursor-pointer">
-                    Program Status
+                  <Label
+                    htmlFor="referral-enabled-toggle"
+                    className="text-sm font-medium cursor-pointer"
+                  >
+                    Program status
                   </Label>
                   <p className="text-xs text-muted-foreground">
                     Enable or pause rewards on user verifications
@@ -326,7 +362,7 @@ export function AdminReferralsClient({
               {/* Referrer Reward */}
               <div className="space-y-1.5">
                 <Label htmlFor="referrer_reward" className="text-xs font-medium">
-                  Referrer Reward (ZED)
+                  Referrer reward (ZED)
                 </Label>
                 <div className="relative">
                   <Input
@@ -348,13 +384,15 @@ export function AdminReferralsClient({
                     ZED
                   </span>
                 </div>
-                <p className="text-[11px] text-muted-foreground">Paid to inviter upon verified referee</p>
+                <p className="text-[11px] text-muted-foreground">
+                  Paid to inviter upon verified referee
+                </p>
               </div>
 
               {/* Referee Reward */}
               <div className="space-y-1.5">
                 <Label htmlFor="referee_reward" className="text-xs font-medium">
-                  New User Welcome Reward (ZED)
+                  New user welcome reward (ZED)
                 </Label>
                 <div className="relative">
                   <Input
@@ -376,13 +414,15 @@ export function AdminReferralsClient({
                     ZED
                   </span>
                 </div>
-                <p className="text-[11px] text-muted-foreground">Paid to newly verified user</p>
+                <p className="text-[11px] text-muted-foreground">
+                  Paid to newly verified user
+                </p>
               </div>
 
-              {/* Max rewarded cap */}
+              {/* Max cap */}
               <div className="space-y-1.5">
                 <Label htmlFor="max_cap" className="text-xs font-medium">
-                  Max Rewarded Referrals / Referrer
+                  Max rewarded referrals / referrer
                 </Label>
                 <Input
                   id="max_cap"
@@ -410,42 +450,47 @@ export function AdminReferralsClient({
               type="submit"
               form="referral-settings-form"
               disabled={isPending}
-              className="w-full gap-2"
+              className="w-full gap-2 transition-all duration-150"
             >
               {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
-              Save Settings
+              Save settings
             </Button>
           </div>
-        </Card>
+        </div>
 
         {/* Top Referrers Leaderboard */}
-        <Card className="lg:col-span-2 p-5 bg-card/60 backdrop-blur-sm border-border flex flex-col">
+        <div className="lg:col-span-2 rounded-lg border border-border/70 bg-card shadow-2xs p-5 flex flex-col">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <div className="p-2 rounded-lg bg-amber-500/10 text-amber-500">
                 <Trophy className="h-4 w-4" />
               </div>
               <div>
-                <h2 className="text-base font-semibold text-foreground">Top Referrers</h2>
-                <p className="text-xs text-muted-foreground">Users with highest rewarded invites</p>
+                <h2 className="text-base font-semibold text-foreground">
+                  Top referrers
+                </h2>
+                <p className="text-xs text-muted-foreground">
+                  Users with highest rewarded invites
+                </p>
               </div>
             </div>
-            <Badge variant="outline" className="text-xs">
-              {topReferrers.length} Leading Referrers
-            </Badge>
+            <span className="text-xs text-muted-foreground font-sans tabular-nums">
+              {topReferrers.length} referrers
+            </span>
           </div>
 
           {topReferrers.length === 0 ? (
-            <div className="flex-1 flex flex-col items-center justify-center p-8 text-center text-muted-foreground border border-dashed rounded-lg">
-              <Gift className="h-8 w-8 mb-2 opacity-40" />
-              <p className="text-sm font-medium">No referral payouts yet</p>
-              <p className="text-xs">Leaderboard will update when users complete account verification.</p>
-            </div>
+            <EmptyState
+              icon={Gift}
+              title="No referral payouts yet"
+              description="Leaderboard updates when users complete account verification."
+              compact
+            />
           ) : (
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto rounded-lg border border-border/70 bg-card shadow-2xs overflow-hidden">
               <table className="w-full text-left text-sm" role="table">
                 <thead>
-                  <tr className="border-b border-border text-xs font-semibold text-muted-foreground">
+                  <tr className="border-b border-border/70 bg-secondary/30 text-muted-foreground text-xs font-medium">
                     <th className="py-2.5 px-3">#</th>
                     <th className="py-2.5 px-3">User</th>
                     <th className="py-2.5 px-3">Code</th>
@@ -454,11 +499,14 @@ export function AdminReferralsClient({
                     <th className="py-2.5 px-3 text-right">Total ZED</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-border">
+                <tbody className="divide-y divide-border/50">
                   {topReferrers.map((r: TopReferrerEntry, index: number) => (
-                    <tr key={r.userId} className="hover:bg-muted/30 transition-colors">
+                    <tr
+                      key={r.userId}
+                      className="hover:bg-muted/30 transition-all duration-150"
+                    >
                       <td className="py-2.5 px-3 font-semibold text-xs text-muted-foreground">
-                        {index === 0 ? "🥇 1" : index === 1 ? "🥈 2" : index === 2 ? "🥉 3" : `${index + 1}`}
+                        {rankLabel(index)}
                       </td>
                       <td className="py-2.5 px-3 font-medium text-foreground">
                         {r.name}
@@ -468,13 +516,13 @@ export function AdminReferralsClient({
                           {r.code}
                         </code>
                       </td>
-                      <td className="py-2.5 px-3 text-right text-muted-foreground text-xs font-medium">
+                      <td className="py-2.5 px-3 text-right text-muted-foreground text-xs font-medium font-sans tabular-nums">
                         {r.totalInvites}
                       </td>
-                      <td className="py-2.5 px-3 text-right font-semibold text-emerald-600 dark:text-emerald-400 text-xs">
+                      <td className="py-2.5 px-3 text-right font-semibold text-emerald-600 dark:text-emerald-400 text-xs font-sans tabular-nums">
                         {r.rewardedCount}
                       </td>
-                      <td className="py-2.5 px-3 text-right font-bold text-amber-500 text-xs">
+                      <td className="py-2.5 px-3 text-right font-bold text-amber-500 text-xs font-sans tabular-nums">
                         {r.totalEarnedZed.toLocaleString()} ZED
                       </td>
                     </tr>
@@ -483,116 +531,222 @@ export function AdminReferralsClient({
               </table>
             </div>
           )}
-        </Card>
+        </div>
       </div>
 
-      {/* Referrals Activity Ledger */}
-      <Card className="p-5 bg-card/60 backdrop-blur-sm border-border space-y-4">
+      {/* Referral Ledger */}
+      <div className="space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h2 className="text-base font-semibold text-foreground">Referral Ledger</h2>
+            <h2 className="text-base font-semibold text-foreground">
+              Referral ledger
+            </h2>
             <p className="text-xs text-muted-foreground">
               Complete history of user invitations and payout statuses
             </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            {/* Status Filter */}
-            <div className="flex items-center gap-1 bg-background/60 p-1 rounded-lg border border-border">
-              {["all", "pending", "rewarded", "capped", "rejected"].map((st) => (
-                <button
-                  key={st}
-                  type="button"
-                  onClick={() => setStatusFilter(st)}
-                  className={cn(
-                    "text-xs px-2.5 py-1 rounded-md capitalize font-medium transition-colors",
-                    statusFilter === st
-                      ? "bg-primary text-primary-foreground shadow-sm"
-                      : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                  )}
-                >
-                  {st}
-                </button>
-              ))}
-            </div>
+            <SegmentedControl
+              options={statusTabs}
+              value={statusFilter as "all" | "pending" | "rewarded" | "capped" | "rejected"}
+              onChange={(v) => setStatusFilter(v)}
+              size="sm"
+              ariaLabel="Filter referrals by status"
+            />
 
-            {/* Search Input */}
+            {/* Search with '/' shortcut */}
             <div className="relative w-full sm:w-64">
-              <Search className="h-3.5 w-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <Search className="h-3.5 w-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
               <Input
-                placeholder="Search user or code..."
+                ref={searchRef}
+                placeholder="Search user or code…"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-8 text-xs h-8"
+                className="pl-8 text-xs h-9 pr-9"
               />
+              <kbd className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground font-sans bg-muted/60 px-1 py-0.5 rounded border border-border/60 leading-none pointer-events-none hidden sm:flex items-center">
+                /
+              </kbd>
             </div>
           </div>
         </div>
 
         {/* Table */}
-        <div className="overflow-x-auto border rounded-lg border-border">
-          <table className="w-full text-left text-sm" role="table">
-            <thead className="bg-muted/40">
-              <tr className="border-b border-border text-xs font-semibold text-muted-foreground">
-                <th className="py-2.5 px-3">Date</th>
-                <th className="py-2.5 px-3">Referrer</th>
-                <th className="py-2.5 px-3">Referred User</th>
-                <th className="py-2.5 px-3">Status</th>
-                <th className="py-2.5 px-3 text-right">Referrer Reward</th>
-                <th className="py-2.5 px-3 text-right">Referee Reward</th>
-                <th className="py-2.5 px-3 text-right">Rewarded At</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {filteredReferrals.length === 0 ? (
-                <tr>
-                  <td colSpan={7} className="text-center py-8 text-muted-foreground text-xs">
-                    No referrals match your current search or filter.
-                  </td>
+        <div className="rounded-lg border border-border/70 bg-card shadow-2xs overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm" role="table">
+              <thead>
+                <tr className="border-b border-border/70 bg-secondary/30 text-muted-foreground text-xs font-medium">
+                  <th className="py-2.5 px-3">Date</th>
+                  <th className="py-2.5 px-3">Referrer</th>
+                  <th className="py-2.5 px-3">Referred user</th>
+                  <th className="py-2.5 px-3">Status</th>
+                  <th className="py-2.5 px-3 text-right">Referrer reward</th>
+                  <th className="py-2.5 px-3 text-right">Referee reward</th>
+                  <th className="py-2.5 px-3 text-right">Rewarded at</th>
                 </tr>
-              ) : (
-                filteredReferrals.map((item: AdminReferralRecord) => (
-                  <tr key={item.id} className="hover:bg-muted/20 transition-colors">
-                    <td className="py-2.5 px-3 text-xs text-muted-foreground whitespace-nowrap">
-                      {new Date(item.created_at).toLocaleDateString(undefined, {
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric",
-                      })}
-                    </td>
-                    <td className="py-2.5 px-3 whitespace-nowrap">
-                      <div className="text-xs font-medium text-foreground">{item.referrer_name}</div>
-                      <code className="text-[10px] text-muted-foreground">{item.referrer_code}</code>
-                    </td>
-                    <td className="py-2.5 px-3 text-xs font-medium text-foreground whitespace-nowrap">
-                      {item.referred_name}
-                    </td>
-                    <td className="py-2.5 px-3 whitespace-nowrap">
-                      {getStatusBadge(item.status)}
-                    </td>
-                    <td className="py-2.5 px-3 text-right text-xs font-medium text-foreground whitespace-nowrap">
-                      {item.referrer_reward_zed != null ? `${item.referrer_reward_zed} ZED` : "—"}
-                    </td>
-                    <td className="py-2.5 px-3 text-right text-xs font-medium text-foreground whitespace-nowrap">
-                      {item.referee_reward_zed != null ? `${item.referee_reward_zed} ZED` : "—"}
-                    </td>
-                    <td className="py-2.5 px-3 text-right text-xs text-muted-foreground whitespace-nowrap">
-                      {item.rewarded_at
-                        ? new Date(item.rewarded_at).toLocaleDateString(undefined, {
-                            month: "short",
-                            day: "numeric",
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })
-                        : "—"}
+              </thead>
+              <tbody className="divide-y divide-border/50">
+                {filteredReferrals.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} className="py-0">
+                      <EmptyState
+                        title="No referrals found"
+                        description="No referrals match your current search or filter."
+                        compact
+                        className="border-0 rounded-none"
+                      />
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                ) : (
+                  filteredReferrals.map((item: AdminReferralRecord) => (
+                    <tr
+                      key={item.id}
+                      className="hover:bg-muted/20 transition-all duration-150"
+                    >
+                      <td className="py-2.5 px-3 text-xs text-muted-foreground whitespace-nowrap">
+                        {new Date(item.created_at).toLocaleDateString(
+                          undefined,
+                          { month: "short", day: "numeric", year: "numeric" }
+                        )}
+                      </td>
+                      <td className="py-2.5 px-3 whitespace-nowrap">
+                        <div className="text-xs font-medium text-foreground">
+                          {item.referrer_name}
+                        </div>
+                        <code className="text-[10px] text-muted-foreground">
+                          {item.referrer_code}
+                        </code>
+                      </td>
+                      <td className="py-2.5 px-3 text-xs font-medium text-foreground whitespace-nowrap">
+                        {item.referred_name}
+                      </td>
+                      <td className="py-2.5 px-3 whitespace-nowrap">
+                        <StatusPill
+                          variant={statusToPill[item.status] ?? "neutral"}
+                        />
+                      </td>
+                      <td className="py-2.5 px-3 text-right text-xs font-sans tabular-nums font-medium text-foreground whitespace-nowrap">
+                        {item.referrer_reward_zed != null
+                          ? `${item.referrer_reward_zed} ZED`
+                          : "—"}
+                      </td>
+                      <td className="py-2.5 px-3 text-right text-xs font-sans tabular-nums font-medium text-foreground whitespace-nowrap">
+                        {item.referee_reward_zed != null
+                          ? `${item.referee_reward_zed} ZED`
+                          : "—"}
+                      </td>
+                      <td className="py-2.5 px-3 text-right text-xs text-muted-foreground whitespace-nowrap font-sans tabular-nums">
+                        {item.rewarded_at
+                          ? new Date(item.rewarded_at).toLocaleDateString(
+                              undefined,
+                              {
+                                month: "short",
+                                day: "numeric",
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              }
+                            )
+                          : "—"}
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </Card>
+      </div>
+
+      {/* Confirm: Process Pending */}
+      <Dialog open={showProcessConfirm} onOpenChange={setShowProcessConfirm}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Process pending referrals?</DialogTitle>
+            <DialogDescription>
+              Process {data.stats.totalPending} pending referrals now? This will
+              credit ZED to qualifying users.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowProcessConfirm(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              disabled={isPending}
+              onClick={() => {
+                setShowProcessConfirm(false);
+                handleProcessPending();
+              }}
+              className="gap-2"
+            >
+              {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
+              Confirm &amp; process
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Confirm: Save Settings */}
+      <Dialog
+        open={showSaveSettingsConfirm}
+        onOpenChange={setShowSaveSettingsConfirm}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Save referral settings?</DialogTitle>
+            <DialogDescription asChild>
+              <ul className="list-disc pl-5 space-y-1 text-sm text-muted-foreground">
+                <li>
+                  Referrer reward:{" "}
+                  <span className="font-sans tabular-nums font-semibold text-foreground">
+                    {settingsForm.referrer_reward_zed} ZED
+                  </span>
+                </li>
+                <li>
+                  Referee welcome reward:{" "}
+                  <span className="font-sans tabular-nums font-semibold text-foreground">
+                    {settingsForm.referee_reward_zed} ZED
+                  </span>
+                </li>
+                <li>
+                  Max per referrer:{" "}
+                  <span className="font-sans tabular-nums font-semibold text-foreground">
+                    {settingsForm.max_rewarded_per_referrer}
+                  </span>
+                </li>
+              </ul>
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowSaveSettingsConfirm(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              disabled={isPending}
+              onClick={() => {
+                setShowSaveSettingsConfirm(false);
+                // Trigger the form submit handler directly
+                const fakeEvent = {
+                  preventDefault: () => {},
+                } as React.FormEvent;
+                handleSaveSettings(fakeEvent);
+              }}
+              className="gap-2"
+            >
+              {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
+              Save settings
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
