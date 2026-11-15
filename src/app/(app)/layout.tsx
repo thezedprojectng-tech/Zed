@@ -4,7 +4,6 @@ import { useState } from "react";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { TopBar } from "@/components/layout/TopBar";
 import { CommandMenu } from "@/components/layout/CommandMenu";
-import { ScrollToTop } from "@/components/layout/ScrollToTop";
 import { PageTransition } from "@/components/layout/PageTransition";
 import { DobGateDialog } from "@/components/auth/DobGateDialog";
 import { AppSidebarProvider } from "@/components/layout/AppSidebarContext";
@@ -40,9 +39,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           open={commandOpen}
           onOpenChange={(open) => setCommandOpen(open)}
         />
-
-        {/* Floating Scroll-to-Top Button */}
-        <ScrollToTop />
 
         {/* Mandatory Date of Birth gate dialog for existing users */}
         <DobGateDialog />
