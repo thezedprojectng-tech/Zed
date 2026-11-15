@@ -25,7 +25,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Search,
-  Bell,
   Sun,
   Moon,
   WifiOff,
@@ -39,6 +38,7 @@ import { signOut } from "@/lib/auth/actions";
 import { getLevelName } from "@/types";
 import { useIsMounted, useIsOnline } from "@/lib/hooks";
 import { MobileDrawerTrigger } from "./MobileDrawer";
+import { NotificationBell } from "./NotificationBell";
 
 interface TopBarProps {
   onOpenCommand: () => void;
@@ -199,57 +199,8 @@ export function TopBar({
           </kbd>
         </button>
 
-        {/* Notifications Popover */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              className="relative text-muted-foreground hover:text-foreground"
-              aria-label="View notifications"
-            >
-              <Bell className="h-4 w-4" />
-              <span className="absolute top-1.5 right-1.5 h-1.5 w-1.5 rounded-full bg-primary" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            align="end"
-            className="w-80 border-hairline bg-popover p-0 shadow-lg"
-          >
-            <div className="border-b border-border px-4 py-2.5">
-              <p className="text-xs font-semibold tracking-tight text-foreground">
-                Zed Nav Updates
-              </p>
-              <p className="text-[11px] text-muted-foreground">
-                Verified procedural alerts and updates
-              </p>
-            </div>
-            <div className="divide-y divide-border/50 text-xs">
-              <div className="p-3 hover:bg-secondary/40 transition-colors">
-                <p className="font-medium text-foreground">
-                  NIS e-Passport Fast-Track Capture
-                </p>
-                <p className="mt-0.5 text-muted-foreground text-[11px]">
-                  Ikoyi and Alausa passport processing offices report lowest queue times before 10:30 AM.
-                </p>
-                <span className="mt-1 block font-mono text-[10px] text-muted-foreground/80">
-                  Today · 08:30 AM
-                </span>
-              </div>
-              <div className="p-3 hover:bg-secondary/40 transition-colors">
-                <p className="font-medium text-foreground">
-                  NYSC 2026 Batch A Mobilisation
-                </p>
-                <p className="mt-0.5 text-muted-foreground text-[11px]">
-                  Senate list verification active on portal. Verify your graduation status before camp call-up.
-                </p>
-                <span className="mt-1 block font-mono text-[10px] text-muted-foreground/80">
-                  Yesterday · 04:15 PM
-                </span>
-              </div>
-            </div>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {/* Notifications Bell Popover */}
+        <NotificationBell />
 
         {/* Theme Toggle */}
         {mounted && (

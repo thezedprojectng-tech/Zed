@@ -18,6 +18,7 @@ import {
   Lightbulb,
   Search,
   ShoppingBag,
+  Newspaper,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getLevelName } from "@/types";
@@ -53,6 +54,7 @@ const sections: NavSection[] = [
       { href: "/mining", label: "Zed Mining", icon: Pickaxe },
       { href: "/market", label: "Zed Market", icon: ShoppingBag },
       { href: "/internships", label: "Internship Radar", icon: Search },
+      { href: "/news", label: "News", icon: Newspaper },
     ],
   },
   {

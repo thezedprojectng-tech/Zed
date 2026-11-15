@@ -17,6 +17,7 @@ const PRODUCT_LINKS = [
 
 const COMPANY_LINKS = [
   { href: "/about", label: "About Zed" },
+  { href: "/news", label: "News & Updates" },
   { href: "/fund", label: "Fund Your Idea" },
   { href: "/ambassadors", label: "Campus Ambassadors" },
   { href: "/mentorship", label: "Mentorship" },
