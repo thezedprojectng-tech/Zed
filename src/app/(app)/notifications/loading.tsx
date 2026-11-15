@@ -12,8 +12,8 @@ export default function NotificationsLoading() {
       {/* Day group skeleton */}
       <div className="space-y-4">
         <Skeleton className="h-4 w-20" />
-        <div className="rounded-xl border border-border bg-card/60 divide-y divide-border/60 overflow-hidden">
-          {Array.from({ length: 4 }).map((_, i) => (
+        <div className="rounded-lg border border-border bg-card/60 divide-y divide-border/60 overflow-hidden">
+          {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="p-4 flex items-start gap-3.5">
               <Skeleton className="h-8 w-8 rounded-full shrink-0" />
               <div className="flex-1 space-y-2">

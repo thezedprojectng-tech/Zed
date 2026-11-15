@@ -9,7 +9,7 @@ import {
   ChevronLeft,
   ShieldAlert,
   Clock,
-  Sparkles,
+  BookOpen,
   MessageSquare,
 } from "lucide-react";
 import { getPublishedAlumniProfileById } from "@/lib/alumni-office-hours/queries";
@@ -60,11 +60,11 @@ export default async function AlumniProfileDetailPage({ params }: ProfilePagePro
     ? "Contact on LinkedIn"
     : isX
       ? "Contact on X"
-      : "Contact Alumni";
+      : "Contact alumni";
 
   return (
     <main id="main-content" className="w-full flex-1">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-16 space-y-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-10 space-y-6">
         {/* Back navigation */}
         <nav aria-label="Breadcrumb">
           <Link
@@ -72,45 +72,45 @@ export default async function AlumniProfileDetailPage({ params }: ProfilePagePro
             className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
           >
             <ChevronLeft className="w-4 h-4" aria-hidden="true" />
-            <span>Back to Alumni Directory</span>
+            <span>Back to alumni directory</span>
           </Link>
         </nav>
 
         {/* Safety Notice Banner */}
         <aside
-          aria-label="Mentorship Safety Notice"
-          className="rounded-xl border border-amber-500/20 bg-amber-500/10 p-4 sm:p-5 text-card-foreground backdrop-blur-xs flex items-start gap-3.5"
+          aria-label="Mentorship safety notice"
+          className="rounded-lg border border-border border-l-2 border-l-[var(--data-flows)] bg-card p-4 text-card-foreground flex items-start gap-3"
         >
           <ShieldAlert
-            className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5"
+            className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5"
             aria-hidden="true"
           />
-          <div className="space-y-1 text-xs sm:text-sm text-foreground/90 leading-relaxed font-sans">
-            <p className="font-semibold text-foreground">Important Safety Notice</p>
+          <div className="space-y-1 text-xs text-muted-foreground leading-relaxed font-sans">
+            <p className="font-semibold text-foreground">Important safety notice</p>
             <p>{DISCLAIMER_TEXT}</p>
           </div>
         </aside>
 
         {/* Main Profile Card */}
-        <article className="rounded-2xl border border-border bg-card p-6 sm:p-8 space-y-8 shadow-xs">
+        <article className="rounded-lg border border-border bg-card p-5 sm:p-6 space-y-6 shadow-2xs">
           {/* Header */}
-          <header className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-6 border-b border-border pb-6">
+          <header className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-5 border-b border-border pb-5">
             <div className="space-y-2">
               <div className="flex flex-wrap items-center gap-2">
-                <Badge variant="outline" className="text-xs font-normal">
+                <Badge variant="outline" className="text-xs font-normal rounded-md">
                   {profile.field}
                 </Badge>
-                <Badge variant="secondary" className="text-xs font-normal">
+                <Badge variant="secondary" className="text-xs font-normal rounded-md">
                   Class of {profile.graduation_year}
                 </Badge>
               </div>
 
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-foreground font-display">
+              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
                 {profile.display_name}
               </h1>
 
-              <div className="space-y-1 text-sm text-muted-foreground">
-                <p className="flex items-center gap-2 font-medium text-foreground/90">
+              <div className="space-y-1 text-xs sm:text-sm text-muted-foreground">
+                <p className="flex items-center gap-2 font-medium text-foreground">
                   <Briefcase className="w-4 h-4 text-muted-foreground shrink-0" aria-hidden="true" />
                   <span>{profile.occupation}</span>
                 </p>
@@ -123,7 +123,7 @@ export default async function AlumniProfileDetailPage({ params }: ProfilePagePro
 
             {/* Direct Contact Button */}
             <div className="shrink-0 pt-2 sm:pt-0">
-              <Button asChild size="lg" className="w-full sm:w-auto shadow-sm gap-2">
+              <Button asChild size="default" className="w-full sm:w-auto shadow-xs gap-2 rounded-lg text-xs sm:text-sm">
                 <a
                   href={profile.contact_url}
                   target="_blank"
@@ -137,43 +137,43 @@ export default async function AlumniProfileDetailPage({ params }: ProfilePagePro
           </header>
 
           {/* Bio Section */}
-          <section aria-labelledby="bio-heading" className="space-y-3">
-            <h2 id="bio-heading" className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-              About the Alumnus
+          <section aria-labelledby="bio-heading" className="space-y-2">
+            <h2 id="bio-heading" className="text-xs font-semibold text-muted-foreground">
+              About the alumnus
             </h2>
-            <div className="text-sm sm:text-base text-foreground/90 leading-relaxed font-sans whitespace-pre-line">
+            <div className="text-sm text-foreground/90 leading-relaxed font-sans whitespace-pre-line">
               {profile.bio}
             </div>
           </section>
 
           {/* Topics Section */}
-          <section aria-labelledby="topics-heading" className="space-y-3 border-t border-border pt-6">
-            <h2 id="topics-heading" className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-primary" aria-hidden="true" />
-              <span>Topics &amp; Guidance Offered</span>
+          <section aria-labelledby="topics-heading" className="space-y-2 border-t border-border pt-5">
+            <h2 id="topics-heading" className="text-xs font-semibold text-muted-foreground flex items-center gap-2">
+              <BookOpen className="w-4 h-4 text-primary" aria-hidden="true" />
+              <span>Topics &amp; guidance offered</span>
             </h2>
-            <div className="rounded-xl border border-border/80 bg-secondary/30 p-4 sm:p-5 text-sm text-foreground/90 leading-relaxed whitespace-pre-line">
+            <div className="rounded-lg border border-border bg-secondary/30 p-4 text-sm text-foreground/90 leading-relaxed whitespace-pre-line">
               {profile.topics}
             </div>
           </section>
 
           {/* Availability Section */}
-          <section aria-labelledby="availability-heading" className="space-y-3 border-t border-border pt-6">
-            <h2 id="availability-heading" className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+          <section aria-labelledby="availability-heading" className="space-y-2 border-t border-border pt-5">
+            <h2 id="availability-heading" className="text-xs font-semibold text-muted-foreground flex items-center gap-2">
               <Clock className="w-4 h-4 text-primary" aria-hidden="true" />
-              <span>Availability &amp; Format</span>
+              <span>Availability &amp; format</span>
             </h2>
-            <div className="rounded-xl border border-border/80 bg-secondary/30 p-4 sm:p-5 text-sm text-foreground/90 leading-relaxed whitespace-pre-line">
+            <div className="rounded-lg border border-border bg-secondary/30 p-4 text-sm text-foreground/90 leading-relaxed whitespace-pre-line">
               {profile.availability}
             </div>
           </section>
 
           {/* Contact External Notice */}
-          <footer className="border-t border-border pt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <footer className="border-t border-border pt-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <p className="text-xs text-muted-foreground">
               Conversations occur on external networks ({isLinkedIn ? "LinkedIn" : "X"}). Keep discussions respectful and educational.
             </p>
-            <Button asChild variant="outline" className="gap-2 shrink-0">
+            <Button asChild variant="outline" size="sm" className="gap-2 shrink-0 rounded-lg text-xs">
               <a
                 href={profile.contact_url}
                 target="_blank"

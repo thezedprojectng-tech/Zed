@@ -69,88 +69,88 @@ export default async function SingleCampusHubPage({
 
   return (
     <main id="main-content" className="w-full flex-1">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6">
         {/* Back navigation */}
         <div>
           <Link
             href="/campus-hubs"
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-[#2E82F7] transition-colors"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />
-            <span>Back to Campus Directory</span>
+            <span>Back to campus directory</span>
           </Link>
         </div>
 
         {/* Header Card */}
         <section
           aria-labelledby="hub-heading"
-          className="rounded-3xl border border-border bg-card p-6 sm:p-8 space-y-6 shadow-xs"
+          className="rounded-lg border border-border bg-card p-5 sm:p-6 space-y-4 shadow-2xs"
         >
-          <div className="space-y-4">
+          <div className="space-y-3">
             <div className="flex flex-wrap items-center gap-2">
               <Badge
                 variant="outline"
-                className="font-mono text-xs gap-1.5 px-3 py-1 border-border bg-secondary/40 text-foreground"
+                className="text-xs gap-1.5 px-2.5 py-0.5 border-border bg-secondary/40 text-foreground rounded-md font-normal"
               >
-                <MapPin className="h-3.5 w-3.5 text-[#2E82F7]" />
+                <MapPin className="h-3.5 w-3.5 text-primary" />
                 <span>{hub.state} State</span>
               </Badge>
               <Badge
                 variant="secondary"
-                className="font-mono text-xs px-2.5 py-0.5"
+                className="text-xs px-2.5 py-0.5 rounded-md font-normal"
               >
-                Official Campus Guide
+                Campus guide
               </Badge>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               <h1
                 id="hub-heading"
-                className="text-2xl sm:text-3xl lg:text-4xl font-bold font-display text-foreground leading-tight"
+                className="text-2xl sm:text-3xl font-bold text-foreground leading-tight"
               >
                 {hub.name}
               </h1>
               {hub.summary && (
-                <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+                <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
                   {hub.summary}
                 </p>
               )}
             </div>
 
             {/* Last Reviewed Timestamp */}
-            <div className="pt-2 flex items-center gap-1.5 text-xs text-muted-foreground font-mono">
-              <Calendar className="h-3.5 w-3.5 text-muted-foreground/70" />
+            <div className="pt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
+              <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
               <span>Last reviewed: {formattedReviewDate}</span>
             </div>
           </div>
 
           {/* Required Notice */}
-          <div className="rounded-xl border border-amber-500/20 bg-amber-50/50 dark:bg-amber-950/20 p-4 flex items-start gap-3 text-amber-900 dark:text-amber-200">
+          <div className="rounded-lg border border-border border-l-2 border-l-[var(--data-flows)] bg-card p-3.5 flex items-start gap-2.5 text-foreground">
             <AlertCircle className="h-4 w-4 shrink-0 mt-0.5 text-amber-600 dark:text-amber-400" />
-            <p className="text-xs sm:text-sm leading-relaxed">
+            <p className="text-xs leading-relaxed text-muted-foreground">
               Community-contributed guide. Always confirm with your institution&apos;s official notices.
             </p>
           </div>
         </section>
 
         {/* Guide Content Sections */}
-        <div className="space-y-6">
+        <div className="space-y-5">
           {/* Section 1: Clearance Guide */}
           {hasClearance && (
             <section
               aria-labelledby="clearance-heading"
-              className="rounded-2xl border border-border bg-card p-6 sm:p-8 space-y-4 shadow-xs"
+              className="rounded-lg border border-border bg-card p-5 sm:p-6 space-y-4 shadow-2xs"
             >
-              <div className="flex items-center gap-2.5 border-b border-border pb-4">
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-                  <FileCheck2 className="h-5 w-5" />
+              <div className="flex items-center gap-2.5 border-b border-border pb-3">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                  <FileCheck2 className="h-4 w-4" />
                 </div>
                 <div>
                   <h2
                     id="clearance-heading"
-                    className="text-lg sm:text-xl font-bold font-display text-foreground"
+                    className="text-base sm:text-lg font-bold text-foreground"
                   >
-                    Clearance Guide &amp; Registration
+                    Clearance guide &amp; registration
                   </h2>
                   <p className="text-xs text-muted-foreground">
                     Step-by-step procedures, documentation checklist, and administrative requirements.
@@ -167,18 +167,18 @@ export default async function SingleCampusHubPage({
           {hasHostel && (
             <section
               aria-labelledby="hostel-heading"
-              className="rounded-2xl border border-border bg-card p-6 sm:p-8 space-y-4 shadow-xs"
+              className="rounded-lg border border-border bg-card p-5 sm:p-6 space-y-4 shadow-2xs"
             >
-              <div className="flex items-center gap-2.5 border-b border-border pb-4">
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400">
-                  <Home className="h-5 w-5" />
+              <div className="flex items-center gap-2.5 border-b border-border pb-3">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400">
+                  <Home className="h-4 w-4" />
                 </div>
                 <div>
                   <h2
                     id="hostel-heading"
-                    className="text-lg sm:text-xl font-bold font-display text-foreground"
+                    className="text-base sm:text-lg font-bold text-foreground"
                   >
-                    Hostel &amp; Accommodation
+                    Hostel &amp; accommodation
                   </h2>
                   <p className="text-xs text-muted-foreground">
                     On-campus hall allocation, portal procedures, and off-campus housing pointers.
@@ -195,18 +195,18 @@ export default async function SingleCampusHubPage({
           {hasDepartments && (
             <section
               aria-labelledby="departments-heading"
-              className="rounded-2xl border border-border bg-card p-6 sm:p-8 space-y-4 shadow-xs"
+              className="rounded-lg border border-border bg-card p-5 sm:p-6 space-y-4 shadow-2xs"
             >
-              <div className="flex items-center gap-2.5 border-b border-border pb-4">
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-purple-500/10 text-purple-600 dark:text-purple-400">
-                  <GraduationCap className="h-5 w-5" />
+              <div className="flex items-center gap-2.5 border-b border-border pb-3">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-500/10 text-purple-600 dark:text-purple-400">
+                  <GraduationCap className="h-4 w-4" />
                 </div>
                 <div>
                   <h2
                     id="departments-heading"
-                    className="text-lg sm:text-xl font-bold font-display text-foreground"
+                    className="text-base sm:text-lg font-bold text-foreground"
                   >
-                    Departments &amp; Faculty
+                    Departments &amp; faculty
                   </h2>
                   <p className="text-xs text-muted-foreground">
                     Faculty walkthroughs, course registration notes, and departmental guidance.
@@ -221,8 +221,8 @@ export default async function SingleCampusHubPage({
 
           {/* If all sections are empty */}
           {!hasClearance && !hasHostel && !hasDepartments && (
-            <div className="rounded-2xl border border-dashed border-border bg-card/40 p-8 text-center space-y-2">
-              <Building2 className="h-8 w-8 mx-auto text-muted-foreground/60" />
+            <div className="rounded-lg border border-border bg-card/40 p-8 text-center space-y-2">
+              <Building2 className="h-7 w-7 mx-auto text-muted-foreground/60" />
               <p className="text-sm font-medium text-foreground">
                 Detailed guides for this campus will be published soon.
               </p>

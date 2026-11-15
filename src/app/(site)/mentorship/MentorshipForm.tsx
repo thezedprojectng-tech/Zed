@@ -126,21 +126,21 @@ export function MentorshipForm() {
 
   if (isSubmitted) {
     return (
-      <div className="rounded-xl border border-border bg-card p-6 sm:p-10 shadow-xs text-center space-y-6">
-        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-500">
-          <CheckCircle2 className="h-8 w-8" />
+      <div className="rounded-lg border border-border bg-card p-6 sm:p-8 shadow-2xs text-center space-y-5">
+        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-500">
+          <CheckCircle2 className="h-6 w-6" />
         </div>
 
-        <div className="space-y-2 max-w-md mx-auto">
-          <h2 className="font-display text-xl sm:text-2xl font-bold text-foreground">
-            Application Received
+        <div className="space-y-1.5 max-w-md mx-auto">
+          <h2 className="text-xl sm:text-2xl font-bold text-foreground">
+            Application received
           </h2>
-          <p className="font-sans text-sm text-muted-foreground leading-relaxed">
+          <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
             Thank you for applying for mentorship with Zed. Applying is free. Our team will review your application and reach out to you by email if matched.
           </p>
         </div>
 
-        <div className="pt-4">
+        <div className="pt-2">
           <button
             type="button"
             onClick={() => {
@@ -165,7 +165,7 @@ export function MentorshipForm() {
               });
               setTurnstileToken(null);
             }}
-            className="inline-flex items-center justify-center gap-2 rounded-lg bg-secondary px-5 py-2.5 font-sans text-xs sm:text-sm font-medium text-foreground hover:bg-secondary/80 transition-colors cursor-pointer"
+            className="inline-flex items-center justify-center gap-2 rounded-lg bg-secondary px-4 py-2 text-xs sm:text-sm font-medium text-foreground hover:bg-secondary/80 transition-colors cursor-pointer"
           >
             <span>Submit another application</span>
             <ArrowRight className="h-4 w-4" />
@@ -179,15 +179,15 @@ export function MentorshipForm() {
     <form
       onSubmit={handleSubmit}
       noValidate
-      className="rounded-xl border border-border bg-card p-6 sm:p-8 shadow-xs space-y-6"
+      className="rounded-lg border border-border bg-card p-5 sm:p-6 shadow-2xs space-y-5"
     >
       {formError && (
         <div
           role="alert"
-          className="flex items-start gap-3 rounded-lg border border-destructive/20 bg-destructive/10 p-4 text-destructive"
+          className="flex items-start gap-2.5 rounded-lg border border-destructive/20 bg-destructive/10 p-3.5 text-destructive"
         >
-          <AlertCircle className="h-5 w-5 shrink-0 mt-0.5" />
-          <p className="font-sans text-xs sm:text-sm font-medium">{formError}</p>
+          <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
+          <p className="text-xs sm:text-sm font-medium">{formError}</p>
         </div>
       )}
 
@@ -210,9 +210,9 @@ export function MentorshipForm() {
         <div className="space-y-1.5">
           <label
             htmlFor="mentorship_full_name"
-            className="block font-sans text-xs font-semibold text-foreground"
+            className="block text-xs font-semibold text-foreground"
           >
-            Full Name <span className="text-destructive">*</span>
+            Full name <span className="text-destructive">*</span>
           </label>
           <input
             id="mentorship_full_name"
@@ -222,12 +222,12 @@ export function MentorshipForm() {
             placeholder="e.g. Chidinma Okafor"
             value={formData.fullName || ""}
             onChange={(e) => handleChange("fullName", e.target.value)}
-            className={`w-full rounded-lg border bg-background px-3.5 py-2.5 font-sans text-sm text-foreground placeholder:text-muted-foreground/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
-              fieldErrors.fullName ? "border-destructive ring-1 ring-destructive" : "border-input"
+            className={`w-full h-10 rounded-lg border bg-background px-3.5 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary ${
+              fieldErrors.fullName ? "border-destructive ring-1 ring-destructive" : "border-border"
             }`}
           />
           {fieldErrors.fullName && (
-            <p className="font-sans text-xs text-destructive">{fieldErrors.fullName}</p>
+            <p className="text-xs text-destructive">{fieldErrors.fullName}</p>
           )}
         </div>
 
@@ -235,9 +235,9 @@ export function MentorshipForm() {
         <div className="space-y-1.5">
           <label
             htmlFor="mentorship_email"
-            className="block font-sans text-xs font-semibold text-foreground"
+            className="block text-xs font-semibold text-foreground"
           >
-            Email Address <span className="text-destructive">*</span>
+            Email address <span className="text-destructive">*</span>
           </label>
           <input
             id="mentorship_email"
@@ -247,12 +247,12 @@ export function MentorshipForm() {
             placeholder="e.g. chidinma@example.com"
             value={formData.email || ""}
             onChange={(e) => handleChange("email", e.target.value)}
-            className={`w-full rounded-lg border bg-background px-3.5 py-2.5 font-sans text-sm text-foreground placeholder:text-muted-foreground/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
-              fieldErrors.email ? "border-destructive ring-1 ring-destructive" : "border-input"
+            className={`w-full h-10 rounded-lg border bg-background px-3.5 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary ${
+              fieldErrors.email ? "border-destructive ring-1 ring-destructive" : "border-border"
             }`}
           />
           {fieldErrors.email && (
-            <p className="font-sans text-xs text-destructive">{fieldErrors.email}</p>
+            <p className="text-xs text-destructive">{fieldErrors.email}</p>
           )}
         </div>
 
@@ -260,7 +260,7 @@ export function MentorshipForm() {
         <div className="space-y-1.5">
           <label
             htmlFor="mentorship_phone"
-            className="block font-sans text-xs font-semibold text-foreground"
+            className="block text-xs font-semibold text-foreground"
           >
             Phone / WhatsApp <span className="text-destructive">*</span>
           </label>
@@ -272,12 +272,12 @@ export function MentorshipForm() {
             placeholder="e.g. 08098765432"
             value={formData.phone || ""}
             onChange={(e) => handleChange("phone", e.target.value)}
-            className={`w-full rounded-lg border bg-background px-3.5 py-2.5 font-sans text-sm text-foreground placeholder:text-muted-foreground/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
-              fieldErrors.phone ? "border-destructive ring-1 ring-destructive" : "border-input"
+            className={`w-full h-10 rounded-lg border bg-background px-3.5 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary ${
+              fieldErrors.phone ? "border-destructive ring-1 ring-destructive" : "border-border"
             }`}
           />
           {fieldErrors.phone && (
-            <p className="font-sans text-xs text-destructive">{fieldErrors.phone}</p>
+            <p className="text-xs text-destructive">{fieldErrors.phone}</p>
           )}
         </div>
 
@@ -285,9 +285,9 @@ export function MentorshipForm() {
         <div className="space-y-1.5">
           <label
             htmlFor="mentorship_location"
-            className="block font-sans text-xs font-semibold text-foreground"
+            className="block text-xs font-semibold text-foreground"
           >
-            Location (State / City) <span className="text-destructive">*</span>
+            Location (state / city) <span className="text-destructive">*</span>
           </label>
           <input
             id="mentorship_location"
@@ -296,12 +296,12 @@ export function MentorshipForm() {
             placeholder="e.g. Ikeja, Lagos"
             value={formData.location || ""}
             onChange={(e) => handleChange("location", e.target.value)}
-            className={`w-full rounded-lg border bg-background px-3.5 py-2.5 font-sans text-sm text-foreground placeholder:text-muted-foreground/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
-              fieldErrors.location ? "border-destructive ring-1 ring-destructive" : "border-input"
+            className={`w-full h-10 rounded-lg border bg-background px-3.5 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary ${
+              fieldErrors.location ? "border-destructive ring-1 ring-destructive" : "border-border"
             }`}
           />
           {fieldErrors.location && (
-            <p className="font-sans text-xs text-destructive">{fieldErrors.location}</p>
+            <p className="text-xs text-destructive">{fieldErrors.location}</p>
           )}
         </div>
 
@@ -309,7 +309,7 @@ export function MentorshipForm() {
         <div className="space-y-1.5">
           <label
             htmlFor="mentorship_age"
-            className="block font-sans text-xs font-semibold text-foreground"
+            className="block text-xs font-semibold text-foreground"
           >
             Age <span className="text-destructive">*</span>
           </label>
@@ -323,12 +323,12 @@ export function MentorshipForm() {
             placeholder="e.g. 22"
             value={formData.ageRaw || ""}
             onChange={(e) => handleChange("ageRaw", e.target.value)}
-            className={`w-full rounded-lg border bg-background px-3.5 py-2.5 font-sans text-sm text-foreground placeholder:text-muted-foreground/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
-              fieldErrors.age ? "border-destructive ring-1 ring-destructive" : "border-input"
+            className={`w-full h-10 rounded-lg border bg-background px-3.5 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary ${
+              fieldErrors.age ? "border-destructive ring-1 ring-destructive" : "border-border"
             }`}
           />
           {fieldErrors.age && (
-            <p className="font-sans text-xs text-destructive">{fieldErrors.age}</p>
+            <p className="text-xs text-destructive">{fieldErrors.age}</p>
           )}
         </div>
 
@@ -336,9 +336,9 @@ export function MentorshipForm() {
         <div className="space-y-1.5">
           <label
             htmlFor="mentorship_interest_area"
-            className="block font-sans text-xs font-semibold text-foreground"
+            className="block text-xs font-semibold text-foreground"
           >
-            Area of Interest <span className="text-destructive">*</span>
+            Area of interest <span className="text-destructive">*</span>
           </label>
           <input
             id="mentorship_interest_area"
@@ -347,12 +347,12 @@ export function MentorshipForm() {
             placeholder="e.g. web development, data analysis, UI design"
             value={formData.interestArea || ""}
             onChange={(e) => handleChange("interestArea", e.target.value)}
-            className={`w-full rounded-lg border bg-background px-3.5 py-2.5 font-sans text-sm text-foreground placeholder:text-muted-foreground/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
-              fieldErrors.interestArea ? "border-destructive ring-1 ring-destructive" : "border-input"
+            className={`w-full h-10 rounded-lg border bg-background px-3.5 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary ${
+              fieldErrors.interestArea ? "border-destructive ring-1 ring-destructive" : "border-border"
             }`}
           />
           {fieldErrors.interestArea && (
-            <p className="font-sans text-xs text-destructive">{fieldErrors.interestArea}</p>
+            <p className="text-xs text-destructive">{fieldErrors.interestArea}</p>
           )}
         </div>
 
@@ -360,9 +360,9 @@ export function MentorshipForm() {
         <div className="space-y-1.5">
           <label
             htmlFor="mentorship_experience_level"
-            className="block font-sans text-xs font-semibold text-foreground"
+            className="block text-xs font-semibold text-foreground"
           >
-            Experience Level <span className="text-destructive">*</span>
+            Experience level <span className="text-destructive">*</span>
           </label>
           <Select
             value={formData.experienceLevel || ""}
@@ -370,10 +370,10 @@ export function MentorshipForm() {
           >
             <SelectTrigger
               id="mentorship_experience_level"
-              className={`w-full rounded-lg border bg-background px-3.5 py-2.5 font-sans text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
+              className={`w-full h-10 rounded-lg border bg-background px-3.5 text-sm text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary ${
                 fieldErrors.experienceLevel
                   ? "border-destructive ring-1 ring-destructive"
-                  : "border-input"
+                  : "border-border"
               }`}
             >
               <SelectValue placeholder="Select current experience level" />
@@ -387,7 +387,7 @@ export function MentorshipForm() {
             </SelectContent>
           </Select>
           {fieldErrors.experienceLevel && (
-            <p className="font-sans text-xs text-destructive">{fieldErrors.experienceLevel}</p>
+            <p className="text-xs text-destructive">{fieldErrors.experienceLevel}</p>
           )}
         </div>
 
@@ -395,7 +395,7 @@ export function MentorshipForm() {
         <div className="space-y-1.5">
           <label
             htmlFor="mentorship_availability"
-            className="block font-sans text-xs font-semibold text-foreground"
+            className="block text-xs font-semibold text-foreground"
           >
             Availability <span className="text-destructive">*</span>
           </label>
@@ -406,12 +406,12 @@ export function MentorshipForm() {
             placeholder="e.g. Weekends or weekday evenings (5-8 hrs/week)"
             value={formData.availability || ""}
             onChange={(e) => handleChange("availability", e.target.value)}
-            className={`w-full rounded-lg border bg-background px-3.5 py-2.5 font-sans text-sm text-foreground placeholder:text-muted-foreground/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
-              fieldErrors.availability ? "border-destructive ring-1 ring-destructive" : "border-input"
+            className={`w-full h-10 rounded-lg border bg-background px-3.5 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary ${
+              fieldErrors.availability ? "border-destructive ring-1 ring-destructive" : "border-border"
             }`}
           />
           {fieldErrors.availability && (
-            <p className="font-sans text-xs text-destructive">{fieldErrors.availability}</p>
+            <p className="text-xs text-destructive">{fieldErrors.availability}</p>
           )}
         </div>
 
@@ -419,9 +419,9 @@ export function MentorshipForm() {
         <div className="space-y-1.5 sm:col-span-2">
           <label
             htmlFor="mentorship_preferred_format"
-            className="block font-sans text-xs font-semibold text-foreground"
+            className="block text-xs font-semibold text-foreground"
           >
-            Preferred Format <span className="text-destructive">*</span>
+            Preferred format <span className="text-destructive">*</span>
           </label>
           <Select
             value={formData.preferredFormat || ""}
@@ -429,10 +429,10 @@ export function MentorshipForm() {
           >
             <SelectTrigger
               id="mentorship_preferred_format"
-              className={`w-full rounded-lg border bg-background px-3.5 py-2.5 font-sans text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
+              className={`w-full h-10 rounded-lg border bg-background px-3.5 text-sm text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary ${
                 fieldErrors.preferredFormat
                   ? "border-destructive ring-1 ring-destructive"
-                  : "border-input"
+                  : "border-border"
               }`}
             >
               <SelectValue placeholder="Select preferred engagement format" />
@@ -446,7 +446,7 @@ export function MentorshipForm() {
             </SelectContent>
           </Select>
           {fieldErrors.preferredFormat && (
-            <p className="font-sans text-xs text-destructive">{fieldErrors.preferredFormat}</p>
+            <p className="text-xs text-destructive">{fieldErrors.preferredFormat}</p>
           )}
         </div>
       </div>
@@ -455,11 +455,11 @@ export function MentorshipForm() {
       <div className="space-y-1.5">
         <label
           htmlFor="mentorship_skills"
-          className="block font-sans text-xs font-semibold text-foreground"
+          className="block text-xs font-semibold text-foreground"
         >
-          Your Skills <span className="text-destructive">*</span>
+          Your skills <span className="text-destructive">*</span>
         </label>
-        <p className="font-sans text-xs text-muted-foreground">
+        <p className="text-xs text-muted-foreground">
           List at least one skill you already have.
         </p>
         <input
@@ -469,12 +469,12 @@ export function MentorshipForm() {
           placeholder="e.g. HTML, Python basics, Figma, Microsoft Excel"
           value={formData.skills || ""}
           onChange={(e) => handleChange("skills", e.target.value)}
-          className={`w-full rounded-lg border bg-background px-3.5 py-2.5 font-sans text-sm text-foreground placeholder:text-muted-foreground/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
-            fieldErrors.skills ? "border-destructive ring-1 ring-destructive" : "border-input"
+          className={`w-full h-10 rounded-lg border bg-background px-3.5 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary ${
+            fieldErrors.skills ? "border-destructive ring-1 ring-destructive" : "border-border"
           }`}
         />
         {fieldErrors.skills && (
-          <p className="font-sans text-xs text-destructive">{fieldErrors.skills}</p>
+          <p className="text-xs text-destructive">{fieldErrors.skills}</p>
         )}
       </div>
 
@@ -483,11 +483,11 @@ export function MentorshipForm() {
         <div className="flex items-center justify-between">
           <label
             htmlFor="mentorship_goals"
-            className="block font-sans text-xs font-semibold text-foreground"
+            className="block text-xs font-semibold text-foreground"
           >
-            Goals &amp; What You Hope to Learn <span className="text-destructive">*</span>
+            Goals &amp; what you hope to learn <span className="text-destructive">*</span>
           </label>
-          <span className="font-mono text-[10px] text-muted-foreground">
+          <span className="text-[10px] text-muted-foreground">
             {(formData.goals || "").length} / 1000
           </span>
         </div>
@@ -498,26 +498,26 @@ export function MentorshipForm() {
           placeholder="Describe your learning objectives, what skills you are looking to develop, and any projects you want to build (minimum 20 characters)..."
           value={formData.goals || ""}
           onChange={(e) => handleChange("goals", e.target.value)}
-          className={`w-full rounded-lg border bg-background px-3.5 py-2.5 font-sans text-sm text-foreground placeholder:text-muted-foreground/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary leading-relaxed resize-y ${
-            fieldErrors.goals ? "border-destructive ring-1 ring-destructive" : "border-input"
+          className={`w-full p-3.5 rounded-lg border bg-background text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary leading-relaxed resize-y ${
+            fieldErrors.goals ? "border-destructive ring-1 ring-destructive" : "border-border"
           }`}
         />
         {fieldErrors.goals && (
-          <p className="font-sans text-xs text-destructive">{fieldErrors.goals}</p>
+          <p className="text-xs text-destructive">{fieldErrors.goals}</p>
         )}
       </div>
 
       {/* University section */}
-      <div className="space-y-4 rounded-lg border border-border bg-secondary/20 p-4">
-        <p className="font-sans text-xs font-semibold text-foreground">
-          University Details <span className="text-destructive">*</span>
+      <div className="space-y-3.5 rounded-lg border border-border bg-secondary/20 p-4">
+        <p className="text-xs font-semibold text-foreground">
+          University details <span className="text-destructive">*</span>
         </p>
 
         {/* University name */}
         <div className="space-y-1.5">
           <label
             htmlFor="mentorship_institution"
-            className="block font-sans text-xs font-semibold text-foreground"
+            className="block text-xs font-semibold text-foreground"
           >
             University <span className="text-destructive">*</span>
           </label>
@@ -528,45 +528,45 @@ export function MentorshipForm() {
             placeholder="e.g. University of Lagos"
             value={formData.institution || ""}
             onChange={(e) => handleChange("institution", e.target.value)}
-            className={`w-full rounded-lg border bg-background px-3.5 py-2.5 font-sans text-sm text-foreground placeholder:text-muted-foreground/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
-              fieldErrors.institution ? "border-destructive ring-1 ring-destructive" : "border-input"
+            className={`w-full h-10 rounded-lg border bg-background px-3.5 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary ${
+              fieldErrors.institution ? "border-destructive ring-1 ring-destructive" : "border-border"
             }`}
           />
           {fieldErrors.institution && (
-            <p className="font-sans text-xs text-destructive">{fieldErrors.institution}</p>
+            <p className="text-xs text-destructive">{fieldErrors.institution}</p>
           )}
         </div>
 
         {/* Student confirmation checkbox */}
-        <label className="flex items-start gap-3 cursor-pointer select-none">
+        <label className="flex items-start gap-2.5 cursor-pointer select-none">
           <input
             type="checkbox"
             required
             checked={formData.isStudent || false}
             onChange={(e) => handleChange("isStudent", e.target.checked)}
-            className="mt-0.5 h-4 w-4 rounded border-input text-primary focus:ring-primary cursor-pointer"
+            className="mt-0.5 h-4 w-4 rounded border-border text-primary focus:ring-primary cursor-pointer"
           />
-          <span className="font-sans text-xs text-foreground leading-normal">
+          <span className="text-xs text-foreground leading-normal">
             I am currently a student at a university{" "}
             <span className="text-destructive">*</span>
           </span>
         </label>
         {fieldErrors.isStudent && (
-          <p className="font-sans text-xs text-destructive">{fieldErrors.isStudent}</p>
+          <p className="text-xs text-destructive">{fieldErrors.isStudent}</p>
         )}
       </div>
 
       {/* Consent Checkbox */}
       <div className="space-y-1.5 pt-2 border-t border-border">
-        <label className="flex items-start gap-3 cursor-pointer select-none">
+        <label className="flex items-start gap-2.5 cursor-pointer select-none">
           <input
             type="checkbox"
             required
             checked={formData.consent || false}
             onChange={(e) => handleChange("consent", e.target.checked)}
-            className="mt-0.5 h-4 w-4 rounded border-input text-primary focus:ring-primary cursor-pointer"
+            className="mt-0.5 h-4 w-4 rounded border-border text-primary focus:ring-primary cursor-pointer"
           />
-          <span className="font-sans text-xs text-muted-foreground leading-normal">
+          <span className="text-xs text-muted-foreground leading-normal">
             I consent to Zed processing my personal information for the purpose of evaluating and administering my mentorship application in accordance with the{" "}
             <Link
               href="/privacy"
@@ -574,13 +574,13 @@ export function MentorshipForm() {
               rel="noopener noreferrer"
               className="text-primary hover:underline font-medium"
             >
-              Privacy Policy
+              Privacy policy
             </Link>
             .
           </span>
         </label>
         {fieldErrors.consent && (
-          <p className="font-sans text-xs text-destructive">{fieldErrors.consent}</p>
+          <p className="text-xs text-destructive">{fieldErrors.consent}</p>
         )}
       </div>
 
@@ -602,16 +602,16 @@ export function MentorshipForm() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 font-sans text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors shadow-xs disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+          className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-lg bg-primary px-6 py-2.5 text-xs sm:text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors shadow-xs disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
         >
           {isSubmitting ? (
             <>
               <Loader2 className="h-4 w-4 animate-spin" />
-              <span>Submitting Application...</span>
+              <span>Submitting application...</span>
             </>
           ) : (
             <>
-              <span>Submit Application</span>
+              <span>Submit application</span>
               <ArrowRight className="h-4 w-4" />
             </>
           )}

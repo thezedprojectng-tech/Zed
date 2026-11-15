@@ -88,6 +88,16 @@ export function LessonMarkdown({ content }: LessonMarkdownProps) {
               {children}
             </blockquote>
           ),
+          a: ({ href, children }) => (
+            <a
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary underline underline-offset-2 hover:text-primary/80 transition-colors font-medium"
+            >
+              {children}
+            </a>
+          ),
           hr: () => <hr className="border-border my-4" />,
         }}
       >

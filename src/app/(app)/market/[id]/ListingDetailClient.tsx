@@ -189,7 +189,7 @@ export function ListingDetailClient({
   };
 
   return (
-    <div className="container mx-auto px-4 py-6 max-w-5xl space-y-6">
+    <div className="w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6">
       {/* ── Breadcrumb & Navigation ────────────────────────────────────────── */}
       <nav aria-label="Breadcrumbs" className="flex items-center justify-between">
         <Button variant="ghost" size="sm" asChild className="h-8 gap-1.5 -ml-2 text-muted-foreground hover:text-foreground">
@@ -201,7 +201,7 @@ export function ListingDetailClient({
 
         <div className="flex items-center gap-2">
           {isOwner ? (
-            <Button variant="outline" size="sm" asChild className="h-8 gap-1.5 text-xs">
+            <Button variant="outline" size="sm" asChild className="h-8 gap-1.5 text-xs rounded-lg">
               <Link href={`/market/${listing.id}/edit`}>
                 <Edit className="h-3.5 w-3.5" />
                 <span>Edit listing</span>
@@ -212,7 +212,7 @@ export function ListingDetailClient({
               variant="ghost"
               size="sm"
               onClick={() => setReportModalOpen(true)}
-              className="h-8 gap-1.5 text-xs text-muted-foreground hover:text-rose-600 dark:hover:text-rose-400"
+              className="h-8 gap-1.5 text-xs text-muted-foreground hover:text-rose-600 dark:hover:text-rose-400 rounded-lg cursor-pointer"
             >
               <Flag className="h-3.5 w-3.5" />
               <span>Report</span>
@@ -225,10 +225,10 @@ export function ListingDetailClient({
       {isOwner && (
         <aside
           aria-label="Owner status"
-          className="rounded-xl border border-primary/30 bg-primary/10 p-3.5 text-xs sm:text-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-primary"
+          className="rounded-lg border border-primary/20 bg-primary/5 p-3.5 text-xs sm:text-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-foreground"
         >
           <div className="flex items-center gap-2">
-            <Tag className="h-4 w-4 shrink-0" />
+            <Tag className="h-4 w-4 shrink-0 text-primary" />
             <span>
               This is your listing (Status: <strong>{statusMeta.label}</strong>).
             </span>
@@ -239,7 +239,7 @@ export function ListingDetailClient({
               variant="outline"
               disabled={isMarkingSold}
               onClick={handleMarkSold}
-              className="h-7 text-xs bg-card"
+              className="h-7 text-xs bg-card rounded-lg"
             >
               {isMarkingSold ? "Updating..." : "Mark as sold"}
             </Button>
@@ -248,79 +248,21 @@ export function ListingDetailClient({
       )}
 
       {/* ── Main Content Grid ─────────────────────────────────────────────── */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Left Column: Image Gallery (7 cols) */}
-        <section aria-label="Listing images" className="lg:col-span-7 space-y-3">
-          <div className="relative aspect-4/3 w-full rounded-2xl border border-border bg-muted/40 overflow-hidden">
-            {images.length > 0 ? (
-              <Image
-                src={`/api/market/image?path=${encodeURIComponent(images[activeImageIndex])}`}
-                alt={listing.title}
-                fill
-                priority
-                sizes="(max-width: 1024px) 100vw, 60vw"
-                className="object-contain"
-                unoptimized
-              />
-            ) : (
-              <div className="flex h-full w-full flex-col items-center justify-center text-muted-foreground gap-2">
-                {categoryMeta && <categoryMeta.icon className="h-16 w-16 stroke-[1]" />}
-                <span className="text-xs">No photos uploaded for this listing</span>
-              </div>
-            )}
-          </div>
-
-          {/* Thumbnail Gallery (if > 1 image) */}
-          {images.length > 1 && (
-            <div className="flex gap-2.5 overflow-x-auto pb-1" role="tablist" aria-label="Image thumbnails">
-              {images.map((path, idx) => (
-                <button
-                  key={path}
-                  type="button"
-                  onClick={() => setActiveImageIndex(idx)}
-                  className={`relative h-18 w-24 shrink-0 rounded-lg border-2 overflow-hidden transition-all ${
-                    activeImageIndex === idx
-                      ? "border-primary ring-2 ring-primary/20 scale-102"
-                      : "border-border hover:border-muted-foreground/60 opacity-75"
-                  }`}
-                  aria-label={`View photo ${idx + 1}`}
-                >
-                  <Image
-                    src={`/api/market/image?path=${encodeURIComponent(path)}`}
-                    alt=""
-                    fill
-                    sizes="96px"
-                    className="object-cover"
-                    unoptimized
-                  />
-                </button>
-              ))}
-            </div>
-          )}
-
-          {/* Description Section */}
-          <article className="rounded-xl border border-border bg-card p-5 space-y-3 mt-6">
-            <h2 className="text-sm font-semibold tracking-tight uppercase tracking-wider text-[11px] text-muted-foreground">
-              Service Description
-            </h2>
-            <div className="text-sm text-foreground/90 whitespace-pre-line leading-relaxed break-words">
-              {listing.description}
-            </div>
-          </article>
-        </section>
-
-        {/* Right Column: Key Details & Seller Contact Action (5 cols) */}
-        <section aria-label="Listing action and seller details" className="lg:col-span-5 space-y-5">
-          <div className="rounded-2xl border border-border bg-card p-5 space-y-4">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
+        {/* On mobile: Key Details & Seller Contact Action appears FIRST (order-1 lg:order-2 lg:col-span-5) */}
+        <section aria-label="Listing action and seller details" className="order-1 lg:order-2 lg:col-span-5 space-y-5">
+          <div className="rounded-lg border border-border bg-card p-5 space-y-4">
             {/* Category & Status */}
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2">
-                <Badge variant="secondary" className="text-xs font-medium">
+                <Badge variant="secondary" className="text-xs font-medium rounded-md">
                   {categoryMeta?.label || listing.category}
                 </Badge>
-                <VerifiedBadge isVerified={sellerVerified} />
+                <Badge variant="outline" className="text-xs text-muted-foreground rounded-md">
+                  Service rate
+                </Badge>
               </div>
-              <Badge variant="outline" className={`text-xs ${statusMeta.badgeClass}`}>
+              <Badge variant="outline" className={`text-xs rounded-md ${statusMeta.badgeClass}`}>
                 {statusMeta.label}
               </Badge>
             </div>
@@ -330,19 +272,21 @@ export function ListingDetailClient({
               {listing.title}
             </h1>
 
-            {/* Price */}
-            <div className="py-2 border-y border-border/70 flex items-baseline justify-between">
-              <span className="text-2xl sm:text-3xl font-extrabold text-foreground tracking-tight">
+            {/* Price Block: "Starting from" as small muted caption ABOVE, price 32px semibold tabular-nums on one line */}
+            <div className="py-2.5 border-y border-border/70 space-y-0.5">
+              {listing.price_ngn !== null && listing.price_ngn !== undefined && listing.price_ngn > 0 && (
+                <span className="block text-xs text-muted-foreground font-medium">Starting from</span>
+              )}
+              <div className="text-2xl sm:text-[32px] font-semibold text-foreground tracking-tight tabular-nums whitespace-nowrap">
                 {listing.price_ngn === null || listing.price_ngn === undefined
                   ? "Contact for price"
                   : listing.price_ngn === 0
                   ? "Free"
-                  : `Starting from ₦${Number(listing.price_ngn).toLocaleString("en-NG", {
+                  : `₦${Number(listing.price_ngn).toLocaleString("en-NG", {
                       minimumFractionDigits: 0,
                       maximumFractionDigits: 2,
                     })}`}
-              </span>
-              <span className="text-xs text-muted-foreground">Service rate</span>
+              </div>
             </div>
 
             {/* Meta attributes */}
@@ -364,10 +308,10 @@ export function ListingDetailClient({
               </div>
             </div>
 
-            {/* Seller Info Card (Masked Name Only) */}
-            <div className="rounded-xl border border-border/80 bg-muted/30 p-3.5 flex items-center justify-between">
+            {/* Seller Info: Flat row separated by divider, NO card inside card, verified badge ONCE here */}
+            <div className="pt-3 border-t border-border flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-semibold text-xs">
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-primary font-semibold text-xs">
                   {listing.seller_name_masked.slice(0, 2).toUpperCase()}
                 </div>
                 <div>
@@ -375,7 +319,7 @@ export function ListingDetailClient({
                     <span>{listing.seller_name_masked}</span>
                     <VerifiedBadge isVerified={sellerVerified} />
                   </div>
-                  <div className="text-[11px] text-muted-foreground">Service Provider</div>
+                  <div className="text-[11px] text-muted-foreground">Service provider</div>
                 </div>
               </div>
             </div>
@@ -383,28 +327,28 @@ export function ListingDetailClient({
             {/* Contact Action */}
             <div className="space-y-2.5 pt-2">
               {currentStatus !== "active" ? (
-                <div className="rounded-xl border border-zinc-500/20 bg-zinc-500/10 p-3 text-center text-xs text-muted-foreground">
+                <div className="rounded-lg border border-border bg-muted/40 p-3 text-center text-xs text-muted-foreground">
                   This listing is no longer active ({currentStatus}). Contacting the provider is disabled.
                 </div>
               ) : contactState.revealed && contactState.hasContact && contactState.whatsapp ? (
-                <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4 space-y-3">
+                <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-4 space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-semibold text-emerald-800 dark:text-emerald-300">
-                      Provider WhatsApp Contact
+                      Provider WhatsApp contact
                     </span>
                     <button
                       type="button"
                       onClick={handleCopyPhone}
-                      className="text-xs text-emerald-700 dark:text-emerald-400 hover:underline flex items-center gap-1"
+                      className="text-xs text-emerald-700 dark:text-emerald-400 hover:underline flex items-center gap-1 cursor-pointer"
                     >
                       {copied ? <CheckCircle2 className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
                       <span>{copied ? "Copied" : "Copy"}</span>
                     </button>
                   </div>
-                  <div className="text-base font-mono font-bold text-foreground">
+                  <div className="text-base font-bold text-foreground">
                     {contactState.whatsapp}
                   </div>
-                  <Button size="sm" asChild className="w-full gap-2 bg-[#25D366] hover:bg-[#1EBE5D] text-white">
+                  <Button size="sm" asChild className="w-full gap-2 bg-[#047857] hover:bg-[#065f46] text-white rounded-lg">
                     <a
                       href={buildWhatsAppLink(contactState.whatsapp, listing.title)}
                       target="_blank"
@@ -417,14 +361,14 @@ export function ListingDetailClient({
                   </Button>
                 </div>
               ) : contactState.revealed && !contactState.hasContact ? (
-                <div className="rounded-xl border border-border bg-muted/40 p-3.5 text-center text-xs text-muted-foreground">
+                <div className="rounded-lg border border-border bg-muted/40 p-3.5 text-center text-xs text-muted-foreground">
                   The provider did not provide a WhatsApp number for this listing.
                 </div>
               ) : (
                 <Button
                   onClick={handleRevealContact}
                   disabled={contactState.loading}
-                  className="w-full h-11 gap-2 bg-[#25D366] hover:bg-[#1EBE5D] text-white font-semibold text-sm shadow-sm"
+                  className="w-full h-11 gap-2 bg-[#047857] hover:bg-[#065f46] text-white font-semibold text-sm rounded-lg cursor-pointer shadow-xs"
                 >
                   <WhatsAppIcon className="h-4 w-4" />
                   <span>{contactState.loading ? "Connecting..." : "Contact provider on WhatsApp"}</span>
@@ -439,7 +383,7 @@ export function ListingDetailClient({
                     <p>{contactState.error}</p>
                     {contactState.error.includes("verify your profile") && (
                       <Link href="/profile" className="font-semibold underline mt-1 inline-block">
-                        Go to Profile Verification →
+                        Go to profile verification →
                       </Link>
                     )}
                   </div>
@@ -448,26 +392,110 @@ export function ListingDetailClient({
             </div>
           </div>
 
-          {/* Safety Warning Card */}
+          {/* Safety rules callout: soft border, 2px left accent in amber token, 13px text, no tinted box */}
           <section
             aria-label="Safety tips"
-            className="rounded-2xl border border-amber-500/25 bg-amber-500/5 p-4 text-xs space-y-2.5"
+            className="rounded-lg border border-border border-l-2 border-l-[var(--data-flows)] bg-card p-4 text-[13px] space-y-2"
           >
-            <div className="flex items-center gap-2 font-semibold text-amber-800 dark:text-amber-300">
-              <ShieldAlert className="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
-              <span>Safety Rules for Zed Market</span>
+            <div className="flex items-center gap-2 font-semibold text-foreground">
+              <ShieldAlert className="h-4 w-4 shrink-0 text-[var(--data-flows)]" />
+              <span>Safety rules for Zed Market</span>
             </div>
-            <p className="text-muted-foreground leading-relaxed">
+            <p className="text-muted-foreground leading-relaxed text-[13px]">
               {SAFETY_DISCLAIMER}
             </p>
-            <ul className="list-disc pl-4 space-y-1 text-muted-foreground text-[11px]">
+            <ul className="list-disc pl-4 space-y-1 text-muted-foreground text-[12px]">
               <li>Never pay the full amount before seeing work. Agree terms clearly first.</li>
               <li>Agree project milestones, deliverables, and timelines in writing.</li>
               <li>For in-person services, meet in public, well-lit spaces or campus locations.</li>
             </ul>
           </section>
         </section>
+
+        {/* On mobile: Image Gallery & Description appear SECOND (order-2 lg:order-1 lg:col-span-7) */}
+        <section aria-label="Listing images and description" className="order-2 lg:order-1 lg:col-span-7 space-y-4">
+          {/* Entire image displayed uncropped: object-contain on neutral surface, rounded-lg, max height 560px on desktop */}
+          <div className="relative w-full aspect-4/3 sm:aspect-auto sm:h-[480px] lg:h-[540px] max-h-[560px] rounded-lg border border-border bg-muted/30 overflow-hidden flex items-center justify-center">
+            {images.length > 0 ? (
+              <Image
+                src={`/api/market/image?path=${encodeURIComponent(images[activeImageIndex])}`}
+                alt={listing.title}
+                fill
+                priority
+                sizes="(max-width: 1024px) 100vw, 60vw"
+                className="object-contain"
+                unoptimized
+              />
+            ) : (
+              <div className="flex h-full w-full flex-col items-center justify-center text-muted-foreground gap-2 p-6">
+                {categoryMeta && <categoryMeta.icon className="h-16 w-16 stroke-[1]" />}
+                <span className="text-xs">No photos uploaded for this listing</span>
+              </div>
+            )}
+          </div>
+
+          {/* Thumbnail Gallery (if > 1 image) */}
+          {images.length > 1 && (
+            <div className="flex gap-2.5 overflow-x-auto pb-1" role="tablist" aria-label="Image thumbnails">
+              {images.map((path, idx) => (
+                <button
+                  key={path}
+                  type="button"
+                  onClick={() => setActiveImageIndex(idx)}
+                  className={`relative h-16 w-20 sm:h-18 sm:w-24 shrink-0 rounded-lg border overflow-hidden transition-all cursor-pointer ${
+                    activeImageIndex === idx
+                      ? "border-primary ring-2 ring-primary/20"
+                      : "border-border hover:border-muted-foreground/60 opacity-75"
+                  }`}
+                  aria-label={`View photo ${idx + 1}`}
+                >
+                  <Image
+                    src={`/api/market/image?path=${encodeURIComponent(path)}`}
+                    alt=""
+                    fill
+                    sizes="96px"
+                    className="object-cover"
+                    unoptimized
+                  />
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Description Section */}
+          <article className="rounded-lg border border-border bg-card p-5 space-y-2.5">
+            <h2 className="text-xs font-semibold text-muted-foreground">
+              Service description
+            </h2>
+            <div className="text-sm text-foreground/90 whitespace-pre-line leading-relaxed break-words">
+              {listing.description}
+            </div>
+          </article>
+        </section>
       </div>
+
+      {/* Sticky mobile bottom bar for contact action */}
+      {currentStatus === "active" && (
+        <div className="fixed bottom-0 left-0 right-0 z-20 p-3 bg-background/95 backdrop-blur-sm border-t border-border lg:hidden">
+          {contactState.revealed && contactState.hasContact && contactState.whatsapp ? (
+            <Button size="sm" asChild className="w-full h-11 gap-2 bg-[#047857] hover:bg-[#065f46] text-white rounded-lg font-semibold text-xs shadow-xs">
+              <a href={buildWhatsAppLink(contactState.whatsapp, listing.title)} target="_blank" rel="noopener noreferrer">
+                <WhatsAppIcon className="h-4 w-4" />
+                <span>Chat on WhatsApp</span>
+              </a>
+            </Button>
+          ) : (
+            <Button
+              onClick={handleRevealContact}
+              disabled={contactState.loading}
+              className="w-full h-11 gap-2 bg-[#047857] hover:bg-[#065f46] text-white rounded-lg font-semibold text-xs shadow-xs cursor-pointer"
+            >
+              <WhatsAppIcon className="h-4 w-4" />
+              <span>{contactState.loading ? "Connecting..." : "Contact provider on WhatsApp"}</span>
+            </Button>
+          )}
+        </div>
+      )}
 
       {/* ── Report Listing Dialog ──────────────────────────────────────────── */}
       <Dialog open={reportModalOpen} onOpenChange={setReportModalOpen}>

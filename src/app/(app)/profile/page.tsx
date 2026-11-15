@@ -693,7 +693,7 @@ export default function ProfilePage() {
             Official community & channels
           </h2>
           <p className="text-xs text-muted-foreground mt-0.5">
-            Connect with fellow Nigerian youths, get real-time center alerts, and follow dispatches.
+            Connect with fellow Nigerian youths, get real-time center alerts, and follow platform updates.
           </p>
         </div>
 

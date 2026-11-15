@@ -75,21 +75,21 @@ export function AlumniDirectoryClient({
     <div className="space-y-8">
       {/* Required Safety Disclaimer Banner */}
       <aside
-        aria-label="Mentorship Safety Notice"
-        className="rounded-xl border border-amber-500/20 bg-amber-500/10 p-4 sm:p-5 text-card-foreground backdrop-blur-xs flex items-start gap-3.5"
+        aria-label="Mentorship safety notice"
+        className="rounded-lg border border-border border-l-2 border-l-[var(--data-flows)] bg-card p-4 text-card-foreground flex items-start gap-3"
       >
         <ShieldAlert
-          className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5"
+          className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5"
           aria-hidden="true"
         />
-        <div className="space-y-1 text-xs sm:text-sm text-foreground/90 leading-relaxed font-sans">
-          <p className="font-semibold text-foreground">Important Safety Notice</p>
+        <div className="space-y-1 text-xs text-muted-foreground leading-relaxed font-sans">
+          <p className="font-semibold text-foreground">Important safety notice</p>
           <p>{DISCLAIMER_TEXT}</p>
         </div>
       </aside>
 
       {/* Search and Filters Toolbar */}
-      <section aria-label="Directory Filters" className="space-y-4">
+      <section aria-label="Directory filters" className="space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-12 gap-3.5">
           <div className="sm:col-span-8 relative">
             <Search
@@ -101,7 +101,7 @@ export function AlumniDirectoryClient({
               placeholder="Search by name, institution, role, or field..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 h-10 w-full bg-card"
+              className="pl-10 h-10 w-full bg-card border-border rounded-lg"
               aria-label="Search alumni profiles"
             />
           </div>
@@ -109,10 +109,10 @@ export function AlumniDirectoryClient({
           <div className="sm:col-span-4">
             <Select value={fieldFilter} onValueChange={setFieldFilter}>
               <SelectTrigger
-                className="h-10 w-full bg-card"
+                className="h-10 w-full bg-card border-border rounded-lg"
                 aria-label="Filter by professional field"
               >
-                <div className="flex items-center gap-2 truncate">
+                <div className="flex items-center gap-2 truncate text-xs sm:text-sm">
                   <SlidersHorizontal className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
                   <SelectValue placeholder="All professional fields" />
                 </div>
@@ -141,7 +141,7 @@ export function AlumniDirectoryClient({
                 setSearchQuery("");
                 setFieldFilter("all");
               }}
-              className="h-7 px-2 text-xs gap-1 hover:text-foreground"
+              className="h-7 px-2 text-xs gap-1 hover:text-foreground cursor-pointer"
             >
               <X className="h-3 w-3" />
               <span>Clear filters</span>
@@ -153,11 +153,11 @@ export function AlumniDirectoryClient({
       {/* Directory Listings */}
       {filteredProfiles.length === 0 ? (
         <section
-          aria-label="Empty Directory"
-          className="rounded-xl border border-dashed border-border bg-card/50 p-8 sm:p-12 text-center space-y-4"
+          aria-label="Empty directory"
+          className="rounded-lg border border-border bg-card/40 p-8 sm:p-12 text-center space-y-4"
         >
-          <div className="w-12 h-12 rounded-full bg-secondary mx-auto flex items-center justify-center text-muted-foreground">
-            <GraduationCap className="w-6 h-6" aria-hidden="true" />
+          <div className="w-10 h-10 rounded-full bg-secondary mx-auto flex items-center justify-center text-muted-foreground">
+            <GraduationCap className="w-5 h-5" aria-hidden="true" />
           </div>
           <div className="space-y-1 max-w-md mx-auto">
             <h2 className="text-base font-semibold text-foreground">
@@ -173,39 +173,39 @@ export function AlumniDirectoryClient({
           </div>
           {initialProfiles.length === 0 && (
             <div className="pt-2">
-              <Button asChild variant="outline" size="sm">
-                <Link href="/alumni-office-hours/apply">Apply to Host Office Hours</Link>
+              <Button asChild variant="outline" size="sm" className="rounded-lg text-xs">
+                <Link href="/alumni-office-hours/apply">Apply to host office hours</Link>
               </Button>
             </div>
           )}
         </section>
       ) : (
         <section
-          aria-label="Alumni Profiles Directory"
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"
+          aria-label="Alumni profiles directory"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
         >
           {filteredProfiles.map((profile) => (
             <article
               key={profile.id}
-              className="group flex flex-col justify-between rounded-xl border border-border bg-card p-5 sm:p-6 shadow-xs hover:border-primary/40 hover:shadow-md transition-all duration-200"
+              className="group flex flex-col justify-between rounded-lg border border-border bg-card p-5 shadow-2xs hover:border-border/80 transition-all duration-200"
             >
-              <div className="space-y-4">
+              <div className="space-y-3.5">
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <h2 className="font-display text-lg font-bold text-foreground group-hover:text-primary transition-colors">
+                    <h2 className="text-base font-bold text-foreground group-hover:text-primary transition-colors">
                       {profile.display_name}
                     </h2>
-                    <p className="text-xs sm:text-sm font-medium text-foreground/80 flex items-center gap-1.5 mt-0.5">
+                    <p className="text-xs font-medium text-muted-foreground flex items-center gap-1.5 mt-0.5">
                       <Briefcase className="w-3.5 h-3.5 text-muted-foreground shrink-0" aria-hidden="true" />
                       <span className="truncate">{profile.occupation}</span>
                     </p>
                   </div>
-                  <Badge variant="secondary" className="shrink-0 text-[11px] font-normal">
+                  <Badge variant="secondary" className="shrink-0 text-[11px] font-normal rounded-md">
                     {profile.field}
                   </Badge>
                 </div>
 
-                <div className="space-y-1.5 text-xs text-muted-foreground border-y border-border/60 py-3">
+                <div className="space-y-1 text-xs text-muted-foreground border-y border-border/60 py-2.5">
                   <div className="flex items-center gap-1.5 truncate">
                     <Building2 className="w-3.5 h-3.5 shrink-0 text-muted-foreground/80" aria-hidden="true" />
                     <span className="truncate">{profile.institution}</span>
@@ -221,9 +221,9 @@ export function AlumniDirectoryClient({
                 </p>
 
                 {profile.topics && (
-                  <div className="space-y-1">
-                    <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-                      Can Advise On:
+                  <div className="space-y-0.5">
+                    <p className="text-[11px] font-medium text-muted-foreground">
+                      Can advise on:
                     </p>
                     <p className="text-xs text-foreground/90 line-clamp-2">
                       {profile.topics}
@@ -232,13 +232,13 @@ export function AlumniDirectoryClient({
                 )}
               </div>
 
-              <div className="pt-5 mt-4 border-t border-border/60 flex items-center justify-between">
+              <div className="pt-4 mt-3 border-t border-border/60 flex items-center justify-between">
                 <span className="text-[11px] text-muted-foreground">Free mentorship</span>
                 <Link
                   href={`/alumni-office-hours/${profile.id}`}
                   className="inline-flex items-center gap-1 text-xs font-semibold text-primary group-hover:translate-x-0.5 transition-transform"
                 >
-                  <span>View Profile</span>
+                  <span>View profile</span>
                   <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
                 </Link>
               </div>

@@ -58,7 +58,7 @@ export default function MiningLoading() {
       <div className="space-y-4">
         <Skeleton className="h-4 w-28 rounded" />
         <div className="rounded-lg border border-border/70 bg-card overflow-hidden divide-y divide-border/60">
-          {Array.from({ length: 5 }).map((_, i) => (
+          {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="px-4 py-3 flex items-center justify-between">
               <Skeleton className="h-3.5 w-24 rounded" />
               <Skeleton className="h-3.5 w-20 rounded" />

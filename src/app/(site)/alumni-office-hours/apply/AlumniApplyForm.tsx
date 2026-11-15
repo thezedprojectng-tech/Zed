@@ -139,21 +139,21 @@ export function AlumniApplyForm() {
     return (
       <section
         aria-labelledby="success-heading"
-        className="text-center py-10 sm:py-16 space-y-6"
+        className="text-center py-8 sm:py-12 space-y-5"
       >
-        <div className="w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 mx-auto flex items-center justify-center">
-          <CheckCircle2 className="w-8 h-8" aria-hidden="true" />
+        <div className="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 mx-auto flex items-center justify-center">
+          <CheckCircle2 className="w-6 h-6" aria-hidden="true" />
         </div>
-        <div className="space-y-2 max-w-lg mx-auto">
-          <h2 id="success-heading" className="text-2xl font-bold tracking-tight text-foreground font-display">
-            Application Received!
+        <div className="space-y-1.5 max-w-lg mx-auto">
+          <h2 id="success-heading" className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
+            Application received!
           </h2>
-          <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+          <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
             Thank you for volunteering to mentor students through Alumni Office Hours. Our team reviews every profile to verify details before publishing it to the public directory.
           </p>
         </div>
 
-        <div className="rounded-xl border border-border bg-secondary/30 p-4 max-w-md mx-auto text-xs text-muted-foreground leading-relaxed text-left space-y-1.5">
+        <div className="rounded-lg border border-border bg-secondary/30 p-4 max-w-md mx-auto text-xs text-muted-foreground leading-relaxed text-left space-y-1.5">
           <p className="font-semibold text-foreground">What happens next?</p>
           <ul className="list-disc pl-4 space-y-1">
             <li>We review your credentials and contact link within 2-3 business days.</li>
@@ -162,9 +162,9 @@ export function AlumniApplyForm() {
           </ul>
         </div>
 
-        <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
-          <Button asChild variant="outline">
-            <Link href="/alumni-office-hours">Return to Alumni Directory</Link>
+        <div className="pt-3 flex flex-col sm:flex-row items-center justify-center gap-3">
+          <Button asChild variant="outline" className="rounded-lg text-xs">
+            <Link href="/alumni-office-hours">Return to alumni directory</Link>
           </Button>
         </div>
       </section>
@@ -172,7 +172,7 @@ export function AlumniApplyForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} noValidate className="space-y-6 sm:space-y-8 font-sans">
+    <form onSubmit={handleSubmit} noValidate className="space-y-6 font-sans">
       {/* Honeypot anti-bot input */}
       <div className="hidden" aria-hidden="true">
         <label htmlFor="hp_company_field">Do not fill this out if you are human</label>
@@ -189,10 +189,10 @@ export function AlumniApplyForm() {
       {formError && (
         <div
           role="alert"
-          className="rounded-xl border border-destructive/20 bg-destructive/10 p-4 text-xs sm:text-sm text-destructive flex items-start gap-3"
+          className="rounded-lg border border-destructive/20 bg-destructive/10 p-3.5 text-xs text-destructive flex items-start gap-2.5"
         >
-          <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" aria-hidden="true" />
-          <div className="space-y-1">
+          <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" aria-hidden="true" />
+          <div className="space-y-0.5">
             <p className="font-semibold">Unable to submit application</p>
             <p>{formError}</p>
           </div>
@@ -201,14 +201,14 @@ export function AlumniApplyForm() {
 
       {/* Basic Personal Information */}
       <fieldset className="space-y-4">
-        <legend className="text-sm font-semibold text-foreground border-b border-border pb-2 w-full">
-          1. Personal &amp; Academic Background
+        <legend className="text-xs font-semibold text-foreground border-b border-border pb-1.5 w-full">
+          1. Personal &amp; academic background
         </legend>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-1.5">
             <label htmlFor="fullName" className="text-xs font-semibold text-foreground">
-              Full Name <span className="text-destructive">*</span>
+              Full name <span className="text-destructive">*</span>
             </label>
             <Input
               id="fullName"
@@ -219,7 +219,7 @@ export function AlumniApplyForm() {
               value={formData.fullName}
               onChange={(e) => handleChange("fullName", e.target.value)}
               aria-invalid={!!fieldErrors.fullName}
-              className={fieldErrors.fullName ? "border-destructive focus-visible:ring-destructive" : ""}
+              className={`h-10 rounded-lg text-sm ${fieldErrors.fullName ? "border-destructive focus-visible:ring-destructive" : ""}`}
             />
             {fieldErrors.fullName && (
               <p className="text-[11px] text-destructive">{fieldErrors.fullName}</p>
@@ -228,7 +228,7 @@ export function AlumniApplyForm() {
 
           <div className="space-y-1.5">
             <label htmlFor="email" className="text-xs font-semibold text-foreground">
-              Email Address <span className="text-destructive">*</span>
+              Email address <span className="text-destructive">*</span>
             </label>
             <Input
               id="email"
@@ -239,7 +239,7 @@ export function AlumniApplyForm() {
               value={formData.email}
               onChange={(e) => handleChange("email", e.target.value)}
               aria-invalid={!!fieldErrors.email}
-              className={fieldErrors.email ? "border-destructive focus-visible:ring-destructive" : ""}
+              className={`h-10 rounded-lg text-sm ${fieldErrors.email ? "border-destructive focus-visible:ring-destructive" : ""}`}
             />
             <p className="text-[10px] text-muted-foreground">
               Kept private. Used strictly for administrative review notifications.
@@ -253,7 +253,7 @@ export function AlumniApplyForm() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-1.5">
             <label htmlFor="institution" className="text-xs font-semibold text-foreground">
-              University / Polytechnic <span className="text-destructive">*</span>
+              University / polytechnic <span className="text-destructive">*</span>
             </label>
             <Input
               id="institution"
@@ -264,7 +264,7 @@ export function AlumniApplyForm() {
               value={formData.institution}
               onChange={(e) => handleChange("institution", e.target.value)}
               aria-invalid={!!fieldErrors.institution}
-              className={fieldErrors.institution ? "border-destructive focus-visible:ring-destructive" : ""}
+              className={`h-10 rounded-lg text-sm ${fieldErrors.institution ? "border-destructive focus-visible:ring-destructive" : ""}`}
             />
             {fieldErrors.institution && (
               <p className="text-[11px] text-destructive">{fieldErrors.institution}</p>
@@ -273,7 +273,7 @@ export function AlumniApplyForm() {
 
           <div className="space-y-1.5">
             <label htmlFor="gradYearRaw" className="text-xs font-semibold text-foreground">
-              Graduation Year <span className="text-destructive">*</span>
+              Graduation year <span className="text-destructive">*</span>
             </label>
             <Input
               id="gradYearRaw"
@@ -286,7 +286,7 @@ export function AlumniApplyForm() {
               value={formData.gradYearRaw}
               onChange={(e) => handleChange("gradYearRaw", e.target.value)}
               aria-invalid={!!fieldErrors.graduationYear}
-              className={fieldErrors.graduationYear ? "border-destructive focus-visible:ring-destructive" : ""}
+              className={`h-10 rounded-lg text-sm ${fieldErrors.graduationYear ? "border-destructive focus-visible:ring-destructive" : ""}`}
             />
             <p className="text-[10px] text-muted-foreground">
               Must be between 1970 and {currentYear}. Future years cannot apply.
@@ -300,14 +300,14 @@ export function AlumniApplyForm() {
 
       {/* Professional Background */}
       <fieldset className="space-y-4">
-        <legend className="text-sm font-semibold text-foreground border-b border-border pb-2 w-full">
-          2. Current Role &amp; Area of Expertise
+        <legend className="text-xs font-semibold text-foreground border-b border-border pb-1.5 w-full">
+          2. Current role &amp; area of expertise
         </legend>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-1.5">
             <label htmlFor="occupation" className="text-xs font-semibold text-foreground">
-              Current Occupation / Role <span className="text-destructive">*</span>
+              Current occupation / role <span className="text-destructive">*</span>
             </label>
             <Input
               id="occupation"
@@ -318,7 +318,7 @@ export function AlumniApplyForm() {
               value={formData.occupation}
               onChange={(e) => handleChange("occupation", e.target.value)}
               aria-invalid={!!fieldErrors.occupation}
-              className={fieldErrors.occupation ? "border-destructive focus-visible:ring-destructive" : ""}
+              className={`h-10 rounded-lg text-sm ${fieldErrors.occupation ? "border-destructive focus-visible:ring-destructive" : ""}`}
             />
             {fieldErrors.occupation && (
               <p className="text-[11px] text-destructive">{fieldErrors.occupation}</p>
@@ -327,7 +327,7 @@ export function AlumniApplyForm() {
 
           <div className="space-y-1.5">
             <label htmlFor="field" className="text-xs font-semibold text-foreground">
-              Field / Domain <span className="text-destructive">*</span>
+              Field / domain <span className="text-destructive">*</span>
             </label>
             <Input
               id="field"
@@ -338,7 +338,7 @@ export function AlumniApplyForm() {
               value={formData.field}
               onChange={(e) => handleChange("field", e.target.value)}
               aria-invalid={!!fieldErrors.field}
-              className={fieldErrors.field ? "border-destructive focus-visible:ring-destructive" : ""}
+              className={`h-10 rounded-lg text-sm ${fieldErrors.field ? "border-destructive focus-visible:ring-destructive" : ""}`}
             />
             {fieldErrors.field && (
               <p className="text-[11px] text-destructive">{fieldErrors.field}</p>
@@ -348,7 +348,7 @@ export function AlumniApplyForm() {
 
         <div className="space-y-1.5">
           <label htmlFor="bio" className="text-xs font-semibold text-foreground">
-            Short Bio (20 to 600 characters) <span className="text-destructive">*</span>
+            Short bio (20 to 600 characters) <span className="text-destructive">*</span>
           </label>
           <Textarea
             id="bio"
@@ -359,7 +359,7 @@ export function AlumniApplyForm() {
             value={formData.bio}
             onChange={(e) => handleChange("bio", e.target.value)}
             aria-invalid={!!fieldErrors.bio}
-            className={fieldErrors.bio ? "border-destructive focus-visible:ring-destructive" : ""}
+            className={`rounded-lg text-sm ${fieldErrors.bio ? "border-destructive focus-visible:ring-destructive" : ""}`}
           />
           <div className="flex justify-between text-[10px] text-muted-foreground">
             <span>Minimum 20 characters</span>
@@ -373,8 +373,8 @@ export function AlumniApplyForm() {
 
       {/* Mentorship Offerings & Contact Link */}
       <fieldset className="space-y-4">
-        <legend className="text-sm font-semibold text-foreground border-b border-border pb-2 w-full">
-          3. Mentorship Details &amp; Contact Channel
+        <legend className="text-xs font-semibold text-foreground border-b border-border pb-1.5 w-full">
+          3. Mentorship details &amp; contact channel
         </legend>
 
         <div className="space-y-1.5">
@@ -390,7 +390,7 @@ export function AlumniApplyForm() {
             value={formData.topics}
             onChange={(e) => handleChange("topics", e.target.value)}
             aria-invalid={!!fieldErrors.topics}
-            className={fieldErrors.topics ? "border-destructive focus-visible:ring-destructive" : ""}
+            className={`rounded-lg text-sm ${fieldErrors.topics ? "border-destructive focus-visible:ring-destructive" : ""}`}
           />
           {fieldErrors.topics && (
             <p className="text-[11px] text-destructive">{fieldErrors.topics}</p>
@@ -399,7 +399,7 @@ export function AlumniApplyForm() {
 
         <div className="space-y-1.5">
           <label htmlFor="availability" className="text-xs font-semibold text-foreground">
-            Availability &amp; Format <span className="text-destructive">*</span>
+            Availability &amp; format <span className="text-destructive">*</span>
           </label>
           <Input
             id="availability"
@@ -410,7 +410,7 @@ export function AlumniApplyForm() {
             value={formData.availability}
             onChange={(e) => handleChange("availability", e.target.value)}
             aria-invalid={!!fieldErrors.availability}
-            className={fieldErrors.availability ? "border-destructive focus-visible:ring-destructive" : ""}
+            className={`h-10 rounded-lg text-sm ${fieldErrors.availability ? "border-destructive focus-visible:ring-destructive" : ""}`}
           />
           {fieldErrors.availability && (
             <p className="text-[11px] text-destructive">{fieldErrors.availability}</p>
@@ -419,7 +419,7 @@ export function AlumniApplyForm() {
 
         <div className="space-y-1.5">
           <label htmlFor="contactUrl" className="text-xs font-semibold text-foreground">
-            Public Contact Link (LinkedIn or X/Twitter profile) <span className="text-destructive">*</span>
+            Public contact link (LinkedIn or X profile) <span className="text-destructive">*</span>
           </label>
           <Input
             id="contactUrl"
@@ -430,7 +430,7 @@ export function AlumniApplyForm() {
             value={formData.contactUrl}
             onChange={(e) => handleChange("contactUrl", e.target.value)}
             aria-invalid={!!fieldErrors.contactUrl}
-            className={fieldErrors.contactUrl ? "border-destructive focus-visible:ring-destructive" : ""}
+            className={`h-10 rounded-lg text-sm ${fieldErrors.contactUrl ? "border-destructive focus-visible:ring-destructive" : ""}`}
           />
           <p className="text-[10px] text-muted-foreground">
             Must start with https:// and belong to linkedin.com or x.com / twitter.com. This is the link students will click to reach you.
@@ -443,18 +443,18 @@ export function AlumniApplyForm() {
 
       {/* Consent & Privacy Notice */}
       <fieldset className="space-y-4 border-t border-border pt-4">
-        <div className="flex items-start gap-3">
+        <div className="flex items-start gap-2.5">
           <Checkbox
             id="consentPublic"
             checked={formData.consentPublic}
             onCheckedChange={(checked) => handleChange("consentPublic", checked === true)}
             aria-invalid={!!fieldErrors.consentPublic}
-            className="mt-1"
+            className="mt-0.5 rounded-sm"
           />
           <div className="space-y-1">
             <label
               htmlFor="consentPublic"
-              className="text-xs font-medium text-foreground leading-snug cursor-pointer block"
+              className="text-xs text-foreground leading-snug cursor-pointer block"
             >
               I agree that, if approved, my name, institution, occupation, bio, topics, availability and this link will be shown publicly on Zed. I can ask for removal at any time. <span className="text-destructive">*</span>
             </label>
@@ -488,16 +488,16 @@ export function AlumniApplyForm() {
         <Button
           type="submit"
           disabled={isSubmitting}
-          className="w-full sm:w-auto h-11 px-8 text-sm font-semibold shadow-sm gap-2"
+          className="w-full sm:w-auto h-10 px-6 text-xs sm:text-sm font-semibold rounded-lg shadow-xs gap-2 cursor-pointer"
         >
           {isSubmitting ? (
             <>
               <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
-              <span>Submitting Application...</span>
+              <span>Submitting application...</span>
             </>
           ) : (
             <>
-              <span>Submit Volunteer Application</span>
+              <span>Submit volunteer application</span>
               <ArrowRight className="w-4 h-4" aria-hidden="true" />
             </>
           )}

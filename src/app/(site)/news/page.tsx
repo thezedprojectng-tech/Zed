@@ -5,13 +5,13 @@ import { NewsListClient } from "./NewsListClient";
 export const revalidate = 60;
 
 export const metadata: Metadata = {
-  title: "News & Updates — The Zed Chronicle",
+  title: "News & Updates — Zed",
   description:
-    "Explore platform announcements, feature releases, civil procedure guides, and community dispatches from Zed.",
+    "Platform announcements, feature releases and civic guides from Zed.",
   openGraph: {
-    title: "News & Updates — The Zed Chronicle",
+    title: "News & Updates — Zed",
     description:
-      "Explore platform announcements, feature releases, civil procedure guides, and community dispatches from Zed.",
+      "Platform announcements, feature releases and civic guides from Zed.",
     url: "https://zedproject.ng/news",
     type: "website",
   },

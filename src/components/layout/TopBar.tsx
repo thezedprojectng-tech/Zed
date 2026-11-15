@@ -49,7 +49,39 @@ const routeLabels: Record<string, string> = {
   referrals: "Referrals",
   fund: "Fund your idea",
   whitepaper: "White paper",
+  "campus-hubs": "Campus Hubs",
+  "alumni-office-hours": "Alumni Office Hours",
+  mentorship: "Mentorship",
+  notifications: "Notifications",
+  mine: "My listings",
+  new: "New listing",
+  edit: "Edit",
+  submit: "Submit lead",
+  apply: "Apply",
+  withdraw: "Withdraw",
 };
+
+const UUID_OR_HASH_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function getHumanBreadcrumbLabel(seg: string, idx: number, segments: string[]): string {
+  if (routeLabels[seg]) return routeLabels[seg];
+
+  const prevSeg = idx > 0 ? segments[idx - 1] : "";
+  const isId = UUID_OR_HASH_REGEX.test(seg) || /^\d+$/.test(seg) || (seg.length >= 24 && !seg.includes("-") && !seg.includes(" "));
+
+  if (prevSeg === "market") return "Listing";
+  if (prevSeg === "internships") return "Opportunity";
+  if (prevSeg === "campus-hubs") return "Campus guide";
+  if (prevSeg === "alumni-office-hours") return "Alumni profile";
+  if (prevSeg === "news") return "Article";
+  if (prevSeg === "skill") return "Track";
+  if (prevSeg === "nav") return "Guide";
+
+  if (isId) return "Details";
+
+  const humanized = seg.replace(/-/g, " ");
+  return humanized.charAt(0).toUpperCase() + humanized.slice(1);
+}
 
 export function TopBar({
   onOpenCommand,
@@ -101,7 +133,7 @@ export function TopBar({
             {segments.map((seg, idx) => {
               const isLast = idx === segments.length - 1;
               const href = `/${segments.slice(0, idx + 1).join("/")}`;
-              const label = routeLabels[seg] || seg.replace(/-/g, " ");
+              const label = getHumanBreadcrumbLabel(seg, idx, segments);
 
               return (
                 <span key={href} className="inline-flex items-center gap-1.5">

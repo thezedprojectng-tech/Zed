@@ -122,7 +122,7 @@ export function NotificationsClient({
   return (
     <div className="max-w-3xl mx-auto px-4 py-6 md:py-8 space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-border/60 pb-5">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-border/60 pb-4">
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
@@ -145,7 +145,7 @@ export function NotificationsClient({
             size="sm"
             onClick={handleMarkAllRead}
             disabled={isPending}
-            className="h-8 gap-1.5 text-xs rounded-md self-start sm:self-auto"
+            className="h-8 gap-1.5 text-xs rounded-lg self-start sm:self-auto cursor-pointer"
           >
             <CheckCheck className="h-3.5 w-3.5" />
             <span>Mark all as read</span>
@@ -155,7 +155,7 @@ export function NotificationsClient({
 
       {/* Notifications list */}
       {notifications.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-border/80 bg-card/40 p-12 text-center space-y-2">
+        <div className="rounded-lg border border-border bg-card/40 p-10 text-center space-y-2">
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary border border-border/60 text-muted-foreground mx-auto">
             <Inbox className="h-5 w-5" strokeWidth={1.75} />
           </div>
@@ -167,19 +167,19 @@ export function NotificationsClient({
       ) : (
         <div className="space-y-6">
           {groupedNotifications.map((group) => (
-            <div key={group.day} className="space-y-2.5">
-              <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground px-1">
+            <div key={group.day} className="space-y-2">
+              <h2 className="text-xs font-semibold text-muted-foreground px-1">
                 {group.day}
               </h2>
 
-              <div className="rounded-xl border border-border bg-card/60 divide-y divide-border/60 overflow-hidden shadow-2xs">
+              <div className="rounded-lg border border-border bg-card/60 divide-y divide-border/60 overflow-hidden shadow-2xs">
                 {group.items.map((item) => {
                   const Icon = getUserNotificationIcon(item.type);
                   return (
                     <div
                       key={item.id}
                       onClick={() => handleItemClick(item)}
-                      className={`p-4 flex items-start gap-3.5 transition-colors duration-150 ${
+                      className={`p-3.5 sm:p-4 flex items-start gap-3.5 transition-colors duration-150 ${
                         item.href && item.href.startsWith("/")
                           ? "cursor-pointer hover:bg-muted/40"
                           : ""
@@ -257,7 +257,7 @@ export function NotificationsClient({
                 size="sm"
                 onClick={handleLoadMore}
                 disabled={loadingMore}
-                className="text-xs h-9 px-4 rounded-md gap-1.5"
+                className="text-xs h-9 px-4 rounded-lg gap-1.5 cursor-pointer"
               >
                 {loadingMore ? (
                   <>

@@ -11,13 +11,21 @@ import {
   CheckCircle2,
   Trash2,
   AlertTriangle,
-  Clock,
   MapPin,
   PackageX,
   ArrowLeft,
+  MoreHorizontal,
+  Calendar,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Dialog,
   DialogContent,
@@ -26,6 +34,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { SegmentedControl, FilterOption } from "@/components/admin/primitives/SegmentedControl";
 import {
   formatNgnPrice,
   STATUS_LABELS,
@@ -33,10 +42,20 @@ import {
   CATEGORY_DEFINITIONS,
 } from "@/lib/market/helpers";
 import { markListingSold, deleteMyListing } from "@/lib/market/actions";
-import type { MarketListing, MarketStatus } from "@/lib/market/types";
+import type { MarketListing, MarketStatus, MarketCategory } from "@/lib/market/types";
 
 interface MyListingsClientProps {
   initialListings: MarketListing[];
+}
+
+function getHumanCategoryLabel(slug: string): string {
+  if (CATEGORY_DEFINITIONS[slug as MarketCategory]?.label) {
+    return CATEGORY_DEFINITIONS[slug as MarketCategory].label;
+  }
+  return slug
+    .split("-")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
 }
 
 export function MyListingsClient({ initialListings }: MyListingsClientProps) {
@@ -72,216 +91,230 @@ export function MyListingsClient({ initialListings }: MyListingsClientProps) {
     setDeleting(false);
 
     if (res.success) {
-      // If hard deleted remove from array, if soft-deleted update status to removed
-      setListings((prev) =>
-        prev.filter((l) => l.id !== deleteTarget.id)
-      );
+      setListings((prev) => prev.filter((l) => l.id !== deleteTarget.id));
       setDeleteTarget(null);
     } else {
       alert(res.error || "Failed to delete listing.");
     }
   };
 
+  const tabOptions: FilterOption<MarketStatus | "all">[] = [
+    { id: "all", label: "All", count: listings.length },
+    { id: "active", label: "Active", count: listings.filter((l) => l.status === "active").length },
+    { id: "sold", label: "Sold", count: listings.filter((l) => l.status === "sold").length },
+    { id: "removed", label: "Removed", count: listings.filter((l) => l.status === "removed").length },
+  ];
+
   return (
-    <div className="container mx-auto px-4 py-6 max-w-5xl space-y-6">
-      {/* ── Header ────────────────────────────────────────────────────────── */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div className="w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6">
+      {/* ── Page Header ─────────────────────────────────────────────────── */}
+      <div className="space-y-3">
         <div>
-          <Button variant="ghost" size="sm" asChild className="h-8 gap-1 text-muted-foreground hover:text-foreground -ml-2 mb-1">
+          <Button variant="ghost" size="sm" asChild className="h-8 gap-1.5 text-muted-foreground hover:text-foreground -ml-2">
             <Link href="/market">
               <ArrowLeft className="h-4 w-4" />
-              <span>Back to Marketplace</span>
+              <span>Back to marketplace</span>
             </Link>
           </Button>
-          <h1 className="text-xl sm:text-2xl font-bold tracking-tight">My Listings</h1>
-          <p className="text-xs text-muted-foreground">Manage your service listings on Zed Market</p>
         </div>
 
-        <Button size="sm" asChild className="h-9 gap-1.5 shadow-sm">
-          <Link href="/market/new">
-            <Plus className="h-4 w-4" />
-            <span>Post a service</span>
-          </Link>
-        </Button>
-      </div>
-
-      {/* ── Status Tabs ────────────────────────────────────────────────────── */}
-      <div className="flex items-center gap-2 border-b border-border pb-2 text-xs font-medium">
-        <button
-          type="button"
-          onClick={() => setFilterTab("all")}
-          className={`px-3 py-1.5 rounded-lg transition-colors ${
-            filterTab === "all"
-              ? "bg-primary text-primary-foreground font-semibold"
-              : "text-muted-foreground hover:text-foreground"
-          }`}
-        >
-          All ({listings.length})
-        </button>
-        <button
-          type="button"
-          onClick={() => setFilterTab("active")}
-          className={`px-3 py-1.5 rounded-lg transition-colors ${
-            filterTab === "active"
-              ? "bg-primary text-primary-foreground font-semibold"
-              : "text-muted-foreground hover:text-foreground"
-          }`}
-        >
-          Active ({listings.filter((l) => l.status === "active").length})
-        </button>
-        <button
-          type="button"
-          onClick={() => setFilterTab("sold")}
-          className={`px-3 py-1.5 rounded-lg transition-colors ${
-            filterTab === "sold"
-              ? "bg-primary text-primary-foreground font-semibold"
-              : "text-muted-foreground hover:text-foreground"
-          }`}
-        >
-          Sold ({listings.filter((l) => l.status === "sold").length})
-        </button>
-        <button
-          type="button"
-          onClick={() => setFilterTab("removed")}
-          className={`px-3 py-1.5 rounded-lg transition-colors ${
-            filterTab === "removed"
-              ? "bg-primary text-primary-foreground font-semibold"
-              : "text-muted-foreground hover:text-foreground"
-          }`}
-        >
-          Removed ({listings.filter((l) => l.status === "removed").length})
-        </button>
-      </div>
-
-      {/* ── Listings List ─────────────────────────────────────────────────── */}
-      {filteredListings.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-border bg-card/40 p-12 text-center space-y-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted text-muted-foreground mx-auto">
-            <PackageX className="h-6 w-6" />
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="space-y-1">
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
+              My listings
+            </h1>
+            <p className="text-xs text-muted-foreground">
+              Manage your service listings, availability, and active offerings on Zed Market
+            </p>
           </div>
-          <h3 className="text-sm font-semibold">No listings in this tab</h3>
-          <p className="text-xs text-muted-foreground max-w-sm mx-auto">
-            {filterTab === "all"
-              ? "You haven't posted any services on Zed Market yet."
-              : `You have no ${filterTab} services at this time.`}
-          </p>
+
+          <Button size="sm" asChild className="h-9 gap-1.5 shadow-xs shrink-0 self-start sm:self-auto">
+            <Link href="/market/new">
+              <Plus className="h-4 w-4" />
+              <span>Post a service</span>
+            </Link>
+          </Button>
+        </div>
+      </div>
+
+      {/* ── Segmented Control Filter Tabs ───────────────────────────────── */}
+      <div>
+        <SegmentedControl<MarketStatus | "all">
+          options={tabOptions}
+          value={filterTab}
+          onChange={(val) => setFilterTab(val)}
+          size="sm"
+          ariaLabel="Filter listings by status"
+        />
+      </div>
+
+      {/* ── Flat Listings List ───────────────────────────────────────────── */}
+      {filteredListings.length === 0 ? (
+        <div className="rounded-lg border border-dashed border-border bg-card/40 p-12 text-center space-y-3">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted text-muted-foreground mx-auto">
+            <PackageX className="h-6 w-6 stroke-[1.5]" />
+          </div>
+          <div className="space-y-1">
+            <h3 className="text-sm font-semibold text-foreground">
+              {filterTab === "all"
+                ? "No listings created yet"
+                : filterTab === "active"
+                ? "No active service listings"
+                : filterTab === "sold"
+                ? "No sold or completed listings"
+                : "No removed listings"}
+            </h3>
+            <p className="text-xs text-muted-foreground max-w-sm mx-auto leading-relaxed">
+              {filterTab === "all"
+                ? "You haven't posted any services on Zed Market yet. List your skills to connect with clients."
+                : filterTab === "active"
+                ? "You have no active services at this time. Post a new service to start offering your skills."
+                : filterTab === "sold"
+                ? "Completed services that you have marked as sold or delivered will appear here."
+                : "Services that were removed or taken down by moderation will appear here."}
+            </p>
+          </div>
           {filterTab === "all" && (
-            <Button size="sm" asChild className="mt-2">
-              <Link href="/market/new">Post a service</Link>
-            </Button>
+            <div className="pt-1">
+              <Button size="sm" asChild className="h-9 text-xs">
+                <Link href="/market/new">Post a service</Link>
+              </Button>
+            </div>
           )}
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="rounded-lg border border-border bg-card divide-y divide-border/60 overflow-hidden">
           {filteredListings.map((listing) => {
             const hasImages = listing.image_paths && listing.image_paths.length > 0;
             const primaryImage = hasImages
               ? `/api/market/image?path=${encodeURIComponent(listing.image_paths[0])}`
               : null;
             const statusMeta = STATUS_LABELS[listing.status];
-            const conditionMeta = CONDITION_LABELS[listing.condition];
-            const categoryMeta = CATEGORY_DEFINITIONS[listing.category];
+            const categoryLabel = getHumanCategoryLabel(listing.category);
 
             return (
               <div
                 key={listing.id}
-                className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-xl border border-border bg-card p-4 hover:border-border/80 transition-all"
+                className="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-muted/20 transition-colors"
               >
                 {/* Left: Thumbnail & Info */}
-                <div className="flex items-start gap-3.5">
+                <div className="flex items-start gap-4 min-w-0 flex-1">
                   <div className="relative h-20 w-24 sm:h-22 sm:w-28 rounded-lg overflow-hidden bg-muted shrink-0 border border-border">
                     {primaryImage ? (
-                      <Image src={primaryImage} alt="" fill sizes="112px" className="object-cover" unoptimized />
+                      <Image
+                        src={primaryImage}
+                        alt={listing.title}
+                        fill
+                        sizes="112px"
+                        className="object-cover"
+                        unoptimized
+                      />
                     ) : (
-                      <div className="flex h-full w-full items-center justify-center text-muted-foreground">
-                        <ShoppingBag className="h-7 w-7 opacity-50" />
+                      <div className="flex h-full w-full items-center justify-center text-muted-foreground/60">
+                        <ShoppingBag className="h-7 w-7 stroke-[1.5]" />
                       </div>
                     )}
                   </div>
 
-                  <div className="space-y-1">
+                  <div className="space-y-1.5 min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-1.5">
-                      <Badge variant="outline" className={`text-[10px] ${statusMeta.badgeClass}`}>
+                      <span className={`inline-flex items-center rounded-md border px-2 py-0.5 text-[10px] font-medium ${statusMeta.badgeClass}`}>
                         {statusMeta.label}
-                      </Badge>
-                      <Badge variant="secondary" className="text-[10px]">
-                        {conditionMeta.label}
-                      </Badge>
-                      <span className="text-[11px] text-muted-foreground">
-                        • {categoryMeta?.label || listing.category}
+                      </span>
+                      <span className="text-[11px] text-muted-foreground font-medium">
+                        • {categoryLabel}
                       </span>
                     </div>
 
                     <Link
                       href={`/market/${listing.id}`}
-                      className="font-semibold text-sm hover:text-primary transition-colors line-clamp-1 block"
+                      className="font-semibold text-sm hover:text-primary transition-colors line-clamp-1 block leading-snug"
                     >
                       {listing.title}
                     </Link>
 
-                    <div className="text-sm font-bold text-foreground">
+                    <div className="text-sm font-semibold tabular-nums text-foreground">
                       {formatNgnPrice(listing.price_ngn)}
                     </div>
 
-                    <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+                    <div className="flex flex-wrap items-center gap-2 text-[11px] text-muted-foreground">
                       <span className="flex items-center gap-1">
-                        <MapPin className="h-3 w-3" />
-                        {listing.location}
+                        <MapPin className="h-3 w-3 stroke-[1.5]" />
+                        <span>{listing.location}</span>
                       </span>
                       <span>•</span>
-                      <span>
-                        Posted on {new Date(listing.created_at).toLocaleDateString("en-NG", { month: "short", day: "numeric" })}
+                      <span className="flex items-center gap-1">
+                        <Calendar className="h-3 w-3 stroke-[1.5]" />
+                        <span>
+                          {new Date(listing.created_at).toLocaleDateString("en-NG", {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                          })}
+                        </span>
                       </span>
                     </div>
 
                     {listing.removed_reason && (
-                      <div className="text-[11px] text-rose-600 dark:text-rose-400 font-medium">
+                      <div className="text-[11px] text-destructive font-medium pt-0.5">
                         Reason: {listing.removed_reason}
                       </div>
                     )}
                   </div>
                 </div>
 
-                {/* Right: Actions */}
+                {/* Right: Actions (Primary Edit + Dropdown More Menu) */}
                 <div className="flex items-center gap-2 self-end sm:self-center shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-border/60 w-full sm:w-auto justify-end">
-                  <Button variant="ghost" size="sm" asChild className="h-8 gap-1 text-xs">
-                    <Link href={`/market/${listing.id}`}>
-                      <ExternalLink className="h-3.5 w-3.5" />
-                      <span>View</span>
-                    </Link>
-                  </Button>
-
-                  {listing.status !== "removed" && (
-                    <Button variant="outline" size="sm" asChild className="h-8 gap-1 text-xs">
+                  {listing.status !== "removed" ? (
+                    <Button variant="outline" size="sm" asChild className="h-8 gap-1 text-xs font-medium">
                       <Link href={`/market/${listing.id}/edit`}>
                         <Edit className="h-3.5 w-3.5" />
                         <span>Edit</span>
                       </Link>
                     </Button>
-                  )}
+                  ) : null}
 
-                  {listing.status === "active" && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      disabled={updatingId === listing.id}
-                      onClick={() => handleMarkSold(listing.id)}
-                      className="h-8 gap-1 text-xs text-blue-600 dark:text-blue-400 hover:bg-blue-500/10"
-                    >
-                      <CheckCircle2 className="h-3.5 w-3.5" />
-                      <span>Mark sold</span>
-                    </Button>
-                  )}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground"
+                        aria-label="More actions"
+                      >
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-44">
+                      <DropdownMenuItem asChild>
+                        <Link href={`/market/${listing.id}`} className="cursor-pointer">
+                          <ExternalLink className="h-3.5 w-3.5 mr-2" />
+                          <span>View listing</span>
+                        </Link>
+                      </DropdownMenuItem>
 
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setDeleteTarget(listing)}
-                    className="h-8 p-2 text-muted-foreground hover:text-rose-600 dark:hover:text-rose-400"
-                    aria-label="Delete listing"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                      {listing.status === "active" && (
+                        <DropdownMenuItem
+                          onClick={() => handleMarkSold(listing.id)}
+                          disabled={updatingId === listing.id}
+                          className="cursor-pointer"
+                        >
+                          <CheckCircle2 className="h-3.5 w-3.5 mr-2 text-emerald-600 dark:text-emerald-400" />
+                          <span>Mark as sold</span>
+                        </DropdownMenuItem>
+                      )}
+
+                      <DropdownMenuSeparator />
+
+                      <DropdownMenuItem
+                        onClick={() => setDeleteTarget(listing)}
+                        className="cursor-pointer text-destructive focus:text-destructive"
+                      >
+                        <Trash2 className="h-3.5 w-3.5 mr-2" />
+                        <span>Delete listing</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               </div>
             );
@@ -289,13 +322,13 @@ export function MyListingsClient({ initialListings }: MyListingsClientProps) {
         </div>
       )}
 
-      {/* ── Delete Confirmation Dialog ────────────────────────────────────── */}
+      {/* ── Delete Confirmation Dialog ──────────────────────────────────── */}
       <Dialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-base text-rose-600 dark:text-rose-400">
+            <DialogTitle className="flex items-center gap-2 text-base text-destructive">
               <AlertTriangle className="h-5 w-5" />
-              <span>Delete Listing</span>
+              <span>Delete listing</span>
             </DialogTitle>
             <DialogDescription className="text-xs">
               Are you sure you want to delete <strong>{deleteTarget?.title}</strong>? This action cannot be undone.
@@ -319,7 +352,7 @@ export function MyListingsClient({ initialListings }: MyListingsClientProps) {
               disabled={deleting}
               onClick={handleDeleteConfirm}
             >
-              {deleting ? "Deleting..." : "Delete Permanently"}
+              {deleting ? "Deleting…" : "Delete permanently"}
             </Button>
           </DialogFooter>
         </DialogContent>

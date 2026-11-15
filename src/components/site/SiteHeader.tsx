@@ -93,7 +93,15 @@ export function SiteHeader() {
               width={160}
               height={80}
               priority
-              className="h-8 sm:h-9 w-auto object-contain"
+              className="h-8 sm:h-9 w-auto object-contain dark:hidden"
+            />
+            <Image
+              src="/icons/zed-logo-full-light.png"
+              alt="The Zed Project"
+              width={160}
+              height={80}
+              priority
+              className="h-8 sm:h-9 w-auto object-contain hidden dark:block"
             />
           </Link>
 

@@ -5,11 +5,10 @@ import nyscFlow from "@/data/nav/nysc.flow.json";
 import ninBvnFlow from "@/data/nav/nin-bvn.flow.json";
 import cacFlow from "@/data/nav/cac.flow.json";
 import type { NavFlow } from "@/types/nav";
-import { Header } from "@/components/layout/Header";
 import { FlowRunner } from "@/components/nav/FlowRunner";
 import { navFlowSchema } from "@/lib/nav/schema";
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, FileSearch } from "lucide-react";
+import { ArrowLeft, ArrowRight, FileSearch, ExternalLink } from "lucide-react";
 
 // ── Flow registry ─────────────────────────────────────────────────────────────
 
@@ -57,72 +56,86 @@ export default async function FlowPage({
   }[flow.difficulty];
 
   return (
-    <>
-      <Header
-        title={flow.title}
-        subtitle={`${flow.category} · ~${flow.estimatedMinutes} min · ${difficultyLabel}`}
-        actions={
+    <div className="w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 pb-24 sm:pb-8">
+      {/* ── 1. Top Navigation & Header ─────────────────────────────── */}
+      <div className="space-y-4 border-b border-border/50 pb-5">
+        <div>
           <Link
             href="/nav"
-            className="flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors"
-            aria-label="Back to all guides"
+            className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
           >
-            <ArrowLeft className="h-3.5 w-3.5" />
-            All Guides
+            <ArrowLeft className="h-3.5 w-3.5 stroke-[1.5]" />
+            <span>All civic guides</span>
           </Link>
-        }
-      />
-
-      <div className="mx-auto max-w-8xl px-4 py-6">
-        {/* Flow meta */}
-        <div className="mb-6 flex items-center justify-between border-hairline-b pb-4">
-          <p className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
-            {flow.steps.length} Steps · Source verified{" "}
-            {new Date(flow.lastVerified).toLocaleDateString("en-NG", {
-              year: "numeric",
-              month: "short",
-              day: "numeric",
-            })}
-          </p>
-          <a
-            href={flow.sourceUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground hover:text-primary transition-colors"
-          >
-            Official Source ↗
-          </a>
         </div>
 
-        {/* Call-up parser link for NYSC */}
-        {flowId === "nysc" && (
-          <aside className="mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 rounded-xl border border-primary/20 bg-primary/5 p-4">
-            <div className="flex items-center gap-3">
-              <div className="rounded-lg bg-primary/10 p-2 text-primary shrink-0">
-                <FileSearch className="h-5 w-5" />
-              </div>
-              <div className="space-y-0.5">
-                <p className="text-sm font-semibold text-foreground">
-                  Have your NYSC Call-up Letter?
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  Extract your state code, camp location, and countdown timer on your device.
-                </p>
-              </div>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center rounded-md border border-border/70 bg-secondary/50 px-2 py-0.5 text-xs font-medium text-muted-foreground">
+                {flow.category}
+              </span>
+              <span className="text-xs text-muted-foreground font-sans">
+                ~{flow.estimatedMinutes} mins · {difficultyLabel}
+              </span>
             </div>
-            <Link
-              href="/nav/nysc/call-up"
-              className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors shrink-0"
-            >
-              Parse Call-up Letter
-              <ArrowRight className="h-3.5 w-3.5" />
-            </Link>
-          </aside>
-        )}
+            <h1 className="text-[26px] leading-[34px] sm:text-[28px] sm:leading-[36px] font-semibold text-foreground tracking-tight">
+              {flow.title}
+            </h1>
+          </div>
 
-        {/* Flow runner (client component) */}
-        <FlowRunner flow={flow} />
+          <div className="flex items-center gap-3 text-xs text-muted-foreground shrink-0">
+            <span className="font-sans">
+              Verified {new Date(flow.lastVerified).toLocaleDateString("en-NG", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+              })}
+            </span>
+            <a
+              href={flow.sourceUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 text-primary hover:underline font-medium"
+            >
+              <span>Source</span>
+              <ExternalLink className="h-3 w-3 stroke-[1.5]" />
+            </a>
+          </div>
+        </div>
       </div>
-    </>
+
+      {/* ── 2. Call-up letter banner for NYSC ─────────────────────── */}
+      {flowId === "nysc" && (
+        <aside
+          aria-label="Call-up letter extraction tool"
+          className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 rounded-lg border border-border/70 bg-secondary/20 p-4 border-l-4 border-l-primary"
+        >
+          <div className="flex items-center gap-3">
+            <div className="rounded-md bg-primary/10 p-2 text-primary shrink-0">
+              <FileSearch className="h-4 w-4 stroke-[1.5]" />
+            </div>
+            <div className="space-y-0.5">
+              <p className="text-xs font-semibold text-foreground">
+                Have your NYSC call-up letter?
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Extract your state code, camp location, and countdown timer directly on your device.
+              </p>
+            </div>
+          </div>
+          <Link
+            href="/nav/nysc/call-up"
+            className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors shrink-0"
+          >
+            <span>Parse call-up letter</span>
+            <ArrowRight className="h-3.5 w-3.5 stroke-[1.5]" />
+          </Link>
+        </aside>
+      )}
+
+      {/* ── 3. Flow runner (interactive client component) ──────────── */}
+      <FlowRunner flow={flow} />
+    </div>
   );
 }

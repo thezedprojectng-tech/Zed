@@ -146,7 +146,7 @@ export function InternshipFeedClient({ initialInternships }: InternshipFeedClien
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {/* Field */}
           <div>
-            <label className="block text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-1">
+            <label className="block text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 mb-1">
               Field
             </label>
             <select
@@ -154,7 +154,7 @@ export function InternshipFeedClient({ initialInternships }: InternshipFeedClien
               onChange={(e) => setFieldFilter(e.target.value)}
               className="w-full h-9 px-2.5 rounded-lg text-xs bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#2E82F7]"
             >
-              <option value="all">All Fields</option>
+              <option value="all">All fields</option>
               {INTERNSHIP_FIELDS.map((f) => (
                 <option key={f.value} value={f.value}>{f.label}</option>
               ))}
@@ -163,15 +163,15 @@ export function InternshipFeedClient({ initialInternships }: InternshipFeedClien
 
           {/* Work Mode */}
           <div>
-            <label className="block text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-1">
-              Work Mode
+            <label className="block text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 mb-1">
+              Work mode
             </label>
             <select
               value={workModeFilter}
               onChange={(e) => setWorkModeFilter(e.target.value)}
               className="w-full h-9 px-2.5 rounded-lg text-xs bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#2E82F7]"
             >
-              <option value="all">All Modes</option>
+              <option value="all">All modes</option>
               {INTERNSHIP_WORK_MODES.map((w) => (
                 <option key={w.value} value={w.value}>{w.label}</option>
               ))}
@@ -180,7 +180,7 @@ export function InternshipFeedClient({ initialInternships }: InternshipFeedClien
 
           {/* Paid Status */}
           <div>
-            <label className="block text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-1">
+            <label className="block text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 mb-1">
               Compensation
             </label>
             <select
@@ -188,7 +188,7 @@ export function InternshipFeedClient({ initialInternships }: InternshipFeedClien
               onChange={(e) => setPaidStatusFilter(e.target.value)}
               className="w-full h-9 px-2.5 rounded-lg text-xs bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#2E82F7]"
             >
-              <option value="all">All Compensation</option>
+              <option value="all">All compensation</option>
               {INTERNSHIP_PAID_STATUSES.map((p) => (
                 <option key={p.value} value={p.value}>{p.label}</option>
               ))}
@@ -197,15 +197,15 @@ export function InternshipFeedClient({ initialInternships }: InternshipFeedClien
 
           {/* Type */}
           <div>
-            <label className="block text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-1">
-              Program Type
+            <label className="block text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 mb-1">
+              Program type
             </label>
             <select
               value={typeFilter}
               onChange={(e) => setTypeFilter(e.target.value)}
               className="w-full h-9 px-2.5 rounded-lg text-xs bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#2E82F7]"
             >
-              <option value="all">All Types</option>
+              <option value="all">All types</option>
               {INTERNSHIP_TYPES.map((t) => (
                 <option key={t.value} value={t.value}>{t.label}</option>
               ))}

@@ -79,10 +79,10 @@ export default async function SingleInternshipPage({
       </div>
 
       {/* ── Header Card ── */}
-      <div className="bg-white dark:bg-[#151518] border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xs">
+      <div className="bg-card border border-border rounded-lg p-5 sm:p-6 space-y-6">
         <div className="space-y-3">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#EEF4FF] dark:bg-[#2E82F7]/10 text-[#2E82F7] border border-[#2E82F7]/20 uppercase tracking-wider">
+            <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#EEF4FF] dark:bg-[#2E82F7]/10 text-[#2E82F7] border border-[#2E82F7]/20">
               {internship.field}
             </span>
             <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 capitalize">
@@ -90,32 +90,32 @@ export default async function SingleInternshipPage({
             </span>
             {internship.paid_status === "paid" && (
               <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/40">
-                Paid Opportunity
+                Paid opportunity
               </span>
             )}
             {internship.paid_status === "stipend" && (
               <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800/40">
-                Monthly Stipend
+                Monthly stipend
               </span>
             )}
           </div>
 
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-zinc-900 dark:text-white tracking-tight">
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
             {internship.title}
           </h1>
 
-          <div className="flex flex-wrap items-center gap-4 text-sm text-zinc-600 dark:text-zinc-400 pt-1">
-            <div className="flex items-center gap-1.5 font-medium text-zinc-900 dark:text-zinc-200">
-              <Building2 className="h-4 w-4 text-zinc-400" />
+          <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground pt-1">
+            <div className="flex items-center gap-1.5 font-medium text-foreground">
+              <Building2 className="h-4 w-4 text-muted-foreground" />
               <span>{internship.organization}</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <MapPin className="h-4 w-4 text-zinc-400" />
+              <MapPin className="h-4 w-4 text-muted-foreground" />
               <span>{internship.location} ({internship.work_mode})</span>
             </div>
             {internship.deadline && (
               <div className="flex items-center gap-1.5">
-                <Calendar className="h-4 w-4 text-zinc-400" />
+                <Calendar className="h-4 w-4 text-muted-foreground" />
                 <span>
                   Deadline:{" "}
                   {new Date(internship.deadline).toLocaleDateString("en-NG", {
@@ -130,15 +130,15 @@ export default async function SingleInternshipPage({
         </div>
 
         {/* ── Primary Apply Action ── */}
-        <div className="flex flex-wrap items-center gap-3 pt-4 border-t border-zinc-100 dark:border-zinc-800/60">
+        <div className="flex flex-wrap items-center gap-3 pt-4 border-t border-border/60">
           {isHttpsApply && (
             <a
               href={internship.apply_url!}
               target="_blank"
               rel="noopener noreferrer nofollow"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold bg-[#2E82F7] hover:bg-[#256fd1] text-white shadow-xs transition-colors"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 shadow-xs transition-colors"
             >
-              <span>Apply on Company Site</span>
+              <span>Apply on company site</span>
               <ExternalLink className="h-4 w-4" />
             </a>
           )}
@@ -146,10 +146,10 @@ export default async function SingleInternshipPage({
           {internship.apply_email && (
             <a
               href={`mailto:${internship.apply_email}?subject=${encodeURIComponent(`Application for ${internship.title}`)}`}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold bg-zinc-900 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-900 shadow-xs transition-colors"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold bg-secondary text-secondary-foreground hover:bg-secondary/80 border border-border shadow-xs transition-colors"
             >
               <Mail className="h-4 w-4" />
-              <span>Apply via Email</span>
+              <span>Apply via email</span>
             </a>
           )}
         </div>
@@ -159,19 +159,19 @@ export default async function SingleInternshipPage({
       <div
         role="region"
         aria-label="Safety advice"
-        className="rounded-2xl p-5 bg-amber-50/80 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/40 text-amber-900 dark:text-amber-200 space-y-2 text-xs sm:text-sm leading-relaxed"
+        className="rounded-lg p-4 bg-card border border-border border-l-2 border-l-[var(--data-flows)] text-foreground space-y-2 text-xs leading-relaxed"
       >
-        <div className="flex items-center gap-2 font-semibold text-amber-950 dark:text-amber-100">
+        <div className="flex items-center gap-2 font-semibold text-foreground">
           <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0" />
-          <span>Safety Warning: Never pay to apply</span>
+          <span>Safety warning: Never pay to apply</span>
         </div>
-        <p className="text-amber-800 dark:text-amber-300">
+        <p className="text-muted-foreground">
           Never pay to apply. Zed does not verify or endorse these opportunities. If this employer requests an application fee, screening charge, or deposit, do not pay.
         </p>
         <div className="pt-1">
           <Link
             href={`/contact?subject=${encodeURIComponent(`Report internship ${internship.id}`)}`}
-            className="inline-flex items-center gap-1.5 font-semibold text-amber-900 dark:text-amber-100 underline hover:text-amber-950"
+            className="inline-flex items-center gap-1.5 font-semibold text-primary underline hover:text-primary/80"
           >
             <ShieldAlert className="h-3.5 w-3.5" />
             <span>Report this suspicious listing</span>
@@ -180,22 +180,22 @@ export default async function SingleInternshipPage({
       </div>
 
       {/* ── Role Description & Details ── */}
-      <div className="bg-white dark:bg-[#151518] border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 sm:p-8 space-y-6">
+      <div className="bg-card border border-border rounded-lg p-5 sm:p-6 space-y-6">
         <div className="space-y-3">
-          <h2 className="text-lg font-bold text-zinc-900 dark:text-white">
-            Role Description
+          <h2 className="text-base font-semibold text-foreground">
+            Role description
           </h2>
-          <div className="text-sm text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap leading-relaxed">
+          <div className="text-xs sm:text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed">
             {internship.description}
           </div>
         </div>
 
         {internship.eligibility && (
-          <div className="space-y-3 pt-6 border-t border-zinc-100 dark:border-zinc-800/60">
-            <h2 className="text-lg font-bold text-zinc-900 dark:text-white">
-              Eligibility &amp; Requirements
+          <div className="space-y-3 pt-5 border-t border-border/60">
+            <h2 className="text-base font-semibold text-foreground">
+              Eligibility and requirements
             </h2>
-            <div className="text-sm text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap leading-relaxed">
+            <div className="text-xs sm:text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed">
               {internship.eligibility}
             </div>
           </div>

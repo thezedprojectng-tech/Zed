@@ -172,38 +172,38 @@ export function SubmitInternshipClient() {
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+    <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 space-y-6">
       {/* ── Page Header ── */}
-      <div className="space-y-2">
-        <h1 className="text-2xl sm:text-3xl font-bold text-zinc-900 dark:text-white tracking-tight">
-          Submit an Opportunity Lead
+      <div className="space-y-1.5">
+        <h1 className="text-xl sm:text-2xl font-bold text-foreground tracking-tight">
+          Submit an opportunity lead
         </h1>
-        <p className="text-sm text-zinc-600 dark:text-zinc-400">
+        <p className="text-xs sm:text-sm text-muted-foreground">
           Know of an open internship, SIWES role, or graduate trainee program? Submit it for review. Once verified by our team, it will appear publicly on the Internship Radar.
         </p>
       </div>
 
       {/* ── Tab Switcher ── */}
-      <div className="flex border-b border-zinc-200 dark:border-zinc-800">
+      <div className="flex border-b border-border text-xs sm:text-sm font-medium">
         <button
           onClick={() => handleTabSwitch("submit")}
-          className={`px-4 py-2.5 text-sm font-semibold border-b-2 transition-colors ${
+          className={`px-4 py-2 border-b-2 transition-colors cursor-pointer ${
             activeTab === "submit"
-              ? "border-[#2E82F7] text-[#2E82F7]"
-              : "border-transparent text-zinc-500 hover:text-zinc-900 dark:hover:text-white"
+              ? "border-primary text-primary font-semibold"
+              : "border-transparent text-muted-foreground hover:text-foreground"
           }`}
         >
-          Submit Opportunity
+          Submit opportunity
         </button>
         <button
           onClick={() => handleTabSwitch("history")}
-          className={`px-4 py-2.5 text-sm font-semibold border-b-2 transition-colors ${
+          className={`px-4 py-2 border-b-2 transition-colors cursor-pointer ${
             activeTab === "history"
-              ? "border-[#2E82F7] text-[#2E82F7]"
-              : "border-transparent text-zinc-500 hover:text-zinc-900 dark:hover:text-white"
+              ? "border-primary text-primary font-semibold"
+              : "border-transparent text-muted-foreground hover:text-foreground"
           }`}
         >
-          My Submissions
+          My submissions
         </button>
       </div>
 
@@ -211,17 +211,17 @@ export function SubmitInternshipClient() {
         /* ── My Submissions Tab ── */
         <div className="space-y-4">
           {loadingSubmissions ? (
-            <div className="flex items-center justify-center py-12 text-zinc-500">
-              <Loader2 className="h-6 w-6 animate-spin mr-2" />
+            <div className="flex items-center justify-center py-12 text-muted-foreground text-xs">
+              <Loader2 className="h-5 w-5 animate-spin mr-2" />
               <span>Loading your submissions...</span>
             </div>
           ) : mySubmissions.length === 0 ? (
-            <div className="text-center py-12 p-6 rounded-2xl border border-dashed border-zinc-300 dark:border-zinc-800 space-y-2">
-              <Clock className="h-8 w-8 text-zinc-400 mx-auto" />
-              <h3 className="text-sm font-semibold text-zinc-900 dark:text-white">
+            <div className="text-center py-12 p-6 rounded-lg border border-border bg-card/40 space-y-2">
+              <Clock className="h-6 w-6 text-muted-foreground mx-auto" />
+              <h3 className="text-sm font-semibold text-foreground">
                 No submissions yet
               </h3>
-              <p className="text-xs text-zinc-500">
+              <p className="text-xs text-muted-foreground">
                 You haven&apos;t submitted any internship leads yet.
               </p>
             </div>
@@ -230,39 +230,39 @@ export function SubmitInternshipClient() {
               {mySubmissions.map((sub) => (
                 <div
                   key={sub.id}
-                  className="p-5 rounded-2xl bg-white dark:bg-[#151518] border border-zinc-200 dark:border-zinc-800 space-y-3"
+                  className="p-4 sm:p-5 rounded-lg bg-card border border-border space-y-3"
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div>
-                      <h3 className="text-base font-bold text-zinc-900 dark:text-white">
+                      <h3 className="text-sm sm:text-base font-bold text-foreground">
                         {sub.title}
                       </h3>
-                      <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                      <p className="text-xs text-muted-foreground">
                         {sub.organization} • {sub.location}
                       </p>
                     </div>
 
                     <div>
                       {sub.status === "pending" && (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-900/40">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-xs font-medium bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20">
                           <Clock className="h-3 w-3" />
-                          Under Review
+                          Under review
                         </span>
                       )}
                       {sub.status === "published" && (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-900/40">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-xs font-medium bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20">
                           <CheckCircle2 className="h-3 w-3" />
                           Published
                         </span>
                       )}
                       {sub.status === "rejected" && (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-900/40">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-xs font-medium bg-rose-500/10 text-rose-700 dark:text-rose-300 border border-rose-500/20">
                           <XCircle className="h-3 w-3" />
                           Rejected
                         </span>
                       )}
                       {sub.status === "expired" && (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-xs font-medium bg-secondary text-muted-foreground border border-border">
                           Expired
                         </span>
                       )}
@@ -270,16 +270,16 @@ export function SubmitInternshipClient() {
                   </div>
 
                   {sub.status === "rejected" && sub.rejection_reason && (
-                    <div className="p-3 rounded-xl bg-red-50/70 dark:bg-red-950/20 border border-red-200 dark:border-red-900/30 text-xs text-red-700 dark:text-red-300">
+                    <div className="p-3 rounded-md bg-rose-500/10 border border-rose-500/20 text-xs text-rose-700 dark:text-rose-300">
                       <strong>Reason from moderation:</strong> {sub.rejection_reason}
                     </div>
                   )}
 
                   {sub.status === "published" && (
-                    <div className="pt-2 border-t border-zinc-100 dark:border-zinc-800/60">
+                    <div className="pt-2 border-t border-border/60">
                       <Link
                         href={`/internships/${sub.id}`}
-                        className="inline-flex items-center gap-1 text-xs font-semibold text-[#2E82F7] hover:underline"
+                        className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
                       >
                         <span>View live opportunity</span>
                         <ExternalLink className="h-3 w-3" />
@@ -293,31 +293,31 @@ export function SubmitInternshipClient() {
         </div>
       ) : isSubmitted ? (
         /* ── Success Confirmation Screen ── */
-        <div className="bg-white dark:bg-[#151518] border border-zinc-200 dark:border-zinc-800 rounded-3xl p-8 sm:p-12 text-center space-y-4">
-          <div className="h-16 w-16 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 rounded-full flex items-center justify-center mx-auto border border-emerald-200 dark:border-emerald-800/40">
-            <CheckCircle2 className="h-8 w-8" />
+        <div className="bg-card border border-border rounded-lg p-6 sm:p-10 text-center space-y-4">
+          <div className="h-12 w-12 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-full flex items-center justify-center mx-auto border border-emerald-500/20">
+            <CheckCircle2 className="h-6 w-6" />
           </div>
 
-          <h2 className="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-white">
+          <h2 className="text-xl sm:text-2xl font-bold text-foreground">
             Thanks! We&apos;ll review your submission before it appears.
           </h2>
 
-          <p className="text-sm text-zinc-600 dark:text-zinc-400 max-w-md mx-auto leading-relaxed">
+          <p className="text-xs sm:text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
             Your lead for <strong>&ldquo;{submittedTitle}&rdquo;</strong> has been routed to our moderation queue. Once our team checks the details and confirms there are no application fees, it will go live on the radar.
           </p>
 
-          <div className="pt-4 flex flex-wrap items-center justify-center gap-3">
+          <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
             <button
               onClick={resetForm}
-              className="px-5 py-2.5 rounded-xl text-sm font-semibold bg-[#2E82F7] hover:bg-[#256fd1] text-white transition-colors"
+              className="px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold bg-primary hover:bg-primary/90 text-primary-foreground transition-colors cursor-pointer"
             >
-              Submit Another Lead
+              Submit another lead
             </button>
             <button
               onClick={() => handleTabSwitch("history")}
-              className="px-5 py-2.5 rounded-xl text-sm font-semibold bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-900 dark:text-white transition-colors"
+              className="px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold bg-secondary hover:bg-secondary/80 text-foreground border border-border transition-colors cursor-pointer"
             >
-              View My Submissions
+              View my submissions
             </button>
           </div>
         </div>
@@ -325,7 +325,7 @@ export function SubmitInternshipClient() {
         /* ── Submit Form ── */
         <form onSubmit={handleSubmit} noValidate className="space-y-6">
           {formError && (
-            <div className="p-4 rounded-xl bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900/40 flex items-start gap-3 text-xs sm:text-sm text-red-600 dark:text-red-400">
+            <div className="p-3.5 rounded-lg bg-rose-500/10 border border-rose-500/20 flex items-start gap-2.5 text-xs text-rose-700 dark:text-rose-300">
               <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
               <span>{formError}</span>
             </div>
@@ -344,42 +344,42 @@ export function SubmitInternshipClient() {
             />
           </div>
 
-          <div className="bg-white dark:bg-[#151518] border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 sm:p-8 space-y-6">
+          <div className="bg-card border border-border rounded-lg p-5 sm:p-6 space-y-5">
             {/* Row 1: Title & Organization */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="block text-xs font-semibold text-zinc-900 dark:text-zinc-100">
-                  Opportunity Title <span className="text-red-500">*</span>
+                <label className="block text-xs font-semibold text-foreground">
+                  Opportunity title <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="text"
                   placeholder="e.g. Frontend Engineering Intern"
                   value={formData.title || ""}
                   onChange={(e) => handleChange("title", e.target.value)}
-                  className={`w-full h-11 px-4 rounded-xl text-sm bg-zinc-50 dark:bg-zinc-900 border ${
-                    fieldErrors.title ? "border-red-500" : "border-zinc-200 dark:border-zinc-800"
-                  } text-zinc-900 dark:text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-[#2E82F7]/20`}
+                  className={`w-full h-10 px-3.5 rounded-lg text-sm bg-background border ${
+                    fieldErrors.title ? "border-rose-500" : "border-border"
+                  } text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary`}
                 />
                 {fieldErrors.title && (
-                  <p className="text-xs text-red-500">{fieldErrors.title}</p>
+                  <p className="text-xs text-rose-500">{fieldErrors.title}</p>
                 )}
               </div>
 
               <div className="space-y-1.5">
-                <label className="block text-xs font-semibold text-zinc-900 dark:text-zinc-100">
-                  Organization / Company <span className="text-red-500">*</span>
+                <label className="block text-xs font-semibold text-foreground">
+                  Organization / company <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="text"
                   placeholder="e.g. Flutterwave, Paystack, MTN"
                   value={formData.organization || ""}
                   onChange={(e) => handleChange("organization", e.target.value)}
-                  className={`w-full h-11 px-4 rounded-xl text-sm bg-zinc-50 dark:bg-zinc-900 border ${
-                    fieldErrors.organization ? "border-red-500" : "border-zinc-200 dark:border-zinc-800"
-                  } text-zinc-900 dark:text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-[#2E82F7]/20`}
+                  className={`w-full h-10 px-3.5 rounded-lg text-sm bg-background border ${
+                    fieldErrors.organization ? "border-rose-500" : "border-border"
+                  } text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary`}
                 />
                 {fieldErrors.organization && (
-                  <p className="text-xs text-red-500">{fieldErrors.organization}</p>
+                  <p className="text-xs text-rose-500">{fieldErrors.organization}</p>
                 )}
               </div>
             </div>
@@ -387,31 +387,31 @@ export function SubmitInternshipClient() {
             {/* Row 2: Location & Work Mode */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="block text-xs font-semibold text-zinc-900 dark:text-zinc-100">
-                  Location (City / State) <span className="text-red-500">*</span>
+                <label className="block text-xs font-semibold text-foreground">
+                  Location (city / state) <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="text"
                   placeholder="e.g. Lagos, Abuja, Ibadan, or Nationwide"
                   value={formData.location || ""}
                   onChange={(e) => handleChange("location", e.target.value)}
-                  className={`w-full h-11 px-4 rounded-xl text-sm bg-zinc-50 dark:bg-zinc-900 border ${
-                    fieldErrors.location ? "border-red-500" : "border-zinc-200 dark:border-zinc-800"
-                  } text-zinc-900 dark:text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-[#2E82F7]/20`}
+                  className={`w-full h-10 px-3.5 rounded-lg text-sm bg-background border ${
+                    fieldErrors.location ? "border-rose-500" : "border-border"
+                  } text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary`}
                 />
                 {fieldErrors.location && (
-                  <p className="text-xs text-red-500">{fieldErrors.location}</p>
+                  <p className="text-xs text-rose-500">{fieldErrors.location}</p>
                 )}
               </div>
 
               <div className="space-y-1.5">
-                <label className="block text-xs font-semibold text-zinc-900 dark:text-zinc-100">
-                  Work Mode <span className="text-red-500">*</span>
+                <label className="block text-xs font-semibold text-foreground">
+                  Work mode <span className="text-rose-500">*</span>
                 </label>
                 <select
                   value={formData.work_mode || "remote"}
                   onChange={(e) => handleChange("work_mode", e.target.value)}
-                  className="w-full h-11 px-3.5 rounded-xl text-sm bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2E82F7]/20"
+                  className="w-full h-10 px-3 rounded-lg text-sm bg-background border border-border text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
                 >
                   {INTERNSHIP_WORK_MODES.map((w) => (
                     <option key={w.value} value={w.value}>{w.label}</option>
@@ -423,13 +423,13 @@ export function SubmitInternshipClient() {
             {/* Row 3: Field, Program Type, Paid Status */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="space-y-1.5">
-                <label className="block text-xs font-semibold text-zinc-900 dark:text-zinc-100">
-                  Field / Discipline <span className="text-red-500">*</span>
+                <label className="block text-xs font-semibold text-foreground">
+                  Field / discipline <span className="text-rose-500">*</span>
                 </label>
                 <select
                   value={formData.field || "tech"}
                   onChange={(e) => handleChange("field", e.target.value)}
-                  className="w-full h-11 px-3.5 rounded-xl text-sm bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2E82F7]/20"
+                  className="w-full h-10 px-3 rounded-lg text-sm bg-background border border-border text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
                 >
                   {INTERNSHIP_FIELDS.map((f) => (
                     <option key={f.value} value={f.value}>{f.label}</option>
@@ -438,13 +438,13 @@ export function SubmitInternshipClient() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="block text-xs font-semibold text-zinc-900 dark:text-zinc-100">
-                  Type <span className="text-red-500">*</span>
+                <label className="block text-xs font-semibold text-foreground">
+                  Type <span className="text-rose-500">*</span>
                 </label>
                 <select
                   value={formData.type || "internship"}
                   onChange={(e) => handleChange("type", e.target.value)}
-                  className="w-full h-11 px-3.5 rounded-xl text-sm bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2E82F7]/20"
+                  className="w-full h-10 px-3 rounded-lg text-sm bg-background border border-border text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
                 >
                   {INTERNSHIP_TYPES.map((t) => (
                     <option key={t.value} value={t.value}>{t.label}</option>
@@ -453,13 +453,13 @@ export function SubmitInternshipClient() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="block text-xs font-semibold text-zinc-900 dark:text-zinc-100">
-                  Compensation <span className="text-red-500">*</span>
+                <label className="block text-xs font-semibold text-foreground">
+                  Compensation <span className="text-rose-500">*</span>
                 </label>
                 <select
                   value={formData.paid_status || "paid"}
                   onChange={(e) => handleChange("paid_status", e.target.value)}
-                  className="w-full h-11 px-3.5 rounded-xl text-sm bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2E82F7]/20"
+                  className="w-full h-10 px-3 rounded-lg text-sm bg-background border border-border text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
                 >
                   {INTERNSHIP_PAID_STATUSES.map((p) => (
                     <option key={p.value} value={p.value}>{p.label}</option>
@@ -470,45 +470,45 @@ export function SubmitInternshipClient() {
 
             {/* Row 4: Description */}
             <div className="space-y-1.5">
-              <label className="block text-xs font-semibold text-zinc-900 dark:text-zinc-100">
-                Description &amp; Key Responsibilities <span className="text-red-500">*</span>
+              <label className="block text-xs font-semibold text-foreground">
+                Description &amp; key responsibilities <span className="text-rose-500">*</span>
               </label>
               <textarea
-                rows={5}
+                rows={4}
                 placeholder="Describe what the role involves, expected tasks, learning opportunities..."
                 value={formData.description || ""}
                 onChange={(e) => handleChange("description", e.target.value)}
-                className={`w-full p-4 rounded-xl text-sm bg-zinc-50 dark:bg-zinc-900 border ${
-                  fieldErrors.description ? "border-red-500" : "border-zinc-200 dark:border-zinc-800"
-                } text-zinc-900 dark:text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-[#2E82F7]/20`}
+                className={`w-full p-3.5 rounded-lg text-sm bg-background border ${
+                  fieldErrors.description ? "border-rose-500" : "border-border"
+                } text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary`}
               />
-              <div className="flex justify-between text-[11px] text-zinc-500">
+              <div className="flex justify-between text-[11px] text-muted-foreground">
                 <span>Minimum 30 characters</span>
                 <span>{(formData.description || "").length}/3,000</span>
               </div>
               {fieldErrors.description && (
-                <p className="text-xs text-red-500">{fieldErrors.description}</p>
+                <p className="text-xs text-rose-500">{fieldErrors.description}</p>
               )}
             </div>
 
             {/* Row 5: Eligibility Criteria (Optional) */}
             <div className="space-y-1.5">
-              <label className="block text-xs font-semibold text-zinc-900 dark:text-zinc-100">
-                Eligibility &amp; Requirements (Optional)
+              <label className="block text-xs font-semibold text-foreground">
+                Eligibility &amp; requirements (optional)
               </label>
               <textarea
                 rows={3}
                 placeholder="e.g. Open to 300L/400L students in Computer Science or Electrical Engineering."
                 value={formData.eligibility || ""}
                 onChange={(e) => handleChange("eligibility", e.target.value)}
-                className="w-full p-4 rounded-xl text-sm bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-[#2E82F7]/20"
+                className="w-full p-3.5 rounded-lg text-sm bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
               />
             </div>
 
             {/* Row 6: Apply URL & Apply Email & Deadline */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="space-y-1.5">
-                <label className="block text-xs font-semibold text-zinc-900 dark:text-zinc-100">
+                <label className="block text-xs font-semibold text-foreground">
                   Application URL
                 </label>
                 <input
@@ -516,69 +516,69 @@ export function SubmitInternshipClient() {
                   placeholder="https://..."
                   value={formData.apply_url || ""}
                   onChange={(e) => handleChange("apply_url", e.target.value)}
-                  className={`w-full h-11 px-4 rounded-xl text-sm bg-zinc-50 dark:bg-zinc-900 border ${
-                    fieldErrors.apply_url ? "border-red-500" : "border-zinc-200 dark:border-zinc-800"
-                  } text-zinc-900 dark:text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-[#2E82F7]/20`}
+                  className={`w-full h-10 px-3.5 rounded-lg text-sm bg-background border ${
+                    fieldErrors.apply_url ? "border-rose-500" : "border-border"
+                  } text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary`}
                 />
                 {fieldErrors.apply_url && (
-                  <p className="text-xs text-red-500">{fieldErrors.apply_url}</p>
+                  <p className="text-xs text-rose-500">{fieldErrors.apply_url}</p>
                 )}
               </div>
 
               <div className="space-y-1.5">
-                <label className="block text-xs font-semibold text-zinc-900 dark:text-zinc-100">
-                  Application Email
+                <label className="block text-xs font-semibold text-foreground">
+                  Application email
                 </label>
                 <input
                   type="email"
                   placeholder="careers@company.com"
                   value={formData.apply_email || ""}
                   onChange={(e) => handleChange("apply_email", e.target.value)}
-                  className={`w-full h-11 px-4 rounded-xl text-sm bg-zinc-50 dark:bg-zinc-900 border ${
-                    fieldErrors.apply_email ? "border-red-500" : "border-zinc-200 dark:border-zinc-800"
-                  } text-zinc-900 dark:text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-[#2E82F7]/20`}
+                  className={`w-full h-10 px-3.5 rounded-lg text-sm bg-background border ${
+                    fieldErrors.apply_email ? "border-rose-500" : "border-border"
+                  } text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary`}
                 />
                 {fieldErrors.apply_email && (
-                  <p className="text-xs text-red-500">{fieldErrors.apply_email}</p>
+                  <p className="text-xs text-rose-500">{fieldErrors.apply_email}</p>
                 )}
               </div>
 
               <div className="space-y-1.5">
-                <label className="block text-xs font-semibold text-zinc-900 dark:text-zinc-100">
-                  Deadline (Optional)
+                <label className="block text-xs font-semibold text-foreground">
+                  Deadline (optional)
                 </label>
                 <input
                   type="date"
                   value={formData.deadline || ""}
                   onChange={(e) => handleChange("deadline", e.target.value)}
-                  className={`w-full h-11 px-4 rounded-xl text-sm bg-zinc-50 dark:bg-zinc-900 border ${
-                    fieldErrors.deadline ? "border-red-500" : "border-zinc-200 dark:border-zinc-800"
-                  } text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2E82F7]/20`}
+                  className={`w-full h-10 px-3.5 rounded-lg text-sm bg-background border ${
+                    fieldErrors.deadline ? "border-rose-500" : "border-border"
+                  } text-foreground focus:outline-none focus:ring-1 focus:ring-primary`}
                 />
                 {fieldErrors.deadline && (
-                  <p className="text-xs text-red-500">{fieldErrors.deadline}</p>
+                  <p className="text-xs text-rose-500">{fieldErrors.deadline}</p>
                 )}
               </div>
             </div>
 
             {/* ── Required Fee Confirmation Checkbox (Requirement 5) ── */}
-            <div className="p-4 rounded-2xl bg-amber-50/70 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/40 space-y-3">
-              <label className="flex items-start gap-3 cursor-pointer select-none">
+            <div className="p-4 rounded-lg bg-amber-500/10 border border-amber-500/20 space-y-2.5">
+              <label className="flex items-start gap-2.5 cursor-pointer select-none">
                 <input
                   type="checkbox"
                   checked={Boolean(formData.feeConfirmation)}
                   onChange={(e) => handleChange("feeConfirmation", e.target.checked)}
-                  className="mt-0.5 h-4 w-4 rounded border-zinc-300 text-[#2E82F7] focus:ring-[#2E82F7]"
+                  className="mt-0.5 h-4 w-4 rounded border-border text-primary focus:ring-primary"
                 />
-                <span className="text-xs sm:text-sm font-semibold text-amber-950 dark:text-amber-100">
+                <span className="text-xs sm:text-sm font-semibold text-foreground">
                   I confirm this opportunity does not charge applicants any fee.
                 </span>
               </label>
-              <p className="text-xs text-amber-800 dark:text-amber-300 pl-7 leading-relaxed">
+              <p className="text-xs text-muted-foreground pl-6.5 leading-relaxed">
                 Zed maintains a strict zero-fee policy. Any opportunity requiring registration, test, kit, or processing fees will be rejected immediately.
               </p>
               {fieldErrors.feeConfirmation && (
-                <p className="text-xs text-red-500 font-medium pl-7">
+                <p className="text-xs text-rose-500 font-medium pl-6.5">
                   {fieldErrors.feeConfirmation}
                 </p>
               )}
@@ -602,16 +602,16 @@ export function SubmitInternshipClient() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full h-12 rounded-xl text-sm font-semibold bg-[#2E82F7] hover:bg-[#256fd1] disabled:opacity-60 text-white shadow-xs transition-colors flex items-center justify-center gap-2"
+                className="w-full h-11 rounded-lg text-sm font-semibold bg-primary hover:bg-primary/90 disabled:opacity-60 text-primary-foreground shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
               >
                 {isSubmitting ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    <span>Submitting Opportunity...</span>
+                    <span>Submitting opportunity...</span>
                   </>
                 ) : (
                   <>
-                    <span>Submit for Review</span>
+                    <span>Submit for review</span>
                     <ArrowRight className="h-4 w-4" />
                   </>
                 )}
