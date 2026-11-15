@@ -1,268 +1,150 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
-import { requireAdmin, maskPhone } from "@/lib/auth/admin-guard";
+import { requireAdmin } from "@/lib/auth/admin-guard";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
-import { ScrollText, ShieldAlert, Clock, User, Terminal } from "lucide-react";
+import { AdminAuditLogClient } from "./AdminAuditLogClient";
+import type { AuditLogRow } from "./AdminAuditLogClient";
 
 export const metadata: Metadata = {
-  title: "Admin Console — Audit Log",
-  description: "Immutable administrative action ledger and compliance records",
+  title: "Admin – Audit log | Zed",
+  description: "Immutable record of all administrative actions.",
 };
 
-interface AuditLogRow {
-  id: string;
-  admin_id: string | null;
-  action: string;
-  target_type: string;
-  target_id: string | null;
-  metadata: Record<string, unknown> | null;
-  created_at: string;
-  admin_user?: {
-    full_name: string | null;
-    phone_number: string | null;
-  } | null;
+interface SearchParams {
+  q?: string;
+  admin_id?: string;
+  target_type?: string;
+  from?: string;
+  to?: string;
+  page?: string;
+  limit?: string;
 }
 
-function getActionBadge(action: string) {
-  if (action === "user.delete") {
-    return {
-      label: "USER DELETED",
-      cls: "border-destructive/30 bg-destructive/10 text-destructive",
-    };
-  }
-  if (action === "user.role_change") {
-    return {
-      label: "ROLE CHANGED",
-      cls: "border-amber-500/30 bg-amber-500/10 text-amber-500",
-    };
-  }
-  if (action === "report.delete") {
-    return {
-      label: "REPORT DELETED",
-      cls: "border-rose-500/30 bg-rose-500/10 text-rose-400",
-    };
-  }
-  if (action === "report.bulk_delete") {
-    return {
-      label: "BULK REPORT DELETE",
-      cls: "border-destructive/30 bg-destructive/10 text-destructive",
-    };
-  }
-  if (action === "users.export_csv") {
-    return {
-      label: "CSV EXPORT",
-      cls: "border-blue-500/30 bg-blue-500/10 text-blue-400",
-    };
-  }
-  return {
-    label: action.toUpperCase(),
-    cls: "border-border text-muted-foreground",
-  };
-}
-
-async function AuditLogContent() {
+export default async function AdminAuditLogPage({
+  searchParams,
+}: {
+  searchParams: Promise<SearchParams>;
+}) {
   await requireAdmin();
+
+  const params = await searchParams;
+
+  const q = params.q?.trim() || "";
+  const adminFilter = params.admin_id?.trim() || "";
+  const targetTypeFilter = params.target_type?.trim() || "";
+  const fromDate = params.from?.trim() || "";
+  const toDate = params.to?.trim() || "";
+  const page = Math.max(1, parseInt(params.page || "1", 10) || 1);
+  const limitRaw = parseInt(params.limit || "50", 10);
+  const limit = [25, 50, 100].includes(limitRaw) ? limitRaw : 50;
+
   const admin = createAdminClient();
 
-  // Fetch audit logs with admin user details
-  const { data: logs, error } = await admin
+  const from = (page - 1) * limit;
+  const to = from + limit - 1;
+
+  // ── Main query ───────────────────────────────────────────────────────────
+  let query = admin
     .from("admin_audit_log")
-    .select(`
-      id,
-      admin_id,
-      action,
-      target_type,
-      target_id,
-      metadata,
-      created_at,
-      admin_user:admin_id (
-        full_name,
-        phone_number
-      )
-    `)
+    .select(
+      `id, admin_id, action, target_type, target_id, metadata, created_at, admin_user:admin_id(full_name)`,
+      { count: "exact" }
+    )
     .order("created_at", { ascending: false })
-    .limit(200);
+    .range(from, to);
 
-  if (error) {
-    // If the table doesn't exist yet in Supabase, show a friendly guide with the exact SQL
-    return (
-      <Card className="p-6 border-amber-500/30 bg-amber-500/5 space-y-4">
-        <div className="flex items-center gap-2 text-amber-500">
-          <Terminal className="h-5 w-5" />
-          <h3 className="text-sm font-bold">Audit Log Table Needs Setup</h3>
-        </div>
-        <p className="text-xs text-muted-foreground">
-          The <code className="font-mono text-foreground">admin_audit_log</code> table has not been created yet in your Supabase database. Run the migration script in Supabase SQL Editor:
-        </p>
-        <div className="rounded-lg border border-border bg-card p-4 font-mono text-[11px] text-foreground overflow-x-auto">
-          <pre>{`CREATE TABLE IF NOT EXISTS public.admin_audit_log (
-  id           UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  admin_id     UUID NOT NULL REFERENCES public.users (id) ON DELETE CASCADE,
-  action       TEXT NOT NULL,
-  target_type  TEXT NOT NULL,
-  target_id    TEXT,
-  metadata     JSONB DEFAULT '{}'::jsonb,
-  created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
-ALTER TABLE public.admin_audit_log ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "admin_audit_log: admin select"
-  ON public.admin_audit_log FOR SELECT
-  USING (EXISTS (SELECT 1 FROM public.users WHERE public.users.id = auth.uid() AND public.users.role = 'admin'));
-
-CREATE POLICY "admin_audit_log: insert"
-  ON public.admin_audit_log FOR INSERT
-  WITH CHECK (auth.uid() = admin_id OR auth.role() = 'service_role');`}</pre>
-        </div>
-      </Card>
-    );
+  if (q) {
+    query = query.or(`action.ilike.%${q}%,target_id.ilike.%${q}%`);
   }
 
-  const logList = (logs as unknown as AuditLogRow[]) ?? [];
-
-  if (logList.length === 0) {
-    return (
-      <Card className="p-12 border-border bg-card text-center space-y-2">
-        <ScrollText className="h-8 w-8 text-muted-foreground mx-auto opacity-40" />
-        <p className="text-sm font-semibold text-foreground">No Audit Records Yet</p>
-        <p className="text-xs text-muted-foreground font-mono">
-          Administrative actions (deletions, role changes, CSV exports) will be logged here automatically.
-        </p>
-      </Card>
-    );
+  if (adminFilter === "system") {
+    query = query.is("admin_id", null);
+  } else if (adminFilter) {
+    query = query.eq("admin_id", adminFilter);
   }
 
-  return (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between text-xs text-muted-foreground font-mono px-1">
-        <span>{logList.length} recorded events (newest first)</span>
-        <span className="text-emerald-500 flex items-center gap-1">
-          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-          Immutable Append-Only Ledger
-        </span>
-      </div>
+  if (targetTypeFilter) {
+    query = query.eq("target_type", targetTypeFilter);
+  }
 
-      <Card className="border-border bg-card shadow-xs overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-xs">
-            <thead>
-              <tr className="border-b border-border bg-secondary/20">
-                <th className="text-left px-4 py-3 font-mono uppercase tracking-wider text-muted-foreground font-semibold text-[10px] whitespace-nowrap">
-                  Timestamp
-                </th>
-                <th className="text-left px-4 py-3 font-mono uppercase tracking-wider text-muted-foreground font-semibold text-[10px] whitespace-nowrap">
-                  Administrator
-                </th>
-                <th className="text-left px-4 py-3 font-mono uppercase tracking-wider text-muted-foreground font-semibold text-[10px] whitespace-nowrap">
-                  Action
-                </th>
-                <th className="text-left px-4 py-3 font-mono uppercase tracking-wider text-muted-foreground font-semibold text-[10px] whitespace-nowrap">
-                  Target
-                </th>
-                <th className="text-left px-4 py-3 font-mono uppercase tracking-wider text-muted-foreground font-semibold text-[10px] whitespace-nowrap">
-                  Details / Metadata
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border/60">
-              {logList.map((entry) => {
-                const badge = getActionBadge(entry.action);
-                const adminName = !entry.admin_id
-                  ? "Deleted admin"
-                  : entry.admin_user?.full_name || "Administrator";
+  if (fromDate) {
+    query = query.gte("created_at", fromDate);
+  }
 
-                return (
-                  <tr key={entry.id} className="hover:bg-secondary/30 transition-colors">
-                    {/* Timestamp */}
-                    <td className="px-4 py-3 font-mono text-muted-foreground whitespace-nowrap text-[11px]">
-                      {new Date(entry.created_at).toLocaleString("en-GB", {
-                        day: "numeric",
-                        month: "short",
-                        year: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                        second: "2-digit",
-                      })}
-                    </td>
+  if (toDate) {
+    // Add end of day
+    const endOfDay = toDate.includes("T") ? toDate : `${toDate}T23:59:59Z`;
+    query = query.lte("created_at", endOfDay);
+  }
 
-                    {/* Admin */}
-                    <td className="px-4 py-3 font-medium text-foreground whitespace-nowrap">
-                      <div className="flex items-center gap-1.5">
-                        <User className="h-3.5 w-3.5 text-muted-foreground" />
-                        <span>{adminName}</span>
-                      </div>
-                    </td>
+  const { data, count, error } = await query;
 
-                    {/* Action */}
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      <Badge
-                        variant="outline"
-                        className={`text-[9px] font-mono font-bold py-0.5 px-2 ${badge.cls}`}
-                      >
-                        {badge.label}
-                      </Badge>
-                    </td>
-
-                    {/* Target */}
-                    <td className="px-4 py-3 font-mono text-muted-foreground whitespace-nowrap text-[11px]">
-                      <span className="uppercase text-foreground font-semibold">
-                        {entry.target_type}
-                      </span>
-                      {entry.target_id && (
-                        <span className="text-[10px] text-muted-foreground ml-1.5 truncate max-w-[100px] inline-block align-bottom">
-                          #{entry.target_id.slice(0, 8)}...
-                        </span>
-                      )}
-                    </td>
-
-                    {/* Metadata */}
-                    <td className="px-4 py-3 font-mono text-[11px] text-muted-foreground max-w-sm truncate">
-                      {entry.metadata && Object.keys(entry.metadata).length > 0 ? (
-                        <span className="bg-secondary/60 rounded px-1.5 py-0.5 border border-border/60 text-foreground">
-                          {JSON.stringify(entry.metadata)}
-                        </span>
-                      ) : (
-                        "—"
-                      )}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      </Card>
-    </div>
-  );
-}
-
-export default function AdminAuditLogPage() {
-  return (
-    <div className="space-y-4 max-w-[1400px] mx-auto">
-      <div>
-        <h2 className="text-base font-bold tracking-tight text-foreground">
-          Administrative Audit Log
-        </h2>
-        <p className="text-xs text-muted-foreground mt-0.5">
-          Immutable audit trail tracking all administrative actions, data exports, and deletions.
-        </p>
-      </div>
-
-      <Suspense
-        fallback={
-          <Card className="p-6 border-border bg-card space-y-3">
-            {[...Array(6)].map((_, i) => (
-              <Skeleton key={i} className="h-10 w-full" />
-            ))}
-          </Card>
+  // ── Distinct target types ─────────────────────────────────────────────────
+  let targetTypes: string[] = [];
+  try {
+    const { data: ttData } = await admin
+      .from("admin_audit_log")
+      .select("target_type")
+      .limit(200);
+    if (ttData) {
+      const seen = new Set<string>();
+      for (const row of ttData) {
+        if (row.target_type && !seen.has(row.target_type)) {
+          seen.add(row.target_type);
+          targetTypes.push(row.target_type as string);
         }
-      >
-        <AuditLogContent />
-      </Suspense>
-    </div>
+      }
+      targetTypes.sort();
+    }
+  } catch {
+    // ignore
+  }
+
+  // ── Distinct admins ───────────────────────────────────────────────────────
+  let admins: { id: string; name: string }[] = [];
+  try {
+    const { data: adminData } = await admin
+      .from("admin_audit_log")
+      .select("admin_id, admin_user:admin_id(full_name)")
+      .not("admin_id", "is", null)
+      .limit(500);
+
+    if (adminData) {
+      const seenIds = new Set<string>();
+      for (const row of adminData) {
+        const id = row.admin_id as string;
+        if (id && !seenIds.has(id)) {
+          seenIds.add(id);
+          const adminUserObj = Array.isArray(row.admin_user)
+            ? (row.admin_user[0] as unknown as { full_name: string | null } | null)
+            : (row.admin_user as unknown as { full_name: string | null } | null);
+          const name = adminUserObj?.full_name || "Administrator";
+          admins.push({ id, name });
+        }
+      }
+    }
+  } catch {
+    // ignore
+  }
+
+  const logs = (data as unknown as AuditLogRow[]) ?? [];
+  const total = count ?? 0;
+  const totalPages = Math.ceil(total / limit);
+
+  return (
+    <AdminAuditLogClient
+      logs={logs}
+      total={total}
+      page={page}
+      limit={limit}
+      totalPages={totalPages}
+      targetTypes={targetTypes}
+      admins={admins}
+      q={q}
+      adminFilter={adminFilter}
+      targetTypeFilter={targetTypeFilter}
+      fromDate={fromDate}
+      toDate={toDate}
+      hasError={!!error}
+    />
   );
 }

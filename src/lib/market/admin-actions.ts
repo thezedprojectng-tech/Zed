@@ -31,7 +31,7 @@ export async function getAdminReportedListings(): Promise<MarketListingWithRepor
       "id, seller_id, seller_name_masked, title, description, category, price_ngn, condition, location, image_paths, status, removed_reason, created_at, updated_at, expires_at, report_count"
     )
     .gt("report_count", 0)
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: true });
 
   if (listingsError || !listings || listings.length === 0) {
     return [];
