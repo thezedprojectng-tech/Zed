@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useRef, useEffect } from "react";
 import {
   Sheet,
   SheetContent,
@@ -41,10 +41,17 @@ import {
   Clock,
   Circle,
   UserX,
+  Copy,
+  Check,
+  ExternalLink,
+  MessageSquare,
+  Eye,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { deleteUserAction, changeUserRoleAction, adminClearUserProfileAction } from "./actions";
+import { adminRevealUserPhoneAction } from "@/lib/comms/admin-actions";
+import { SendMessageDialog } from "@/components/admin/comms/SendMessageDialog";
 import { getLevelName } from "@/types";
 import { PanelSection, FieldList, FieldItem } from "@/components/admin/primitives/PanelSection";
 import { StatusPill } from "@/components/admin/people/StatusPill";
@@ -113,7 +120,67 @@ export function UserDetailDrawer({
   const [clearReason, setClearReason] = useState("");
   const [typedEmail, setTypedEmail] = useState("");
   const [selectedRole, setSelectedRole] = useState<"user" | "admin">("user");
+  const [revealedPhone, setRevealedPhone] = useState<string | null>(null);
+  const [revealingPhone, setRevealingPhone] = useState(false);
+  const [phoneCopied, setPhoneCopied] = useState(false);
+  const [sendMessageOpen, setSendMessageOpen] = useState(false);
+  const phoneTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [isPending, startTransition] = useTransition();
+
+  useEffect(() => {
+    return () => {
+      if (phoneTimerRef.current) clearTimeout(phoneTimerRef.current);
+      setRevealedPhone(null);
+    };
+  }, [user?.id, open]);
+
+  const handleRevealPhone = async () => {
+    if (!user) return;
+    setRevealingPhone(true);
+    try {
+      const res = await adminRevealUserPhoneAction(user.id);
+      if (!res.ok) {
+        toast.error(res.error || "Failed to reveal phone number");
+        return;
+      }
+      if (!res.data) {
+        toast.error("Failed to reveal phone number");
+        return;
+      }
+      setRevealedPhone(res.data.phone);
+      toast.info("Access is logged");
+
+      // Auto-hide after 60 seconds
+      if (phoneTimerRef.current) clearTimeout(phoneTimerRef.current);
+      phoneTimerRef.current = setTimeout(() => {
+        setRevealedPhone(null);
+      }, 60000);
+    } catch {
+      toast.error("Failed to reveal phone number");
+    } finally {
+      setRevealingPhone(false);
+    }
+  };
+
+  const handleCopyPhone = async () => {
+    if (!revealedPhone) return;
+    try {
+      await navigator.clipboard.writeText(revealedPhone);
+      setPhoneCopied(true);
+      setTimeout(() => setPhoneCopied(false), 2000);
+      toast.success("Phone number copied to clipboard");
+    } catch {
+      // ignore
+    }
+  };
+
+  const cleanWhatsAppPhone = (phone: string) => {
+    let clean = phone.replace(/[^0-9]/g, "");
+    if (clean.startsWith("0") && clean.length === 11) {
+      clean = `234${clean.slice(1)}`;
+    }
+    return clean;
+  };
 
   if (!user) return null;
 
@@ -185,7 +252,16 @@ export function UserDetailDrawer({
 
   return (
     <>
-      <Sheet open={open} onOpenChange={onOpenChange}>
+      <Sheet
+        open={open}
+        onOpenChange={(openState) => {
+          if (!openState) {
+            if (phoneTimerRef.current) clearTimeout(phoneTimerRef.current);
+            setRevealedPhone(null);
+          }
+          onOpenChange(openState);
+        }}
+      >
         <SheetContent
           onOpenAutoFocus={(e) => e.preventDefault()}
           className="w-full sm:max-w-md p-0 flex flex-col bg-card border-border overflow-y-auto focus-visible:outline-hidden"
@@ -263,9 +339,69 @@ export function UserDetailDrawer({
             {/* Account Information Section */}
             <PanelSection title="Account information">
               <FieldList columns={2}>
-                <FieldItem label="Phone (masked)">
-                  <span className="tabular-nums text-xs">{user.masked_phone}</span>
-                </FieldItem>
+                {revealedPhone ? (
+                  <FieldItem label="Phone number (revealed)" span={2}>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="tabular-nums font-mono text-xs font-semibold text-foreground">
+                        {revealedPhone}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={handleCopyPhone}
+                        className="p-1 rounded-sm hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                        title="Copy phone number"
+                        aria-label="Copy phone number"
+                      >
+                        {phoneCopied ? (
+                          <Check className="h-3 w-3 text-emerald-500" />
+                        ) : (
+                          <Copy className="h-3 w-3" />
+                        )}
+                      </button>
+                      <a
+                        href={`https://wa.me/${cleanWhatsAppPhone(revealedPhone)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-[11px] text-emerald-600 dark:text-emerald-400 hover:underline font-medium"
+                      >
+                        <span>WhatsApp</span>
+                        <ExternalLink className="h-3 w-3" />
+                      </a>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (phoneTimerRef.current) clearTimeout(phoneTimerRef.current);
+                          setRevealedPhone(null);
+                        }}
+                        className="text-[11px] text-muted-foreground hover:text-foreground underline ml-auto cursor-pointer"
+                      >
+                        Hide
+                      </button>
+                    </div>
+                    <p className="text-[10px] text-muted-foreground mt-0.5">
+                      Auto-hides in 60s. Access is logged.
+                    </p>
+                  </FieldItem>
+                ) : (
+                  <FieldItem label="Phone (masked)">
+                    <div className="flex items-center gap-2">
+                      <span className="tabular-nums text-xs">{user.masked_phone}</span>
+                      <button
+                        type="button"
+                        onClick={handleRevealPhone}
+                        disabled={revealingPhone}
+                        className="inline-flex items-center gap-1 text-[11px] text-primary hover:underline font-medium cursor-pointer"
+                      >
+                        {revealingPhone ? (
+                          <Loader2 className="h-3 w-3 animate-spin" />
+                        ) : (
+                          <Eye className="h-3 w-3" />
+                        )}
+                        <span>Show number</span>
+                      </button>
+                    </div>
+                  </FieldItem>
+                )}
                 <FieldItem label="Joined date">
                   <span className="font-sans text-xs tabular-nums">
                     {new Date(user.created_at).toLocaleDateString("en-GB", {
@@ -387,6 +523,17 @@ export function UserDetailDrawer({
                     >
                       <UserX className="h-3.5 w-3.5" />
                       <span>Clear profile fields</span>
+                    </Button>
+
+                    {/* Message User Button */}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setSendMessageOpen(true)}
+                      className="gap-1.5 text-xs h-9 rounded-md border-border hover:bg-secondary font-sans"
+                    >
+                      <MessageSquare className="h-3.5 w-3.5 text-primary" />
+                      <span>Message user</span>
                     </Button>
                   </div>
 
@@ -657,6 +804,16 @@ export function UserDetailDrawer({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Message User Dialog */}
+      <SendMessageDialog
+        open={sendMessageOpen}
+        onOpenChange={setSendMessageOpen}
+        preselectedUser={{
+          id: user.id,
+          name: user.full_name || "User",
+        }}
+      />
     </>
   );
 }

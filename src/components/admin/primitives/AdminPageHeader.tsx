@@ -30,6 +30,7 @@ export function AdminPageHeader({
     money: "text-admin-accent-money bg-admin-accent-money-subtle border-admin-accent-money-border",
     marketplace: "text-admin-accent-inbox bg-admin-accent-inbox-subtle border-admin-accent-inbox-border",
     inbox: "text-admin-accent-inbox bg-admin-accent-inbox-subtle border-admin-accent-inbox-border",
+    communication: "text-admin-accent-content bg-admin-accent-content-subtle border-admin-accent-content-border",
     system: "text-muted-foreground bg-secondary/60 border-border",
   }[section as string] || "text-primary bg-primary/10 border-primary/20";
 

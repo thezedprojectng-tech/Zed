@@ -60,6 +60,9 @@ const ACTION_LABELS: Record<string, string> = {
   "report.delete": "Report deleted",
   "report.bulk_delete": "Bulk report delete",
   "users.export_csv": "CSV export",
+  news_published: "News published",
+  notification_sent: "Notification sent",
+  user_phone_revealed: "Phone revealed",
 };
 
 function humanizeAction(action: string): string {
@@ -94,7 +97,8 @@ function getActionRisk(action: string): RiskLevel {
   if (
     action.includes("verification") ||
     action.includes("bank") ||
-    action.includes("dob")
+    action.includes("dob") ||
+    action === "user_phone_revealed"
   )
     return "amber";
   if (

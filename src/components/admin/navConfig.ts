@@ -17,6 +17,8 @@ import {
   Sliders,
   Mail,
   ScrollText,
+  Newspaper,
+  Bell,
   type LucideIcon,
 } from "lucide-react";
 
@@ -42,6 +44,7 @@ export type AdminNavSectionKey =
   | "programs"
   | "money"
   | "marketplace"
+  | "communication"
   | "system";
 
 export interface AdminNavSection {
@@ -226,6 +229,26 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
         href: "/admin/market",
         label: "Market",
         icon: ShoppingBag,
+      },
+    ],
+  },
+  {
+    key: "communication",
+    label: "Communication",
+    accentClass: "text-data-users",
+    accentToken: "var(--data-users)",
+    barColor: "bg-data-users",
+    dotColor: "bg-data-users",
+    items: [
+      {
+        href: "/admin/news",
+        label: "News & updates",
+        icon: Newspaper,
+      },
+      {
+        href: "/admin/notifications",
+        label: "Notifications",
+        icon: Bell,
       },
     ],
   },

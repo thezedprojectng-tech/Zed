@@ -31,6 +31,7 @@ import {
   AdminMenuContent,
   AdminMenuItem,
 } from "./AdminDropdownMenu";
+import { AdminNotificationBell } from "./comms/AdminNotificationBell";
 
 interface AdminTopBarProps {
   adminUser: {
@@ -112,6 +113,9 @@ export function AdminTopBar({ adminUser }: AdminTopBarProps) {
             <span className="hidden sm:inline">Back to app</span>
           </Link>
         </Button>
+
+        {/* Admin Notification Bell */}
+        {mounted && <AdminNotificationBell />}
 
         {/* Theme toggle dropdown */}
         {mounted && (
