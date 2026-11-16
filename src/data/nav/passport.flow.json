@@ -22,6 +22,7 @@
       "type": "document-check",
       "id": "fresh-docs",
       "title": "Documents for Fresh Application",
+      "branchGroup": "application-type-docs",
       "documents": [
         {
           "id": "birth-cert",
@@ -60,6 +61,7 @@
       "type": "document-check",
       "id": "renewal-docs",
       "title": "Documents for Renewal",
+      "branchGroup": "application-type-docs",
       "documents": [
         {
           "id": "old-passport",

@@ -9,7 +9,7 @@ import {
   getCurrentStep,
   advance,
   goBack,
-  getProgress,
+  getFlowProgress,
   getCompletedStepsCount,
   resolveBranch,
   toggleChecklistItem,
@@ -63,8 +63,9 @@ export function FlowRunner({ flow }: FlowRunnerProps) {
   }, [flow, rawProgress, progress, isMounted, setProgress]);
 
   const currentStep = getCurrentStep(flow, progress);
-  const percent = getProgress(flow, progress);
-  const completed = isFlowComplete(flow, progress);
+  const flowProgress = getFlowProgress(flow, progress);
+  const percent = flowProgress.percentage;
+  const completed = flowProgress.isCompleted;
 
   const currentStepIndex = useMemo(() => {
     const idx = flow.steps.findIndex((s) => s.id === currentStep.id);
@@ -99,7 +100,10 @@ export function FlowRunner({ flow }: FlowRunnerProps) {
         const finalCompleted = Array.from(
           new Set([...next.completed_steps, next.current_step])
         );
-        setProgress(flow.id, { ...next, completed_steps: finalCompleted });
+        const isComplete =
+          Boolean(next.completed) ||
+          getFlowProgress(flow, { ...next, completed_steps: finalCompleted }).isCompleted;
+        setProgress(flow.id, { ...next, completed_steps: finalCompleted, completed: isComplete });
       } else {
         setProgress(flow.id, next);
       }
@@ -135,7 +139,7 @@ export function FlowRunner({ flow }: FlowRunnerProps) {
     setProgress(flow.id, {
       ...progress,
       current_step: stepId,
-      completed: false,
+      completed: Boolean(progress.completed),
       updated_at: new Date().toISOString(),
     });
   }
@@ -236,7 +240,7 @@ export function FlowRunner({ flow }: FlowRunnerProps) {
         <div className="flex items-center justify-between text-xs text-muted-foreground">
           <div className="flex items-center gap-2">
             <span className="font-semibold text-foreground font-sans tabular-nums">
-              Step {currentStepIndex + 1} of {flow.steps.length}
+              Step {Math.min(flowProgress.completedCount + (completed ? 0 : 1), flowProgress.totalSlots)} of {flowProgress.totalSlots}
             </span>
             <span>·</span>
             <span className="capitalize">{currentStep.type.replace(/-/g, " ")}</span>

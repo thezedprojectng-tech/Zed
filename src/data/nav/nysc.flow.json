@@ -22,6 +22,7 @@
       "type": "document-check",
       "id": "nigerian-docs",
       "title": "Documents for Nigerian Graduates",
+      "branchGroup": "origin-docs",
       "documents": [
         {
           "id": "nin-slip",
@@ -60,6 +61,7 @@
       "type": "document-check",
       "id": "foreign-docs",
       "title": "Documents for Foreign-Trained Graduates",
+      "branchGroup": "origin-docs",
       "documents": [
         {
           "id": "nin-slip",

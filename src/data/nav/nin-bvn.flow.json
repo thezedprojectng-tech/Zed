@@ -22,6 +22,7 @@
       "type": "document-check",
       "id": "enrolment-docs",
       "title": "Documents for NIMC Enrolment",
+      "optional": true,
       "documents": [
         {
           "id": "birth-cert",
@@ -54,6 +55,7 @@
       "type": "link",
       "id": "nimc-enrolment",
       "title": "Enrol at an Accredited NIMC Centre",
+      "optional": true,
       "body": "Visit an accredited NIMC Enrolment Centre or participating commercial bank branch. Complete your enrolment form, capture your 10 fingerprints and facial photograph, and collect your National Identification Transaction Slip. Your 11-digit NIN will be issued after processing.",
       "href": "https://nimc.gov.ng",
       "linkLabel": "Find NIMC Enrolment Centres →",
@@ -114,6 +116,7 @@
       "type": "info",
       "id": "fix-nimc-record",
       "title": "Correcting Details on Your NIMC Record",
+      "optional": true,
       "body": "If the error is on your NIN record (such as misspelled name, reversed first/last name, or incorrect date of birth):\n\n- **Minor corrections & phone numbers**: Use the NIMC Self-Service Portal or official mobile app to submit changes.\n- **Date of birth & major name changes**: Visit a State NIMC Head Office in person with your original NPC Birth Certificate, court affidavit, and newspaper publication where applicable.\n\nStatutory modification fees are paid via Remita on the portal. NIMC permits date of birth modifications only once in a lifetime.",
       "tips": [
         "Check the official NIMC website for current modification fees before making payment.",
@@ -125,6 +128,7 @@
       "type": "info",
       "id": "fix-bvn-record",
       "title": "Updating Your BVN Record at Your Bank",
+      "optional": true,
       "body": "If your NIN is correct but your bank BVN has typographical errors or the wrong date of birth:\n\nVisit the specific bank branch where you initially registered your BVN. Ask for a BVN Data Correction form. Provide your verified NIN slip, a court affidavit, newspaper publication (for name changes), and a valid ID.\n\nThe bank officer will submit the correction request to the Nigeria Inter-Bank Settlement System (NIBSS). Updates typically reflect within 24–48 working hours.",
       "tips": [
         "Only the bank that originally enrolled your BVN can submit modification requests to NIBSS.",

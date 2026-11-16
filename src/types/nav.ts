@@ -12,6 +12,11 @@ export interface InfoStep {
   warning?: string;
   /** Next step id; omit for linear last step */
   next?: string;
+  /** If set, this step belongs to a mutually-exclusive branch group.
+   * Only one member of the group needs to be completed for the slot to count. */
+  branchGroup?: string;
+  /** If true, this step is optional and never counts toward the required denominator. */
+  optional?: boolean;
 }
 
 export interface ChecklistItem {
@@ -27,6 +32,8 @@ export interface ChecklistStep {
   items: ChecklistItem[];
   /** Complete when all items are checked */
   next?: string;
+  branchGroup?: string;
+  optional?: boolean;
 }
 
 export interface LinkStep {
@@ -38,6 +45,8 @@ export interface LinkStep {
   linkLabel: string;
   /** Marked complete on "Done" tap */
   next?: string;
+  branchGroup?: string;
+  optional?: boolean;
 }
 
 export interface DecisionOption {
@@ -52,6 +61,8 @@ export interface DecisionStep {
   question: string;
   options: DecisionOption[];
   /** No `next` – branching is driven by DecisionOption.nextStepId */
+  branchGroup?: string;
+  optional?: boolean;
 }
 
 export interface DocumentItem {
@@ -67,6 +78,8 @@ export interface DocumentCheckStep {
   title: string;
   documents: DocumentItem[];
   next?: string;
+  branchGroup?: string;
+  optional?: boolean;
 }
 
 /** Discriminated union of all step variants */

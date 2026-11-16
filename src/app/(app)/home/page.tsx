@@ -21,6 +21,12 @@ import { isSameLagosDay } from "@/lib/mining/helpers";
 import { isVerifiedBadgeEnabled } from "@/lib/verification/flags";
 import { VerifyAccountBanner } from "@/components/verification/VerifyAccountBanner";
 import { CountUp } from "@/components/home/CountUp";
+import passportFlow from "@/data/nav/passport.flow.json";
+import nyscFlow from "@/data/nav/nysc.flow.json";
+import ninBvnFlow from "@/data/nav/nin-bvn.flow.json";
+import cacFlow from "@/data/nav/cac.flow.json";
+import { getFlowProgress } from "@/lib/nav/engine";
+import type { NavFlow, NavProgress } from "@/types/nav";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -59,6 +65,13 @@ const FLOW_META: Record<string, { href: string; label: string; ref: string }> = 
   nysc: { href: "/nav/nysc", label: "NYSC Mobilisation", ref: "NYSC-02" },
   "nin-bvn": { href: "/nav/nin-bvn", label: "NIN & BVN Harmonisation", ref: "NIMC-03" },
   cac: { href: "/nav/cac", label: "CAC Business Registration", ref: "CAC-04" },
+};
+
+const ALL_FLOWS_MAP: Record<string, NavFlow> = {
+  passport: passportFlow as unknown as NavFlow,
+  nysc: nyscFlow as unknown as NavFlow,
+  "nin-bvn": ninBvnFlow as unknown as NavFlow,
+  cac: cacFlow as unknown as NavFlow,
 };
 
 function getRequirementUnit(type: string, count: number): string {
@@ -188,16 +201,22 @@ export default async function HomePage() {
     levelProgress = levelProgressRes.data as unknown as LevelProgressData;
   }
 
-  // Active guide detection
-  const activeGuideRow = (progressRowsRes.data ?? []).find(
-    (row) => !row.state?.completed
-  );
+  // Active guide detection: skip completed guides and find next in-progress guide
+  const activeGuideRow = (progressRowsRes.data ?? []).find((row) => {
+    const flow = ALL_FLOWS_MAP[row.flow_id];
+    if (!flow) return false;
+    const progress = getFlowProgress(flow, row.state as NavProgress | null);
+    return (
+      !progress.isCompleted &&
+      ((row.state?.completed_steps?.length ?? 0) > 0 || Boolean(row.state?.current_step))
+    );
+  });
   const activeFlowId = activeGuideRow?.flow_id as string | undefined;
   const activeGuideMeta = activeFlowId ? FLOW_META[activeFlowId] : null;
-  const activeGuideState = activeGuideRow?.state as {
-    completed_steps?: string[];
-  } | null;
-  const completedSteps = activeGuideState?.completed_steps ?? [];
+  const activeFlow = activeFlowId ? ALL_FLOWS_MAP[activeFlowId] : null;
+  const activeMetrics = activeFlow
+    ? getFlowProgress(activeFlow, activeGuideRow?.state as NavProgress | null)
+    : null;
 
   // Check verification banner status
   const isVerified = Boolean(profile?.is_verified);
@@ -574,18 +593,18 @@ export default async function HomePage() {
                 <h3 className="text-base font-semibold text-foreground">
                   {activeGuideMeta.label}
                 </h3>
-                {completedSteps.length > 0 && (
+                {activeMetrics && activeMetrics.completedCount > 0 && (
                   <div className="space-y-1.5 pt-1">
                     <div className="flex items-center justify-between text-xs text-muted-foreground">
                       <span>Progress</span>
                       <span className="font-sans tabular-nums">
-                        {completedSteps.length} {pluralize(completedSteps.length, "step", "steps")} completed
+                        {activeMetrics.completedCount} of {activeMetrics.totalSlots} {pluralize(activeMetrics.totalSlots, "step", "steps")} completed
                       </span>
                     </div>
                     <div className="h-1.5 w-full bg-secondary/80 rounded-full overflow-hidden">
                       <div
                         className="h-full bg-[var(--data-verified)] rounded-full transition-all duration-300"
-                        style={{ width: `${Math.min(completedSteps.length * 15, 100)}%` }}
+                        style={{ width: `${activeMetrics.percentage}%` }}
                       />
                     </div>
                   </div>

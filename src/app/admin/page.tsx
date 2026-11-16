@@ -107,9 +107,15 @@ async function fetchOverviewMetrics() {
     guideMap[fid].started++;
     totalFlowsStarted++;
 
-    const state = row.state as { completed_steps?: string[]; steps?: string[] } | null;
-    if (state && Array.isArray(state.completed_steps) && Array.isArray(state.steps)) {
-      if (state.completed_steps.length === state.steps.length && state.steps.length > 0) {
+    const state = row.state as { completed_steps?: string[]; steps?: string[]; completed?: boolean } | null;
+    if (state) {
+      const isComplete =
+        Boolean(state.completed) ||
+        (Array.isArray(state.completed_steps) &&
+          Array.isArray(state.steps) &&
+          state.steps.length > 0 &&
+          state.completed_steps.length === state.steps.length);
+      if (isComplete) {
         guideMap[fid].completed++;
         totalFlowsCompleted++;
       }

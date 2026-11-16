@@ -22,6 +22,7 @@
       "type": "info",
       "id": "ltd-overview",
       "title": "Business Name vs. Limited Company (LTD)",
+      "optional": true,
       "body": "A **Business Name (Enterprise)** is ideal for solo entrepreneurs, freelancers, artisans, small retail shops, and partnerships. It is fast, cost-effective, and has straightforward statutory obligations.\n\nA **Private Limited Company (LTD)** creates a separate legal entity with shareholders, directors, and share capital, which is suited for startups seeking equity investors or bidding for large institutional contracts.\n\nIf you want the fastest, simplest registration for your business, proceed with Business Name registration.",
       "tips": [
         "You can upgrade your registered Business Name to a Limited Liability Company later when your business expands.",

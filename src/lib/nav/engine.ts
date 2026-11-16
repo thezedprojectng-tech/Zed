@@ -55,10 +55,15 @@ export function resolveBranch(
     new Set([...progress.completed_steps, step.id])
   );
 
+  const isCompleted =
+    Boolean(progress.completed) ||
+    getFlowProgress(_flow, { ...progress, completed_steps: completed }).isCompleted;
+
   return {
     ...progress,
     current_step: option.nextStepId,
     completed_steps: completed,
+    completed: isCompleted,
     updated_at: new Date().toISOString(),
   };
 }
@@ -83,10 +88,15 @@ export function advance(
     new Set([...progress.completed_steps, current.id])
   );
 
+  const isCompleted =
+    Boolean(progress.completed) ||
+    getFlowProgress(flow, { ...progress, completed_steps: completed }).isCompleted;
+
   return {
     ...progress,
     current_step: current.next,
     completed_steps: completed,
+    completed: isCompleted,
     updated_at: new Date().toISOString(),
   };
 }
@@ -191,14 +201,87 @@ export function getIncompleteEarlierSteps(
 
 // ── Progress & Reconciliation ─────────────────────────────────────────────────
 
+export interface FlowProgressMetrics {
+  completedCount: number;
+  totalSlots: number;
+  percentage: number;
+  isCompleted: boolean;
+}
+
+/**
+ * Computes flow progress using required slots:
+ * - Non-optional, non-branchGroup steps = 1 slot each
+ * - Each unique branchGroup = 1 slot (satisfied when ANY member is in completed_steps)
+ * - Optional steps add to numerator only if completed; never count toward denominator
+ * Returns isCompleted=true when all required slots are satisfied (or progress.completed is set).
+ */
+export function getFlowProgress(
+  flow: NavFlow,
+  progress?: NavProgress | null
+): FlowProgressMetrics {
+  const completedSet = new Set(progress?.completed_steps ?? []);
+
+  // Collect branch groups and classify steps
+  const branchGroups = new Set<string>();
+  const optionalSteps: NavStep[] = [];
+  const requiredLinearSteps: NavStep[] = [];
+
+  for (const step of flow.steps) {
+    if ((step as { branchGroup?: string }).branchGroup) {
+      branchGroups.add((step as { branchGroup: string }).branchGroup);
+    } else if ((step as { optional?: boolean }).optional) {
+      optionalSteps.push(step);
+    } else {
+      requiredLinearSteps.push(step);
+    }
+  }
+
+  // Required denominator = linear required + 1 per branchGroup
+  const requiredSlots = requiredLinearSteps.length + branchGroups.size;
+
+  // Count satisfied required linear slots
+  const satisfiedLinear = requiredLinearSteps.filter((s) => completedSet.has(s.id)).length;
+
+  // Count satisfied branch group slots (any member completed = slot satisfied)
+  let satisfiedBranch = 0;
+  for (const group of branchGroups) {
+    const membersInGroup = flow.steps.filter(
+      (s) => (s as { branchGroup?: string }).branchGroup === group
+    );
+    if (membersInGroup.some((s) => completedSet.has(s.id))) {
+      satisfiedBranch++;
+    }
+  }
+
+  // Count completed optional steps (bonus numerator, also expand denominator)
+  const completedOptional = optionalSteps.filter((s) => completedSet.has(s.id)).length;
+
+  const numerator = satisfiedLinear + satisfiedBranch + completedOptional;
+  const denominator = requiredSlots + completedOptional;
+
+  const percentage =
+    denominator > 0 ? Math.min(100, Math.round((numerator / denominator) * 100)) : 0;
+
+  // All required slots satisfied = completed
+  const allRequiredSatisfied =
+    requiredSlots > 0 ? satisfiedLinear + satisfiedBranch >= requiredSlots : true;
+
+  const isCompleted = Boolean(progress?.completed) || allRequiredSatisfied;
+
+  return {
+    completedCount: numerator,
+    totalSlots: denominator,
+    percentage,
+    isCompleted,
+  };
+}
+
 /**
  * Calculates completion percentage (0–100) based on completed steps count
  * relative to total steps in the flow, counting only steps that exist in the current flow.
  */
 export function getProgress(flow: NavFlow, progress: NavProgress): number {
-  if (!flow.steps.length) return 0;
-  const count = getCompletedStepsCount(flow, progress);
-  return Math.min(100, Math.round((count / flow.steps.length) * 100));
+  return getFlowProgress(flow, progress).percentage;
 }
 
 /**
@@ -260,9 +343,13 @@ export function reconcileProgress(
   }
 
   // 3. Preserve or update completion state
-  const isComplete =
-    Boolean(persisted.completed) ||
-    (flow.steps.length > 0 && flow.steps.every((s) => reconciledCompleted.includes(s.id)));
+  const reconciledProgress: NavProgress = {
+    ...persisted,
+    completed_steps: reconciledCompleted,
+    checklist_state: reconciledChecklist,
+    document_state: reconciledDocument,
+  };
+  const { isCompleted: isComplete } = getFlowProgress(flow, reconciledProgress);
 
   return {
     ...persisted,
@@ -295,15 +382,11 @@ export function completeFlow(flow: NavFlow, progress: NavProgress): NavProgress 
 }
 
 /**
- * Returns true if all steps in the active path (or all flow steps) are completed,
+ * Returns true if all required slots in the flow are satisfied,
  * or if the flow was explicitly finished.
  */
 export function isFlowComplete(flow: NavFlow, progress: NavProgress): boolean {
-  if (progress.completed) return true;
-  const path = getActivePathSteps(flow, progress);
-  const relevantSteps = path.length > 0 ? path : flow.steps;
-  const completedSet = new Set(progress.completed_steps ?? []);
-  return relevantSteps.every((s) => completedSet.has(s.id));
+  return getFlowProgress(flow, progress).isCompleted;
 }
 
 // ── Checklist helpers ─────────────────────────────────────────────────────────

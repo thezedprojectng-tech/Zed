@@ -30,6 +30,8 @@ const infoStepSchema = z.object({
   tips: z.array(z.string()).optional(),
   warning: z.string().optional(),
   next: z.string().optional(),
+  branchGroup: z.string().optional(),
+  optional: z.boolean().optional(),
 });
 
 const checklistStepSchema = z.object({
@@ -38,6 +40,8 @@ const checklistStepSchema = z.object({
   title: z.string().min(1),
   items: z.array(checklistItemSchema).min(1),
   next: z.string().optional(),
+  branchGroup: z.string().optional(),
+  optional: z.boolean().optional(),
 });
 
 const linkStepSchema = z.object({
@@ -48,6 +52,8 @@ const linkStepSchema = z.object({
   href: z.string().url(),
   linkLabel: z.string().min(1),
   next: z.string().optional(),
+  branchGroup: z.string().optional(),
+  optional: z.boolean().optional(),
 });
 
 const decisionStepSchema = z.object({
@@ -56,6 +62,8 @@ const decisionStepSchema = z.object({
   title: z.string().min(1),
   question: z.string().min(1),
   options: z.array(decisionOptionSchema).min(2),
+  branchGroup: z.string().optional(),
+  optional: z.boolean().optional(),
 });
 
 const documentCheckStepSchema = z.object({
@@ -64,6 +72,8 @@ const documentCheckStepSchema = z.object({
   title: z.string().min(1),
   documents: z.array(documentItemSchema).min(1),
   next: z.string().optional(),
+  branchGroup: z.string().optional(),
+  optional: z.boolean().optional(),
 });
 
 /** Discriminated union validator for all step variants */

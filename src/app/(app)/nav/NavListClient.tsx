@@ -21,6 +21,7 @@ import { useNavProgressStore } from "@/store/useNavProgressStore";
 import { useIsMounted } from "@/lib/hooks";
 import type { NavFlow } from "@/types/nav";
 import { pluralize } from "@/lib/utils";
+import { getFlowProgress } from "@/lib/nav/engine";
 
 interface GuideConfig {
   flow: NavFlow;
@@ -100,15 +101,13 @@ export function NavListClient({ guides }: NavListClientProps) {
     if (!isMounted) return null;
     for (const g of guides) {
       const p = progressMap[g.flow.id];
-      if (p && !p.completed && (p.completed_steps?.length > 0 || p.current_step)) {
-        const completedCount = p.completed_steps?.length || 0;
-        const totalCount = g.flow.steps.length;
-        const pct = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
+      const metrics = getFlowProgress(g.flow, p);
+      if (p && !metrics.isCompleted && (p.completed_steps?.length > 0 || p.current_step)) {
         return {
           ...g,
-          completedCount,
-          totalCount,
-          pct,
+          completedCount: metrics.completedCount,
+          totalCount: metrics.totalSlots,
+          pct: metrics.percentage,
         };
       }
     }
@@ -281,14 +280,12 @@ export function NavListClient({ guides }: NavListClientProps) {
             {filteredGuides.map((guide) => {
               const Icon = GUIDE_ICONS[guide.flow.id] || Compass;
               const p = isMounted ? progressMap[guide.flow.id] : undefined;
-              const isCompleted = p?.completed === true;
-              const completedStepsCount = p?.completed_steps?.length || 0;
-              const totalSteps = guide.flow.steps.length;
-              const isInProgress = !isCompleted && (completedStepsCount > 0 || Boolean(p?.current_step));
-              const progressPct =
-                totalSteps > 0
-                  ? Math.min(100, Math.round((completedStepsCount / totalSteps) * 100))
-                  : 0;
+              const flowMetrics = getFlowProgress(guide.flow, p);
+              const isCompleted = flowMetrics.isCompleted;
+              const completedStepsCount = flowMetrics.completedCount;
+              const totalSteps = flowMetrics.totalSlots;
+              const isInProgress = !isCompleted && (flowMetrics.completedCount > 0 || Boolean(p?.current_step));
+              const progressPct = flowMetrics.percentage;
 
               return (
                 <Link
@@ -354,6 +351,13 @@ export function NavListClient({ guides }: NavListClientProps) {
                         />
                       </div>
                     )}
+
+                    <div className="flex items-center justify-between pt-1 text-xs">
+                      <span className="font-medium text-primary inline-flex items-center gap-1 group-hover:underline">
+                        {isCompleted ? "Review guide" : isInProgress ? "Resume guide" : "Start guide"}
+                        <ArrowRight className="h-3.5 w-3.5 stroke-[1.5]" />
+                      </span>
+                    </div>
                   </div>
                 </Link>
               );
