@@ -34,6 +34,9 @@ function LoginForm() {
         "Account created! Check your email to confirm your address, then sign in here."
       );
     }
+    if (searchParams.get("password_reset") === "true") {
+      toast.success("Password updated successfully. Sign in with your new password.");
+    }
   }, [searchParams]);
 
   const {
@@ -130,6 +133,16 @@ function LoginForm() {
             {errors.password.message}
           </p>
         )}
+      </div>
+
+      {/* Forgot password link */}
+      <div className="text-right -mt-2">
+        <Link
+          href="/forgot-password"
+          className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+        >
+          Forgot password?
+        </Link>
       </div>
 
       {/* Submit */}
