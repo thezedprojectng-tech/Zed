@@ -6,7 +6,6 @@ import {
   ArrowRight,
   Search,
   Bell,
-  Sparkles,
   FileText,
 } from "lucide-react";
 
@@ -134,7 +133,7 @@ export function HeroMockup() {
               </div>
               <div className="text-right">
                 <span className="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
-                  <Sparkles className="h-3 w-3" />
+                  <Coins className="h-3 w-3 stroke-[1.5]" />
                   +100 Ready
                 </span>
               </div>

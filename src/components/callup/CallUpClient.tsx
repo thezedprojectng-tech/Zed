@@ -22,16 +22,30 @@ export function CallUpClient() {
   // If not mounted yet (hydration check), render loading skeleton
   if (!isMounted) {
     return (
-      <>
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 sm:space-y-8">
         <Header
-          title="Call-up Letter Parser"
+          backHref="/nav"
+          backLabel="Back to Zed Nav"
+          title="Call-up letter parser"
           subtitle="Extract state code, deployed state, and reporting date on your device."
         />
-        <div className="mx-auto max-w-4xl px-4 py-6 md:px-8 space-y-6">
-          <Skeleton className="h-44 w-full rounded-xl" />
-          <Skeleton className="h-64 w-full rounded-xl" />
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+          <div className="lg:col-span-7 space-y-4">
+            <Skeleton className="h-6 w-36 rounded-md" />
+            <Skeleton className="h-20 w-full rounded-lg" />
+            <Skeleton className="h-9 w-72 rounded-lg" />
+            <div className="space-y-2">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <Skeleton key={i} className="h-14 w-full rounded-lg" />
+              ))}
+            </div>
+          </div>
+          <div className="lg:col-span-5 space-y-4">
+            <Skeleton className="h-72 w-full rounded-lg" />
+            <Skeleton className="h-24 w-full rounded-lg" />
+          </div>
         </div>
-      </>
+      </div>
     );
   }
 
@@ -60,13 +74,15 @@ export function CallUpClient() {
   };
 
   return (
-    <>
+    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 sm:space-y-8">
       <Header
-        title="Call-up Letter Parser"
+        backHref="/nav"
+        backLabel="Back to Zed Nav"
+        title="Call-up letter parser"
         subtitle="Extract your NYSC state code, deployed state, and reporting countdown entirely on your device."
       />
 
-      <div className=" px-4 py-6 md:px-8">
+      <div>
         {effectiveStep === "input" && (
           <CallUpInput
             onParsed={handleParsed}
@@ -87,7 +103,6 @@ export function CallUpClient() {
           <CallUpSummary
             details={details}
             onEdit={() => {
-              // Convert saved details into parsedData shape to re-open review
               setParsedData({
                 fullName: { value: details.fullName, confidence: "found" },
                 stateCode: { value: details.stateCode, confidence: "found" },
@@ -107,6 +122,6 @@ export function CallUpClient() {
           />
         )}
       </div>
-    </>
+    </div>
   );
 }

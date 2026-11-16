@@ -10,7 +10,7 @@ import {
   Clock,
   Flame,
   Globe2,
-  Zap,
+  Target,
   Users2,
   MessageCircle,
 } from "lucide-react";
@@ -40,7 +40,7 @@ const locationVariant: Record<JobLocation, string> = {
 const VALUES = [
   {
     num: "01",
-    icon: Zap,
+    icon: Target,
     title: "Mission-Driven Impact",
     desc: "Solve actual administrative friction, middleman inflation, and document rejections for millions of Nigerian youth.",
   },

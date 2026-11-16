@@ -29,20 +29,20 @@ export default async function CDSLoggerPage() {
   const initialLogs = "logs" in result ? result.logs : [];
 
   return (
-    <>
+    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 sm:space-y-8">
       <Header
-        title="CDS Logger"
+        backHref="/nav"
+        backLabel="Back to Zed Nav"
+        title="CDS logger"
         subtitle="Track your Community Development Service attendance. Sessions are stored securely and tied to your account."
       />
 
-      <div className="mx-auto max-w-8xl px-4 py-6">
-        <CdsLoggerClient
-          initialLogs={initialLogs}
-          onCreate={createCdsLog}
-          onUpdate={updateCdsLog}
-          onDelete={deleteCdsLog}
-        />
-      </div>
-    </>
+      <CdsLoggerClient
+        initialLogs={initialLogs}
+        onCreate={createCdsLog}
+        onUpdate={updateCdsLog}
+        onDelete={deleteCdsLog}
+      />
+    </div>
   );
 }

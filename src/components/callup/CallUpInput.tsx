@@ -4,7 +4,6 @@ import { useState, useRef } from "react";
 import {
   FileText,
   Upload,
-  Sparkles,
   ShieldCheck,
   ArrowRight,
   BookmarkCheck,
@@ -69,7 +68,6 @@ export function CallUpInput({
       }
     };
     reader.readAsText(file);
-    // Reset file input
     e.target.value = "";
   };
 
@@ -79,11 +77,11 @@ export function CallUpInput({
   };
 
   return (
-    <section className="space-y-6" aria-labelledby="parser-input-heading">
+    <section className="space-y-6 max-w-4xl" aria-labelledby="parser-input-heading">
       {hasSavedDetails && (
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 rounded-xl border border-primary/20 bg-primary/5 p-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 rounded-lg border border-primary/20 bg-primary/5 p-4">
           <div className="flex items-center gap-3">
-            <BookmarkCheck className="h-5 w-5 text-primary shrink-0" />
+            <BookmarkCheck className="h-5 w-5 text-primary shrink-0 stroke-[1.5]" />
             <div>
               <p className="text-sm font-medium text-foreground">
                 You have saved call-up details
@@ -97,24 +95,24 @@ export function CallUpInput({
             variant="outline"
             size="sm"
             onClick={onViewSaved}
-            className="shrink-0"
+            className="shrink-0 text-xs h-9"
           >
-            View Saved Details
-            <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
+            <span>View saved details</span>
+            <ArrowRight className="h-3.5 w-3.5 ml-1.5 stroke-[1.5]" />
           </Button>
         </div>
       )}
 
       {/* Main card */}
-      <div className="rounded-xl border border-hairline bg-card p-4 sm:p-6 space-y-4">
+      <div className="rounded-lg border border-border/70 bg-card p-5 sm:p-6 space-y-4">
         <header className="space-y-1">
           <div className="flex items-center justify-between flex-wrap gap-2">
             <h2
               id="parser-input-heading"
-              className="text-base font-medium text-foreground flex items-center gap-2"
+              className="text-base font-semibold text-foreground flex items-center gap-2"
             >
-              <FileText className="h-4 w-4 text-primary" />
-              Paste Letter Text
+              <FileText className="h-4 w-4 text-primary stroke-[1.5]" />
+              Paste letter text
             </h2>
             <div className="flex items-center gap-2">
               <Button
@@ -122,19 +120,18 @@ export function CallUpInput({
                 variant="ghost"
                 size="sm"
                 onClick={loadSample}
-                className="text-xs text-muted-foreground hover:text-foreground h-8"
+                className="text-xs text-muted-foreground hover:text-foreground h-9"
               >
-                <Sparkles className="h-3.5 w-3.5 mr-1 text-primary" />
-                Load Sample
+                Load sample
               </Button>
               <Button
                 type="button"
                 variant="outline"
                 size="sm"
                 onClick={() => fileInputRef.current?.click()}
-                className="text-xs h-8"
+                className="text-xs h-9 gap-1.5"
               >
-                <Upload className="h-3.5 w-3.5 mr-1" />
+                <Upload className="h-3.5 w-3.5 stroke-[1.5]" />
                 Upload .txt
               </Button>
               <input
@@ -148,14 +145,14 @@ export function CallUpInput({
             </div>
           </div>
           <p className="text-xs text-muted-foreground">
-            Copy the text from your letter and paste it here. No PDF or image/OCR parsing in this version.
+            Copy the text from your call-up letter document and paste it here. Processing occurs entirely in your browser.
           </p>
         </header>
 
         {/* Textarea */}
         <div>
           <label htmlFor="callup-textarea" className="sr-only">
-            Call-up Letter Text
+            Call-up letter text
           </label>
           <textarea
             id="callup-textarea"
@@ -163,19 +160,19 @@ export function CallUpInput({
             onChange={(e) => setText(e.target.value)}
             rows={10}
             placeholder="NATIONAL YOUTH SERVICE CORPS&#10;CALL-UP LETTER FOR 2026 BATCH 'A'&#10;&#10;Name: ...&#10;Call-up Number: NYSC/...&#10;State Code: ...&#10;State of Deployment: ...&#10;Orientation Camp: ...&#10;Date of Reporting: ..."
-            className="w-full rounded-lg border border-input bg-background/50 px-3.5 py-3 font-mono text-xs leading-relaxed text-foreground placeholder:text-muted-foreground/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="w-full rounded-lg border border-border bg-secondary/30 px-3.5 py-3 font-mono text-xs leading-relaxed text-foreground placeholder:text-muted-foreground/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary"
           />
         </div>
 
         {/* Privacy notice banner */}
-        <div className="flex items-start gap-2.5 rounded-lg border border-hairline bg-muted/30 p-3 text-xs text-muted-foreground">
-          <ShieldCheck className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" />
+        <div className="flex items-start gap-2.5 rounded-lg border border-border/70 bg-secondary/30 p-3.5 text-xs text-muted-foreground">
+          <ShieldCheck className="h-4 w-4 text-primary shrink-0 mt-0.5 stroke-[1.5]" />
           <div className="space-y-0.5">
             <span className="font-medium text-foreground">
-              Your letter text is processed on your device and is not uploaded.
+              Your letter text is processed locally on your device and is not uploaded.
             </span>
             <p>
-              Parsing runs entirely in your local browser runtime. No text or data is ever transmitted to any server or remote database.
+              Parsing runs entirely in your local browser runtime. No text or data is ever transmitted to any remote server or database.
             </p>
           </div>
         </div>
@@ -186,10 +183,10 @@ export function CallUpInput({
             type="button"
             onClick={handleParse}
             disabled={!text.trim()}
-            className="w-full sm:w-auto font-medium"
+            className="w-full sm:w-auto text-xs h-10 px-5 font-medium gap-1.5"
           >
-            Parse Letter
-            <ArrowRight className="h-4 w-4 ml-2" />
+            <span>Parse letter</span>
+            <ArrowRight className="h-4 w-4 stroke-[1.5]" />
           </Button>
         </div>
       </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
-import { Check, ShieldCheck, ArrowRight, Sparkles, FileText, Smartphone, Lock } from "lucide-react";
+import { Check, ShieldCheck, ArrowRight, FileText, Smartphone, Lock } from "lucide-react";
 import { FadeIn } from "./FadeIn";
 
 export function HowItWorksSection() {

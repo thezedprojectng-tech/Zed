@@ -58,9 +58,9 @@ export default async function WithdrawPage() {
   }
 
   return (
-    <div className="mx-auto max-w-8xl">
+    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 sm:space-y-8">
       {bannerStatus && (
-        <div className="px-4 md:px-8 pt-6 md:pt-8">
+        <div>
           <VerifyAccountBanner status={bannerStatus} />
         </div>
       )}

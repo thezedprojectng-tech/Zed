@@ -9,6 +9,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { cdsLogSchema, type CdsLogFormData } from "@/lib/cds/helpers";
 import type { CdsLog } from "@/types/cds";
 
@@ -72,103 +75,125 @@ export function CdsLogForm({
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
       {/* Date */}
-      <div className="space-y-1">
-        <label htmlFor="cds-date" className="type-caption font-medium text-foreground">
-          Session Date <span aria-hidden="true" className="text-destructive">*</span>
-        </label>
-        <input
+      <div className="space-y-1.5">
+        <Label htmlFor="cds-date" className="text-xs font-medium text-foreground">
+          Session date <span aria-hidden="true" className="text-destructive">*</span>
+        </Label>
+        <Input
           id="cds-date"
           type="date"
           max={today}
           {...register("session_date")}
-          className="w-full h-9 rounded-md border border-input bg-background px-3 text-sm text-foreground outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition-colors"
+          className="h-10 text-sm"
         />
         {errors.session_date && (
-          <p role="alert" className="text-xs text-destructive">{errors.session_date.message}</p>
+          <p role="alert" className="text-xs font-medium text-destructive mt-1">
+            {errors.session_date.message}
+          </p>
         )}
       </div>
 
       {/* Group Name */}
-      <div className="space-y-1">
-        <label htmlFor="cds-group" className="type-caption font-medium text-foreground">
-          CDS Group Name <span aria-hidden="true" className="text-destructive">*</span>
-        </label>
-        <input
+      <div className="space-y-1.5">
+        <Label htmlFor="cds-group" className="text-xs font-medium text-foreground">
+          CDS group name <span aria-hidden="true" className="text-destructive">*</span>
+        </Label>
+        <Input
           id="cds-group"
           type="text"
           placeholder="e.g. Health Community Development"
           maxLength={100}
           {...register("group_name")}
-          className="w-full h-9 rounded-md border border-input bg-background px-3 text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition-colors"
+          className="h-10 text-sm"
         />
         {errors.group_name && (
-          <p role="alert" className="text-xs text-destructive">{errors.group_name.message}</p>
+          <p role="alert" className="text-xs font-medium text-destructive mt-1">
+            {errors.group_name.message}
+          </p>
         )}
       </div>
 
       {/* Activity */}
-      <div className="space-y-1">
-        <label htmlFor="cds-activity" className="type-caption font-medium text-foreground">
+      <div className="space-y-1.5">
+        <Label htmlFor="cds-activity" className="text-xs font-medium text-foreground">
           Activity <span aria-hidden="true" className="text-destructive">*</span>
-        </label>
-        <textarea
+        </Label>
+        <Textarea
           id="cds-activity"
           placeholder="Brief description of what you did at this session"
           rows={3}
           maxLength={500}
           {...register("activity")}
-          className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition-colors resize-y min-h-[72px]"
+          className="min-h-[80px] text-sm resize-y"
         />
         {errors.activity && (
-          <p role="alert" className="text-xs text-destructive">{errors.activity.message}</p>
+          <p role="alert" className="text-xs font-medium text-destructive mt-1">
+            {errors.activity.message}
+          </p>
         )}
       </div>
 
       {/* Hours */}
-      <div className="space-y-1">
-        <label htmlFor="cds-hours" className="type-caption font-medium text-foreground">
+      <div className="space-y-1.5">
+        <Label htmlFor="cds-hours" className="text-xs font-medium text-foreground">
           Hours <span aria-hidden="true" className="text-destructive">*</span>
-        </label>
-        <input
+        </Label>
+        <Input
           id="cds-hours"
           type="number"
           step="0.5"
           min="0.5"
           max="12"
           {...register("hours", { valueAsNumber: true })}
-          className="w-full h-9 rounded-md border border-input bg-background px-3 text-sm text-foreground outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition-colors"
+          className="h-10 text-sm"
         />
         {errors.hours && (
-          <p role="alert" className="text-xs text-destructive">{errors.hours.message}</p>
+          <p role="alert" className="text-xs font-medium text-destructive mt-1">
+            {errors.hours.message}
+          </p>
         )}
       </div>
 
       {/* Notes (optional) */}
-      <div className="space-y-1">
-        <label htmlFor="cds-notes" className="type-caption font-medium text-foreground">
+      <div className="space-y-1.5">
+        <Label htmlFor="cds-notes" className="text-xs font-medium text-foreground">
           Notes <span className="text-muted-foreground font-normal">(optional)</span>
-        </label>
-        <textarea
+        </Label>
+        <Textarea
           id="cds-notes"
           placeholder="Any extra details — e.g. attendance roll number, facilitator name"
           rows={2}
           maxLength={1000}
           {...register("notes")}
-          className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition-colors resize-y min-h-[56px]"
+          className="min-h-[64px] text-sm resize-y"
         />
         {errors.notes && (
-          <p role="alert" className="text-xs text-destructive">{errors.notes.message}</p>
+          <p role="alert" className="text-xs font-medium text-destructive mt-1">
+            {errors.notes.message}
+          </p>
         )}
       </div>
 
       {/* Actions */}
-      <div className="flex items-center gap-2 pt-1">
-        <Button type="submit" disabled={isSubmitting} className="gap-1.5">
+      <div className="flex items-center gap-2 pt-2">
+        <Button
+          type="submit"
+          disabled={isSubmitting}
+          size="sm"
+          className="h-9 px-4 text-xs font-medium gap-1.5"
+        >
           {isSubmitting && <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />}
-          {editing ? "Save Changes" : "Log Session"}
+          <span>{editing ? "Save changes" : "Log session"}</span>
         </Button>
         {onCancel && (
-          <Button type="button" variant="ghost" onClick={onCancel} disabled={isSubmitting}>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={onCancel}
+            disabled={isSubmitting}
+            className="h-9 px-4 text-xs"
+          >
             Cancel
           </Button>
         )}

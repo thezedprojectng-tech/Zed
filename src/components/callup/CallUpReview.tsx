@@ -12,7 +12,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
 import {
   type ParsedCallUpResult,
   type FieldConfidence,
@@ -54,37 +53,31 @@ export function CallUpReview({
   const renderConfidenceBadge = (confidence: FieldConfidence) => {
     if (confidence === "found") {
       return (
-        <Badge
-          variant="outline"
-          className="h-5 px-1.5 text-[10px] font-mono text-emerald-600 dark:text-emerald-400 border-emerald-500/30 bg-emerald-500/10 gap-1 font-normal"
-        >
-          <CheckCircle2 className="h-2.5 w-2.5" />
-          Detected
-        </Badge>
+        <span className="inline-flex items-center gap-1 rounded-md border border-[var(--data-verified-border)] bg-[var(--data-verified-subtle)] px-2 py-0.5 text-[11px] font-medium text-[var(--data-verified-ink)]">
+          <CheckCircle2 className="h-3 w-3 stroke-[2]" />
+          <span>Detected</span>
+        </span>
       );
     }
     return (
-      <Badge
-        variant="outline"
-        className="h-5 px-1.5 text-[10px] font-mono text-muted-foreground border-border bg-muted/30 gap-1 font-normal"
-      >
-        <AlertCircle className="h-2.5 w-2.5" />
-        Not detected
-      </Badge>
+      <span className="inline-flex items-center gap-1 rounded-md border border-border bg-secondary/60 px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
+        <AlertCircle className="h-3 w-3 stroke-[1.5]" />
+        <span>Not detected</span>
+      </span>
     );
   };
 
   return (
-    <section className="space-y-6" aria-labelledby="review-heading">
-      <div className="rounded-xl border border-hairline bg-card p-4 sm:p-6 space-y-6">
-        <header className="space-y-1.5 border-hairline-b pb-4">
+    <section className="space-y-6 max-w-4xl" aria-labelledby="review-heading">
+      <div className="rounded-lg border border-border/70 bg-card p-5 sm:p-6 space-y-6">
+        <header className="space-y-1.5 border-b border-border/60 pb-4">
           <div className="flex items-center justify-between flex-wrap gap-2">
             <div>
               <h2
                 id="review-heading"
-                className="text-base font-semibold text-foreground"
+                className="text-base font-semibold text-foreground tracking-tight"
               >
-                Review and correct the details
+                Review and correct details
               </h2>
               <p className="text-xs text-muted-foreground">
                 Nothing is verified automatically. Please double-check all extracted fields against your official Call-up Letter before confirming.
@@ -95,133 +88,137 @@ export function CallUpReview({
               variant="ghost"
               size="sm"
               onClick={onBack}
-              className="text-xs h-8"
+              className="text-xs h-9"
             >
-              <ArrowLeft className="h-3.5 w-3.5 mr-1" />
-              Re-paste Text
+              <ArrowLeft className="h-3.5 w-3.5 mr-1 stroke-[1.5]" />
+              Re-paste text
             </Button>
           </div>
         </header>
 
-        <form onSubmit={handleSubmit(onConfirm)} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+        <form onSubmit={handleSubmit(onConfirm)} className="space-y-6" noValidate>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
             {/* Full Name */}
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               <div className="flex items-center justify-between">
-                <Label htmlFor="fullName" className="text-xs font-medium">
-                  Full Name
+                <Label htmlFor="fullName" className="text-xs font-medium text-foreground">
+                  Full name
                 </Label>
                 {renderConfidenceBadge(initialParsed.fullName.confidence)}
               </div>
               <Input
                 id="fullName"
-                placeholder="e.g. ADENIRAN BABAJIDE SAMUEL"
+                placeholder="e.g. Adeniran Babajide Samuel"
+                className="h-10 text-sm"
                 {...register("fullName")}
               />
               {errors.fullName && (
-                <p className="text-[11px] text-destructive">
+                <p className="text-xs font-medium text-destructive mt-1">
                   {errors.fullName.message}
                 </p>
               )}
             </div>
 
             {/* State Code */}
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               <div className="flex items-center justify-between">
-                <Label htmlFor="stateCode" className="text-xs font-medium">
-                  State Code
+                <Label htmlFor="stateCode" className="text-xs font-medium text-foreground">
+                  State code
                 </Label>
                 {renderConfidenceBadge(initialParsed.stateCode.confidence)}
               </div>
               <Input
                 id="stateCode"
                 placeholder="e.g. LA/26A/4912"
-                className="font-mono"
+                className="h-10 text-sm font-mono"
                 {...register("stateCode")}
               />
               {errors.stateCode && (
-                <p className="text-[11px] text-destructive">
+                <p className="text-xs font-medium text-destructive mt-1">
                   {errors.stateCode.message}
                 </p>
               )}
             </div>
 
             {/* Call-up Number */}
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               <div className="flex items-center justify-between">
-                <Label htmlFor="callUpNumber" className="text-xs font-medium">
-                  Call-up Number
+                <Label htmlFor="callUpNumber" className="text-xs font-medium text-foreground">
+                  Call-up number
                 </Label>
                 {renderConfidenceBadge(initialParsed.callUpNumber.confidence)}
               </div>
               <Input
                 id="callUpNumber"
                 placeholder="e.g. NYSC/ABU/2026/142981"
-                className="font-mono"
+                className="h-10 text-sm font-mono"
                 {...register("callUpNumber")}
               />
               {errors.callUpNumber && (
-                <p className="text-[11px] text-destructive">
+                <p className="text-xs font-medium text-destructive mt-1">
                   {errors.callUpNumber.message}
                 </p>
               )}
             </div>
 
             {/* Deployed Camp State */}
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               <div className="flex items-center justify-between">
-                <Label htmlFor="campState" className="text-xs font-medium">
-                  State of Deployment
+                <Label htmlFor="campState" className="text-xs font-medium text-foreground">
+                  State of deployment
                 </Label>
                 {renderConfidenceBadge(initialParsed.campState.confidence)}
               </div>
               <Input
                 id="campState"
                 placeholder="e.g. Lagos"
+                className="h-10 text-sm"
                 {...register("campState")}
               />
               {errors.campState && (
-                <p className="text-[11px] text-destructive">
+                <p className="text-xs font-medium text-destructive mt-1">
                   {errors.campState.message}
                 </p>
               )}
             </div>
 
             {/* Orientation Camp Venue */}
-            <div className="space-y-2 md:col-span-2">
+            <div className="space-y-1.5 md:col-span-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="campName" className="text-xs font-medium">
-                  Orientation Camp Venue / Address
+                <Label htmlFor="campName" className="text-xs font-medium text-foreground">
+                  Orientation camp venue / address
                 </Label>
                 {renderConfidenceBadge(initialParsed.campName.confidence)}
               </div>
               <Input
                 id="campName"
                 placeholder="e.g. NYSC Permanent Orientation Camp, Iyana-Ipaja, Lagos State"
+                className="h-10 text-sm"
                 {...register("campName")}
               />
               {errors.campName && (
-                <p className="text-[11px] text-destructive">
+                <p className="text-xs font-medium text-destructive mt-1">
                   {errors.campName.message}
                 </p>
               )}
             </div>
 
             {/* Reporting Date */}
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               <div className="flex items-center justify-between">
-                <Label htmlFor="reportingDate" className="text-xs font-medium">
-                  Reporting Date (YYYY-MM-DD)
+                <Label htmlFor="reportingDate" className="text-xs font-medium text-foreground">
+                  Reporting date
                 </Label>
                 {renderConfidenceBadge(initialParsed.reportingDate.confidence)}
               </div>
               <Input
                 id="reportingDate"
                 type="date"
+                className="h-10 text-sm"
                 {...register("reportingDate")}
               />
               {errors.reportingDate && (
-                <p className="text-[11px] text-destructive">
+                <p className="text-xs font-medium text-destructive mt-1">
                   {errors.reportingDate.message}
                 </p>
               )}
@@ -229,9 +226,9 @@ export function CallUpReview({
 
             {/* Batch & Stream */}
             <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="batch" className="text-xs font-medium">
+                  <Label htmlFor="batch" className="text-xs font-medium text-foreground">
                     Batch
                   </Label>
                   {renderConfidenceBadge(initialParsed.batch.confidence)}
@@ -239,12 +236,13 @@ export function CallUpReview({
                 <Input
                   id="batch"
                   placeholder="e.g. 2026 Batch A"
+                  className="h-10 text-sm"
                   {...register("batch")}
                 />
               </div>
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="stream" className="text-xs font-medium">
+                  <Label htmlFor="stream" className="text-xs font-medium text-foreground">
                     Stream
                   </Label>
                   {renderConfidenceBadge(initialParsed.stream.confidence)}
@@ -252,14 +250,16 @@ export function CallUpReview({
                 <Input
                   id="stream"
                   placeholder="e.g. Stream 1"
+                  className="h-10 text-sm"
                   {...register("stream")}
                 />
               </div>
             </div>
           </div>
 
-          <div className="rounded-lg border border-hairline bg-muted/20 p-3 text-xs text-muted-foreground flex items-center gap-2">
-            <Info className="h-4 w-4 text-primary shrink-0" />
+          {/* Local storage note */}
+          <div className="rounded-lg border border-border/70 bg-secondary/30 p-3.5 text-xs text-muted-foreground flex items-center gap-2.5">
+            <Info className="h-4 w-4 text-primary shrink-0 stroke-[1.5]" />
             <span>
               Saving will store these confirmed details in your browser&apos;s local storage so you can track your reporting countdown and pre-camp packing list.
             </span>
@@ -271,12 +271,13 @@ export function CallUpReview({
               variant="outline"
               size="sm"
               onClick={onBack}
+              className="text-xs h-9 px-4"
             >
               Cancel
             </Button>
-            <Button type="submit" size="sm" className="font-medium">
-              <Save className="h-4 w-4 mr-1.5" />
-              Save Details & View Checklist
+            <Button type="submit" size="sm" className="text-xs h-9 px-4 font-medium gap-1.5">
+              <Save className="h-3.5 w-3.5 stroke-[1.5]" />
+              <span>Save details &amp; view checklist</span>
             </Button>
           </div>
         </form>

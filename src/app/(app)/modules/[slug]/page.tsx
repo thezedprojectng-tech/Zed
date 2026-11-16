@@ -71,7 +71,7 @@ export default async function ModulePlaceholderPage({ params }: Props) {
               {mod.tagline}
             </p>
 
-            <span className="font-mono text-[11px] text-muted-foreground/60 uppercase tracking-wider">
+            <span className="text-xs text-muted-foreground">
               {mod.phase}
             </span>
           </div>
@@ -79,13 +79,13 @@ export default async function ModulePlaceholderPage({ params }: Props) {
       </section>
 
       {/* Divider */}
-      <div className="border-hairline-b" role="separator" />
+      <div className="border-b border-border/60" role="separator" />
 
       {/* What it will do */}
       <section aria-labelledby="module-what" className="space-y-3">
         <h2
           id="module-what"
-          className="type-caption text-muted-foreground font-semibold uppercase tracking-wider"
+          className="text-xs font-semibold text-muted-foreground"
         >
           What it will do
         </h2>
@@ -97,10 +97,10 @@ export default async function ModulePlaceholderPage({ params }: Props) {
       {/* Status notice */}
       <aside
         aria-label="Development status"
-        className="rounded-xl border-hairline bg-card/50 p-5 flex flex-col gap-2"
+        className="rounded-lg border border-border/70 bg-card/50 p-5 flex flex-col gap-2"
       >
-        <p className="type-caption text-muted-foreground font-semibold uppercase">
-          Development Status
+        <p className="text-xs font-semibold text-muted-foreground">
+          Development status
         </p>
         <p className="type-small text-muted-foreground leading-relaxed">
           This module is in planning and has not been built yet. No functionality
