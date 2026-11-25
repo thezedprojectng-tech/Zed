@@ -1,4 +1,4 @@
-﻿import { describe, it, expect } from "vitest";
+import { describe, it, expect } from "vitest";
 import {
   trackSchema,
   lessonSchema,
@@ -6,6 +6,12 @@ import {
   calculateUserEarnedPoints,
   reorderLessonList,
   mapAdminSkillError,
+  validateScoreBands,
+  minutesToSeconds,
+  secondsToMinutes,
+  computeAutoMinSeconds,
+  trackSettingsSchema,
+  quizSchema,
 } from "./validation";
 
 describe("trackSchema validation", () => {
@@ -224,5 +230,114 @@ describe("mapAdminSkillError helper", () => {
   it("preserves empty track publishing block message", () => {
     const err = "Cannot publish a track with no lessons. Please add at least 1 lesson first.";
     expect(mapAdminSkillError(err)).toBe(err);
+  });
+});
+
+describe("validateScoreBands", () => {
+  it("accepts strictly descending score bands", () => {
+    const res = validateScoreBands([
+      { min: 85, label: "Distinction" },
+      { min: 70, label: "Merit" },
+      { min: 50, label: "Pass" },
+    ]);
+    expect(res.ok).toBe(true);
+  });
+
+  it("rejects empty bands, equal minimums, or ascending minimums", () => {
+    expect(validateScoreBands([]).ok).toBe(false);
+    expect(
+      validateScoreBands([
+        { min: 70, label: "Merit" },
+        { min: 70, label: "Pass" },
+      ]).ok
+    ).toBe(false);
+    expect(
+      validateScoreBands([
+        { min: 50, label: "Pass" },
+        { min: 80, label: "Distinction" },
+      ]).ok
+    ).toBe(false);
+  });
+
+  it("rejects empty labels or out-of-range scores", () => {
+    expect(validateScoreBands([{ min: 80, label: "   " }]).ok).toBe(false);
+    expect(validateScoreBands([{ min: 101, label: "Too high" }]).ok).toBe(false);
+  });
+});
+
+describe("minutes and seconds helpers", () => {
+  it("converts minutes to seconds and handles empty values", () => {
+    expect(minutesToSeconds(10)).toBe(600);
+    expect(minutesToSeconds("1.5")).toBe(90);
+    expect(minutesToSeconds("")).toBeNull();
+    expect(minutesToSeconds(null)).toBeNull();
+  });
+
+  it("converts seconds back to clean minutes strings", () => {
+    expect(secondsToMinutes(600)).toBe("10");
+    expect(secondsToMinutes(90)).toBe("1.5");
+    expect(secondsToMinutes(null)).toBe("");
+  });
+
+  it("computes automatic minimum seconds from duration and percentage", () => {
+    expect(computeAutoMinSeconds(600, 80)).toBe(480);
+    expect(computeAutoMinSeconds(null, 80)).toBeNull();
+    expect(computeAutoMinSeconds(0, 80)).toBeNull();
+  });
+});
+
+describe("trackSettingsSchema & quizSchema", () => {
+  it("accepts valid track settings with nullable overrides", () => {
+    expect(
+      trackSettingsSchema.safeParse({
+        price_ngn: 0,
+        pass_mark: null,
+        max_attempts: 3,
+        min_time_pct: null,
+        certificate_enabled: true,
+      }).success
+    ).toBe(true);
+  });
+
+  it("validates quiz questions have 2-6 options and valid correct_index", () => {
+    expect(
+      quizSchema.safeParse({
+        track_id: "11111111-1111-4111-8111-111111111111",
+        lesson_id: null,
+        title: "Final exam",
+        pass_mark: 70,
+        max_attempts: null,
+        shuffle_questions: true,
+        weight: 2,
+        questions: [
+          {
+            prompt: "What is 2 + 2?",
+            options: ["3", "4"],
+            correct_index: 1,
+            points: 1,
+          },
+        ],
+      }).success
+    ).toBe(true);
+
+    expect(
+      quizSchema.safeParse({
+        track_id: "11111111-1111-4111-8111-111111111111",
+        lesson_id: null,
+        title: "Final exam",
+        pass_mark: null,
+        max_attempts: null,
+        shuffle_questions: false,
+        weight: 1,
+        questions: [
+          {
+            prompt: "Bad question",
+            options: ["Only one"],
+            correct_index: 0,
+            points: 1,
+          },
+        ],
+      }).success
+    ).toBe(false);
   });
 });

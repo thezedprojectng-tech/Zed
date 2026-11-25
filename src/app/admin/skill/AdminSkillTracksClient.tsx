@@ -15,6 +15,7 @@ import {
   Loader2,
   BookOpen,
   Award,
+  Settings,
 } from "lucide-react";
 import { toast } from "sonner";
 import type { AdminTrackListItem } from "@/lib/skill/admin-actions";
@@ -230,22 +231,35 @@ export function AdminSkillTracksClient({
         icon={GraduationCap}
         section="programs"
         actions={
-          <Button
-            size="sm"
-            variant="default"
-            onClick={() => {
-              setCreateTitle("");
-              setCreateSlug("");
-              setCreateDesc("");
-              setHasManuallyEditedSlug(false);
-              setCreateErrors({});
-              setCreateDialogOpen(true);
-            }}
-            className="gap-1.5 rounded-lg h-9 text-xs"
-          >
-            <Plus className="h-4 w-4" />
-            <span>New track</span>
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              asChild
+              size="sm"
+              variant="outline"
+              className="gap-1.5 rounded-lg h-9 text-xs border-border/70"
+            >
+              <Link href="/admin/skill/settings">
+                <Settings className="h-4 w-4 stroke-[1.5]" />
+                <span>Settings</span>
+              </Link>
+            </Button>
+            <Button
+              size="sm"
+              variant="default"
+              onClick={() => {
+                setCreateTitle("");
+                setCreateSlug("");
+                setCreateDesc("");
+                setHasManuallyEditedSlug(false);
+                setCreateErrors({});
+                setCreateDialogOpen(true);
+              }}
+              className="gap-1.5 rounded-lg h-9 text-xs"
+            >
+              <Plus className="h-4 w-4" />
+              <span>New track</span>
+            </Button>
+          </div>
         }
       />
 

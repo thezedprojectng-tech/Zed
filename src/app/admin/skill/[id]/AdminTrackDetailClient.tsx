@@ -19,29 +19,45 @@ import {
   XCircle,
   Eye,
   EyeOff,
-  GripVertical,
+  AlertCircle,
+  HelpCircle,
+  Clock,
 } from "lucide-react";
 import { toast } from "sonner";
-import type { AdminTrackDetail, AdminLessonItem } from "@/lib/skill/admin-actions";
+import type {
+  AdminTrackDetail,
+  AdminLessonItem,
+  AdminQuizItem,
+} from "@/lib/skill/admin-actions";
 import {
   adminUpdateTrackAction,
   adminSetTrackPublishedAction,
   adminSaveLessonAction,
   adminReorderLessonsAction,
   adminDeleteLessonAction,
+  adminUpdateTrackSettingsAction,
+  adminUpdateLessonContentUrlAction,
+  adminUpdateLessonTimingAction,
 } from "@/lib/skill/admin-actions";
 import {
   lessonSchema,
   trackSchema,
-  reorderLessonList,
+  trackSettingsSchema,
+  minutesToSeconds,
+  secondsToMinutes,
+  computeAutoMinSeconds,
+  formatSecondsAsMinutesLabel,
 } from "@/lib/skill/validation";
 import { LessonMarkdown } from "@/components/skill/LessonMarkdown";
+import { QuizBuilderDialog } from "@/components/admin/skill/QuizBuilderDialog";
 import { PanelSection } from "@/components/admin/primitives/PanelSection";
 import { AdminCard } from "@/components/admin/primitives/AdminCard";
 import { StatusPill } from "@/components/admin/people/StatusPill";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -72,12 +88,38 @@ export function AdminTrackDetailClient({
   // Lessons list state (ordered)
   const [lessons, setLessons] = useState<AdminLessonItem[]>(initialTrack.lessons || []);
 
+  // Pricing & rules state
+  const [priceNgn, setPriceNgn] = useState(String(initialTrack.price_ngn ?? 0));
+  const [passMark, setPassMark] = useState(
+    initialTrack.pass_mark !== null ? String(initialTrack.pass_mark) : ""
+  );
+  const [maxAttempts, setMaxAttempts] = useState(
+    initialTrack.max_attempts !== null ? String(initialTrack.max_attempts) : ""
+  );
+  const [minTimePct, setMinTimePct] = useState(
+    initialTrack.min_time_pct !== null ? String(initialTrack.min_time_pct) : ""
+  );
+  const [certificateEnabled, setCertificateEnabled] = useState(
+    Boolean(initialTrack.certificate_enabled)
+  );
+  const [pricingError, setPricingError] = useState<string | null>(null);
+
+  // Quiz builder modal state
+  const [quizModalOpen, setQuizModalOpen] = useState(false);
+  const [quizLessonId, setQuizLessonId] = useState<string | null>(null);
+  const [quizLessonTitle, setQuizLessonTitle] = useState<string | undefined>(
+    undefined
+  );
+
   // Lesson editor modal state
   const [lessonModalOpen, setLessonModalOpen] = useState(false);
   const [editingLessonId, setEditingLessonId] = useState<string | null>(null);
   const [lessonTitle, setLessonTitle] = useState("");
   const [lessonSummary, setLessonSummary] = useState("");
   const [lessonContent, setLessonContent] = useState("");
+  const [lessonContentUrl, setLessonContentUrl] = useState("");
+  const [lessonDurationMin, setLessonDurationMin] = useState("");
+  const [lessonMinTimeMin, setLessonMinTimeMin] = useState("");
   const [lessonPoints, setLessonPoints] = useState(15);
   const [lessonPosition, setLessonPosition] = useState(1);
   const [lessonErrors, setLessonErrors] = useState<Record<string, string>>({});
@@ -101,6 +143,97 @@ export function AdminTrackDetailClient({
       trackDesc !== initialTrack.description,
     [trackTitle, trackSlug, trackDesc, initialTrack]
   );
+
+  const quizByLessonId = useMemo(() => {
+    const map = new Map<string, AdminQuizItem>();
+    for (const q of initialTrack.quizzes ?? []) {
+      if (q.lesson_id) map.set(q.lesson_id, q);
+    }
+    return map;
+  }, [initialTrack.quizzes]);
+
+  const finalExamQuiz = useMemo(
+    () => (initialTrack.quizzes ?? []).find((q) => q.lesson_id === null) ?? null,
+    [initialTrack.quizzes]
+  );
+
+  const effectiveMinTimePct = useMemo(() => {
+    if (minTimePct.trim() !== "" && !Number.isNaN(Number(minTimePct))) {
+      return Number(minTimePct);
+    }
+    return initialTrack.settingsDefaults.default_min_time_pct;
+  }, [minTimePct, initialTrack.settingsDefaults.default_min_time_pct]);
+
+  const parsedPricingInput = useMemo(
+    () => ({
+      price_ngn: priceNgn.trim() === "" ? 0 : Number(priceNgn),
+      pass_mark: passMark.trim() === "" ? null : Number(passMark),
+      max_attempts: maxAttempts.trim() === "" ? null : Number(maxAttempts),
+      min_time_pct: minTimePct.trim() === "" ? null : Number(minTimePct),
+      certificate_enabled: certificateEnabled,
+    }),
+    [priceNgn, passMark, maxAttempts, minTimePct, certificateEnabled]
+  );
+
+  const isPricingDirty = useMemo(
+    () =>
+      parsedPricingInput.price_ngn !== (initialTrack.price_ngn ?? 0) ||
+      parsedPricingInput.pass_mark !== (initialTrack.pass_mark ?? null) ||
+      parsedPricingInput.max_attempts !== (initialTrack.max_attempts ?? null) ||
+      parsedPricingInput.min_time_pct !== (initialTrack.min_time_pct ?? null) ||
+      parsedPricingInput.certificate_enabled !==
+        Boolean(initialTrack.certificate_enabled),
+    [parsedPricingInput, initialTrack]
+  );
+
+  const handleSavePricing = () => {
+    setPricingError(null);
+    const parsed = trackSettingsSchema.safeParse(parsedPricingInput);
+    if (!parsed.success) {
+      const msg =
+        parsed.error.issues[0]?.message ?? "Please fix pricing and rules errors.";
+      setPricingError(msg);
+      toast.error(msg);
+      return;
+    }
+
+    const patch: Record<string, number | boolean | null> = {};
+    if (parsed.data.price_ngn !== (initialTrack.price_ngn ?? 0)) {
+      patch.price_ngn = parsed.data.price_ngn;
+    }
+    if (parsed.data.pass_mark !== (initialTrack.pass_mark ?? null)) {
+      patch.pass_mark = parsed.data.pass_mark;
+    }
+    if (parsed.data.max_attempts !== (initialTrack.max_attempts ?? null)) {
+      patch.max_attempts = parsed.data.max_attempts;
+    }
+    if (parsed.data.min_time_pct !== (initialTrack.min_time_pct ?? null)) {
+      patch.min_time_pct = parsed.data.min_time_pct;
+    }
+    if (
+      parsed.data.certificate_enabled !==
+      Boolean(initialTrack.certificate_enabled)
+    ) {
+      patch.certificate_enabled = parsed.data.certificate_enabled;
+    }
+
+    startTransition(async () => {
+      const res = await adminUpdateTrackSettingsAction(initialTrack.id, patch);
+      if (!res.ok) {
+        setPricingError(res.error);
+        toast.error(res.error);
+        return;
+      }
+      toast.success("Pricing and rules updated");
+      router.refresh();
+    });
+  };
+
+  const openQuizModal = (lessonId: string | null, title?: string) => {
+    setQuizLessonId(lessonId);
+    setQuizLessonTitle(title);
+    setQuizModalOpen(true);
+  };
 
   // Track Save handler
   const handleSaveTrack = () => {
@@ -166,6 +299,9 @@ export function AdminTrackDetailClient({
     setLessonTitle("");
     setLessonSummary("");
     setLessonContent("");
+    setLessonContentUrl("");
+    setLessonDurationMin("");
+    setLessonMinTimeMin("");
     setLessonPoints(15);
     setLessonPosition(lessons.length + 1);
     setLessonErrors({});
@@ -178,6 +314,9 @@ export function AdminTrackDetailClient({
     setLessonTitle(lesson.title);
     setLessonSummary(lesson.summary);
     setLessonContent(lesson.content_md);
+    setLessonContentUrl(lesson.content_url ?? "");
+    setLessonDurationMin(secondsToMinutes(lesson.duration_seconds));
+    setLessonMinTimeMin(secondsToMinutes(lesson.min_seconds));
     setLessonPoints(lesson.skill_points);
     setLessonPosition(lesson.position);
     setLessonErrors({});
@@ -207,6 +346,21 @@ export function AdminTrackDetailClient({
       return;
     }
 
+    const durationSeconds = minutesToSeconds(lessonDurationMin);
+    const minSeconds = minutesToSeconds(lessonMinTimeMin);
+
+    if (
+      durationSeconds !== null &&
+      minSeconds !== null &&
+      minSeconds > durationSeconds
+    ) {
+      setLessonErrors({
+        min_seconds: "Minimum time cannot exceed lesson duration.",
+      });
+      toast.error("Minimum time cannot exceed lesson duration.");
+      return;
+    }
+
     startTransition(async () => {
       const res = await adminSaveLessonAction({
         lessonId: editingLessonId ?? null,
@@ -217,6 +371,32 @@ export function AdminTrackDetailClient({
       if (!res.ok) {
         toast.error(res.error || "Failed to save lesson");
         return;
+      }
+
+      const savedLessonId = res.data?.lesson_id ?? editingLessonId;
+      if (savedLessonId) {
+        const [urlRes, timingRes] = await Promise.all([
+          adminUpdateLessonContentUrlAction(
+            savedLessonId,
+            initialTrack.id,
+            lessonContentUrl
+          ),
+          adminUpdateLessonTimingAction(
+            savedLessonId,
+            initialTrack.id,
+            durationSeconds,
+            minSeconds
+          ),
+        ]);
+
+        if (!urlRes.ok) {
+          toast.error(urlRes.error);
+          return;
+        }
+        if (!timingRes.ok) {
+          toast.error(timingRes.error);
+          return;
+        }
       }
 
       toast.success(editingLessonId ? "Lesson updated" : "Lesson created");
@@ -396,20 +576,162 @@ export function AdminTrackDetailClient({
             </div>
           </PanelSection>
 
+          {/* Pricing & Rules Section */}
+          <PanelSection
+            title="Pricing and rules"
+            description="Set course price, pass mark, attempt limits, and certificate eligibility."
+          >
+            <div className="rounded-lg border border-border/70 bg-card p-5 space-y-4">
+              {pricingError && (
+                <div
+                  role="alert"
+                  className="flex items-center gap-2 rounded-lg border border-rose-500/30 bg-rose-500/10 p-3 text-xs text-rose-700 dark:text-rose-400"
+                >
+                  <AlertCircle className="h-4 w-4 shrink-0 stroke-[1.5]" />
+                  <span>{pricingError}</span>
+                </div>
+              )}
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <Label htmlFor="trackPriceNgn" className="text-xs font-medium">
+                    Price (NGN)
+                  </Label>
+                  <Input
+                    id="trackPriceNgn"
+                    type="number"
+                    min={0}
+                    value={priceNgn}
+                    onChange={(e) => setPriceNgn(e.target.value)}
+                    disabled={isPending}
+                    className="h-9 rounded-lg text-sm tabular-nums"
+                  />
+                  <p className="text-[11px] text-muted-foreground">
+                    Set to 0 for a free course. Free courses issue certificates instantly upon passing.
+                  </p>
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="trackPassMark" className="text-xs font-medium">
+                    Pass mark (%)
+                  </Label>
+                  <Input
+                    id="trackPassMark"
+                    type="number"
+                    min={1}
+                    max={100}
+                    value={passMark}
+                    onChange={(e) => setPassMark(e.target.value)}
+                    placeholder={`Default (${initialTrack.settingsDefaults.default_pass_mark}%)`}
+                    disabled={isPending}
+                    className="h-9 rounded-lg text-sm tabular-nums"
+                  />
+                  <p className="text-[11px] text-muted-foreground">
+                    Leave empty to use the global default.
+                  </p>
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="trackMaxAttempts" className="text-xs font-medium">
+                    Max quiz attempts
+                  </Label>
+                  <Input
+                    id="trackMaxAttempts"
+                    type="number"
+                    min={1}
+                    max={20}
+                    value={maxAttempts}
+                    onChange={(e) => setMaxAttempts(e.target.value)}
+                    placeholder={`Default (${initialTrack.settingsDefaults.default_max_attempts})`}
+                    disabled={isPending}
+                    className="h-9 rounded-lg text-sm tabular-nums"
+                  />
+                  <p className="text-[11px] text-muted-foreground">
+                    Leave empty to use the global default.
+                  </p>
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="trackMinTimePct" className="text-xs font-medium">
+                    Minimum lesson time (%)
+                  </Label>
+                  <Input
+                    id="trackMinTimePct"
+                    type="number"
+                    min={0}
+                    max={100}
+                    value={minTimePct}
+                    onChange={(e) => setMinTimePct(e.target.value)}
+                    placeholder={`Default (${initialTrack.settingsDefaults.default_min_time_pct}%)`}
+                    disabled={isPending}
+                    className="h-9 rounded-lg text-sm tabular-nums"
+                  />
+                  <p className="text-[11px] text-muted-foreground">
+                    Used when a lesson has no custom minimum time.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-t border-border/60 pt-4">
+                <label className="flex items-center gap-2.5 text-xs text-foreground cursor-pointer select-none">
+                  <Checkbox
+                    checked={certificateEnabled}
+                    onCheckedChange={(checked) => {
+                      setCertificateEnabled(Boolean(checked));
+                      setPricingError(null);
+                    }}
+                    disabled={isPending}
+                  />
+                  <span>Issue certificate when course requirements are met</span>
+                </label>
+
+                <Button
+                  type="button"
+                  size="sm"
+                  disabled={isPending || !isPricingDirty}
+                  onClick={handleSavePricing}
+                  className="h-8 text-xs rounded-lg gap-1.5 self-start sm:self-auto"
+                >
+                  {isPending ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin motion-reduce:animate-none" />
+                  ) : (
+                    <Save className="h-3.5 w-3.5" />
+                  )}
+                  <span>Save pricing and rules</span>
+                </Button>
+              </div>
+            </div>
+          </PanelSection>
+
           {/* Lessons Section */}
           <PanelSection
             title="Lessons & curriculum"
             description="Ordered lesson sequence. Learners unlock rewards and skill points as they progress."
             action={
-              <Button
-                size="sm"
-                variant="default"
-                onClick={openNewLessonModal}
-                className="gap-1.5 rounded-md h-8 text-xs"
-              >
-                <Plus className="h-3.5 w-3.5" />
-                <span>Add lesson</span>
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => openQuizModal(null)}
+                  className="gap-1.5 rounded-lg h-8 text-xs border-border/70"
+                >
+                  <HelpCircle className="h-3.5 w-3.5" />
+                  <span>
+                    {finalExamQuiz
+                      ? `Final exam (${finalExamQuiz.questions.length})`
+                      : "Add final exam"}
+                  </span>
+                </Button>
+                <Button
+                  size="sm"
+                  variant="default"
+                  onClick={openNewLessonModal}
+                  className="gap-1.5 rounded-lg h-8 text-xs"
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                  <span>Add lesson</span>
+                </Button>
+              </div>
             }
           >
             <div className="space-y-2 pt-1">
@@ -478,12 +800,53 @@ export function AdminTrackDetailClient({
                         </div>
                       </div>
 
-                      {/* Right: Points + Completion badge + Actions */}
+                      {/* Right: Badges + Actions */}
                       <div
-                        className="flex items-center gap-2.5 shrink-0"
+                        className="flex items-center gap-2 shrink-0 flex-wrap justify-end"
                         onClick={(e) => e.stopPropagation()}
                       >
-                        <span className="font-sans tabular-nums font-semibold text-[11px] px-2 py-0.5 rounded-full bg-[color:var(--data-signups-subtle)] text-[color:var(--data-signups-ink)] border border-[color:var(--data-signups-border)]">
+                        {lesson.duration_seconds !== null &&
+                          lesson.duration_seconds > 0 && (
+                            <span className="inline-flex items-center gap-1 font-sans tabular-nums text-[11px] px-2 py-0.5 rounded-md border border-border/70 bg-secondary/50 text-muted-foreground">
+                              <Clock className="h-3 w-3 stroke-[1.5]" />
+                              <span>
+                                {formatSecondsAsMinutesLabel(
+                                  lesson.duration_seconds
+                                )}
+                              </span>
+                            </span>
+                          )}
+
+                        {(() => {
+                          const lessonQuiz = quizByLessonId.get(lesson.id);
+                          return (
+                            <button
+                              type="button"
+                              onClick={() =>
+                                openQuizModal(lesson.id, lesson.title)
+                              }
+                              className={cn(
+                                "inline-flex items-center gap-1 font-sans tabular-nums font-medium text-[11px] px-2 py-0.5 rounded-md border motion-safe:transition-colors duration-150",
+                                lessonQuiz
+                                  ? "border-[var(--data-verified-border)] bg-[var(--data-verified-subtle)] text-[var(--data-verified-ink)] hover:opacity-90"
+                                  : "border-border/70 bg-secondary/40 text-muted-foreground hover:text-foreground"
+                              )}
+                            >
+                              <HelpCircle className="h-3 w-3 stroke-[1.5]" />
+                              <span>
+                                {lessonQuiz
+                                  ? `Quiz (${lessonQuiz.questions.length} ${
+                                      lessonQuiz.questions.length === 1
+                                        ? "question"
+                                        : "questions"
+                                    })`
+                                  : "Add quiz"}
+                              </span>
+                            </button>
+                          );
+                        })()}
+
+                        <span className="font-sans tabular-nums font-semibold text-[11px] px-2 py-0.5 rounded-md bg-[color:var(--data-signups-subtle)] text-[color:var(--data-signups-ink)] border border-[color:var(--data-signups-border)]">
                           {lesson.skill_points} pts
                         </span>
 
@@ -512,6 +875,28 @@ export function AdminTrackDetailClient({
                       </div>
                     </div>
                   ))}
+
+                  {finalExamQuiz && (
+                    <div
+                      onClick={() => openQuizModal(null)}
+                      className="p-3.5 flex items-center justify-between gap-3 text-xs bg-secondary/20 hover:bg-muted/40 motion-safe:transition-colors duration-150 cursor-pointer"
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <span className="inline-flex items-center rounded-md border border-primary/30 bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary shrink-0">
+                          Final exam
+                        </span>
+                        <span className="font-medium text-foreground truncate text-sm">
+                          {finalExamQuiz.title}
+                        </span>
+                      </div>
+                      <span className="font-sans tabular-nums text-[11px] text-muted-foreground shrink-0">
+                        {finalExamQuiz.questions.length}{" "}
+                        {finalExamQuiz.questions.length === 1
+                          ? "question"
+                          : "questions"}
+                      </span>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -652,6 +1037,78 @@ export function AdminTrackDetailClient({
                   onChange={(e) => setLessonPoints(Number(e.target.value))}
                   className="h-9 text-xs rounded-md bg-background border-border font-sans tabular-nums"
                 />
+              </div>
+            </div>
+
+            {/* Video link & Timing */}
+            <div className="space-y-3 border-t border-border/60 pt-3">
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-foreground block font-sans">
+                  Video link
+                </label>
+                <Input
+                  type="url"
+                  value={lessonContentUrl}
+                  onChange={(e) => setLessonContentUrl(e.target.value)}
+                  placeholder="https://www.youtube.com/watch?v=..."
+                  className="h-9 text-xs rounded-lg bg-background border-border"
+                />
+                <p className="text-[11px] text-muted-foreground font-sans">
+                  Use YouTube or Vimeo links in the video link field. Short lessons of 10–15 minutes work best.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-foreground block font-sans">
+                    Duration (minutes)
+                  </label>
+                  <Input
+                    type="number"
+                    step="0.5"
+                    min={0}
+                    value={lessonDurationMin}
+                    onChange={(e) => setLessonDurationMin(e.target.value)}
+                    placeholder="e.g. 12"
+                    className="h-9 text-xs rounded-lg bg-background border-border font-sans tabular-nums"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-foreground block font-sans">
+                    Minimum time (minutes)
+                  </label>
+                  <Input
+                    type="number"
+                    step="0.5"
+                    min={0}
+                    value={lessonMinTimeMin}
+                    onChange={(e) => setLessonMinTimeMin(e.target.value)}
+                    placeholder="Automatic"
+                    className="h-9 text-xs rounded-lg bg-background border-border font-sans tabular-nums"
+                  />
+                  {(() => {
+                    const durSecs = minutesToSeconds(lessonDurationMin);
+                    const autoSecs = computeAutoMinSeconds(
+                      durSecs,
+                      effectiveMinTimePct
+                    );
+                    if (lessonMinTimeMin.trim() === "" && autoSecs !== null) {
+                      return (
+                        <p className="text-[11px] text-muted-foreground font-sans tabular-nums">
+                          Automatic: {formatSecondsAsMinutesLabel(autoSecs)} (
+                          {effectiveMinTimePct}% of {lessonDurationMin} min)
+                        </p>
+                      );
+                    }
+                    return null;
+                  })()}
+                  {lessonErrors.min_seconds && (
+                    <p className="text-[11px] font-medium text-rose-600 dark:text-rose-400 font-sans">
+                      {lessonErrors.min_seconds}
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -828,6 +1285,31 @@ export function AdminTrackDetailClient({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Quiz Builder Dialog */}
+      <QuizBuilderDialog
+        open={quizModalOpen}
+        onOpenChange={setQuizModalOpen}
+        trackId={initialTrack.id}
+        lessonId={quizLessonId}
+        lessonTitle={quizLessonTitle}
+        existingQuiz={
+          quizLessonId
+            ? quizByLessonId.get(quizLessonId) ?? null
+            : finalExamQuiz
+        }
+        defaultPassMark={
+          passMark.trim() !== "" && !Number.isNaN(Number(passMark))
+            ? Number(passMark)
+            : initialTrack.settingsDefaults.default_pass_mark
+        }
+        defaultMaxAttempts={
+          maxAttempts.trim() !== "" && !Number.isNaN(Number(maxAttempts))
+            ? Number(maxAttempts)
+            : initialTrack.settingsDefaults.default_max_attempts
+        }
+        onSaved={() => router.refresh()}
+      />
     </div>
   );
 }
