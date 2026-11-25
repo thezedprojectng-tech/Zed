@@ -1,5 +1,6 @@
 import { Check } from "lucide-react";
 import { isVerifiedBadgeEnabled } from "@/lib/verification/flags";
+import { cn } from "@/lib/utils";
 
 interface VerifiedBadgeProps {
   isVerified?: boolean;
@@ -21,9 +22,12 @@ export function VerifiedBadge({
   if (isVerified) {
     return (
       <span
-        className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium border bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-400 ${className}`}
+        className={cn(
+          "inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-medium border border-[var(--data-verified-border)] bg-[var(--data-verified-subtle)] text-[var(--data-verified-ink)]",
+          className
+        )}
       >
-        <Check className="h-2.5 w-2.5 stroke-[2.5]" />
+        <Check className="h-3 w-3 stroke-[2]" />
         <span>Verified</span>
       </span>
     );
@@ -31,7 +35,10 @@ export function VerifiedBadge({
 
   return (
     <span
-      className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium border bg-muted/50 border-border/80 text-muted-foreground ${className}`}
+      className={cn(
+        "inline-flex items-center rounded-md px-2 py-0.5 text-[11px] font-medium border border-border/70 bg-secondary/50 text-muted-foreground",
+        className
+      )}
     >
       <span>Not verified</span>
     </span>
