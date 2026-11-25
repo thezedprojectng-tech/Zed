@@ -307,7 +307,7 @@ describe("trackSettingsSchema & quizSchema", () => {
         title: "Final exam",
         pass_mark: 70,
         max_attempts: null,
-        shuffle_questions: true,
+        shuffle: true,
         weight: 2,
         questions: [
           {
@@ -327,7 +327,7 @@ describe("trackSettingsSchema & quizSchema", () => {
         title: "Final exam",
         pass_mark: null,
         max_attempts: null,
-        shuffle_questions: false,
+        shuffle: false,
         weight: 1,
         questions: [
           {

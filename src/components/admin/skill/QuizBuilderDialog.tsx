@@ -99,7 +99,7 @@ export function QuizBuilderDialog({
           ? String(existingQuiz.max_attempts)
           : ""
       );
-      setShuffleQuestions(existingQuiz.shuffle_questions);
+      setShuffleQuestions(existingQuiz.shuffle);
       setWeight(String(existingQuiz.weight ?? 1));
       setQuestions(
         existingQuiz.questions.length > 0
@@ -204,7 +204,7 @@ export function QuizBuilderDialog({
       title,
       pass_mark: passMark.trim() === "" ? null : Number(passMark),
       max_attempts: maxAttempts.trim() === "" ? null : Number(maxAttempts),
-      shuffle_questions: shuffleQuestions,
+      shuffle: shuffleQuestions,
       weight: Number(weight),
       questions: questions.map((q) => ({
         id: q.id,

@@ -369,33 +369,42 @@ export function AdminTrackDetailClient({
       });
 
       if (!res.ok) {
+        setLessonErrors({ form: res.error || "Failed to save lesson" });
         toast.error(res.error || "Failed to save lesson");
         return;
       }
 
       const savedLessonId = res.data?.lesson_id ?? editingLessonId;
       if (savedLessonId) {
-        const [urlRes, timingRes] = await Promise.all([
-          adminUpdateLessonContentUrlAction(
+        const existingLesson = editingLessonId
+          ? lessons.find((l) => l.id === editingLessonId)
+          : null;
+        const nextUrl = lessonContentUrl.trim();
+        const prevUrl = (existingLesson?.content_url ?? "").trim();
+
+        const timingRes = await adminUpdateLessonTimingAction(
+          savedLessonId,
+          initialTrack.id,
+          durationSeconds,
+          minSeconds
+        );
+        if (!timingRes.ok) {
+          setLessonErrors({ min_seconds: timingRes.error });
+          toast.error(timingRes.error);
+          return;
+        }
+
+        if (nextUrl !== prevUrl) {
+          const urlRes = await adminUpdateLessonContentUrlAction(
             savedLessonId,
             initialTrack.id,
             lessonContentUrl
-          ),
-          adminUpdateLessonTimingAction(
-            savedLessonId,
-            initialTrack.id,
-            durationSeconds,
-            minSeconds
-          ),
-        ]);
-
-        if (!urlRes.ok) {
-          toast.error(urlRes.error);
-          return;
-        }
-        if (!timingRes.ok) {
-          toast.error(timingRes.error);
-          return;
+          );
+          if (!urlRes.ok) {
+            setLessonErrors({ content_url: urlRes.error });
+            toast.error(urlRes.error);
+            return;
+          }
         }
       }
 
@@ -993,6 +1002,15 @@ export function AdminTrackDetailClient({
           </DialogHeader>
 
           <div className="space-y-4 py-2 text-xs">
+            {lessonErrors.form && (
+              <div
+                role="alert"
+                className="flex items-center gap-2 rounded-lg border border-rose-500/30 bg-rose-500/10 p-3 text-xs text-rose-700 dark:text-rose-400"
+              >
+                <AlertCircle className="h-4 w-4 shrink-0 stroke-[1.5]" />
+                <span>{lessonErrors.form}</span>
+              </div>
+            )}
             {/* Title */}
             <div className="space-y-1.5">
               <label className="text-xs font-medium text-foreground block font-sans">
@@ -1056,6 +1074,11 @@ export function AdminTrackDetailClient({
                 <p className="text-[11px] text-muted-foreground font-sans">
                   Use YouTube or Vimeo links in the video link field. Short lessons of 10–15 minutes work best.
                 </p>
+                {lessonErrors.content_url && (
+                  <p className="text-[11px] font-medium text-rose-600 dark:text-rose-400 font-sans">
+                    {lessonErrors.content_url}
+                  </p>
+                )}
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">

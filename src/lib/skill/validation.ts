@@ -391,7 +391,7 @@ export const quizSchema = z.object({
     .min(1, "Max attempts must be between 1 and 20")
     .max(20, "Max attempts must be between 1 and 20")
     .nullable(),
-  shuffle_questions: z.boolean(),
+  shuffle: z.boolean(),
   weight: z
     .number()
     .positive("Weight must be greater than 0")

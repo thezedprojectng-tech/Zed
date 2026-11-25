@@ -10,6 +10,12 @@ import {
 } from "@/data/skill-levels";
 import { LessonMarkdown } from "@/components/skill/LessonMarkdown";
 import { mapSkillRpcError } from "@/lib/skill/errors";
+import {
+  formatCountdownMmSs,
+  buildQuizAnswersPayload,
+  areAllQuestionsAnswered,
+  parseVideoEmbed,
+} from "@/lib/skill/learner-helpers";
 
 describe("Zed Skill – Level Thresholds & Config", () => {
   it("has 5 levels with ascending point thresholds", () => {
@@ -360,5 +366,54 @@ describe("getSkillLevelProgress – exact threshold boundaries", () => {
     // 2 original tracks × 50 pts + 4 new tracks × 50 pts = 300 pts total
     const totalPublishedPoints = 300;
     expect(computeEligibleLevel(totalPublishedPoints)).toBe(3);
+  });
+});
+
+describe("learner-helpers: countdown and quiz answer payload", () => {
+  it("formats countdown seconds as mm:ss", () => {
+    expect(formatCountdownMmSs(0)).toBe("00:00");
+    expect(formatCountdownMmSs(65)).toBe("01:05");
+    expect(formatCountdownMmSs(600)).toBe("10:00");
+    expect(formatCountdownMmSs(-10)).toBe("00:00");
+  });
+
+  it("builds quiz answers payload as {question_id: chosen_index}", () => {
+    const questions = [{ id: "q1" }, { id: "q2" }, { id: "q3" }];
+    expect(
+      buildQuizAnswersPayload(questions, { q1: 0, q2: 2, q3: undefined })
+    ).toEqual({ q1: 0, q2: 2 });
+    expect(areAllQuestionsAnswered(questions, { q1: 0, q2: 2 })).toBe(false);
+    expect(
+      areAllQuestionsAnswered(questions, { q1: 0, q2: 2, q3: 1 })
+    ).toBe(true);
+  });
+
+  it("parses YouTube and Vimeo URLs into embed URLs and falls back to link", () => {
+    expect(parseVideoEmbed("https://www.youtube.com/watch?v=dQw4w9WgXcQ")).toEqual({
+      kind: "youtube",
+      embedUrl: "https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?rel=0&autoplay=0",
+    });
+    expect(parseVideoEmbed("https://youtu.be/dQw4w9WgXcQ")).toEqual({
+      kind: "youtube",
+      embedUrl: "https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?rel=0&autoplay=0",
+    });
+    expect(parseVideoEmbed("https://vimeo.com/123456789")).toEqual({
+      kind: "vimeo",
+      embedUrl: "https://player.vimeo.com/video/123456789?dnt=1&autoplay=0",
+    });
+    expect(parseVideoEmbed("https://example.com/video.mp4")).toEqual({
+      kind: "link",
+      href: "https://example.com/video.mp4",
+    });
+    expect(parseVideoEmbed(null)).toEqual({ kind: "none" });
+  });
+
+  it("preserves readable time-gate and quiz-gate errors from complete_lesson", () => {
+    expect(mapSkillRpcError("Please spend at least 120 more seconds on this lesson.")).toBe(
+      "Please spend at least 120 more seconds on this lesson."
+    );
+    expect(mapSkillRpcError("You must pass the lesson quiz before completing this lesson.")).toBe(
+      "You must pass the lesson quiz before completing this lesson."
+    );
   });
 });

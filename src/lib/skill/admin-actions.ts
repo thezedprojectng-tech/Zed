@@ -59,7 +59,7 @@ export interface AdminQuizItem {
   title: string;
   pass_mark: number | null;
   max_attempts: number | null;
-  shuffle_questions: boolean;
+  shuffle: boolean;
   weight: number;
   questions: AdminQuizQuestionItem[];
 }
@@ -203,7 +203,7 @@ export async function getAdminTrackDetail(
     supabase
       .from("skill_quizzes")
       .select(
-        "id, track_id, lesson_id, title, pass_mark, max_attempts, shuffle_questions, weight"
+        "id, track_id, lesson_id, title, pass_mark, max_attempts, shuffle, weight"
       )
       .eq("track_id", trackId),
     getAdminSkillSettings(),
@@ -299,7 +299,7 @@ export async function getAdminTrackDetail(
       q.max_attempts !== null && q.max_attempts !== undefined
         ? Number(q.max_attempts)
         : null,
-    shuffle_questions: Boolean(q.shuffle_questions),
+    shuffle: Boolean(q.shuffle),
     weight: Number(q.weight ?? 1),
     questions: questionsByQuiz[q.id] ?? [],
   }));
@@ -595,7 +595,7 @@ export async function adminUpdateTrackSettingsAction(
 }
 
 /**
- * Update lesson video URL (content_url) directly through RLS.
+ * Update lesson video URL (content_url) via admin_set_lesson_content_url RPC.
  */
 export async function adminUpdateLessonContentUrlAction(
   lessonId: string,
@@ -605,10 +605,10 @@ export async function adminUpdateLessonContentUrlAction(
   try {
     const supabase = await createClient();
     const cleaned = contentUrl && contentUrl.trim() ? contentUrl.trim() : null;
-    const { error } = await supabase
-      .from("skill_lessons")
-      .update({ content_url: cleaned })
-      .eq("id", lessonId);
+    const { error } = await supabase.rpc("admin_set_lesson_content_url", {
+      p_lesson_id: lessonId,
+      p_content_url: cleaned,
+    });
 
     if (error) {
       return { ok: false, error: mapAdminSkillError(error) };
@@ -675,7 +675,7 @@ export async function adminSaveQuizAction(
           title: data.title,
           pass_mark: data.pass_mark,
           max_attempts: data.max_attempts,
-          shuffle_questions: data.shuffle_questions,
+          shuffle: data.shuffle,
           weight: data.weight,
         })
         .eq("id", quizId);
@@ -692,7 +692,7 @@ export async function adminSaveQuizAction(
           title: data.title,
           pass_mark: data.pass_mark,
           max_attempts: data.max_attempts,
-          shuffle_questions: data.shuffle_questions,
+          shuffle: data.shuffle,
           weight: data.weight,
         })
         .select("id")
