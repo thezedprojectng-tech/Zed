@@ -50,6 +50,7 @@ import {
 } from "@/lib/skill/validation";
 import { LessonMarkdown } from "@/components/skill/LessonMarkdown";
 import { QuizBuilderDialog } from "@/components/admin/skill/QuizBuilderDialog";
+import { CertificateTemplateEditor } from "@/components/admin/skill/CertificateTemplateEditor";
 import { PanelSection } from "@/components/admin/primitives/PanelSection";
 import { AdminCard } from "@/components/admin/primitives/AdminCard";
 import { StatusPill } from "@/components/admin/people/StatusPill";
@@ -710,6 +711,19 @@ export function AdminTrackDetailClient({
                 </Button>
               </div>
             </div>
+          </PanelSection>
+
+          {/* Certificate Section */}
+          <PanelSection
+            title="Certificate"
+            description="Upload a template image and position learner fields on the live preview."
+          >
+            <CertificateTemplateEditor
+              trackId={initialTrack.id}
+              trackTitle={trackTitle}
+              initialTemplatePath={initialTrack.certificate_template_path}
+              initialLayout={initialTrack.certificate_layout}
+            />
           </PanelSection>
 
           {/* Lessons Section */}

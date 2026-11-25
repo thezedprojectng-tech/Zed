@@ -15,6 +15,10 @@ import {
   type SkillSettingsInput,
   type QuizInput,
 } from "./validation";
+import {
+  certificateLayoutSchema,
+  type CertificateLayout,
+} from "@/lib/certificate/layout";
 
 export interface AdminTrackListItem {
   id: string;
@@ -87,6 +91,8 @@ export interface AdminTrackDetail {
   max_attempts: number | null;
   min_time_pct: number | null;
   certificate_enabled: boolean;
+  certificate_template_path: string | null;
+  certificate_layout: CertificateLayout | null;
   created_at: string;
   lessons: AdminLessonItem[];
   quizzes: AdminQuizItem[];
@@ -189,7 +195,7 @@ export async function getAdminTrackDetail(
     supabase
       .from("skill_tracks")
       .select(
-        "id, slug, title, description, is_published, price_ngn, pass_mark, max_attempts, min_time_pct, certificate_enabled, created_at"
+        "id, slug, title, description, is_published, price_ngn, pass_mark, max_attempts, min_time_pct, certificate_enabled, certificate_template_path, certificate_layout, created_at"
       )
       .eq("id", trackId)
       .maybeSingle(),
@@ -304,6 +310,8 @@ export async function getAdminTrackDetail(
     questions: questionsByQuiz[q.id] ?? [],
   }));
 
+  const parsedLayout = certificateLayoutSchema.safeParse(track.certificate_layout);
+
   return {
     id: track.id,
     slug: track.slug,
@@ -324,6 +332,8 @@ export async function getAdminTrackDetail(
         ? Number(track.min_time_pct)
         : null,
     certificate_enabled: Boolean(track.certificate_enabled),
+    certificate_template_path: track.certificate_template_path ?? null,
+    certificate_layout: parsedLayout.success ? parsedLayout.data : null,
     created_at: track.created_at,
     lessons: enrichedLessons,
     quizzes: enrichedQuizzes,
@@ -783,6 +793,265 @@ export async function adminDeleteQuizAction(
     }
 
     revalidatePath(`/admin/skill/${trackId}`);
+    revalidatePath("/skill");
+    return { ok: true };
+  } catch (err) {
+    return { ok: false, error: mapAdminSkillError(err) };
+  }
+}
+
+export interface AdminCertificateOrder {
+  id: string;
+  learner_name: string;
+  learner_email: string | null;
+  course_title: string;
+  amount_ngn: number;
+  payer_name: string;
+  payment_reference: string;
+  status: "pending" | "approved" | "rejected";
+  reason: string | null;
+  created_at: string;
+}
+
+export interface AdminIssuedCertificate {
+  id: string;
+  code: string;
+  learner_name: string;
+  course_title: string;
+  score: number;
+  remark: string;
+  issued_at: string;
+  revoked_at: string | null;
+  revoke_reason: string | null;
+}
+
+/**
+ * Update certificate template path and/or layout JSON for a track via
+ * admin_update_skill_track_settings.
+ */
+export async function adminUpdateTrackCertificateAction(
+  trackId: string,
+  input: {
+    certificate_template_path?: string | null;
+    certificate_layout?: CertificateLayout;
+  }
+): Promise<AdminActionResult> {
+  const settingsPatch: Record<string, unknown> = {};
+
+  if (input.certificate_template_path !== undefined) {
+    settingsPatch.certificate_template_path = input.certificate_template_path;
+  }
+
+  if (input.certificate_layout !== undefined) {
+    const parsed = certificateLayoutSchema.safeParse(input.certificate_layout);
+    if (!parsed.success) {
+      return {
+        ok: false,
+        error: parsed.error.issues[0]?.message ?? "Invalid certificate layout",
+      };
+    }
+    settingsPatch.certificate_layout = parsed.data;
+  }
+
+  if (Object.keys(settingsPatch).length === 0) {
+    return { ok: true };
+  }
+
+  try {
+    const supabase = await createClient();
+    const { error } = await supabase.rpc("admin_update_skill_track_settings", {
+      p_track_id: trackId,
+      p_settings: settingsPatch,
+    });
+
+    if (error) {
+      return { ok: false, error: error.message || mapAdminSkillError(error) };
+    }
+
+    revalidatePath("/admin/skill");
+    revalidatePath(`/admin/skill/${trackId}`);
+    revalidatePath("/skill");
+    return { ok: true };
+  } catch (err) {
+    return { ok: false, error: mapAdminSkillError(err) };
+  }
+}
+
+function normalizeCertificateOrderRow(
+  row: Record<string, unknown>,
+  fallbackStatus: "pending" | "approved" | "rejected"
+): AdminCertificateOrder {
+  const rawStatus = String(row.status ?? fallbackStatus).toLowerCase();
+  const status: "pending" | "approved" | "rejected" =
+    rawStatus === "approved" || rawStatus === "rejected" ? rawStatus : "pending";
+
+  return {
+    id: String(row.id ?? row.order_id ?? ""),
+    learner_name: String(
+      row.learner_name ?? row.full_name ?? row.user_name ?? row.name ?? "Learner"
+    ),
+    learner_email:
+      row.learner_email !== undefined && row.learner_email !== null
+        ? String(row.learner_email)
+        : row.email !== undefined && row.email !== null
+          ? String(row.email)
+          : null,
+    course_title: String(
+      row.course_title ?? row.track_title ?? row.course ?? "Course"
+    ),
+    amount_ngn: Number(row.amount_ngn ?? row.amount ?? 0),
+    payer_name: String(row.payer_name ?? ""),
+    payment_reference: String(row.payment_reference ?? row.reference ?? ""),
+    status,
+    reason:
+      row.reason !== undefined && row.reason !== null
+        ? String(row.reason)
+        : row.rejection_reason !== undefined && row.rejection_reason !== null
+          ? String(row.rejection_reason)
+          : null,
+    created_at: String(row.created_at ?? row.ordered_at ?? ""),
+  };
+}
+
+function normalizeIssuedCertificateRow(
+  row: Record<string, unknown>
+): AdminIssuedCertificate {
+  return {
+    id: String(row.id ?? row.certificate_id ?? ""),
+    code: String(row.code ?? row.certificate_code ?? ""),
+    learner_name: String(
+      row.learner_name ?? row.full_name ?? row.user_name ?? row.name ?? "Learner"
+    ),
+    course_title: String(
+      row.course_title ?? row.track_title ?? row.course ?? "Course"
+    ),
+    score: Number(row.score ?? row.score_pct ?? 0),
+    remark: String(row.remark ?? ""),
+    issued_at: String(row.issued_at ?? row.created_at ?? ""),
+    revoked_at:
+      row.revoked_at !== undefined && row.revoked_at !== null
+        ? String(row.revoked_at)
+        : null,
+    revoke_reason:
+      row.revoke_reason !== undefined && row.revoke_reason !== null
+        ? String(row.revoke_reason)
+        : row.reason !== undefined && row.reason !== null
+          ? String(row.reason)
+          : null,
+  };
+}
+
+/**
+ * List certificate orders filtered by status.
+ */
+export async function adminListCertificateOrdersAction(
+  status: "pending" | "approved" | "rejected"
+): Promise<AdminActionResult<AdminCertificateOrder[]>> {
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase.rpc("admin_list_certificate_orders", {
+      p_status: status,
+    });
+
+    if (error) {
+      return { ok: false, error: error.message || mapAdminSkillError(error) };
+    }
+
+    const rows = Array.isArray(data) ? data : [];
+    return {
+      ok: true,
+      data: rows.map((r) =>
+        normalizeCertificateOrderRow(r as Record<string, unknown>, status)
+      ),
+    };
+  } catch (err) {
+    return { ok: false, error: mapAdminSkillError(err) };
+  }
+}
+
+/**
+ * Approve or reject a manual certificate order.
+ */
+export async function adminReviewCertificateOrderAction(
+  orderId: string,
+  approve: boolean,
+  reason: string | null
+): Promise<AdminActionResult> {
+  const trimmedReason = reason?.trim() || null;
+  if (!approve && !trimmedReason) {
+    return { ok: false, error: "A rejection reason is required." };
+  }
+
+  try {
+    const supabase = await createClient();
+    const { error } = await supabase.rpc("admin_review_certificate_order", {
+      p_order_id: orderId,
+      p_approve: approve,
+      p_reason: trimmedReason,
+    });
+
+    if (error) {
+      return { ok: false, error: error.message || mapAdminSkillError(error) };
+    }
+
+    revalidatePath("/admin/skill/certificates");
+    revalidatePath("/skill");
+    return { ok: true };
+  } catch (err) {
+    return { ok: false, error: mapAdminSkillError(err) };
+  }
+}
+
+/**
+ * List all issued certificates.
+ */
+export async function adminListIssuedCertificatesAction(): Promise<
+  AdminActionResult<AdminIssuedCertificate[]>
+> {
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase.rpc("admin_list_certificates");
+
+    if (error) {
+      return { ok: false, error: error.message || mapAdminSkillError(error) };
+    }
+
+    const rows = Array.isArray(data) ? data : [];
+    return {
+      ok: true,
+      data: rows.map((r) =>
+        normalizeIssuedCertificateRow(r as Record<string, unknown>)
+      ),
+    };
+  } catch (err) {
+    return { ok: false, error: mapAdminSkillError(err) };
+  }
+}
+
+/**
+ * Revoke an issued certificate with a required reason.
+ */
+export async function adminRevokeCertificateAction(
+  certificateId: string,
+  reason: string
+): Promise<AdminActionResult> {
+  const trimmedReason = reason.trim();
+  if (!trimmedReason) {
+    return { ok: false, error: "A revocation reason is required." };
+  }
+
+  try {
+    const supabase = await createClient();
+    const { error } = await supabase.rpc("admin_revoke_certificate", {
+      p_certificate_id: certificateId,
+      p_reason: trimmedReason,
+    });
+
+    if (error) {
+      return { ok: false, error: error.message || mapAdminSkillError(error) };
+    }
+
+    revalidatePath("/admin/skill/certificates");
     revalidatePath("/skill");
     return { ok: true };
   } catch (err) {

@@ -238,6 +238,17 @@ export function AdminSkillTracksClient({
               variant="outline"
               className="gap-1.5 rounded-lg h-9 text-xs border-border/70"
             >
+              <Link href="/admin/skill/certificates">
+                <Award className="h-4 w-4 stroke-[1.5]" />
+                <span>Certificates</span>
+              </Link>
+            </Button>
+            <Button
+              asChild
+              size="sm"
+              variant="outline"
+              className="gap-1.5 rounded-lg h-9 text-xs border-border/70"
+            >
               <Link href="/admin/skill/settings">
                 <Settings className="h-4 w-4 stroke-[1.5]" />
                 <span>Settings</span>
