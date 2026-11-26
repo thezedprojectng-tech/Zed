@@ -52,17 +52,17 @@ export function AdminSkillSettingsClient({
   );
 
   const [paymentMode] = useState<"manual" | "paystack">("manual");
-  const [manualBankName, setManualBankName] = useState(
-    initialSettings.manual_bank_name
+  const [payBankName, setPayBankName] = useState(
+    initialSettings.pay_bank_name
   );
-  const [manualAccountNumber, setManualAccountNumber] = useState(
-    initialSettings.manual_account_number
+  const [payAccountNumber, setPayAccountNumber] = useState(
+    initialSettings.pay_account_number
   );
-  const [manualAccountName, setManualAccountName] = useState(
-    initialSettings.manual_account_name
+  const [payAccountName, setPayAccountName] = useState(
+    initialSettings.pay_account_name
   );
-  const [manualInstructions, setManualInstructions] = useState(
-    initialSettings.manual_instructions
+  const [payInstructions, setPayInstructions] = useState(
+    initialSettings.pay_instructions
   );
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -107,10 +107,10 @@ export function AdminSkillSettingsClient({
       default_max_attempts: Number(defaultMaxAttempts),
       default_min_time_pct: Number(defaultMinTimePct),
       payment_mode: paymentMode,
-      manual_bank_name: manualBankName,
-      manual_account_number: manualAccountNumber,
-      manual_account_name: manualAccountName,
-      manual_instructions: manualInstructions,
+      pay_bank_name: payBankName,
+      pay_account_number: payAccountNumber,
+      pay_account_name: payAccountName,
+      pay_instructions: payInstructions,
     });
 
     if (!parsedSettings.success) {
@@ -419,16 +419,16 @@ export function AdminSkillSettingsClient({
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="space-y-1.5">
                 <Label
-                  htmlFor="manualBankName"
+                  htmlFor="payBankName"
                   className="text-xs font-medium text-foreground"
                 >
                   Bank name
                 </Label>
                 <Input
-                  id="manualBankName"
+                  id="payBankName"
                   type="text"
-                  value={manualBankName}
-                  onChange={(e) => setManualBankName(e.target.value)}
+                  value={payBankName}
+                  onChange={(e) => setPayBankName(e.target.value)}
                   placeholder="e.g. GTBank"
                   disabled={isPending}
                   className="h-10 rounded-lg text-sm"
@@ -437,17 +437,17 @@ export function AdminSkillSettingsClient({
 
               <div className="space-y-1.5">
                 <Label
-                  htmlFor="manualAccountNumber"
+                  htmlFor="payAccountNumber"
                   className="text-xs font-medium text-foreground"
                 >
                   Account number
                 </Label>
                 <Input
-                  id="manualAccountNumber"
+                  id="payAccountNumber"
                   type="text"
                   inputMode="numeric"
-                  value={manualAccountNumber}
-                  onChange={(e) => setManualAccountNumber(e.target.value)}
+                  value={payAccountNumber}
+                  onChange={(e) => setPayAccountNumber(e.target.value)}
                   placeholder="0123456789"
                   disabled={isPending}
                   className="h-10 rounded-lg text-sm tabular-nums"
@@ -456,16 +456,16 @@ export function AdminSkillSettingsClient({
 
               <div className="space-y-1.5">
                 <Label
-                  htmlFor="manualAccountName"
+                  htmlFor="payAccountName"
                   className="text-xs font-medium text-foreground"
                 >
                   Account name
                 </Label>
                 <Input
-                  id="manualAccountName"
+                  id="payAccountName"
                   type="text"
-                  value={manualAccountName}
-                  onChange={(e) => setManualAccountName(e.target.value)}
+                  value={payAccountName}
+                  onChange={(e) => setPayAccountName(e.target.value)}
                   placeholder="e.g. Zed Digital Ltd"
                   disabled={isPending}
                   className="h-10 rounded-lg text-sm"
@@ -475,16 +475,16 @@ export function AdminSkillSettingsClient({
 
             <div className="space-y-1.5">
               <Label
-                htmlFor="manualInstructions"
+                htmlFor="payInstructions"
                 className="text-xs font-medium text-foreground"
               >
                 Payment instructions
               </Label>
               <Textarea
-                id="manualInstructions"
+                id="payInstructions"
                 rows={3}
-                value={manualInstructions}
-                onChange={(e) => setManualInstructions(e.target.value)}
+                value={payInstructions}
+                onChange={(e) => setPayInstructions(e.target.value)}
                 placeholder="Include what reference to use and how long verification takes..."
                 disabled={isPending}
                 className="rounded-lg text-sm leading-relaxed"

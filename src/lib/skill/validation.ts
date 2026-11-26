@@ -297,19 +297,75 @@ export const skillSettingsSchema = z.object({
     .min(0, "Minimum time cannot be negative")
     .max(100, "Minimum time cannot exceed 100%"),
   payment_mode: z.enum(["manual", "paystack"]),
-  manual_bank_name: z.string().trim().max(120, "Bank name is too long"),
-  manual_account_number: z
+  pay_bank_name: z.string().trim().max(120, "Bank name is too long"),
+  pay_account_number: z
     .string()
     .trim()
     .max(20, "Account number is too long"),
-  manual_account_name: z.string().trim().max(120, "Account name is too long"),
-  manual_instructions: z
+  pay_account_name: z.string().trim().max(120, "Account name is too long"),
+  pay_instructions: z
     .string()
     .trim()
     .max(1000, "Instructions must not exceed 1,000 characters"),
 });
 
 export type SkillSettingsInput = z.infer<typeof skillSettingsSchema>;
+
+export const ALLOWED_SKILL_SETTINGS_KEYS = [
+  "default_pass_mark",
+  "default_max_attempts",
+  "default_min_time_pct",
+  "score_bands",
+  "payment_mode",
+  "pay_bank_name",
+  "pay_account_number",
+  "pay_account_name",
+  "pay_instructions",
+] as const;
+
+export const ALLOWED_TRACK_SETTINGS_KEYS = [
+  "price_ngn",
+  "pass_mark",
+  "max_attempts",
+  "min_time_pct",
+  "certificate_enabled",
+  "certificate_template_path",
+  "certificate_layout",
+] as const;
+
+const ALLOWED_TRACK_KEY_SET = new Set<string>(ALLOWED_TRACK_SETTINGS_KEYS);
+
+export function buildAdminSkillSettingsPayload(
+  parsed: SkillSettingsInput,
+  scoreBands: ScoreBand[]
+) {
+  return {
+    default_pass_mark: parsed.default_pass_mark,
+    default_max_attempts: parsed.default_max_attempts,
+    default_min_time_pct: parsed.default_min_time_pct,
+    score_bands: scoreBands.map((b) => ({
+      min: b.min,
+      label: b.label.trim(),
+    })),
+    payment_mode: "manual" as const,
+    pay_bank_name: parsed.pay_bank_name,
+    pay_account_number: parsed.pay_account_number,
+    pay_account_name: parsed.pay_account_name,
+    pay_instructions: parsed.pay_instructions,
+  };
+}
+
+export function filterTrackSettingsPatch(
+  patch: Record<string, unknown>
+): Record<string, unknown> {
+  const filtered: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(patch)) {
+    if (ALLOWED_TRACK_KEY_SET.has(key)) {
+      filtered[key] = value;
+    }
+  }
+  return filtered;
+}
 
 export const trackSettingsSchema = z.object({
   price_ngn: z

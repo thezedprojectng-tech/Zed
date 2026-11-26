@@ -12,6 +12,11 @@ import {
   computeAutoMinSeconds,
   trackSettingsSchema,
   quizSchema,
+  skillSettingsSchema,
+  ALLOWED_SKILL_SETTINGS_KEYS,
+  ALLOWED_TRACK_SETTINGS_KEYS,
+  buildAdminSkillSettingsPayload,
+  filterTrackSettingsPatch,
 } from "./validation";
 
 describe("trackSchema validation", () => {
@@ -339,5 +344,55 @@ describe("trackSettingsSchema & quizSchema", () => {
         ],
       }).success
     ).toBe(false);
+  });
+
+  it("validates skillSettingsSchema with pay_* column names and emits only allowed RPC keys", () => {
+    const parsed = skillSettingsSchema.safeParse({
+      default_pass_mark: 70,
+      default_max_attempts: 3,
+      default_min_time_pct: 80,
+      payment_mode: "manual",
+      pay_bank_name: "GTBank",
+      pay_account_number: "0123456789",
+      pay_account_name: "Zed Digital Ltd",
+      pay_instructions: "Use your full name as narration.",
+    });
+
+    expect(parsed.success).toBe(true);
+    if (!parsed.success) return;
+
+    const payload = buildAdminSkillSettingsPayload(parsed.data, [
+      { min: 85, label: "Distinction" },
+      { min: 50, label: "Pass" },
+    ]);
+
+    const allowedSet = new Set<string>(ALLOWED_SKILL_SETTINGS_KEYS);
+    for (const key of Object.keys(payload)) {
+      expect(allowedSet.has(key)).toBe(true);
+    }
+    expect(Object.keys(payload).sort()).toEqual(
+      [...ALLOWED_SKILL_SETTINGS_KEYS].sort()
+    );
+  });
+
+  it("strips any key outside ALLOWED_TRACK_SETTINGS_KEYS for admin_update_skill_track_settings", () => {
+    const allowedSet = new Set<string>(ALLOWED_TRACK_SETTINGS_KEYS);
+    const filtered = filterTrackSettingsPatch({
+      price_ngn: 5000,
+      pass_mark: 75,
+      max_attempts: null,
+      min_time_pct: 80,
+      certificate_enabled: true,
+      certificate_template_path: "track/123.png",
+      certificate_layout: { fields: {} },
+      unexpected_extra_key: "should_be_removed",
+      manual_bank_name: "should_be_removed",
+    });
+
+    for (const key of Object.keys(filtered)) {
+      expect(allowedSet.has(key)).toBe(true);
+    }
+    expect("unexpected_extra_key" in filtered).toBe(false);
+    expect("manual_bank_name" in filtered).toBe(false);
   });
 });

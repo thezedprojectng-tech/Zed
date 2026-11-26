@@ -8,14 +8,14 @@ import {
   Lock,
   BookOpen,
   HelpCircle,
-  Award,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn, pluralize } from "@/lib/utils";
 import type { TrackDetailData, SkillQuizSummary } from "@/lib/skill/actions";
+import { CourseCertificateCard } from "@/components/skill/CourseCertificateCard";
 
 export function TrackDetailClient({ data }: { data: TrackDetailData }) {
-  const { track, lessons, quizzes, courseStatus } = data;
+  const { track, lessons, quizzes, courseStatus, publicSettings, holderName } = data;
 
   const completedCount = lessons.filter((l) => l.completed).length;
   const totalCount = lessons.length;
@@ -367,70 +367,16 @@ export function TrackDetailClient({ data }: { data: TrackDetailData }) {
         </section>
 
         {/* Right: Certificate Status Card */}
-        <aside
-          aria-label="Certificate status"
-          className="lg:col-span-4 rounded-lg border border-border/70 bg-card p-5 space-y-4 lg:sticky lg:top-20"
-        >
-          <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-border/70 bg-secondary/50 text-foreground">
-              <Award className="h-4 w-4 stroke-[1.5]" />
-            </div>
-            <h2 className="text-sm font-semibold text-foreground">
-              Certificate status
-            </h2>
-          </div>
-
-          <dl className="divide-y divide-border/50 border-t border-border/50 text-sm">
-            <div className="py-2.5 flex items-center justify-between gap-3">
-              <dt className="text-xs text-muted-foreground">Lessons done</dt>
-              <dd className="text-xs font-medium text-foreground tabular-nums">
-                {courseStatus?.lessons_done ?? completedCount} of{" "}
-                {courseStatus?.lessons_total ?? totalCount}
-              </dd>
-            </div>
-            <div className="py-2.5 flex items-center justify-between gap-3">
-              <dt className="text-xs text-muted-foreground">Quizzes passed</dt>
-              <dd className="text-xs font-medium text-foreground tabular-nums">
-                {courseStatus?.quizzes_passed ??
-                  quizzes.filter((q) => q.passed).length}{" "}
-                of {courseStatus?.quizzes_total ?? quizzes.length}
-              </dd>
-            </div>
-            <div className="py-2.5 flex items-center justify-between gap-3">
-              <dt className="text-xs text-muted-foreground">Score</dt>
-              <dd className="text-xs font-medium text-foreground tabular-nums">
-                {courseStatus?.score_pct !== null &&
-                courseStatus?.score_pct !== undefined
-                  ? `${courseStatus.score_pct}%`
-                  : "—"}
-              </dd>
-            </div>
-            <div className="py-2.5 flex items-center justify-between gap-3">
-              <dt className="text-xs text-muted-foreground">Remark</dt>
-              <dd className="text-xs font-medium text-foreground text-right">
-                {courseStatus?.remark || "In progress"}
-              </dd>
-            </div>
-            <div className="py-2.5 flex items-center justify-between gap-3">
-              <dt className="text-xs text-muted-foreground">Price</dt>
-              <dd className="text-xs font-medium text-foreground tabular-nums">
-                {(courseStatus?.price_ngn ?? track.price_ngn) === 0
-                  ? "Free"
-                  : `₦${(
-                      courseStatus?.price_ngn ?? track.price_ngn
-                    ).toLocaleString()}`}
-              </dd>
-            </div>
-          </dl>
-
-          <Button
-            type="button"
-            disabled
-            className="w-full h-9 text-xs rounded-lg font-medium"
-          >
-            Get certificate
-          </Button>
-        </aside>
+        <CourseCertificateCard
+          track={track}
+          courseStatus={courseStatus}
+          publicSettings={publicSettings}
+          holderName={holderName}
+          completedCount={completedCount}
+          totalCount={totalCount}
+          earnedPoints={earnedPoints}
+          quizzes={quizzes}
+        />
       </div>
     </div>
   );

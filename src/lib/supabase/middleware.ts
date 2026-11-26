@@ -37,13 +37,15 @@ export async function updateSession(request: NextRequest) {
 
   const pathname = request.nextUrl.pathname;
 
-  // Public marketing & informational routes (never require authentication):
-  // '/', '/whitepaper', '/fund', '/privacy', '/terms', '/cookies'
+  // Public marketing, informational, & certificate verification routes (never require authentication):
+  // '/', '/whitepaper', '/fund', '/privacy', '/terms', '/cookies', '/certificates/verify/[code]'
+  const isPublicCertificateVerify = pathname.startsWith("/certificates/verify/");
   const isAppRoute =
-    pathname.startsWith("/home") ||
-    pathname.startsWith("/nav") ||
-    pathname.startsWith("/profile") ||
-    pathname.startsWith("/admin");
+    !isPublicCertificateVerify &&
+    (pathname.startsWith("/home") ||
+      pathname.startsWith("/nav") ||
+      pathname.startsWith("/profile") ||
+      pathname.startsWith("/admin"));
 
   if (!user && isAppRoute) {
     const url = request.nextUrl.clone();

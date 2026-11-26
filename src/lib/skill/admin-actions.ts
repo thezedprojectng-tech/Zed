@@ -11,6 +11,8 @@ import {
   skillSettingsSchema,
   validateScoreBands,
   quizSchema,
+  buildAdminSkillSettingsPayload,
+  filterTrackSettingsPatch,
   type ScoreBand,
   type SkillSettingsInput,
   type QuizInput,
@@ -74,10 +76,10 @@ export interface AdminSkillSettings {
   default_min_time_pct: number;
   score_bands: ScoreBand[];
   payment_mode: "manual" | "paystack";
-  manual_bank_name: string;
-  manual_account_number: string;
-  manual_account_name: string;
-  manual_instructions: string;
+  pay_bank_name: string;
+  pay_account_number: string;
+  pay_account_name: string;
+  pay_instructions: string;
 }
 
 export interface AdminTrackDetail {
@@ -176,10 +178,10 @@ export async function getAdminSkillSettings(): Promise<AdminSkillSettings> {
             { min: 50, label: "Pass" },
           ],
     payment_mode: raw.payment_mode === "paystack" ? "paystack" : "manual",
-    manual_bank_name: String(raw.manual_bank_name ?? ""),
-    manual_account_number: String(raw.manual_account_number ?? ""),
-    manual_account_name: String(raw.manual_account_name ?? ""),
-    manual_instructions: String(raw.manual_instructions ?? ""),
+    pay_bank_name: String(raw.pay_bank_name ?? ""),
+    pay_account_number: String(raw.pay_account_number ?? ""),
+    pay_account_name: String(raw.pay_account_name ?? ""),
+    pay_instructions: String(raw.pay_instructions ?? ""),
   };
 }
 
@@ -546,14 +548,10 @@ export async function adminUpdateSkillSettingsAction(
 
   try {
     const supabase = await createClient();
-    const payload = {
-      ...parsed.data,
-      payment_mode: "manual",
-      score_bands: input.score_bands.map((b) => ({
-        min: b.min,
-        label: b.label.trim(),
-      })),
-    };
+    const payload = buildAdminSkillSettingsPayload(
+      parsed.data,
+      input.score_bands
+    );
 
     const { error } = await supabase.rpc("admin_update_skill_settings", {
       p_settings: payload,
@@ -580,7 +578,8 @@ export async function adminUpdateTrackSettingsAction(
   trackId: string,
   patch: Record<string, number | boolean | null>
 ): Promise<AdminActionResult> {
-  if (Object.keys(patch).length === 0) {
+  const safePatch = filterTrackSettingsPatch(patch);
+  if (Object.keys(safePatch).length === 0) {
     return { ok: true };
   }
 
@@ -588,7 +587,7 @@ export async function adminUpdateTrackSettingsAction(
     const supabase = await createClient();
     const { error } = await supabase.rpc("admin_update_skill_track_settings", {
       p_track_id: trackId,
-      p_settings: patch,
+      p_settings: safePatch,
     });
 
     if (error) {

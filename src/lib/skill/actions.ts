@@ -4,6 +4,10 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getSkillLevelProgress, SkillProgressSummary } from "@/data/skill-levels";
 import { mapSkillRpcError } from "@/lib/skill/errors";
+import {
+  certificateLayoutSchema,
+  type CertificateLayout,
+} from "@/lib/certificate/layout";
 
 export interface SkillTrackSummary {
   id: string;
@@ -163,6 +167,20 @@ export interface SkillCourseStatus {
   remark: string | null;
   price_ngn: number;
   certificate_enabled: boolean;
+  eligible: boolean;
+  reason: string | null;
+  order_status: "pending" | "approved" | "rejected" | null;
+  order_reject_reason: string | null;
+  certificate_code: string | null;
+  certificate_issued_at: string | null;
+}
+
+export interface SkillPublicSettings {
+  payment_mode: "manual" | "paystack";
+  pay_bank_name: string;
+  pay_account_number: string;
+  pay_account_name: string;
+  pay_instructions: string;
 }
 
 export interface TrackDetailData {
@@ -173,10 +191,14 @@ export interface TrackDetailData {
     description: string;
     price_ngn: number;
     certificate_enabled: boolean;
+    certificate_template_path: string | null;
+    certificate_layout: CertificateLayout | null;
   };
   lessons: SkillLessonItem[];
   quizzes: SkillQuizSummary[];
   courseStatus: SkillCourseStatus | null;
+  publicSettings: SkillPublicSettings;
+  holderName: string;
   completedCount: number;
   totalPoints: number;
   earnedPoints: number;
@@ -217,6 +239,14 @@ function normalizeCourseStatus(
   fallbackCertEnabled: boolean
 ): SkillCourseStatus | null {
   if (!raw) return null;
+  const rawOrderStatus = raw.order_status ? String(raw.order_status).toLowerCase() : null;
+  const orderStatus: "pending" | "approved" | "rejected" | null =
+    rawOrderStatus === "pending" ||
+    rawOrderStatus === "approved" ||
+    rawOrderStatus === "rejected"
+      ? rawOrderStatus
+      : null;
+
   return {
     lessons_done: Number(raw.lessons_done ?? raw.completed_lessons ?? 0),
     lessons_total: Number(raw.lessons_total ?? raw.total_lessons ?? 0),
@@ -233,6 +263,33 @@ function normalizeCourseStatus(
     certificate_enabled: Boolean(
       raw.certificate_enabled ?? fallbackCertEnabled
     ),
+    eligible: Boolean(raw.eligible),
+    reason: raw.reason ? String(raw.reason) : null,
+    order_status: orderStatus,
+    order_reject_reason: raw.order_reject_reason
+      ? String(raw.order_reject_reason)
+      : null,
+    certificate_code: raw.certificate_code
+      ? String(raw.certificate_code)
+      : null,
+    certificate_issued_at: raw.certificate_issued_at
+      ? String(raw.certificate_issued_at)
+      : raw.issued_at
+      ? String(raw.issued_at)
+      : null,
+  };
+}
+
+function normalizePublicSettings(
+  raw: Record<string, unknown> | null | undefined
+): SkillPublicSettings {
+  const obj = raw ?? {};
+  return {
+    payment_mode: obj.payment_mode === "paystack" ? "paystack" : "manual",
+    pay_bank_name: String(obj.pay_bank_name ?? ""),
+    pay_account_number: String(obj.pay_account_number ?? ""),
+    pay_account_name: String(obj.pay_account_name ?? ""),
+    pay_instructions: String(obj.pay_instructions ?? ""),
   };
 }
 
@@ -254,7 +311,9 @@ export async function getTrackDetail(
   // Fetch track
   const { data: track } = await supabase
     .from("skill_tracks")
-    .select("id, slug, title, description, price_ngn, certificate_enabled")
+    .select(
+      "id, slug, title, description, price_ngn, certificate_enabled, certificate_template_path, certificate_layout"
+    )
     .eq("slug", slug)
     .eq("is_published", true)
     .maybeSingle();
@@ -263,17 +322,18 @@ export async function getTrackDetail(
     return null;
   }
 
-  // Fetch verification, lessons, progress, quizzes, and course status in parallel
+  // Fetch verification, lessons, progress, quizzes, course status, and public settings in parallel
   const [
     profileResult,
     lessonsResult,
     progressResult,
     quizzesResult,
     statusResult,
+    publicSettingsResult,
   ] = await Promise.all([
     supabase
       .from("users")
-      .select("is_verified")
+      .select("is_verified, full_name")
       .eq("id", user.id)
       .maybeSingle(),
     supabase
@@ -289,6 +349,7 @@ export async function getTrackDetail(
       .eq("user_id", user.id),
     supabase.rpc("skill_list_quizzes", { p_track_id: track.id }),
     supabase.rpc("skill_course_status", { p_track_id: track.id }),
+    supabase.rpc("skill_public_settings"),
   ]);
 
   const completedMap = new Map<
@@ -341,6 +402,10 @@ export async function getTrackDetail(
     Number(track.price_ngn ?? 0),
     Boolean(track.certificate_enabled)
   );
+  const publicSettings = normalizePublicSettings(
+    (publicSettingsResult.data as Record<string, unknown> | null) ?? null
+  );
+  const parsedLayout = certificateLayoutSchema.safeParse(track.certificate_layout);
 
   return {
     track: {
@@ -350,10 +415,14 @@ export async function getTrackDetail(
       description: track.description,
       price_ngn: Number(track.price_ngn ?? 0),
       certificate_enabled: Boolean(track.certificate_enabled),
+      certificate_template_path: track.certificate_template_path ?? null,
+      certificate_layout: parsedLayout.success ? parsedLayout.data : null,
     },
     lessons,
     quizzes,
     courseStatus,
+    publicSettings,
+    holderName: String(profileResult.data?.full_name ?? "Learner"),
     completedCount,
     totalPoints,
     earnedPoints,
@@ -597,5 +666,187 @@ export async function submitQuizAction(
       ok: false,
       error: err instanceof Error ? err.message : "Failed to submit quiz",
     };
+  }
+}
+
+export interface RequestCertificateResult {
+  status: "issued" | "pending";
+  certificate_code: string | null;
+  order_id: string | null;
+}
+
+export async function requestCertificateAction(
+  trackId: string,
+  payerName?: string | null,
+  paymentReference?: string | null,
+  trackSlug?: string
+): Promise<
+  | { ok: true; data: RequestCertificateResult }
+  | { ok: false; error: string }
+> {
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase.rpc("skill_request_certificate", {
+      p_track_id: trackId,
+      p_payer_name: payerName?.trim() || null,
+      p_payment_reference: paymentReference?.trim() || null,
+    });
+
+    if (error) {
+      return { ok: false, error: error.message };
+    }
+
+    const row = (data ?? {}) as Record<string, unknown>;
+    revalidatePath("/skill");
+    revalidatePath("/profile");
+    if (trackSlug) {
+      revalidatePath(`/skill/${trackSlug}`);
+    }
+
+    return {
+      ok: true,
+      data: {
+        status: row.status === "issued" ? "issued" : "pending",
+        certificate_code: row.certificate_code
+          ? String(row.certificate_code)
+          : null,
+        order_id: row.order_id ? String(row.order_id) : null,
+      },
+    };
+  } catch (err) {
+    return {
+      ok: false,
+      error:
+        err instanceof Error ? err.message : "Could not request certificate",
+    };
+  }
+}
+
+export interface VerifyCertificateResult {
+  valid: boolean;
+  revoked: boolean;
+  holder_name: string | null;
+  course_title: string | null;
+  score_pct: number | null;
+  remark: string | null;
+  issued_at: string | null;
+}
+
+/**
+ * Public verification lookup via verify_certificate(p_code) — works without login.
+ */
+export async function verifyCertificateByCode(
+  code: string
+): Promise<VerifyCertificateResult | null> {
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase.rpc("verify_certificate", {
+      p_code: code.trim(),
+    });
+
+    if (error || !data) {
+      return null;
+    }
+
+    const row = (Array.isArray(data) ? data[0] : data) as
+      | Record<string, unknown>
+      | undefined;
+    if (!row || (!row.valid && !row.revoked && !row.holder_name && !row.course_title)) {
+      return null;
+    }
+
+    return {
+      valid: Boolean(row.valid),
+      revoked: Boolean(row.revoked),
+      holder_name: row.holder_name ? String(row.holder_name) : null,
+      course_title: row.course_title ? String(row.course_title) : null,
+      score_pct:
+        row.score_pct !== null && row.score_pct !== undefined
+          ? Number(row.score_pct)
+          : null,
+      remark: row.remark ? String(row.remark) : null,
+      issued_at: row.issued_at ? String(row.issued_at) : null,
+    };
+  } catch {
+    return null;
+  }
+}
+
+export interface UserCertificateItem {
+  id: string;
+  code: string;
+  track_id: string;
+  track_slug: string;
+  course_title: string;
+  holder_name: string;
+  score_pct: number;
+  remark: string;
+  issued_at: string;
+  certificate_template_path: string | null;
+  certificate_layout: CertificateLayout | null;
+}
+
+/**
+ * Fetch the signed-in user's active (non-revoked) issued certificates.
+ */
+export async function getMyIssuedCertificatesAction(): Promise<
+  UserCertificateItem[]
+> {
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) return [];
+
+    const [profileRes, certsRes] = await Promise.all([
+      supabase
+        .from("users")
+        .select("full_name")
+        .eq("id", user.id)
+        .maybeSingle(),
+      supabase
+        .from("skill_certificates")
+        .select(
+          "id, code, track_id, holder_name, score_pct, remark, issued_at, revoked_at, skill_tracks(title, slug, certificate_template_path, certificate_layout)"
+        )
+        .eq("user_id", user.id)
+        .is("revoked_at", null)
+        .order("issued_at", { ascending: false }),
+    ]);
+
+    if (certsRes.error || !certsRes.data) {
+      return [];
+    }
+
+    const fallbackName = String(profileRes.data?.full_name ?? "Learner");
+
+    return certsRes.data.map((row) => {
+      const rawTrack = (Array.isArray(row.skill_tracks)
+        ? row.skill_tracks[0]
+        : row.skill_tracks) as Record<string, unknown> | null | undefined;
+      const parsedLayout = certificateLayoutSchema.safeParse(
+        rawTrack?.certificate_layout
+      );
+
+      return {
+        id: String(row.id),
+        code: String(row.code ?? ""),
+        track_id: String(row.track_id ?? ""),
+        track_slug: String(rawTrack?.slug ?? ""),
+        course_title: String(rawTrack?.title ?? "Course"),
+        holder_name: String(row.holder_name ?? fallbackName),
+        score_pct: Number(row.score_pct ?? 0),
+        remark: String(row.remark ?? ""),
+        issued_at: String(row.issued_at ?? ""),
+        certificate_template_path: rawTrack?.certificate_template_path
+          ? String(rawTrack.certificate_template_path)
+          : null,
+        certificate_layout: parsedLayout.success ? parsedLayout.data : null,
+      };
+    });
+  } catch {
+    return [];
   }
 }

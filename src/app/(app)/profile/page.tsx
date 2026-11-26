@@ -42,6 +42,7 @@ import {
   WhatsAppIcon,
   TikTokIcon,
 } from "@/data/socials";
+import { ProfileCertificatesSection } from "@/components/skill/ProfileCertificatesSection";
 
 /**
  * Resizes and compresses an image file in the browser using HTML5 Canvas.
@@ -771,6 +772,9 @@ export default function ProfilePage() {
           </a>
         </div>
       </section>
+
+      {/* ── 4.5 Certificates ────────────────────────────────────────── */}
+      <ProfileCertificatesSection />
 
       {/* ── 5. Security & Session ─────────────────────────────────── */}
       <section
