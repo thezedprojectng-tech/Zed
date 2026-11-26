@@ -11,6 +11,7 @@ import {
   ShieldCheck,
   FileText,
   Award,
+  BadgeCheck,
   ArrowRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -41,6 +42,8 @@ export function getUserNotificationIcon(type: string) {
       return FileText;
     case "level":
       return Award;
+    case "certificate":
+      return BadgeCheck;
     default:
       return Bell;
   }
@@ -226,9 +229,11 @@ export function NotificationBell() {
                 >
                   <div
                     className={`h-7 w-7 rounded-full flex items-center justify-center shrink-0 mt-0.5 border ${
-                      isHighlighted
-                        ? "bg-primary/10 border-primary/20 text-primary"
-                        : "bg-secondary border-border/70 text-muted-foreground"
+                      item.type === "certificate"
+                        ? "bg-[var(--data-verified-subtle)] border-[var(--data-verified-border)] text-[var(--data-verified-ink)]"
+                        : isHighlighted
+                          ? "bg-primary/10 border-primary/20 text-primary"
+                          : "bg-secondary border-border/70 text-muted-foreground"
                     }`}
                   >
                     <Icon className="h-3.5 w-3.5" strokeWidth={1.75} />

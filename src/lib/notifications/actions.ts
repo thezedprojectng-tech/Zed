@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 
 export interface UserNotification {
   id: string;
-  type: "news" | "announcement" | "message" | "verification" | "application" | "level" | string;
+  type: "news" | "announcement" | "message" | "verification" | "application" | "level" | "certificate" | string;
   title: string;
   body: string | null;
   href: string | null;

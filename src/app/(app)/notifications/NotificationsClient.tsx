@@ -193,9 +193,11 @@ export function NotificationsClient({
                       {/* Outline Icon */}
                       <div
                         className={`h-8 w-8 rounded-full flex items-center justify-center shrink-0 mt-0.5 border ${
-                          item.is_unread
-                            ? "bg-primary/10 border-primary/20 text-primary"
-                            : "bg-secondary border-border/70 text-muted-foreground"
+                          item.type === "certificate"
+                            ? "bg-[var(--data-verified-subtle)] border-[var(--data-verified-border)] text-[var(--data-verified-ink)]"
+                            : item.is_unread
+                              ? "bg-primary/10 border-primary/20 text-primary"
+                              : "bg-secondary border-border/70 text-muted-foreground"
                         }`}
                       >
                         <Icon className="h-4 w-4" strokeWidth={1.75} />
@@ -204,15 +206,22 @@ export function NotificationsClient({
                       {/* Content */}
                       <div className="flex-1 min-w-0 space-y-0.5">
                         <div className="flex items-center justify-between gap-2">
-                          <h3
-                            className={`text-sm leading-snug truncate ${
-                              item.is_unread
-                                ? "font-semibold text-foreground"
-                                : "font-medium text-foreground/90"
-                            }`}
-                          >
-                            {item.title}
-                          </h3>
+                          <div className="flex items-center gap-2 min-w-0">
+                            {item.type === "certificate" && (
+                              <span className="inline-flex items-center rounded-md border border-[var(--data-verified-border)] bg-[var(--data-verified-subtle)] px-2 py-0.5 text-[10px] font-semibold text-[var(--data-verified-ink)] shrink-0">
+                                Certificate
+                              </span>
+                            )}
+                            <h3
+                              className={`text-sm leading-snug truncate ${
+                                item.is_unread
+                                  ? "font-semibold text-foreground"
+                                  : "font-medium text-foreground/90"
+                              }`}
+                            >
+                              {item.title}
+                            </h3>
+                          </div>
                           <span
                             className="text-[11px] text-muted-foreground tabular-nums shrink-0"
                             title={new Date(item.created_at).toLocaleString()}

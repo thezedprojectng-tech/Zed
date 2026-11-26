@@ -17,6 +17,7 @@ import {
   Banknote,
   ShoppingBag,
   Lightbulb,
+  BadgeCheck,
   Check,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -56,9 +57,16 @@ export function getNotificationTypeIcon(type: string) {
       return ShoppingBag;
     case "funding":
       return Lightbulb;
+    case "certificate":
+      return BadgeCheck;
     default:
       return Bell;
   }
+}
+
+export function getNotificationTypeLabel(type: string): string {
+  if (type === "certificate") return "Certificate";
+  return type || "notification";
 }
 
 function relativeTime(isoString: string): string {
@@ -251,9 +259,11 @@ export function AdminNotificationBell() {
                 >
                   <div
                     className={`h-7 w-7 rounded-full flex items-center justify-center shrink-0 mt-0.5 border ${
-                      item.is_unread
-                        ? "bg-primary/10 border-primary/20 text-primary"
-                        : "bg-secondary border-border/70 text-muted-foreground"
+                      item.type === "certificate"
+                        ? "bg-[var(--data-verified-subtle)] border-[var(--data-verified-border)] text-[var(--data-verified-ink)]"
+                        : item.is_unread
+                          ? "bg-primary/10 border-primary/20 text-primary"
+                          : "bg-secondary border-border/70 text-muted-foreground"
                     }`}
                   >
                     <Icon className="h-3.5 w-3.5" />

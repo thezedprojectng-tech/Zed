@@ -41,6 +41,7 @@ const TYPE_FILTER_OPTIONS: { id: string; label: string }[] = [
   { id: "withdrawal", label: "Withdrawals" },
   { id: "market", label: "Marketplace" },
   { id: "funding", label: "Funding" },
+  { id: "certificate", label: "Certificate" },
 ];
 
 function relativeTime(isoString: string): string {
@@ -232,9 +233,11 @@ export function AdminNotificationsClient({
               >
                 <div
                   className={`h-9 w-9 rounded-full flex items-center justify-center shrink-0 mt-0.5 border ${
-                    item.is_unread
-                      ? "bg-primary/10 border-primary/20 text-primary"
-                      : "bg-secondary border-border/70 text-muted-foreground"
+                    item.type === "certificate"
+                      ? "bg-[var(--data-verified-subtle)] border-[var(--data-verified-border)] text-[var(--data-verified-ink)]"
+                      : item.is_unread
+                        ? "bg-primary/10 border-primary/20 text-primary"
+                        : "bg-secondary border-border/70 text-muted-foreground"
                   }`}
                 >
                   <Icon className="h-4 w-4" />
@@ -243,8 +246,14 @@ export function AdminNotificationsClient({
                 <div className="flex-1 min-w-0 space-y-1">
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-2 min-w-0">
-                      <span className="text-xs uppercase tracking-wider text-[10px] font-semibold text-muted-foreground bg-secondary px-2 py-0.5 rounded-md">
-                        {item.type}
+                      <span
+                        className={
+                          item.type === "certificate"
+                            ? "text-[10px] font-semibold border border-[var(--data-verified-border)] bg-[var(--data-verified-subtle)] text-[var(--data-verified-ink)] px-2 py-0.5 rounded-md shrink-0"
+                            : "text-xs uppercase tracking-wider text-[10px] font-semibold text-muted-foreground bg-secondary px-2 py-0.5 rounded-md shrink-0"
+                        }
+                      >
+                        {item.type === "certificate" ? "Certificate" : item.type || "notification"}
                       </span>
                       <h3
                         className={`text-sm truncate ${

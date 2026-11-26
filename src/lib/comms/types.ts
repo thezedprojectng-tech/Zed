@@ -8,7 +8,8 @@ export type AdminNotificationType =
   | "contact"
   | "withdrawal"
   | "market"
-  | "funding";
+  | "funding"
+  | "certificate";
 
 export interface AdminNotification {
   id: string;
