@@ -7,6 +7,9 @@ import type { NextConfig } from "next";
 const baseConfig: NextConfig = {
   compress: true,
   poweredByHeader: false,
+  experimental: {
+    agentUpgrade: "security",
+  },
   images: {
     formats: ["image/avif", "image/webp"],
     remotePatterns: [
