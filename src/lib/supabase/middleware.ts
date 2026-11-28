@@ -44,6 +44,7 @@ export async function updateSession(request: NextRequest) {
     !isPublicCertificateVerify &&
     (pathname.startsWith("/home") ||
       pathname.startsWith("/nav") ||
+      pathname.startsWith("/leaderboard") ||
       pathname.startsWith("/profile") ||
       pathname.startsWith("/admin"));
 

@@ -43,6 +43,7 @@ import {
   TikTokIcon,
 } from "@/data/socials";
 import { ProfileCertificatesSection } from "@/components/skill/ProfileCertificatesSection";
+import { LeaderboardVisibilitySection } from "@/components/profile/LeaderboardVisibilitySection";
 
 /**
  * Resizes and compresses an image file in the browser using HTML5 Canvas.
@@ -775,6 +776,9 @@ export default function ProfilePage() {
 
       {/* ── 4.5 Certificates ────────────────────────────────────────── */}
       <ProfileCertificatesSection />
+
+      {/* ── 4.75 Leaderboard Privacy ────────────────────────────────── */}
+      <LeaderboardVisibilitySection />
 
       {/* ── 5. Security & Session ─────────────────────────────────── */}
       <section

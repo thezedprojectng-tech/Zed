@@ -20,6 +20,7 @@ import {
   ChevronRight,
   ChevronLeft,
   LayoutDashboard,
+  BarChart3,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -72,6 +73,7 @@ const navSections: NavSection[] = [
   {
     title: "Explore",
     items: [
+      { href: "/leaderboard", label: "Leaderboard", icon: BarChart3 },
       { href: "/internships", label: "Internship Radar", icon: Search },
       { href: "/news", label: "News", icon: Newspaper },
     ],
