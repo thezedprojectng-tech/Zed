@@ -29,13 +29,22 @@ export type ResetPasswordData = z.infer<typeof resetPasswordSchema>;
  * Always resolves (never throws for email-not-found) to prevent user enumeration.
  * Throws only for rate-limit errors so the UI can surface them.
  */
-export async function sendPasswordResetEmail(email: string): Promise<void> {
+export async function sendPasswordResetEmail(
+  email: string,
+  captchaToken?: string
+): Promise<void> {
   const supabase = createClient();
   const { error } = await supabase.auth.resetPasswordForEmail(
     email.trim().toLowerCase(),
-    { redirectTo: `${window.location.origin}/reset-password` }
+    {
+      redirectTo: `${window.location.origin}/reset-password`,
+      captchaToken,
+    }
   );
   if (error) {
+    if (error.message.toLowerCase().includes("captcha")) {
+      throw new Error("Please confirm you are human and try again.");
+    }
     if (
       error.message.toLowerCase().includes("rate") ||
       error.message.toLowerCase().includes("too many")

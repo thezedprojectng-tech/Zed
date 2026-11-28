@@ -43,6 +43,7 @@ export async function signUp(params: {
   fullName: string;
   phoneNumber: string;
   dateOfBirth: string;
+  captchaToken?: string;
 }): Promise<{ success: boolean; message: string; hasSession: boolean }> {
   const supabase = createClient();
 
@@ -52,6 +53,7 @@ export async function signUp(params: {
     email: params.email.trim().toLowerCase(),
     password: params.password,
     options: {
+      captchaToken: params.captchaToken,
       data: {
         full_name: params.fullName.trim(),
         phone_number: normalizedPhone,
@@ -61,6 +63,9 @@ export async function signUp(params: {
   });
 
   if (error) {
+    if (error.message.toLowerCase().includes("captcha")) {
+      throw new Error("Please confirm you are human and try again.");
+    }
     // If signup fails with "Database error saving new user", phone or email may already be registered
     if (
       error.message.includes("Database error saving new user") ||
@@ -95,15 +100,22 @@ export async function signUp(params: {
 export async function signIn(params: {
   email: string;
   password: string;
+  captchaToken?: string;
 }): Promise<{ success: boolean; message: string }> {
   const supabase = createClient();
 
   const { error } = await supabase.auth.signInWithPassword({
     email: params.email.trim().toLowerCase(),
     password: params.password,
+    options: {
+      captchaToken: params.captchaToken,
+    },
   });
 
   if (error) {
+    if (error.message.toLowerCase().includes("captcha")) {
+      throw new Error("Please confirm you are human and try again.");
+    }
     if (
       error.message.includes("Invalid login credentials") ||
       error.message.includes("invalid_credentials")

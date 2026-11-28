@@ -1,12 +1,13 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
+import type { TurnstileInstance } from "@marsidev/react-turnstile";
 import {
   ArrowRight,
   Loader2,
@@ -20,6 +21,7 @@ import {
 } from "lucide-react";
 
 import { AuthLayout } from "@/components/auth/AuthLayout";
+import { AuthTurnstile } from "@/components/auth/AuthTurnstile";
 import { Button } from "@/components/ui/button";
 import { signUp, isValidNigerianPhone } from "@/lib/auth/actions";
 import { MIN_AGE, buildDob, validateDob } from "@/lib/auth/age";
@@ -117,6 +119,18 @@ function SignupForm() {
   const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [captchaError, setCaptchaError] = useState<string | null>(null);
+  const turnstileRef = useRef<TurnstileInstance>(null);
+
+  const resetCaptcha = () => {
+    try {
+      turnstileRef.current?.reset();
+    } catch {
+      /* ignore */
+    }
+    setCaptchaToken(null);
+  };
 
   // Capture ?ref=CODE from query param and persist in localStorage safely with expiration
   const refParam = searchParams.get("ref");
@@ -157,13 +171,19 @@ function SignupForm() {
   const termsAccepted = watch("terms");
 
   const onSubmit = async (data: SignupFormData) => {
+    if (!captchaToken) {
+      setCaptchaError("Please confirm you are human and try again.");
+      return;
+    }
     setIsLoading(true);
+    setCaptchaError(null);
     try {
       const day = parseInt(data.dobDay, 10);
       const month = parseInt(data.dobMonth, 10);
       const year = parseInt(data.dobYear, 10);
       const dob = buildDob(year, month, day);
       if (!dob) {
+        resetCaptcha();
         toast.error("Please enter a valid date of birth.");
         return;
       }
@@ -174,6 +194,7 @@ function SignupForm() {
         fullName: data.fullName,
         phoneNumber: data.phone,
         dateOfBirth: dob,
+        captchaToken,
       });
 
       toast.success(res.message);
@@ -197,6 +218,7 @@ function SignupForm() {
         router.push("/login?registered=true");
       }
     } catch (err: unknown) {
+      resetCaptcha();
       const message =
         err instanceof Error
           ? err.message
@@ -465,10 +487,18 @@ function SignupForm() {
         )}
       </div>
 
+      {/* Turnstile */}
+      <AuthTurnstile
+        turnstileRef={turnstileRef}
+        error={captchaError}
+        onTokenChange={setCaptchaToken}
+        onErrorChange={setCaptchaError}
+      />
+
       {/* Submit Action */}
       <Button
         type="submit"
-        disabled={isLoading}
+        disabled={isLoading || !captchaToken}
         className="h-12 w-full rounded-xl bg-primary text-primary-foreground font-semibold hover:bg-primary/90 text-sm sm:text-base gap-2 shadow-lg shadow-primary/10 transition-all min-h-[44px]"
       >
         {isLoading ? (

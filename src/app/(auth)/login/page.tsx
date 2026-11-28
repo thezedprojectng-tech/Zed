@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -8,8 +8,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
 import { ArrowRight, Loader2, Mail, Lock, Eye, EyeOff } from "lucide-react";
+import type { TurnstileInstance } from "@marsidev/react-turnstile";
 
 import { AuthLayout } from "@/components/auth/AuthLayout";
+import { AuthTurnstile } from "@/components/auth/AuthTurnstile";
 import { Button } from "@/components/ui/button";
 import { signIn } from "@/lib/auth/actions";
 
@@ -26,6 +28,18 @@ function LoginForm() {
   const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [captchaError, setCaptchaError] = useState<string | null>(null);
+  const turnstileRef = useRef<TurnstileInstance>(null);
+
+  const resetCaptcha = () => {
+    try {
+      turnstileRef.current?.reset();
+    } catch {
+      /* ignore */
+    }
+    setCaptchaToken(null);
+  };
 
   // Show a confirmation message when arriving from the signup flow
   useEffect(() => {
@@ -52,14 +66,24 @@ function LoginForm() {
   });
 
   const onSubmit = async (data: LoginFormData) => {
+    if (!captchaToken) {
+      setCaptchaError("Please confirm you are human and try again.");
+      return;
+    }
     setIsLoading(true);
+    setCaptchaError(null);
     try {
-      await signIn({ email: data.email, password: data.password });
+      await signIn({
+        email: data.email,
+        password: data.password,
+        captchaToken,
+      });
       toast.success("Welcome back!");
       // Hard navigate so middleware re-evaluates the fresh session cookie
       router.push("/home");
       router.refresh();
     } catch (err: unknown) {
+      resetCaptcha();
       const message = err instanceof Error ? err.message : "Sign in failed. Please try again.";
       toast.error(message);
     } finally {
@@ -145,10 +169,18 @@ function LoginForm() {
         </Link>
       </div>
 
+      {/* Turnstile */}
+      <AuthTurnstile
+        turnstileRef={turnstileRef}
+        error={captchaError}
+        onTokenChange={setCaptchaToken}
+        onErrorChange={setCaptchaError}
+      />
+
       {/* Submit */}
       <Button
         type="submit"
-        disabled={isLoading}
+        disabled={isLoading || !captchaToken}
         className="h-12 w-full rounded-xl bg-primary text-primary-foreground font-semibold hover:bg-primary/90 text-sm sm:text-base gap-2 shadow-lg shadow-primary/10 transition-all min-h-[44px]"
       >
         {isLoading ? (

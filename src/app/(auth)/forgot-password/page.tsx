@@ -1,12 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, Mail, ArrowRight } from "lucide-react";
+import type { TurnstileInstance } from "@marsidev/react-turnstile";
 
 import { AuthLayout } from "@/components/auth/AuthLayout";
+import { AuthTurnstile } from "@/components/auth/AuthTurnstile";
 import { Button } from "@/components/ui/button";
 import {
   forgotPasswordSchema,
@@ -19,6 +21,18 @@ function ForgotPasswordForm() {
   const [sent, setSent] = useState(false);
   const [sentEmail, setSentEmail] = useState("");
   const [rateLimitError, setRateLimitError] = useState("");
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [captchaError, setCaptchaError] = useState<string | null>(null);
+  const turnstileRef = useRef<TurnstileInstance>(null);
+
+  const resetCaptcha = () => {
+    try {
+      turnstileRef.current?.reset();
+    } catch {
+      /* ignore */
+    }
+    setCaptchaToken(null);
+  };
 
   const {
     register,
@@ -29,13 +43,19 @@ function ForgotPasswordForm() {
   });
 
   const onSubmit = async (data: ForgotPasswordData) => {
+    if (!captchaToken) {
+      setCaptchaError("Please confirm you are human and try again.");
+      return;
+    }
     setIsLoading(true);
     setRateLimitError("");
+    setCaptchaError(null);
     try {
-      await sendPasswordResetEmail(data.email);
+      await sendPasswordResetEmail(data.email, captchaToken);
       setSentEmail(data.email);
       setSent(true);
     } catch (err: unknown) {
+      resetCaptcha();
       setRateLimitError(
         err instanceof Error ? err.message : "Something went wrong. Please try again."
       );
@@ -101,9 +121,16 @@ function ForgotPasswordForm() {
         )}
       </div>
 
+      <AuthTurnstile
+        turnstileRef={turnstileRef}
+        error={captchaError}
+        onTokenChange={setCaptchaToken}
+        onErrorChange={setCaptchaError}
+      />
+
       <Button
         type="submit"
-        disabled={isLoading}
+        disabled={isLoading || !captchaToken}
         className="h-12 w-full rounded-xl bg-primary text-primary-foreground font-semibold hover:bg-primary/90 text-sm sm:text-base gap-2 shadow-lg shadow-primary/10 transition-all min-h-[44px]"
       >
         {isLoading ? (
